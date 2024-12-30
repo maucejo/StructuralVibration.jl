@@ -1,0 +1,74 @@
+/*-- scss:defaults --*/
+
+// Colors: Quarto variables
+$primary:#C1002A;
+$secondary:#405A68;
+// // Colors: custom variables
+$primary-light: lighten($primary, 20%);
+$secondary-light: lighten($secondary, 20%);
+
+// // Body
+$body-color:#11304C;
+$body-secondary:#6C757D;
+$body-tertiary-bg:#f8f9fa;
+
+// Fonts
+$headings-font-family: "Raleway";
+// $headings-font-weight: 500;
+
+$font-family-sans-serif: "Lato";
+$font-family-monospace: "Dank Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+// Links
+$link-color:                  $primary;
+$link-decoration:             underline;
+$link-hover-color:            $secondary;
+$link-hover-decoration:       none;
+
+// Paragraphs
+p {
+    text-align: justify;
+}
+
+// Title
+.title {
+    font-size: 2.5em;
+    font-weight: 600;
+    line-height: 1.1em;
+}
+
+.navbar-title {
+font-size: 1em;
+font-weight: bold;
+color: white;
+
+&:hover {
+    border-bottom: 1px solid white !important;
+}
+}
+
+// links
+.navbar-nav .nav-link {
+  color: white !important;
+  border-bottom: 0px hidden white;
+  padding: 2px 2px 1px 2px !important;
+
+  &:hover {
+    border-bottom: 1px solid white !important;
+    padding: 2px 2px 0px 2px !important;
+  }
+}
+
+// Sidebar - Navigation
+.sidebar-navigation .sidebar-item a.active {
+  font-weight: bold;
+}
+
+.sidebar-navigation .sidebar-item a {
+  color: $body-color;
+}
+
+// Sidebar - TOC
+.sidebar nav[role=doc-toc] ul>li>a.active {
+  font-weight: bold;
+}

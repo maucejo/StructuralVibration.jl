@@ -1,0 +1,35 @@
+project:
+  type: website
+
+website:
+  title: "StructuralVibration.jl"
+  favicon: "assets/logo/doclogo.svg"
+  page-navigation: true
+  navbar:
+    logo: "assets/logo/doclogo.svg"
+    left:
+      - text: "Overview"
+        file: overview/index.qmd
+    right:
+      - icon: github
+        href: https://github.com/maucejo/StructuralVibration.jl
+        aria-label: GitHub
+  sidebar:
+    - title: "Overview"
+      contents:
+        - overview/index.qmd
+        - overview/installation.qmd
+
+  page-footer:
+    center: "2025 Mathieu Aucejo &#8729; Powered by [![](/assets/logo/quarto.png){width=4mm}](https://quarto.org) and [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org)"
+
+format:
+  html:
+    theme:
+      - cosmo
+      - assets/doctheme.scss
+    smooth-scroll: true
+    lightbox: true
+
+execute:
+  freeze: auto
