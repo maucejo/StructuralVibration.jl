@@ -28,7 +28,7 @@ F = excitation(rect, t)
 xexact = @. F₀*(Ω₀ - (Ω₀*cos(Ω₀*t) + ξ*ω₀*sin(Ω₀*t))*exp(-ξ*ω₀*t))/m/Ω₀/(Ω₀^2 + ξ^2*ω₀^2)
 
 # Duhamel's integral
-x = forced_response(sdof, F, t)
+x = forced_response(sdof, F, t)[1]
 
 lines(t, xexact, color = :blue)
 lines!(t, x, color = :red, linestyle = :dash)

@@ -146,7 +146,9 @@ function forced_response(s::SDOF, F::Vector{Float64}, t, x₀ = 0., v₀ = 0.; t
 
     xp = Δt*conv(F, h)[1:length(F)]
 
-    return xh .+ xp
+    x = xh .+ xp
+
+    return x, xh, xp
 end
 
 """
