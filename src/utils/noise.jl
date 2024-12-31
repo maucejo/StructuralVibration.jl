@@ -116,8 +116,8 @@ function noisevar1D(x)
     elseif ndim == 2
         nx = size(x, 1)
         noisevar = Vector{Float64}(undef, nx)
-        @inbounds @views for idx ∈ 1:nx
-             noisevar[idx] = noisevar1D_(x[idx, :])
+        @inbounds @views for (idx, xi) in enumerate(eachrow(x))
+             noisevar[idx] = noisevar1D_(xi)
         end
     end
 
@@ -276,25 +276,22 @@ function estimatenoise_(x)
     noisevar = Vector{Float64}(undef, nd)
     σₑ = fill(NaN, nd, nfda)
     Q = Matrix{Float64}(undef, nd, np)
-    @inbounds @views for i ∈ 1:nfda
-        fdai = fda[i]
+    @inbounds @views for (i, fdai) in enumerate(fda)
         posnd = (i+1):ns
         ntrim = ns - i
         noisedata = Matrix{Float64}(undef, nd, ntrim)
         p = Vector{Float64}(undef, ntrim)
-        @inbounds for j ∈ 1:nd
-            xj = x[j, :]
+        @inbounds for (j, xj) in enumerate(eachrow(x))
             noisedata[j, :] .= conv(xj, fdai)[posnd]
         end
-        # noisedata = conv([1.], fdai, x)[:, posnd] # Less time efficient
 
         if ntrim ≥ 2
             # Sorting will provide the necessary percentiles after interpolation.
             sort!(noisedata, dims = 2,  alg = InsertionSort)
             p .= (0.5 .+ collect(Float64, 1:ntrim))./(ntrim + 0.5)
 
-            @inbounds for k ∈ 1:nd
-                itp = LinearInterpolation(noisedata[k, :], p)
+            @inbounds for (k, nk) in enumerate(eachrow(noisedata))
+                itp = LinearInterpolation(nk, p)
                 @. Q[k, :] = (itp(1 - perc) - itp(perc))/2z
             end
 
@@ -302,7 +299,7 @@ function estimatenoise_(x)
             notnan = findall(@. !isnan(Q[1, :]))
 
             # Our noise std estimate is given by the median of the interquantile range(s). This is an ad hoc, but hopefully effective, way of estimating the measurement noise present in the signal.
-            @inbounds for j ∈ 1:nd
+            @inbounds for j in 1:nd
                 σₑ[j, i] = median(Q[j, notnan])
             end
         end
