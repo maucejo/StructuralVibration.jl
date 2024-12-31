@@ -1,4 +1,4 @@
-module VibrationData
+module StructuralVibration
 
 using Parameters, ProgressMeter, LinearAlgebra,
       DSP, Interpolations, PrecompileTools

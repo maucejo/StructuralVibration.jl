@@ -16,8 +16,13 @@ TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 [compat]
 DSP = "0.8.0"
 Interpolations = "0.15.1"
+LazyGrids = "1.0.0"
+LinearAlgebra = "1.11.0"
+Parameters = "0.12.3"
 PrecompileTools = "1.2.1"
+ProgressMeter = "1.10.2"
 TestItems = "1.0.0"
+Test = "1.0.0"
 julia = "1.10"
 
 [extras]
