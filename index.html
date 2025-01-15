@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-04bc85c7675eb93047aefffee8b8c772.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-33f4db4864a347c998c2fcc649fa2d3c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-f0681912ecb9235b0f321e3f0fb419dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -139,6 +139,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./solvers/index.html"> 
 <span class="menu-text">Solvers</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./visualization/index.html"> 
+<span class="menu-text">Visualization</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -195,7 +199,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#mechanical-models" id="toc-mechanical-models" class="nav-link" data-scroll-target="#mechanical-models">Mechanical models</a></li>
   <li><a href="#vibration-data-generation" id="toc-vibration-data-generation" class="nav-link" data-scroll-target="#vibration-data-generation">Vibration data generation</a></li>
-  <li><a href="#measurement-noise" id="toc-measurement-noise" class="nav-link" data-scroll-target="#measurement-noise">Measurement noise</a></li>
   </ul></li>
   <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">License</a></li>
@@ -253,9 +256,9 @@ Warning
 <ul>
 <li>Spring-mass-damper SDOF system</li>
 <li>Spring-mass-damper MDOF system (TODO)</li>
-<li>FE models of bar, rod and beams (TODO)</li>
+<li>FE models of bar, rod and beams</li>
 </ul></li>
-<li><strong>Modal models of continuous model</strong>
+<li><strong>Continuous models</strong>
 <ul>
 <li>Longitudinal and torsional bars for various boundary conditions
 <ul>
@@ -273,6 +276,7 @@ Warning
 </ul></li>
 <li>Simply-supported plate</li>
 </ul></li>
+<li><strong>State space model</strong></li>
 </ul>
 </section>
 <section id="vibration-data-generation" class="level3">
@@ -310,18 +314,15 @@ Warning
 <li>Frequency spectrum
 <ul>
 <li>Modal summation</li>
-<li>Direct method (TODO)</li>
+<li>Direct method</li>
 </ul></li>
 <li>Frequency response function (FRF)
 <ul>
 <li>Modal summation</li>
-<li>Direct method (TODO)</li>
+<li>Direct method</li>
 </ul></li>
 </ul></li>
-</ul>
-</section>
-<section id="measurement-noise" class="level3">
-<h3 class="anchored" data-anchor-id="measurement-noise">Measurement noise</h3>
+<li><strong>Measurement noise</strong>
 <ul>
 <li>Addition of Gaussian white noise with a prescribed SNR</li>
 <li>Measurement noise variance estimation algorithms from noisy data
@@ -330,6 +331,7 @@ Warning
 <li>D’Errico’s method - <a href="https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise">Link to the Matlab version</a></li>
 </ul></li>
 <li>SNR estimation from estimated measurement noise variance</li>
+</ul></li>
 </ul>
 </section>
 </section>
