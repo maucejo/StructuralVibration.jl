@@ -113,9 +113,7 @@ Generates a continuous-time state-space model from the mass, damping, and stiffn
 * `C`: Damping matrix
 
 # Output
-`model`: ContinuousStateSpace
-    * `Ac`: Continuous-time state-space matrix A
-    * `Bc`: Continuous-time state-space matrix B
+`css`: ContinuousStateSpace
 """
 function ss_model(K::Matrix{Float64}, M::Matrix{Float64}, C::Matrix{Float64})
     n = size(K, 1)
@@ -142,7 +140,6 @@ Computes the eigenmodes of a continuous-time state-space model
 
 function eigenmode(css::ContinuousStateSpace, Nₘ)
     (; Ac) = css
-    n = size(Ac, 1)
     λ, Ψ = eigen(Ac)
 
     return λ[1:Nₘ], Ψ[:, 1:Nₘ]
@@ -165,9 +162,6 @@ Solves a discrete-time problem using the state-space model
 
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
-    * `D`: Displacement matrix
-    * `V`: Velocity matrix
-    * `A`: Acceleration matrix
 """
 function solve(prob::StateSpaceProblem, method = :zoh)
     (; css) = prob
@@ -194,6 +188,19 @@ function solve(prob::StateSpaceProblem, method = :zoh)
     return StateSpaceSolution(x[1:m, :], x[m+1:end, :], A)
 end
 
+
+"""
+    solve(prob::StateSpaceProblem, alg = RK4())
+
+Solves a continuous-time problem using the state-space model
+
+# Inputs
+* `prob`: Continuous-time problem
+* `alg`: Time integration algorithm
+
+# Output
+* `StateSpaceSolution`: Solution of the state-space model
+"""
 function solve(prob::StateSpaceProblem, alg = RK4())
     (; css) = prob
     (; Ac, Bc) = css

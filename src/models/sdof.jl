@@ -134,12 +134,12 @@ Structure containing the data for computing the FRF a sdof system
 * `sdof`: Sdof structure
 * `freq``: Vector of frequencies [Hz]
 * `type_exc`: Type of excitation
-    - :force: External force (default)
-    - :base: Base motion
+    * :force: External force (default)
+    * :base: Base motion
 * `type_resp`: Type of response
-    - :dis: Displacement spectrum or Admittance (default)
-    - :vel: Velocity spectrum or Mobility
-    - :acc: Acceleration spectrum or Accelerance
+    * :dis: Displacement spectrum or Admittance (default)
+    * :vel: Velocity spectrum or Mobility
+    * :acc: Acceleration spectrum or Accelerance
 """
 @with_kw struct SdofFRFProblem
     sdof :: Sdof
@@ -183,7 +183,7 @@ end
 Structure containing the data of the solution of a frequency problem for a sdof system
 
 # Fields
-- `x`: Solution of the frequency problem
+* `x`: Solution of the frequency problem
    * Response spectrum (displacement, velocity, acceleration) [m, m/s, m/s²]
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
@@ -196,21 +196,11 @@ end
 
 Compute the free response of a single degree of freedom (Sdof) system.
 
-# Inputs
+# Input
 * `prob`: Structure containing the parameters of the Sdof problem
-    * `sdof`: Sdof structure
-    * `u0`: Initial conditions
-        * `x₀`: Initial displacement
-        * `v₀`: Initial velocity
-    * `t`: Time points at which to evaluate the response
-    * `type_exc`: Type of excitation
-        * :force: External force (default)
-        * :base: Base motion
 
-# Outputs
+# Output
 * `sol`: The response of the system at the given time points
-    * `x`: Free response
-    * `env`: Free response envelope
 """
 function solve(prob::SdofFreeTimeProblem)
     (; sdof, u0, t) = prob
@@ -250,20 +240,10 @@ end
 Computes the forced response of a single degree of freedom (Sdof) system due to an harmonic external force or base motion
 
 # Inputs
-* `prob`: Structure containing the parameters of the Sdof problem
-* `u0`: Initial conditions
-    * `x₀`: Initial displacement
-    * `v₀`: Initial velocity
-* `t`: Time points at which to evaluate the response
-* `exc`: Structure defining the harmonic excitation
-    * `F₀`: Amplitude of the force excitation [N] or base motion [m]
-    * `ω`: Frequency of the excitation [rad/s]
+* `prob`: Structure containing the parameters of the Sdof harmonic problem
 
 # Output
 * `sol`: The response of the system at the given time points
-    * `x`: Total response
-    * `xh`: Homogeneous solution
-    * `xp`: Particular solution
 """
 function solve(prob::SdofHarmonicTimeProblem)
 
@@ -306,21 +286,10 @@ end
 Computes the forced response of a single degree of freedom (Sdof) system due to an arbitrary external force or base motion
 
 # Inputs
-* `prob`: Structure containing the parameters of the Sdof problem
-* `u0`: Initial conditions
-    * `x₀`: Initial displacement
-    * `v₀`: Initial velocity
-* `t`: Time points at which to evaluate the response
-* `F`: External force [N] or base motion [m]
-* `type_exc`: Type of excitation
-    * :force: External force (default)
-    * :base: Base motion
+* `prob`: Structure containing the parameters of the Sdof forced problem
 
 # Output
-- `sol`: The response of the system at the given time points
-    * `x`: Total response
-    * `xh`: Homogeneous solution
-    * `xp`: Particular solution
+* `sol`: The response of the system at the given time points
 """
 function solve(prob::SdofForcedTimeProblem)
 
@@ -376,20 +345,10 @@ end
 Compute the FRF of a single degree of freedom (Sdof) system
 
 # Inputs
-* `prob`: Structure containing the parameters of the Sdof problem
-    * `sdof`: Sdof structure
-    * `freq`: Vector of frequencies [Hz]
-    * `type_exc`: Type of excitation
-        * :force: External force (default)
-        * :base: Base motion
-    * `type_resp`: Type of response
-        * :dis: Displacement spectrum or Admittance (default)
-        * :vel: Velocity spectrum or Mobility
-        * :acc: Acceleration spectrum or Accelerance
+* `prob`: Structure containing the parameters of the Sdof FRF problem
 
 # Output
 * sol: Solution of the FRF problem
-    * x: FRF of the system at the given frequencies
 """
 function solve(prob::SdofFRFProblem)
     (; sdof, freq, type_exc, type_resp) = prob
@@ -417,21 +376,10 @@ end
 Compute the frequency response function of a single degree of freedom (Sdof) system
 
 # Inputs
-* `prob`: Structure containing the parameters of the Sdof problem
-    * `sdof`: Sdof structure
-    * `freq`: Vector of frequencies [Hz]
-    * `F`: Vector of the force excitation [N] or base motion [m]
-    * `type_exc`: Type of excitation
-        * :force: External force (default)
-        * :base: Base motion
-    * `type_resp`: Type of response
-        * :dis: Displacement spectrum or Admittance (default)
-        * :vel: Velocity spectrum or Mobility
-        * :acc: Acceleration spectrum or Accelerance
+* `prob`: Structure containing the parameters of the Sdof frequency problem
 
 # Output
-- sol: Solution of the frequency problem
-    * x: Frequency response spectrum of the system at the given frequencies
+* sol: Solution of the frequency problem
 """
 function solve(prob::SdofFrequencyProblem)
     (; sdof, freq, F, type_exc, type_resp) = prob

@@ -24,38 +24,39 @@ The package is organized into the following functionalities:
 ### Mechanical models
 
 - **Discrete models**
-    - [x] Spring-mass-damper SDOF system
-    - [ ] Spring-mass-damper MDOF system
-    - [ ] FE models of bar, rod and beams
-- **Modal models of continuous model**
-    - [x] Longitudinal and torsional bars for various boundary conditions
+    - Spring-mass-damper SDOF system
+    - Spring-mass-damper MDOF system (TODO)
+    - FE models of bar, rod and beams
+- **Continuous model**
+    - Longitudinal and torsional bars for various boundary conditions
         - Clamped-clamped
         - Clamped-free
         - Free-free
-    - [x] Euler-Bernoulli beams for various boundary conditions
+    - Euler-Bernoulli beams for various boundary conditions
         - Simply-supported at both ends
         - Clamped-clamped
         - Clamped-simply-supported
         - Clamped-free
         - Simply-supported-free
-    - [x] Simply-supported plate
+    - Simply-supported plate
+- **State space model**
 
 ### Vibration data generation
 
 - **Excitation signals**
-    - [x] Triangle wave
-    - [x] Rectangular wave
-    - [x] Hammer impact
-    - [x] Smoothed rectangular wave
-    - [x] Sine wave
-    - [x] Swept sine wave
-    - [x] Gaussian pulse
-    - [x] Colored noise
+    - Triangle wave
+    - Rectangular wave
+    - Hammer impact
+    - Smoothed rectangular wave
+    - Sine wave
+    - Swept sine wave
+    - Gaussian pulse
+    - Colored noise
 
 - **Solution for SDOF systems**
-    - [x] Free response
-    - [x] Forced response due to a harmonic force or a base motion
-    - [x] Forced response due to any external force
+    - Free response
+    - Forced response due to a harmonic force or a base motion
+    - Forced response due to any external force
 
 - **Time-domain integration schemes for linear systems**
     - Central difference scheme
@@ -68,16 +69,15 @@ The package is organized into the following functionalities:
 
 - **Frequency-domain calculations for linear systems**
     - Frequency spectrum
-        - [x] Modal summation
-        - [ ] Direct method
+        - Modal summation
+        - Direct method
     - Frequency response function (FRF)
-        - [x] Modal summation
-        - [ ] Direct method
+        - Modal summation
+        - Direct method
 
-### Measurement noise
-
-- [x] Addition of Gaussian white noise with a prescribed SNR
-- [x] Measurement noise variance estimation algorithms from noisy data
-    - [x] Bayesian estimation
-    - [x] D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
-- [x] SNR estimation from estimated measurement noise variance
+- **Measurement noise**
+    - Addition of Gaussian white noise with a prescribed SNR
+    - Measurement noise variance estimation algorithms from noisy data
+        - Bayesian estimation
+        - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
+    - SNR estimation from estimated measurement noise variance

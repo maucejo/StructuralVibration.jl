@@ -59,6 +59,11 @@ color: white;
   }
 }
 
+// Items spacing
+.navbar-nav .nav-item{
+  padding: 2px 12px 1px 2px !important;
+}
+
 // Sidebar - Navigation
 .sidebar-navigation .sidebar-item a.active {
   font-weight: bold;

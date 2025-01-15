@@ -9,20 +9,24 @@ website:
     logo: "assets/logo/doclogo.svg"
     left:
       - text: "Overview"
-        file: overview/index.qmd
+        file: index.qmd
       - text: "Models"
         file: models/index.qmd
       - text: "Solvers"
         file: solvers/index.qmd
+      - text: "Visualization"
+        file: visualization/index.qmd
     right:
       - icon: github
         href: https://github.com/maucejo/StructuralVibration.jl
         aria-label: GitHub
+
   sidebar:
     - title: "Overview"
       contents:
-        - overview/index.qmd
+        - index.qmd
         - overview/installation.qmd
+
     - title: "Models"
       contents:
         - models/index.qmd
@@ -34,11 +38,19 @@ website:
       # Continuous models
       # Excitation models
       # Noise models
+
     - title: "Solvers"
       contents:
         - solvers/index.qmd
       # Time solvers (modal + direct)
       # Frequency solvers (modal + direct)
+
+    - title: "Visualization"
+      contents:
+        - visualization/index.qmd
+      # Mode shapes
+      # Frequency response
+      # Time response
 
   page-footer:
     center: "2025 Mathieu Aucejo &#8729; Powered by [![](/assets/logo/quarto.png){width=4mm}](https://quarto.org) and [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org)"
