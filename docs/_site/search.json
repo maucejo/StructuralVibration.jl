@@ -1,0 +1,79 @@
+[
+  {
+    "objectID": "overview/installation.html",
+    "href": "overview/installation.html",
+    "title": "Installation",
+    "section": "",
+    "text": "Note\n\n\n\nIf you are already a Julia user, you can skip this section.\nThis section explains how to install Julia and Vibration.jl.",
+    "crumbs": [
+      "Overview",
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "overview/installation.html#install-julia",
+    "href": "overview/installation.html#install-julia",
+    "title": "Installation",
+    "section": "Install Julia ",
+    "text": "Install Julia \nThere exists several ways of installing Julia and managing versions. The recommended way consists in installing juliaup, which is a Julia version manager.\n\nWindows\nOn Windows, juliaup can be installed directly from the Windows store or from a terminal by typing the following command:\nwinget install julia -s msstore\nMacOS and Linux\nOn MacOS and Linux, juliaup can be installed from a terminal by typing:\ncurl -fsSL https://install.julialang.org | sh\nor by using software repositories:\n# MacOS\nbrew install juliaup\n\n# Arch-based distributions\nyay -S juliaup\n\nOnce juliaup is installed, the latest version of Julia can be installed from a terminal as follows:\njuliaup add release",
+    "crumbs": [
+      "Overview",
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "overview/installation.html#install-vibrationdata.jl",
+    "href": "overview/installation.html#install-vibrationdata.jl",
+    "title": "Installation",
+    "section": "Install VibrationData.jl ",
+    "text": "Install VibrationData.jl \nThe package is not yet registered in the Julia General Registry. To install the package, you can use the following command:\n(Yourenv) pkg&gt; add \"git@https://github.com/maucejo/VibrationData.jl.git\"",
+    "crumbs": [
+      "Overview",
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "StructuralVibration.jl",
+    "section": "",
+    "text": "StructuralVibration.jl is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.",
+    "crumbs": [
+      "Overview",
+      "StructuralVibration.jl"
+    ]
+  },
+  {
+    "objectID": "index.html#features",
+    "href": "index.html#features",
+    "title": "StructuralVibration.jl",
+    "section": "Features",
+    "text": "Features\nThe package provides the following features:\n\nMechanical models\n\nDiscrete models\n\nSpring-mass-damper SDOF system\nSpring-mass-damper MDOF system (TODO)\nFE models of bar, rod and beams\n\nContinuous models\n\nLongitudinal and torsional bars for various boundary conditions\n\nClamped-clamped\nClamped-free\nFree-free\n\nEuler-Bernoulli beams for various boundary conditions\n\nSimply-supported at both ends\nClamped-clamped\nClamped-simply-supported\nClamped-free\nSimply-supported-free\n\nSimply-supported plate\n\nState space model\n\n\n\nVibration data generation\n\nExcitation signals\n\nTriangle wave\nRectangular wave\nHammer impact\nSmoothed rectangular wave\nSine wave\nSwept sine wave\nGaussian pulse\nColored noise\n\nSolution for SDOF systems\n\nFree response\nForced response due to a harmonic force or a base motion\nForced response due to any external force or base motion (Duhamel’s integral)\n\nTime-domain integration schemes for linear second order systems\n\nCentral difference scheme\nRK4\nNewmark-beta method\nHHT\nWBZ\nGeneralized-alpha\nMid-Point rule\n\nFrequency-domain calculations for linear systems\n\nFrequency spectrum\n\nModal summation\nDirect method\n\nFrequency response function (FRF)\n\nModal summation\nDirect method\n\n\nMeasurement noise\n\nAddition of Gaussian white noise with a prescribed SNR\nMeasurement noise variance estimation algorithms from noisy data\n\nBayesian estimation\nD’Errico’s method - Link to the Matlab version\n\nSNR estimation from estimated measurement noise variance",
+    "crumbs": [
+      "Overview",
+      "StructuralVibration.jl"
+    ]
+  },
+  {
+    "objectID": "index.html#reproducibility",
+    "href": "index.html#reproducibility",
+    "title": "StructuralVibration.jl",
+    "section": "Reproducibility",
+    "text": "Reproducibility\n\n\n\n\n\n\nProject direct dependencies\n\n\n\n\n\nProject StructuralVibration v0.1.0\nStatus\n  [717857b8] DSP v0.8.0\n  [a98d9a8b] Interpolations v0.15.1\n  [7031d0ef] LazyGrids v1.0.0\n  [d96e819e] Parameters v0.12.3\n  [aea7be01] PrecompileTools v1.2.1\n  [92933f4c] ProgressMeter v1.10.2\n  [1c621080] TestItems v1.0.0\n  [37e2e46d] LinearAlgebra v1.11.0\n\n\n\n\n\n\n\n\n\nJulia version and machine information\n\n\n\n\n\nJulia Version 1.11.2\nCommit 5e9a32e7af (2024-12-01 20:02 UTC)\nBuild Info:\n  Official https://julialang.org/ release\nPlatform Info:\n  OS: Windows (x86_64-w64-mingw32)\n  CPU: 8 × Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz\n  WORD_SIZE: 64\n  LLVM: libLLVM-16.0.6 (ORCJIT, skylake)\nThreads: 8 default, 0 interactive, 4 GC (on 8 virtual cores)\nEnvironment:\n  JULIA_EDITOR = code",
+    "crumbs": [
+      "Overview",
+      "StructuralVibration.jl"
+    ]
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "StructuralVibration.jl",
+    "section": "License",
+    "text": "License\nThis package is under MIT License.",
+    "crumbs": [
+      "Overview",
+      "StructuralVibration.jl"
+    ]
+  }
+]
