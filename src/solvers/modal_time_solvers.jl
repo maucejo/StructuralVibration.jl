@@ -1,0 +1,372 @@
+"""
+    ModalTimeProblem(K, M, ξₙ, Nₘ = size(K, 1))
+
+Structure containing data for the modal time solver
+
+# Fields
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `ξₙ`: Damping ratios
+* `Nₘ`: Number of modes to retain inf the modal basis
+"""
+@with_kw struct FreeModalTimeProblem
+    K :: Matrix{Float64}
+    M :: Matrix{Float64}
+    ξₙ :: Vector{Float64}
+    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
+    t
+    Nₘ :: Int
+
+    function FreeModalTimeProblem(K, M, ξₙ, u0, t, Nₘ = size(K, 1))
+        if !isa(ξₙ, Array)
+            ξₙ = fill(ξₙ, Nₘ)
+        elseif length(ξₙ) != Nₘ
+            error("The number of damping ratios must be equal to Nₘ")
+        end
+
+        new(K, M, ξₙ, u0, t, Nₘ)
+    end
+end
+
+"""
+    HarmonicModalTimeProblem(K, M, ξₙ, u0, t, F, ω = 0., Nₘ = size(K, 1))
+
+Structure containing data for the modal time solver for computing the forced response due to an harmonic excitation
+
+# Fields
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `ξₙ`: Damping ratios
+* `u0`: Initial conditions
+    * `u0[1]`: Initial displacement
+    * `u0[2]`: Initial velocity
+* `t`: Time points at which to evaluate the response
+* `F`: Amplitude vector
+* `ω`: Excitation frequency (for harmonic excitation)
+* `Nₘ`: Number of modes to retain in the modal basis
+"""
+@with_kw struct HarmonicModalTimeProblem
+    K :: Matrix{Float64}
+    M :: Matrix{Float64}
+    ξₙ :: Vector{Float64}
+    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
+    t
+    F :: Vector{Float64}
+    ω :: Float64
+    Nₘ :: Int
+
+    function HarmonicModalTimeProblem(K, M, ξₙ, u0, t, F, ω, Nₘ = size(K, 1))
+        if !isa(ξₙ, Array)
+            ξₙ = fill(ξₙ, Nₘ)
+        elseif length(ξₙ) != Nₘ
+            error("The number of damping ratios must be equal to Nₘ")
+        end
+
+        new(K, M, ξₙ, u0, t, F, ω, Nₘ)
+    end
+end
+
+"""
+    ForcedModalTimeProblem(K, M, ξₙ, u0, t, F, Nₘ = size(K, 1))
+
+Structure containing data for modal time solver for computing the forced response due to an arbitrary excitation
+
+# Fields
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `ξₙ`: Damping ratios
+* `u0`: Initial conditions
+    * `u0[1]`: Initial displacement
+    * `u0[2]`: Initial velocity
+* `t`: Time points at which to evaluate the response
+* `F`: External force matrix
+* `Nₘ`: Number of modes to retain in the modal basis
+"""
+@with_kw struct ForcedModalTimeProblem
+    K :: Matrix{Float64}
+    M :: Matrix{Float64}
+    ξₙ :: Vector{Float64}
+    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
+    t
+    F :: Matrix{Float64}
+    Nₘ :: Int
+
+    function ForcedModalTimeProblem(K, M, ξₙ, u0, t, F, Nₘ = size(K, 1))
+        if !isa(ξₙ, Array)
+            ξₙ = fill(ξₙ, Nₘ)
+        elseif length(ξₙ) != Nₘ
+            error("The number of damping ratios must be equal to Nₘ")
+        end
+
+        new(K, M, ξₙ, u0, t, F, Nₘ)
+    end
+end
+
+"""
+    ModalTimeSolution(D, V, A)
+
+Structure containing problem solutions
+
+# Fields
+* `D`: Displacement matrix
+* `V`: Velocity matrix
+* `A`: Acceleration matrix
+"""
+@with_kw struct ModalTimeSolution
+    D :: Matrix{Float64}
+    V :: Matrix{Float64}
+    A :: Matrix{Float64}
+end
+
+"""
+    solve(prob::FreeModalTimeProblem)
+
+Compute the free response of a multi-degrees of freedom (Mdof) system using the modal approach.
+
+# Inputs
+* `prob`: Structure containing the parameters of the Mdof problem
+    * `K`: Stiffness matrix
+    * `M`: Mass matrix
+    * `ξₙ`: Damping ratios
+    * `u0`: Initial conditions
+        * `x₀`: Initial displacement
+        * `v₀`: Initial velocity
+    * `t`: Time points at which to evaluate the response
+    * `Nₘ`: Number of modes to retain in the modal basis
+
+# Outputs
+* `sol`: ModalTimeSolution structure containing the response of the system at the given time points
+    * `D`: Displacement matrix
+    * `V`: Velocity matrix
+    * `A`: Acceleration matrix
+"""
+function solve(prob::FreeModalTimeProblem)
+    (; K, M, ξₙ, Nₘ, u0, t) = prob
+    x₀, v₀ = u0
+    nt = length(t)
+
+    # Modal analysis
+    λ, Φ = eigen(K, M)
+    λₘ = λ[1:Nₘ]
+    Φₘ = Φ[:, 1:Nₘ]
+    ωₙ = .√λₘ;
+    # Note: The mode shapes are mass-normalized, so Mₙ = I
+
+    # Modal initial conditions
+    qₓ = Φₘ'*M*x₀
+    qᵥ = Φₘ'*M*v₀
+
+    # Modal coordinate calculation
+    q = typeof(M)(undef, nt, Nₘ)
+    dq = typeof(M)(undef, nt, Nₘ)
+    ddq = typeof(M)(undef, nt, Nₘ)
+    for (m, (ωₘ, ξₘ, Aₘ, qₘ))  in enumerate(zip(ωₙ, ξₙ, qₓ, qᵥ))
+        if ξₘ < 1.
+            Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
+            Ξₘ = ξₘ*ωₘ
+
+            # Constant Bₙ
+            Bₘ = (qₘ + Ξₘ*Aₘ)/Ωₘ
+
+            @. q[:, m] = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
+
+            @. dq[:, m] = (-Aₘ*Ξₘ*cos(Ωₘ*t) - Bₘ*Ξₘ*sin(Ωₘ*t) - Aₘ*Ωₘ*sin(Ωₘ*t) + Bₘ*Ωₘ*cos(Ωₘ*t))*exp(-Ξₘ*t)
+
+            @. ddq[:, m] = (Aₘ*Ξₘ^2*cos(Ωₘ*t) + Bₘ*Ξₘ^2*sin(Ωₘ*t) + 2*Aₘ*Ξₘ*Ωₘ*sin(Ωₘ*t) - 2*Bₘ*Ξₘ*Ωₘ*cos(Ωₘ*t) - Aₘ*Ωₘ^2*cos(Ωₘ*t) - Bₘ*Ωₘ^2*sin(Ωₘ*t))*exp(-Ξₘ*t)
+
+        elseif ξₘ == 1.
+            Bₘ = qₘ + ω*Aₘ - ω*ρₘ*sin(ϕₘ)
+
+            @. q[:, m] = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
+
+            @. dq[:, m] = (Bₘ - ωₘ*(Aₘ + Bₘ*t))*exp(-ωₘ*t)
+
+            @. ddq[:, m] = (ωₘ^2*(Aₘ + Bₘ*t) - 2Bₘ*ωₘ)*exp(-ωₘ*t)
+
+        else
+            βₘ = ωₘ*sqrt(ξₘ^2 - 1)
+            Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/βₘ
+
+            @. q[:, m] = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
+
+            @. dq[:, m] = (Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t) - Ξₘ*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t)
+
+            @. ddq[:, m] = (Aₘ*βₘ^2*cosh(βₘ*t) + Bₘ*βₘ^2*sinh(βₘ*t) - 2*Ξₘ*(Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t)) + Ξₘ^2*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t)
+        end
+    end
+
+    # Computation of the displacement
+    D = Φₘ*q';
+    V = Φₘ*dq';
+    A = Φₘ*ddq';
+
+    return ModalTimeSolution(D, V, A)
+end
+
+"""
+    solve(prob::ForcedModalTimeProblem)
+
+Compute the forced response of a multi-degrees of freedom (Mdof) system due to an harmonic excitation using the modal approach.
+
+# Inputs
+* `prob`: Structure containing the parameters of the Mdof problem
+    * `K`: Stiffness matrix
+    * `M`: Mass matrix
+    * `ξₙ`: Damping ratios
+    * `u0`: Initial conditions
+        * `x₀`: Initial displacement
+        * `v₀`: Initial velocity
+    * `t`: Time points at which to evaluate the response
+    * `F`: External force matrix or amplitude vector
+    * `ω`: Excitation frequency (for harmonic excitation only)
+    * `Nₘ`: Number of modes to retain in the modal basis
+
+# Outputs
+* `sol`: ModalTimeSolution structure containing the response of the system at the given time points
+    * `D`: Displacement matrix
+    * `V`: Velocity matrix
+    * `A`: Acceleration matrix
+"""
+function solve(prob::HarmonicModalTimeProblem)
+    (; K, M, ξₙ, u0, t, F, ω, Nₘ) = prob
+    x₀, v₀ = u0
+
+    if size(F, 2) ≠ 1
+        error("The external force amplitude must be a vector")
+    end
+
+    # Modal analysis
+    λ, Φ = eigen(K, M)
+    λₘ = λ[1:Nₘ]
+    Φₘ = Φ[:, 1:Nₘ]
+    ωₙ = .√λₘ;
+    # Note: The mode shapes are mass-normalized, so Mₙ = I
+
+    # Modal Damped angular frequencies vector
+    Ω = @. ωₙ*sqrt(1 - ξₙ^2)
+
+    # Modal viscous Damping vector
+    Ξ = ξₙ.*ωₙ
+
+    # Modal participation factor
+    Lₙ = Φₘ'*F
+
+    # Particular solution
+    Qₚ = @. Lₙ/(ωₙ^2 - ω^2 + 2im*Ξ*ω)
+    ρ = abs.(Qₚ)
+    ϕ = angle.(Qₚ)
+
+    # Modal initial conditions
+    qₓ = Φₘ'*M*x₀
+    qᵥ = Φₘ'*M*v₀
+
+    A = @. qₓ - ρ*cos(ϕ)
+
+    # Modal coordinate calculation
+    q = typeof(M)(undef, nt, Nₘ)
+    dq = typeof(M)(undef, nt, Nₘ)
+    ddq = typeof(M)(undef, nt, Nₘ)
+    for (m, (ωₘ, ξₘ, Aₘ, qₘ, ρₘ, ϕₘ))  in enumerate(zip(ωₙ, ξₙ, A, qᵥ, ρ, ϕ))
+        if ξₘ < 1.
+            Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
+            Ξₘ = ξₘ*ωₘ
+
+            # Constant Bₙ
+            Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/Ωₘ
+
+            @. q[:, m] = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t) + ρₘ*cos(ω*t + ϕₘ)
+
+            @. dq[:, m] = (-Aₘ*Ξₘ*cos(Ωₘ*t) - Bₘ*Ξₘ*sin(Ωₘ*t) - Aₘ*Ωₘ*sin(Ωₘ*t) + Bₘ*Ωₘ*cos(Ωₘ*t))*exp(-Ξₘ*t) - ρₘ*ω*sin(ω*t + ϕₘ)
+
+            @. ddq[:, m] = (Aₘ*Ξₘ^2*cos(Ωₘ*t) + Bₘ*Ξₘ^2*sin(Ωₘ*t) + 2*Aₘ*Ξₘ*Ωₘ*sin(Ωₘ*t) - 2*Bₘ*Ξₘ*Ωₘ*cos(Ωₘ*t) - Aₘ*Ωₘ^2*cos(Ωₘ*t) - Bₘ*Ωₘ^2*sin(Ωₘ*t))*exp(-Ξₘ*t) - ρₘ*ω^2*cos(ω*t + ϕₘ)
+
+        elseif ξₘ == 1.
+            Bₘ = qₘ + ω*Aₘ - ω*ρₘ*sin(ϕₘ)
+
+            @. q[:, m] = (Aₘ + Bₘ*t)*exp(-ωₘ*t) + ρₘ*cos(ω*t + ϕₘ)
+
+            @. dq[:, m] = (Bₘ - ωₘ*(Aₘ + Bₘ*t))*exp(-ωₘ*t) - ρₘ*ω*sin(ω*t + ϕₘ)
+
+            @. ddq[:, m] = (ωₘ^2*(Aₘ + Bₘ*t) - 2Bₘ*ωₘ)*exp(-ωₘ*t) - ρₘ*ω^2*cos(ω*t + ϕₘ)
+
+        else
+            βₘ = ωₘ*sqrt(ξₘ^2 - 1)
+            Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/βₘ
+
+            @. q[:, m] = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t) + ρₘ*cos(ω*t + ϕₘ)
+
+            @. dq[:, m] = (Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t) - Ξₘ*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t) - ρₘ*ω*sin(ω*t + ϕₘ)
+
+            @. ddq[:, m] = (Aₘ*βₘ^2*cosh(βₘ*t) + Bₘ*βₘ^2*sinh(βₘ*t) - 2*Ξₘ*(Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t)) + Ξₘ^2*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t) - ρₘ*ω^2*cos(ω*t + ϕₘ)
+        end
+    end
+
+    D = Φₘ*q';
+    V = Φₘ*dq';
+    A = Φₘ*ddq';
+
+    return ModalTimeSolution(D, V, A)
+end
+
+
+"""
+    solve(prob::ModalTimeProblem, u0, t, F::Matrix{Float64})
+
+Compute the forced response of a multi-degrees of freedom (Mdof) system due to an arbitrary excitation using the modal approach.
+
+# Inputs
+* `prob`: Structure containing the parameters of the Mdof problem
+* `u0`: Initial conditions
+    * `x₀`: Initial displacement
+    * `v₀`: Initial velocity
+* `t`: Time points at which to evaluate the response
+* `F`: Matrix of the arbitrary excitation [N]
+"""
+function solve(prob::ForcedModalTimeProblem)
+    (; K, M, ξₙ, u0, t, F, Nₘ) = prob
+    x₀, v₀ = u0
+    nt = length(t)
+    Δt = t[2] - t[1]
+
+    # Modal analysis
+    λ, Φ = eigen(K, M)
+    λₘ = λ[1:Nₘ]
+    Φₘ = Φ[:, 1:Nₘ]
+    ωₙ = .√λₘ;
+    # Note: The mode shapes are mass-normalized, so Mₙ = I
+
+    # Modal participation factor
+    Lₙ = Φₘ'*F
+
+    # Modal initial conditions
+    Aₙ = Φₘ'*M*x₀
+    Bₙ = Φₘ'*M*v₀
+
+    # Modal coordinate calculation
+    q = zeros(nt, Nₘ)
+    qₕ = zeros(nt)
+    h = zeros(nt)
+    for (m, (ωₘ, ξₘ, Aₘ, Bₘ)) in enumerate(zip(ωₙ, ξₙ, Aₙ, Bₙ))
+        if ξₘ < 1.
+            Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
+            Ξₘ = ξₘ*ωₘ
+            @. qₕ = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
+            @. h = exp(-Ξₘ*t)*sin(Ωₘ*t)/Ωₘ
+        elseif ξₘ == 1.
+            @. h = t*exp(-ωₘ*t)
+        else
+            βₘ = ωₘ*sqrt(ξₘ^2 - 1)
+            Ξₘ = ξₘ*ωₘ
+            @. qₕ = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
+            @. h = exp(-Ξₘ*t)*sinh(βₘ*t)/βₘ
+        end
+
+        q[:, m] .= qₕ .+ Δt*conv(Lₙ[n, :], h)[1:nt]
+    end
+
+    D = Φₘ*q';
+    V = gradient(D, t);
+    A = gradient(V, t);
+
+    return ModalTimeSolution(D, V, A)
+end

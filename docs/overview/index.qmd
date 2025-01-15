@@ -1,0 +1,132 @@
+---
+title: StructuralVibration.jl
+format:
+  html:
+    toc: true
+    number-sections: false
+---
+
+<center>
+    ![](../assets/logo/doclogo.svg){width=35%}
+</center>
+
+<br/>
+
+[![Generic badge](https://img.shields.io/badge/Version-0.1.0-cornflowerblue.svg)]()
+[![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+
+`StructuralVibration.jl` is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.
+
+::: {.callout-warning}
+The package is under active development and is not yet registered in the Julia General Registry. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
+:::
+
+## Features
+
+The package provides the following features:
+
+### Mechanical models
+
+- **Discrete models**
+    - Spring-mass-damper SDOF system
+    - Spring-mass-damper MDOF system (TODO)
+    - FE models of bar, rod and beams (TODO)
+- **Modal models of continuous model**
+    - Longitudinal and torsional bars for various boundary conditions
+        - Clamped-clamped
+        - Clamped-free
+        - Free-free
+    - Euler-Bernoulli beams for various boundary conditions
+        - Simply-supported at both ends
+        - Clamped-clamped
+        - Clamped-simply-supported
+        - Clamped-free
+        - Simply-supported-free
+    - Simply-supported plate
+
+### Vibration data generation
+
+- **Excitation signals**
+    - Triangle wave
+    - Rectangular wave
+    - Hammer impact
+    - Smoothed rectangular wave
+    - Sine wave
+    - Swept sine wave
+    - Gaussian pulse
+    - Colored noise
+
+- **Solution for SDOF systems**
+    - Free response
+    - Forced response due to a harmonic force or a base motion
+    - Forced response due to any external force or base motion (Duhamel's integral)
+
+- **Time-domain integration schemes for linear second order systems**
+    - Central difference scheme
+    - RK4
+    - Newmark-beta method
+    - HHT
+    - WBZ
+    - Generalized-alpha
+    - Mid-Point rule
+
+- **Frequency-domain calculations for linear systems**
+    - Frequency spectrum
+        - Modal summation
+        - Direct method (TODO)
+    - Frequency response function (FRF)
+        - Modal summation
+        - Direct method (TODO)
+
+### Measurement noise
+
+- Addition of Gaussian white noise with a prescribed SNR
+- Measurement noise variance estimation algorithms from noisy data
+    - Bayesian estimation
+    - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
+- SNR estimation from estimated measurement noise variance
+
+## Reproducibility
+
+::: {.callout-note collapse=true appearance="simple" icon=false}
+
+# Project direct dependencies
+
+```python
+Project StructuralVibration v0.1.0
+Status
+  [717857b8] DSP v0.8.0
+  [a98d9a8b] Interpolations v0.15.1
+  [7031d0ef] LazyGrids v1.0.0
+  [d96e819e] Parameters v0.12.3
+  [aea7be01] PrecompileTools v1.2.1
+  [92933f4c] ProgressMeter v1.10.2
+  [1c621080] TestItems v1.0.0
+  [37e2e46d] LinearAlgebra v1.11.0
+```
+:::
+
+::: {.callout-note collapse=true appearance="simple" icon=false}
+
+# Julia version and machine information
+
+```python
+Julia Version 1.11.2
+Commit 5e9a32e7af (2024-12-01 20:02 UTC)
+Build Info:
+  Official https://julialang.org/ release
+Platform Info:
+  OS: Windows (x86_64-w64-mingw32)
+  CPU: 8 × Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz
+  WORD_SIZE: 64
+  LLVM: libLLVM-16.0.6 (ORCJIT, skylake)
+Threads: 8 default, 0 interactive, 4 GC (on 8 virtual cores)
+Environment:
+  JULIA_EDITOR = code
+```
+:::
+
+## License
+
+This package is under MIT License.
