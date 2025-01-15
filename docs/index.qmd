@@ -7,7 +7,7 @@ format:
 ---
 
 <center>
-    ![](../assets/logo/doclogo.svg){width=35%}
+    ![](./assets/logo/doclogo.svg){width=35%}
 </center>
 
 <br/>
