@@ -88,17 +88,25 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
 """
 function c2d(css::ContinuousStateSpace, h, method)
     (; Ac, Bc) = css
-    Ad = exp(Ac*h)
+
     if method == :zoh
+        Ad = exp(Ac*h)
         Bd = (A .- I)*(A\Β)
         return DiscreteStateSpace(Ad, Bd)
     elseif method == :foh
+        Ad = exp(Ac*h)
         Bd = (A .- I)*(A\Β)
         Bg = (Ad .- Ac*h .- I)*(Ac^2\Bc)/h
         return DiscreteStateSpace(Ad, Bd .- Bg, Bg)
     elseif method == :blh
+        Ad = exp(Ac*h)
         Bd = A*Bc*h
         return DiscreteStateSpace(Ad, Bd)
+    elseif method == :rk4
+        Ad = [24(I + Ac*h) + 12(Ac*h)^2 + 4(Ac*h)^3 + (Ac*h)^4]/24
+        Bf = h*[12I + 8Ac*h + 3(Ac*h)^2 + (Ac*h)^3]*Bc/24
+        Bg = h*[12I + 4Ac*h + (Ac*h)^2]*Bc/24
+        return DiscreteStateSpace(Ad, Bf, Bg)
     end
 end
 
@@ -159,6 +167,7 @@ Solves a discrete-time problem using the state-space model
     * `:zoh`: Zero-order Hold method
     * `:foh`: First-order Hold method
     * `:blh`: Band-limited Hold method
+    * `:rk4`: Runge-Kutta 4th order method
 
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
@@ -178,7 +187,7 @@ function solve(prob::StateSpaceProblem, method = :zoh)
     @views @inbounds for k in 1:nt-1
         if method == :zoh && method == :blh
             x[:, k+1] .= dss.Ad*x[:, k] .+ dss.Bd*F[:, k]
-        elseif method == :foh
+        elseif method == :foh || method == :rk4
             x[:, k+1] .= dss.Ad*x[:, k] .+ dss.Bd*F[:, k] .+ dss.Bdp*F[:, k+1]
         end
 
