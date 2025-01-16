@@ -308,7 +308,7 @@ function solve(prob::SdofForcedTimeProblem)
         Ω₀ = ω₀*√(1 - ξ^2)
         A = x₀
         B = (v₀ + ξ*ω₀*x₀)/Ω₀
-        @. xh = exp(-ξ*ω₀*t)*(A*cos(Ω₀*t) + B*sin(Ω₀*t))
+        @. xh = (A*cos(Ω₀*t) + B*sin(Ω₀*t))*exp(-ξ*ω₀*t)
         @. h = exp(-ξ*ω₀*t)*sin(Ω₀*t)/m/Ω₀
     elseif ξ == 1.
         A = x₀
@@ -319,7 +319,7 @@ function solve(prob::SdofForcedTimeProblem)
         β = ω₀*√(ξ^2 - 1)
         A = x₀
         B = (v₀ + ξ*ω₀*x₀)/β
-        @. xh = exp(-ξ*ω₀*t)*(A*cosh(β*t) + B*sinh(β*t))
+        @. xh = (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω₀*t)
         @. h = exp(-ξ*ω₀*t)*sinh(β*t)/m/β
     end
 

@@ -164,7 +164,7 @@ Solves a discrete-time problem using the state-space model
 * `StateSpaceSolution`: Solution of the state-space model
 """
 function solve(prob::StateSpaceProblem, method = :zoh)
-    (; css) = prob
+    (; css, u0, h, F) = prob
     dss = c2d(css, h, method)
 
     n, nt = size(F)
@@ -202,7 +202,7 @@ Solves a continuous-time problem using the state-space model
 * `StateSpaceSolution`: Solution of the state-space model
 """
 function solve(prob::StateSpaceProblem, alg = RK4())
-    (; css) = prob
+    (; css, u0, h, F) = prob
     (; Ac, Bc) = css
 
     n, nt = size(F)

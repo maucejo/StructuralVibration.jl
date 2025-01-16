@@ -19,7 +19,6 @@ The mode shapes must be mass-normalized
     freq
     ϕₒ :: Matrix{Float64}
     ϕₑ :: Matrix{Float64}
-    freq
 
     function ModalFRFProblem(ωₙ, ξₙ, freq, ϕₒ, ϕₑ = Matrix{Float64}[])
         if !isa(ξₙ, Array)
