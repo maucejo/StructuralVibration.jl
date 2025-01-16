@@ -159,9 +159,9 @@ function solve(prob::FreeModalTimeProblem)
     end
 
     # Modal coordinate calculation
-    q = typeof(M)(undef, nt, Nₘ)
-    dq = typeof(M)(undef, nt, Nₘ)
-    ddq = typeof(M)(undef, nt, Nₘ)
+    q = Matrix{Float64}(undef, nt, Nₘ)
+    dq = Matrix{Float64}(undef, nt, Nₘ)
+    ddq = Matrix{Float64}(undef, nt, Nₘ)
     for (m, (ωₘ, ξₘ, Aₘ, qₘ))  in enumerate(zip(ωₙ, ξₙ, qₓ, qᵥ))
         if ξₘ < 1.
             Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
@@ -172,18 +172,18 @@ function solve(prob::FreeModalTimeProblem)
 
             @. q[:, m] = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
 
-            @. dq[:, m] = (-Aₘ*Ξₘ*cos(Ωₘ*t) - Bₘ*Ξₘ*sin(Ωₘ*t) - Aₘ*Ωₘ*sin(Ωₘ*t) + Bₘ*Ωₘ*cos(Ωₘ*t))*exp(-Ξₘ*t)
+            @. dq[:, m] = Ωₘ*(-Aₘ*sin(Ωₘ*t) + Bₘ*cos(Ωₘ*t))*exp(-ξ*ω₀*t) - Ξₘ*q[:, m]
 
-            @. ddq[:, m] = (Aₘ*Ξₘ^2*cos(Ωₘ*t) + Bₘ*Ξₘ^2*sin(Ωₘ*t) + 2*Aₘ*Ξₘ*Ωₘ*sin(Ωₘ*t) - 2*Bₘ*Ξₘ*Ωₘ*cos(Ωₘ*t) - Aₘ*Ωₘ^2*cos(Ωₘ*t) - Bₘ*Ωₘ^2*sin(Ωₘ*t))*exp(-Ξₘ*t)
+            @. ddq[:, m] = -2Ξₘ*dq[:, m] - ωₘ^2*q[:, m]
 
         elseif ξₘ == 1.
             Bₘ = qₘ + ω*Aₘ - ω*ρₘ*sin(ϕₘ)
 
             @. q[:, m] = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
 
-            @. dq[:, m] = (Bₘ - ωₘ*(Aₘ + Bₘ*t))*exp(-ωₘ*t)
+            @. dq[:, m] = Bₘ*exp(-ωₘ*t) - ωₘ*q[:, m]
 
-            @. ddq[:, m] = (ωₘ^2*(Aₘ + Bₘ*t) - 2Bₘ*ωₘ)*exp(-ωₘ*t)
+            @. ddq[:, m] = -2ωₘ*dq[:, m] - ω₀^2*q[:, m]
 
         else
             βₘ = ωₘ*sqrt(ξₘ^2 - 1)
@@ -191,9 +191,9 @@ function solve(prob::FreeModalTimeProblem)
 
             @. q[:, m] = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
 
-            @. dq[:, m] = (Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t) - Ξₘ*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t)
+            @. dq[:, m] = βₘ*(Aₘ*sinh(βₘ*t) + Bₘ*cosh(βₘ*t))*exp(-Ξₘ*t) - Ξₘ*q[:, m]
 
-            @. ddq[:, m] = (Aₘ*βₘ^2*cosh(βₘ*t) + Bₘ*βₘ^2*sinh(βₘ*t) - 2*Ξₘ*(Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t)) + Ξₘ^2*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t)
+            @. ddq[:, m] = -2Ξₘ*dq[:, m] - ωₘ^2*q[:, m]
         end
     end
 
@@ -256,9 +256,12 @@ function solve(prob::HarmonicModalTimeProblem)
     A = @. qₓ - ρ*cos(ϕ)
 
     # Modal coordinate calculation
-    q = typeof(M)(undef, nt, Nₘ)
-    dq = typeof(M)(undef, nt, Nₘ)
-    ddq = typeof(M)(undef, nt, Nₘ)
+    q = Matrix{Float64}(undef, nt, Nₘ)
+    dq = Matrix{Float64}(undef, nt, Nₘ)
+    ddq = Matrix{Float64}(undef, nt, Nₘ)
+    qh = Vector{Float64}(undef, nt)
+    dqh = Vector{Float64}(undef, nt)
+    dqh = Vector{Float64}(undef, nt)
     for (m, (ωₘ, ξₘ, Aₘ, qₘ, ρₘ, ϕₘ))  in enumerate(zip(ωₙ, ξₙ, A, qᵥ, ρ, ϕ))
         if ξₘ < 1.
             Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
@@ -267,31 +270,27 @@ function solve(prob::HarmonicModalTimeProblem)
             # Constant Bₙ
             Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/Ωₘ
 
-            @. q[:, m] = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t) + ρₘ*cos(ω*t + ϕₘ)
-
-            @. dq[:, m] = (-Aₘ*Ξₘ*cos(Ωₘ*t) - Bₘ*Ξₘ*sin(Ωₘ*t) - Aₘ*Ωₘ*sin(Ωₘ*t) + Bₘ*Ωₘ*cos(Ωₘ*t))*exp(-Ξₘ*t) - ρₘ*ω*sin(ω*t + ϕₘ)
-
-            @. ddq[:, m] = (Aₘ*Ξₘ^2*cos(Ωₘ*t) + Bₘ*Ξₘ^2*sin(Ωₘ*t) + 2*Aₘ*Ξₘ*Ωₘ*sin(Ωₘ*t) - 2*Bₘ*Ξₘ*Ωₘ*cos(Ωₘ*t) - Aₘ*Ωₘ^2*cos(Ωₘ*t) - Bₘ*Ωₘ^2*sin(Ωₘ*t))*exp(-Ξₘ*t) - ρₘ*ω^2*cos(ω*t + ϕₘ)
-
+            @. qh = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
+            @. dqh = Ωₘ*(-Aₘ*sin(Ωₘ*t) + Bₘ*cos(Ωₘ*t))*exp(-Ξₘ*t) - Ξₘ*qh
+            @. ddqh = -2Ξₘ*dqₕ - ωₘ^2*qₕ
         elseif ξₘ == 1.
-            Bₘ = qₘ + ω*Aₘ - ω*ρₘ*sin(ϕₘ)
+            Bₘ = qₘ + ωₘ*Aₘ + ρₘ*ω*sin(ϕₘ)
 
-            @. q[:, m] = (Aₘ + Bₘ*t)*exp(-ωₘ*t) + ρₘ*cos(ω*t + ϕₘ)
-
-            @. dq[:, m] = (Bₘ - ωₘ*(Aₘ + Bₘ*t))*exp(-ωₘ*t) - ρₘ*ω*sin(ω*t + ϕₘ)
-
-            @. ddq[:, m] = (ωₘ^2*(Aₘ + Bₘ*t) - 2Bₘ*ωₘ)*exp(-ωₘ*t) - ρₘ*ω^2*cos(ω*t + ϕₘ)
-
+            @. qh = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
+            @. dqh = Bₘ*exp(-ωₘ*t) - ωₘ*qh
+            @. ddqh = -2ωₘ*dqh - ωₘ^2*qh
         else
             βₘ = ωₘ*sqrt(ξₘ^2 - 1)
             Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/βₘ
 
-            @. q[:, m] = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t) + ρₘ*cos(ω*t + ϕₘ)
-
-            @. dq[:, m] = (Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t) - Ξₘ*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t) - ρₘ*ω*sin(ω*t + ϕₘ)
-
-            @. ddq[:, m] = (Aₘ*βₘ^2*cosh(βₘ*t) + Bₘ*βₘ^2*sinh(βₘ*t) - 2*Ξₘ*(Aₘ*βₘ*sinh(βₘ*t) + Bₘ*βₘ*cosh(βₘ*t)) + Ξₘ^2*(Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t)))*exp(-Ξₘ*t) - ρₘ*ω^2*cos(ω*t + ϕₘ)
+            @. qh = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
+            @. dqh = βₘ*(Aₘ*sinh(βₘ*t) + Bₘ*cosh(βₘ*t))*exp(-Ξₘ*t) - Ξₘ*qh
+            @. ddqh = -2Ξₘ*dqh - ωₘ^2*qh
         end
+
+        @. q[:, m] = qh + ρₘ*cos(ω*t + ϕₘ)
+        @. dq[:, m] = dqh - ρₘ*ω*sin(ω*t + ϕₘ)
+        @. ddq[:, m] = ddqh - ρₘ*ω^2*cos(ω*t + ϕₘ)
     end
 
     D = Φₘ*q';
@@ -347,28 +346,28 @@ function solve(prob::ForcedModalTimeProblem)
     end
 
     # Modal coordinate calculation
-    q = zeros(nt, Nₘ)
-    qₕ = zeros(nt)
-    h = zeros(nt)
-    for (m, (ωₘ, ξₘ, Aₘ, Bₘ)) in enumerate(zip(ωₙ, ξₙ, Aₙ, Bₙ))
+    q = Matrix{Float64}(undef, nt, Nₘ)
+    qh = Vector{Float64}(undef, nt)
+    h = Vector{Float64}(undef, nt)
+    for (m, (ωₘ, ξₘ, qxₘ, qvₘ)) in enumerate(zip(ωₙ, ξₙ, qₓ, qᵥ))
         if ξₘ < 1.
             Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
             Ξₘ = ξₘ*ωₘ
-            Aₘ = qₓ
-            Bₘ = (qᵥ + Ξₘ*qₓ)/Ωₘ
-            @. qₕ = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
+            Aₘ = qxₘ
+            Bₘ = (qvₘ + Ξₘ*qxₘ)/Ωₘ
+            @. qh = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
             @. h = exp(-Ξₘ*t)*sin(Ωₘ*t)/Ωₘ
         elseif ξₘ == 1.
-            Aₘ = qₓ
-            Bₘ = qᵥ + ωₘ*qₓ
-            @. qₕ = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
+            Aₘ = qxₘ
+            Bₘ = qv₍ + ωₘ*qxₘ
+            @. qh = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
             @. h = t*exp(-ωₘ*t)
         else
             βₘ = ωₘ*sqrt(ξₘ^2 - 1)
             Ξₘ = ξₘ*ωₘ
-            Aₘ = qₓ
-            Bₘ = (qᵥ + Ξₘ*qₓ)/βₘ
-            @. qₕ = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
+            Aₘ = qxₘ
+            Bₘ = (qvₘ + Ξₘ*qxₘ)/βₘ
+            @. qh = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
             @. h = exp(-Ξₘ*t)*sinh(βₘ*t)/βₘ
         end
 
