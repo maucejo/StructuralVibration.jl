@@ -132,7 +132,7 @@ Compute the free response of a multi-degrees of freedom (Mdof) system using the 
 # Inputs
 * `prob`: Structure containing the parameters of the Mdof problem
 
-# Outputs
+# Output
 * `sol`: ModalTimeSolution structure containing the response of the system at the given time points
 """
 function solve(prob::FreeModalTimeProblem)
@@ -213,7 +213,7 @@ Compute the forced response of a multi-degrees of freedom (Mdof) system due to a
 # Inputs
 * `prob`: Structure containing the parameters of the Mdof problem
 
-# Outputs
+# Output
 * `sol`: ModalTimeSolution structure containing the response of the system at the given time points
 """
 function solve(prob::HarmonicModalTimeProblem)
@@ -303,17 +303,15 @@ end
 
 
 """
-    solve(prob::ModalTimeProblem, u0, t, F::Matrix{Float64})
+    solve(prob::ModalTimeProblem)
 
 Compute the forced response of a multi-degrees of freedom (Mdof) system due to an arbitrary excitation using the modal approach.
 
 # Inputs
 * `prob`: Structure containing the parameters of the Mdof problem
-* `u0`: Initial conditions
-    * `x₀`: Initial displacement
-    * `v₀`: Initial velocity
-* `t`: Time points at which to evaluate the response
-* `F`: Matrix of the arbitrary excitation [N]
+
+# Output
+* `sol`: ModalTimeSolution structure containing the response of the system at the given time points
 """
 function solve(prob::ForcedModalTimeProblem)
     (; K, M, ξₙ, u0, t, F, Nₘ, ismodal) = prob
