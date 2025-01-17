@@ -416,7 +416,7 @@ function excitation(type::ColoredNoise, t)
         white_fft = rfft(randn(N))
         freq = rfftfreq(N, fs)
 
-        scale = zeros(length(freq))
+        scale = ones(length(freq))
         if color == :pink
             @. scale[2:end] = 1/sqrt(freq[2:end])
         elseif color == :blue
@@ -446,9 +446,11 @@ function excitation(type::ColoredNoise, t)
         elseif band_freq[1] < freq[1] && band_freq[2] < freq[end]
             # Low-pass filter
             filter_type = Lowpass(band_freq[2])
-        else
+        elseif band_freq[1] > freq[1] && band_freq[2] > freq[end]
             # High-pass filter
             filter_type = Highpass(band_freq[1])
+        else
+            return x .+ colored_noise
         end
 
         df = digitalfilter(filter_type, Butterworth(4); fs)

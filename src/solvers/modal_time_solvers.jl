@@ -88,12 +88,12 @@ Structure containing data for modal time solver for computing the forced respons
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
 @with_kw struct ForcedModalTimeProblem
-    K :: Matrix{Float64}
-    M :: Matrix{Float64}
+    K
+    M
     ξₙ :: Vector{Float64}
     u0 :: Tuple{Vector{Float64}, Vector{Float64}}
     t
-    F :: Matrix{Float64}
+    F
     Nₘ :: Int
     ismodal :: Bool
 
@@ -114,14 +114,14 @@ end
 Structure containing problem solutions
 
 # Fields
-* `D`: Displacement matrix
-* `V`: Velocity matrix
-* `A`: Acceleration matrix
+* `D`: Displacement matrix or vector
+* `V`: Velocity matrix or vector
+* `A`: Acceleration matrix or vector
 """
 @with_kw struct ModalTimeSolution
-    D :: Matrix{Float64}
-    V :: Matrix{Float64}
-    A :: Matrix{Float64}
+    D
+    V
+    A
 end
 
 """
@@ -153,7 +153,7 @@ function solve(prob::FreeModalTimeProblem)
         qᵥ = Φₘ'*M*v₀
     else
         Φₘ = M
-        ωₙ = .√(diag(K))
+        ωₙ = .√(diagm(K))
         qₓ = x₀
         qᵥ = v₀
     end
@@ -237,7 +237,7 @@ function solve(prob::HarmonicModalTimeProblem)
         qᵥ = Φₘ'*M*v₀
     else
         Φₘ = M
-        ωₙ = .√(diag(K))
+        ωₙ = .√(diagm(K))
         qₓ = x₀
         qᵥ = v₀
     end

@@ -1,5 +1,5 @@
 """
-    DiscreteTimeProblem(K::Matrix{Float64}, M::Matrix{Float64}, C::Matrix{Float64}, u0::Tuple{Vector{Float64}, Vector{Float64}}, h::Float64, F::Matrix{Float64})
+    DiscreteTimeProblem(K, M, C, u0::Tuple{Vector{Float64}, Vector{Float64}}, h::Float64, F::Matrix{Float64})
 
 Structure containing data for the time solver
 
@@ -14,12 +14,12 @@ Structure containing data for the time solver
 * F: External force matrix
 """
 @with_kw struct DiscreteTimeProblem
-    K :: Matrix{Float64}
-    M :: Matrix{Float64}
-    C :: Matrix{Float64}
+    K
+    M
+    C
     u0 :: Tuple{Vector{Float64}, Vector{Float64}}
     h :: Float64
-    F :: Matrix{Float64}
+    F
 end
 
 """
@@ -28,14 +28,14 @@ end
 Structure containing problem solutions
 
 # Fields
-* D: Displacement matrix
-* V: Velocity matrix
-* A: Acceleration matrix
+* D: Displacement matrix or vector
+* V: Velocity matrix or vector
+* A: Acceleration matrix or vector
 """
 @with_kw struct DiscreteTimeSolution
-    D :: Matrix{Float64}
-    V :: Matrix{Float64}
-    A :: Matrix{Float64}
+    D
+    V
+    A
 end
 
 # Solvers

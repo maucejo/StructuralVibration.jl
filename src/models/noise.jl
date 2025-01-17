@@ -4,17 +4,12 @@
 Adds a Gaussian White Noise (AWGN) to a signal `x` with a given SNR.
 
 # Inputs
-- `x`: signal - Matrix{ComplexF64}
-- `snr_dB`: signal to noise ratio [dB] - Float64
-- `rst`: reset the random number generator - Bool
+* `x`: signal
+* `snr_dB`: signal to noise ratio [dB]
+* `rst`: reset the random number generator - Bool
 
 # Output
-- `y`: noisy signal - Matrix{ComplexF64}
-
-# Example
-```julia-repl
-julia> y = agwn(x, 25.)
-```
+* `y`: noisy signal - Matrix{ComplexF64}
 """
 function agwn(x, snr_dB, rst = true)
     # Reset the RNG if required
@@ -22,15 +17,154 @@ function agwn(x, snr_dB, rst = true)
         rng = MersenneTwister(1000)
     end
 
-    N, L = size(x)                          # Dimensions des données
-    SNR = 10^(snr_dB/10.)                   # SNR en échelle linéaire
-    En = sum(abs2, x, dims = 2)/L           # Énergie du signal
-    V = En/SNR                              # Variance du bruit
+    N, L = size(x)                          # Data dimensions
+    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
+    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    V = En/SNR                              # Noise variance
 
-    σ = sqrt.(V)                           # Écart-type
-    n = σ.*randn(rng, eltype(x), N, L)    # Bruit
+    σ = sqrt.(V)                            # Standard deviation
+    n = σ.*randn(rng, eltype(x), N, L)      # Gaussian noise
 
     return x .+ n
+end
+
+"""
+    acn(x, snr_dB, rst = true)
+
+Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
+
+# Inputs
+* `x`: Signal
+* `snr_dB`: Signal to noise ratio [dB]
+* `freq`: Frequency range of interest
+* `color`: Color of the noise
+    * `:white` (default)
+    * `:pink`
+    * `:blue`
+    * `:brown`
+    * `:purple`
+* `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
+* `rst`: reset the random number generator
+
+# Output
+* `y`: noisy signal
+"""
+function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = true)
+    # Reset the RNG if required
+    if rst
+        rng = MersenneTwister(1000)
+    end
+
+    N, L = size(x)                          # Data dimensions
+    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
+    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    V = En/SNR                              # Noise variance
+
+    σ = sqrt.(V)                            # Standard deviation
+
+    white_noise = randn(rng, eltype(x), N, L)
+    scale = ones(L)
+    if color == :pink
+        @. scale[2:end] = 1/sqrt(freq[2:end])
+    elseif color == :blue
+        @. scale = sqrt(freq)
+    elseif color == :brown
+        @. scale[2:end] = 1/freq[2:end]
+    elseif color == :purple
+        scale .= freq
+    end
+
+    # Energy preservation of the white noise
+    scale ./= sqrt(mean(scale.^2))
+    colored_noise = white_noise.*scale
+
+    # Colored noise with scaled variance
+    colored_noise .*= σ/std(colored_noise)
+
+    return x .+ colored_noise
+end
+
+"""
+    acn(x, snr_dB, rst = true)
+
+Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
+
+# Inputs
+* `x`: Signal
+* `snr_dB`: Signal to noise ratio [dB]
+* `freq`: Frequency range of interest
+* `color`: Color of the noise
+    * `:white` (default)
+    * `:pink`
+    * `:blue`
+    * `:brown`
+    * `:purple`
+* `fs`: Sampling frequency [Hz]
+* `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
+* `rst`: reset the random number generator
+
+# Output
+* `y`: noisy signal
+"""
+function acn(x::VecOrMat{Float64}, snr_dB, color = :white, fs, band_freq = Float64[], rst = true)
+    # Reset the RNG if required
+    if rst
+        rng = MersenneTwister(1000)
+    end
+
+    N, L = size(x)                          # Data dimensions
+    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
+    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    V = En/SNR                              # Noise variance
+
+    σ = sqrt.(V)                            # Standard deviation
+
+    white_fft = rfft(randn(rng, N, L), 2)
+    freq = rfftfreq(N, fs)
+
+    scale = ones(L)
+    if color == :pink
+        @. scale[2:end] = 1/sqrt(freq[2:end])
+    elseif color == :blue
+        @. scale = sqrt(freq)
+    elseif color == :brown
+        @. scale[2:end] = 1/freq[2:end]
+    elseif color == :purple
+        scale .= freq
+    end
+
+    # Energy preservation of the white noise
+    scale ./= sqrt(mean(scale.^2))
+    colored_fft = white_fft.*scale'
+
+    # Colored noise with scaled variance
+    colored_noise = irfft(colored_fft, L, 2)
+    colored_noise .*= σ/std(colored_noise)
+
+    if length(band_freq) > 0
+        flag = true
+        if band_freq[1] > freq[1] && band_freq[2] < freq[end]
+            # Band-pass filter
+            filter_type = Bandpass(band_freq[1], band_freq[2])
+        elseif band_freq[1] < freq[1] && band_freq[2] < freq[end]
+            # Low-pass filter
+            filter_type = Lowpass(band_freq[2])
+        elseif band_freq[1] > freq[1] && band_freq[2] > freq[end]
+            # High-pass filter
+            filter_type = Highpass(band_freq[1])
+        else
+            flag = false
+        end
+
+        if flag
+            df = digitalfilter(filter_type, Butterworth(4); fs)
+            for i in 1:N
+                colored_noise[i, :] .= filtfilt(df, colored_noise[i, :])
+            end
+        end
+    end
+
+    return x .+ colored_noise
 end
 
 """
@@ -39,16 +173,11 @@ end
 Estimates the SNR of a signal `x` with a given variance `var`.
 
 # Inputs
-- `x`: signal - Matrix{ComplexF64}
-- `var`: variance - Float64
+* `x`: Signal
+* `var`: Variance
 
 # Output
-- `SNR`: signal to noise ratio [dB] - Float64
-
-# Example
-```julia-repl
-julia> SNR = estimated_SNR(x, 1e-3)
-```
+* `SNR`: signal to noise ratio [dB] - Float64
 """
 function estimated_SNR(x, var)
     L = size(x, 2)
@@ -65,17 +194,13 @@ end
 Estimates the noise variance of a signal `x` using the method specified by `method`.
 
 # Inputs
-- `x`: signal - Matrix{ComplexF64}
-- `method`: method to estimate the noise variance - Symbol
-    - `:bayes`: Bayesian denoising
-    - `:derrico`: method proposed by John D'Errico in [1]
+* `x`: Signal
+* `method`: Method to estimate the noise variance - Symbol
+    * `:bayes`: Bayesian denoising
+    * `:derrico`: method proposed by John D'Errico in [1]
 
 # Output
-- `noisevar`: noise variance - Vector{Float64}
-
-# Example
-```julia-repl
-julia> noisevar = varest(x, :bayes)
+* `noisevar`: Noise variance - Vector{Float64}
 ```
 
 # Reference
@@ -97,15 +222,10 @@ end
 Estimates the noise variance of a signal `x` using Bayesian denoising.
 
 # Inputs
-- `x`: signal - Matrix{ComplexF64}
+* `x`: Signal
 
 # Output
-- `noisevar`: noise variance - Vector{Float64}
-
-# Example
-```julia-repl
-julia> noisevar = noisevar1D(x)
-```
+* `noisevar`: Noise variance - Vector{Float64}
 """
 function noisevar1D(x)
     # Initialisation
@@ -132,11 +252,10 @@ Estimates the noise variance of a signal `x` using Bayesian regularization.
 Note: This function is not intended to be used directly
 
 # Input
-- `x`: signal - Vector{Float64}
+* `x`: Signal - Vector{Float64}
 
 # Output
-
-- `noisevar`: noise variance - Float64
+* `noisevar`: Noise variance - Float64
 """
 function noisevar1D_(x)
     # Valeurs propres de la matrice de lissage d'ordre 1
@@ -180,13 +299,12 @@ Function to be optimized in `noisevar1D_`.
 Note: This function is not intended to be used directly
 
 # Inputs
-
-- `L`: parameter to be optimized - Float64
-- `z`: signal - Vector{Float64}
-- `s²`: eigenvalues of the smoothing matrix - Vector{Float64}
+* `L`: Parameter to be optimized - Float64
+* `z`: Signal - Vector{Float64}
+* `s²`: Eigenvalues of the smoothing matrix - Vector{Float64}
 
 # Output
-- `f`: function to be optimized - Float64
+* `f`: function to be optimized - Float64
 """
 function func!(L, z, s²)
     n = length(z)
@@ -210,10 +328,10 @@ end
 Estimates the noise variance of a signal `x` using the method proposed by John D'Errico in [1].
 
 # Input
-- `x`: signal - Matrix{ComplexF64}
+- `x`: Signal
 
 # Output
-- `noisevar`: noise variance - Vector{Float64}
+- `noisevar`: Noise variance - Vector{Float64}
 
 # Example
 ```julia-repl
@@ -239,15 +357,10 @@ Estimates the noise variance of a signal `x` using the method proposed by John D
 Note: This function is not intended to be used directly
 
 # Input
-- `x`: signal - Vector{Float64}
+* `x`: Signal
 
 # Output
-- `noisevar`: noise variance - Float64
-
-# Example
-```julia-repl
-julia> noisevar = estimatenoise_(x)
-```
+* `noisevar`: Noise variance - Float64
 """
 function estimatenoise_(x)
     nd, ns = size(x)

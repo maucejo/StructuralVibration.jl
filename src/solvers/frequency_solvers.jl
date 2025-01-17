@@ -17,10 +17,10 @@ The mode shapes must be mass-normalized
     ωₙ :: Vector{Float64}
     ξₙ :: Vector{Float64}
     freq
-    ϕₒ :: Matrix{Float64}
-    ϕₑ :: Matrix{Float64}
+    ϕₒ
+    ϕₑ
 
-    function ModalFRFProblem(ωₙ, ξₙ, freq, ϕₒ, ϕₑ = Matrix{Float64}[])
+    function ModalFRFProblem(ωₙ, ξₙ, freq, ϕₒ, ϕₑ)
         if !isa(ξₙ, Array)
             ξₙ = fill(ξₙ, length(ωₙ))
         elseif length(ξₙ) != length(ωₙ)
@@ -45,18 +45,20 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * Sₑ: Selection matrix for excitation points
 """
 @with_kw struct DirectFRFProblem
-    K :: Matrix{Float64}
-    M :: Matrix{Float64}
-    C :: Matrix{Float64}
+    K
+    M
+    C
     freq
-    Sₒ :: Matrix{Float64}
-    Sₑ :: Matrix{Float64}
+    Sₒ
+    Sₑ
+
+    DirectFRFProblem(K, M, C, freq, Sₒ = I(size(K, 1)), Sₑ = I(size(K, 1))) = new(K, M, C, freq, Sₒ, Sₑ)
 end
 
 """
     ModalFreqProblem(ωₙ, ξₙ, Fₙ, freq, ϕₒ)
 
-Structure containing the data feeding the modal solver for calculating the modal frequencies
+Structure containing the data feeding the modal solver for calculating the frequency reponse by modal approach
 
 # Fields
 * ωₙ: Resonance frequencies
@@ -68,9 +70,9 @@ Structure containing the data feeding the modal solver for calculating the modal
 @with_kw struct ModalFreqProblem
     ωₙ :: Vector{Float64}
     ξₙ :: Vector{Float64}
-    Fₙ :: Matrix{Float64}
+    Fₙ
     freq
-    ϕₒ :: Matrix{Float64}
+    ϕₒ
 
     function ModalFreqProblem(ωₙ, ξₙ, Fₙ, freq, ϕₒ)
         if !isa(ξₙ, Array)
@@ -97,12 +99,14 @@ Structure containing the data feeding the direct solver for calculating the moda
 * Sₒ: Selection matrix for observation points
 """
 @with_kw struct DirectFreqProblem
-    K :: Matrix{Float64}
-    M :: Matrix{Float64}
-    C :: Matrix{Float64}
-    F :: Matrix{Float64}
+    K
+    M
+    C
+    F
     freq
-    Sₒ :: Matrix{Float64}
+    Sₒ
+
+    DirectFreqProblem(K, M, C, F, freq, Sₒ = I(size(K, 1))) = new(K, M, C, F, freq, Sₒ)
 end
 
 """
@@ -187,7 +191,6 @@ Computes the FRF matrix by direct method
 # Output
 * sol: FRFSolution structure
 """
-
 function solve(m::DirectFRFProblem, type = :dis, ismat = false)
     # Initialisation
     (; K, M, C, freq, Sₒ, Sₑ) = m
@@ -246,7 +249,7 @@ function solve(m::ModalFreqProblem, type = :dis)
     indm = diagind(M)
 
     p = Progress(Nf, color = :black, desc = "Frequency Response - Modal approach...", showspeed = true)
-    @inbounds for (f, ω, F) in enumerate(zip(ωf, eachcol(Fₙ)))
+    @inbounds for (f, (ω, F)) in enumerate(zip(ωf, eachcol(Fₙ)))
         next!(p)
         @. M[indm] = 1/(ωₙ^2 - ω^2 + 2im*ξₙ*ωₙ*ω)
         y[:, f] .= ϕₒ*M*F
@@ -291,7 +294,7 @@ function solve(m::DirectFreqProblem, type = :dis)
     D = Matrix{ComplexF64}(undef, Ndofs, Ndofs)
 
     p = Progress(Nf, color = :black, desc = "Frequency Response - Direct method...", showspeed = true)
-    @inbounds for (f, ω, Fₑ) in enumerate(zip(ωf, eachcol(F)))
+    @inbounds for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
         next!(p)
         D .= (K + 1im*ω*C  - ω^2*M)\Fₑ
         y[:, f] .= Sₒ*D
