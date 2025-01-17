@@ -382,7 +382,6 @@ function excitation(type::SweptSine, t)
 end
 
 function excitation(type::GaussianPulse, t)
-
     (; F₀, tstart, duration, fc, precision) = type
 
     Ft = zeros(length(t))

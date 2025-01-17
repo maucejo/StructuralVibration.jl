@@ -167,6 +167,38 @@ function acn(x::VecOrMat{Float64}, snr_dB, color = :white, fs, band_freq = Float
     return x .+ colored_noise
 end
 
+function mult_noise(x, snr_dB, rst = true)
+    # Reset the RNG if required
+    if rst
+        rng = MersenneTwister(1000)
+    end
+
+    N, L = size(x)
+    SNR = 10^(snr_dB/10.)
+    n = randn(rng, eltype(x), N, L)/sqrt(SNR)
+
+    return @. (1. + n)*x
+end
+
+function mixed_noise(x, snr_dB, rst = true)
+    # Reset the RNG if required
+    if rst
+        rng = MersenneTwister(1000)
+    end
+
+    N, L = size(x)                          # Data dimensions
+    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
+    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    V = En/SNR                              # Noise variance
+
+    σ = sqrt.(V)                            # Standard deviation
+    addn = σ.*randn(rng, eltype(x), N, L)   # Gaussian noise
+
+    muln = randn(rng, eltype(x), N, L)/sqrt(SNR)
+
+    return @. (1. + muln)*x + addn
+end
+
 """
     estimated_SNR(x, var)
 
