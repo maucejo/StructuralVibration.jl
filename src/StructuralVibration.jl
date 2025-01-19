@@ -10,9 +10,9 @@ export Sdof, Bar, Rod, Beam, Plate,
 # Structs - FE and discrete models
 export Mesh
 
-# # Structs - Excitations
-# export Rectangle, Triangle, Hammer, SmoothRect,
-#        SineWave, SweptSine, GaussianPulse, ColoredNoise
+# Structs - Excitations
+export Rectangle, Triangle, Hammer, SmoothRect,
+       SineWave, SweptSine, GaussianPulse, ColoredNoise
 
 # # Structs - Problems
 export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
