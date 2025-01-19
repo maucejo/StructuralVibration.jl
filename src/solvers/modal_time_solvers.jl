@@ -1,5 +1,5 @@
 """
-    ModalTimeProblem(K, M, ξₙ, Nₘ = size(K, 1); ismodal = false)
+    FreeModalTimeProblem(K, M, ξₙ, Nₘ = size(K, 1); ismodal = false)
 
 Structure containing data for the modal time solver
 

@@ -142,7 +142,7 @@ end
 
 
 """
-    solve(prob::StateSpaceProblem, alg = RK4())
+    solve(prob::StateTimeSpaceProblem, alg = RK4())
 
 Solves a continuous-time problem using the state-space model
 
@@ -153,7 +153,7 @@ Solves a continuous-time problem using the state-space model
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
 """
-function solve(prob::StateSpaceProblem, alg = RK4())
+function solve(prob::StateSpaceTimeProblem, alg = RK4())
     (; css, u0, h, F) = prob
     (; Ac, Bc) = css
 
@@ -236,19 +236,20 @@ function solve(m::StateSpaceFRFProblem, type = :dis, ismat = false)
 end
 
 """
-    solve(m::StateSpaceFRFProblem, type = :dis, ismat = false, Nₘ = Int[])
+    solve(m::StateSpaceFRFProblem, Nₘ = Int[], type = :dis, ismat = false, )
 
 Computes the FRF matrix by modal method
 
 # Parameter
 * m: Structure containing the problem data
+* Nₘ: Number of eigenmodes to keep in the modal basis
 * type: Type of FRF to compute (:dis, :vel, :acc)
 * ismat: Return the FRF matrix as a 3D array (default = false)
 
 # Output
 * sol: StateSpaceFRFSolution
 """
-function solve(m::StateSpaceFRFProblem, type = :dis, ismat = false, Nₘ)
+function solve(m::StateSpaceFRFProblem, Nₘ = Int[], type = :dis, ismat = false, )
     # Initialisation
     (; css, freq, Sₒ, Sₑ) = m
     Nₒ = size(Sₒ, 1)
@@ -339,12 +340,13 @@ function solve(m::StateSpaceFreqProblem, type = :dis)
 end
 
 """
-    solve(m::StateSpaceFreqProblem, type = :dis, Nₘ)
+    solve(m::StateSpaceFreqProblem, Nₘ = Int[], type = :dis)
 
 Computes the frequency response by modal method
 
 # Inputs
 * `m`: Structure containing the problem data
+* `Nₘ`: Number of eigenmodes to keep in the modal basis
 * `type::Symbol`: Type of FRF to compute
     * `:dis`: Displacement
     * `:vel`: Velocity

@@ -15,6 +15,14 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
+[weakdeps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+
+[Extensions]
+CairoMakieExt = "CairoMakie"
+GLMakieExt = "GLMakie"
+
 [compat]
 DSP = "0.8.0"
 FFTW = "1.8.0"

@@ -92,21 +92,20 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
 # Inputs
 * `x`: Signal
 * `snr_dB`: Signal to noise ratio [dB]
-* `freq`: Frequency range of interest
+* `fs`: Sampling frequency [Hz]
 * `color`: Color of the noise
     * `:white` (default)
     * `:pink`
     * `:blue`
     * `:brown`
     * `:purple`
-* `fs`: Sampling frequency [Hz]
 * `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
 * `rst`: reset the random number generator
 
 # Output
 * `y`: noisy signal
 """
-function acn(x::VecOrMat{Float64}, snr_dB, color = :white, fs, band_freq = Float64[], rst = true)
+function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :white,  band_freq = Float64[], rst = true)
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -167,6 +166,19 @@ function acn(x::VecOrMat{Float64}, snr_dB, color = :white, fs, band_freq = Float
     return x .+ colored_noise
 end
 
+"""
+    mult_noise(x, snr_dB, rst = true)
+
+Adds a multiplicative Gaussian White Noise (AWGN) to a signal `x` with a given SNR
+
+# Inputs
+* `x`: Signal
+* `snr_dB`: Signal to noise ratio [dB]
+* `rst`: reset the random number generator
+
+# Output
+* `y`: noisy signal
+"""
 function mult_noise(x, snr_dB, rst = true)
     # Reset the RNG if required
     if rst
@@ -180,6 +192,19 @@ function mult_noise(x, snr_dB, rst = true)
     return @. (1. + n)*x
 end
 
+"""
+    mixed_noise(x, snr_dB, rst = true)
+
+Adds both additive and multiplicative Gaussian White Noise to a signal `x` with a given SNR
+
+# Inputs
+* `x`: Signal
+* `snr_dB`: Signal to noise ratio [dB]
+* `rst`: reset the random number generator
+
+# Output
+* `y`: noisy signal
+"""
 function mixed_noise(x, snr_dB, rst = true)
     # Reset the RNG if required
     if rst
