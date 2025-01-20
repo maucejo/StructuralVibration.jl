@@ -1,6 +1,6 @@
 module CairoMakieExt
 
-using CairoMakie
+using StructuralVibration, CairoMakie
 
 include("./common_plots.jl")
 end

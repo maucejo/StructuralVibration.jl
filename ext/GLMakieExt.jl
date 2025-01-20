@@ -1,6 +1,6 @@
 module GLMakieExt
 
-using GLMakie
+using StructuralVibration, GLMakie
 
 include("./common_plots.jl")
 end

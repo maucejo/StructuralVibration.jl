@@ -236,7 +236,7 @@ function solve(m::StateSpaceFRFProblem, type = :dis, ismat = false)
 end
 
 """
-    solve(m::StateSpaceFRFProblem, Nₘ = Int[], type = :dis, ismat = false, )
+    solve(m::StateSpaceFRFProblem, Nₘ::Int, type = :dis, ismat = false)
 
 Computes the FRF matrix by modal method
 
@@ -249,7 +249,7 @@ Computes the FRF matrix by modal method
 # Output
 * sol: StateSpaceFRFSolution
 """
-function solve(m::StateSpaceFRFProblem, Nₘ = Int[], type = :dis, ismat = false, )
+function solve(m::StateSpaceFRFProblem, Nₘ::Int, type = :dis, ismat = false)
     # Initialisation
     (; css, freq, Sₒ, Sₑ) = m
     Nₒ = size(Sₒ, 1)
@@ -356,7 +356,7 @@ Computes the frequency response by modal method
 # Output
 `sol`: StateSpaceFreqSolution
 """
-function solve(m::StateSpaceFreqProblem, type = :dis, Nₘ)
+function solve(m::StateSpaceFreqProblem, Nₘ::Int, type = :dis)
     # Initialisation
     (; css, freq, F, Sₒ) = m
     Nₒ = size(Sₒ, 1)
