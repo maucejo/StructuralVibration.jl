@@ -28,21 +28,30 @@ export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
 export excitation, modefreq, modeshape, eigenmode, modal_matrices, solve,
        assembly, selection_matrix, agwn, acn, mult_noise, mix_noise, varest, estimated_SNR, c2d, ss_model
 
-# Include files - Models
+# Include files - Sdof
 include("models/sdof.jl")
+include("solvers/sdof_solvers.jl")
+
+# Include files - Continuous structures
 include("models/oned_structure.jl")
 include("models/plate.jl")
 include("models/modal_model.jl")
-include("models/state_space.jl")
+
+# Include files - FEM
 include("models/FEmodel.jl")
+include("solvers/direct_time_solvers.jl")
+
+
+
+include("models/state_space.jl")
+
 include("models/excitation.jl")
 include("models/noise.jl")
 
 # Include files - Solvers
-include("solvers/sdof_solvers.jl")
 include("solvers/state_space_solvers.jl")
 include("solvers/frequency_solvers.jl")
-include("solvers/direct_time_solvers.jl")
+
 include("solvers/modal_time_solvers.jl")
 
 # Include files - Utils

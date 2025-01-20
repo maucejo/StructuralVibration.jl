@@ -115,7 +115,7 @@ Solves a discrete-time problem using the state-space model
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
 """
-function solve(prob::StateSpaceTimeProblem, method = :zoh)
+function solve(prob::StateSpaceTimeProblem, method::Symbol = :zoh)
     (; css, u0, h, F) = prob
     dss = c2d(css, h, method)
 
@@ -153,7 +153,7 @@ Solves a continuous-time problem using the state-space model
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
 """
-function solve(prob::StateSpaceTimeProblem, alg = RK4())
+function solve(prob::StateSpaceTimeProblem, alg::RK4)
     (; css, u0, h, F) = prob
     (; Ac, Bc) = css
 
