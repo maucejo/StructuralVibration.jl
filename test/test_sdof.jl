@@ -1,8 +1,9 @@
 using Parameters, DSP, FFTW, LinearAlgebra, Interpolations
 @usingany GLMakie
 
-includet("../src/utils/excitation.jl")
 includet("../src/models/sdof.jl")
+includet("../src/solvers/sdof_solvers.jl")
+includet("../src/utils/excitation.jl")
 
 
 ## SDOF system
@@ -39,12 +40,12 @@ lines!(t, x, color = :red, linestyle = :dash)
 
 # Response calculation
 freq = 1.:0.01:30.
-prob_resp = SdofFrequencyProblem(sdof, F = 1e-2ones(length(freq)))
-y = solve(prob_resp, freq).x
+prob_resp = SdofFrequencyProblem(sdof, freq, 1e-2ones(length(freq)))
+y = solve(prob_resp).y
 lines(freq, 20log10.(abs.(y)), color = :blue)
 
 ## FRF
 prob_frf = SdofFrequencyProblem(sdof)
-H = solve(prob_frf, freq).x
+H = solve(prob_frf, freq).y
 lines(freq, 20log10.(abs.(H)), color = :blue)
 lines(freq, angle.(H), color = :blue)

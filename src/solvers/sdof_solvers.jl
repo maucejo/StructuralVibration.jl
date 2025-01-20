@@ -119,7 +119,7 @@ Structure containing the data for computing the FRF a sdof system
 end
 
 """
-    SdofFrequencyProblem(sdof, u0, t, F, type_exc, type_resp)
+    SdofFrequencyProblem(sdof, F, type_exc, type_resp)
 
 Structure containing the data for computing the frequency response of a sdof system
 
@@ -156,7 +156,7 @@ Structure containing the data of the solution of a frequency problem for a sdof 
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
 @with_kw struct SdofFrequencySolution
-    x :: Vector{Complex{Float64}}
+    y :: Vector{Complex{Float64}}
 end
 
 """
