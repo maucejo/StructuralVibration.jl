@@ -115,7 +115,7 @@ Structure containing the data for computing the FRF a sdof system
     type_exc :: Symbol
     type_resp :: Symbol
 
-    SdofFRFProblem(sdof, freq, type_exc = :force, type_resp = :dis) = new(sdof, freq, type_exc, type_resp)
+    SdofFRFProblem(sdof, freq; type_exc = :force, type_resp = :dis) = new(sdof, freq, type_exc, type_resp)
 end
 
 """
@@ -142,7 +142,7 @@ Structure containing the data for computing the frequency response of a sdof sys
     type_exc :: Symbol
     type_resp :: Symbol
 
-    SdofFrequencyProblem(sdof, freq, F, type_exc = :force, type_resp = :dis) = new(sdof, freq, F, type_exc, type_resp)
+    SdofFrequencyProblem(sdof, freq, F; type_exc = :force, type_resp = :dis) = new(sdof, freq, F, type_exc, type_resp)
 end
 
 """
@@ -275,7 +275,6 @@ function solve(prob::SdofForcedTimeProblem)
     x₀, v₀ = u0
 
     # Time step
-    nt = length(t)
     Δt = t[2] - t[1]
 
     # Impulse response

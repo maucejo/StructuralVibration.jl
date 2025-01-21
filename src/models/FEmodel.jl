@@ -158,10 +158,10 @@ function element_matrix(beam::Beam, h)
     return kₑ, mₑ
 end
 
-function element_matrix(barod::BarRod, h)
+function element_matrix(brs::BarRodString, h)
     # Constants
-    kc = barod.D/h
-    mc = barod.m*h/6.
+    kc = brs.D/h
+    mc = brs.m*h/6.
 
     # Elemental stiffness matrix
     kₑ = kc.*[1. -1.;

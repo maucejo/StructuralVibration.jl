@@ -4,7 +4,7 @@ using Parameters, ProgressMeter, LinearAlgebra, Statistics,
       DSP, FFTW, Interpolations, PrecompileTools
 
 # # Structs - Models
-export Sdof, Bar, Rod, Beam, Plate,
+export Sdof, Bar, Rod, Strings, Beam, Plate, RectMembrane,
        ContinuousStateSpace, DiscreteStateSpace
 
 # Structs - FE and discrete models
@@ -29,7 +29,7 @@ export excitation, modefreq, modeshape, eigenmode, modal_matrices, solve,
        assembly, selection_matrix, agwn, acn, mult_noise, mix_noise, varest, estimated_SNR, c2d, ss_model
 
 # Functions for plotting
-export bode_plot
+export plot, bode_plot, nyquist_plot, waterfall_plot
 
 # Include files - Sdof
 include("models/sdof.jl")
@@ -37,7 +37,7 @@ include("solvers/sdof_solvers.jl")
 
 # Include files - Continuous structures
 include("models/oned_structure.jl")
-include("models/plate.jl")
+include("models/twod_structure.jl")
 
 # Include files - Discrete structures
 include("models/FEmodel.jl")

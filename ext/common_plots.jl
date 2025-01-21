@@ -1,18 +1,159 @@
 """
-    bode_plot(freq, y; lw = 1., colorline = :blue, xlab = "Frequency (Hz)", ylab = "Magnitude (dB)", title = "Bode Plot", xscale = :log, axis_tight = false, isdeg = false, layout = :vertical, ref_dB = 1.)
+    plot(x, y; lw = 1., color_auto = true, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
+
+Plot a 2D plot.
+
+# Inputs
+* `x`: x-axis values
+* `y`: y-axis values
+* `lw`: linewidth
+* `color_auto`: Automatic color selection
+* `xscale`: x-axis scale (default: identity)
+* `yscale`: y-axis scale (default: identity)
+* `axis_tight`: Tight axis (default: true)
+* `xlabel`: x-axis label
+* `ylabel`: y-axis label
+* `legend`: Legend parameters
+    * active : Bool
+    * position : Symbol
+    * entry : String
+
+# Output
+* `fig`: Figure
+"""
+function plot(x, y; lw = 1., color_auto = true, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
+    # For cycling
+    ls = [:solid, :dash, :dashdot, :dashdotdot, :dot]
+    if color_auto
+        colorline = Makie.wong_colors()
+    else
+        colorline = [:blue, :red, :green, :magenta, :orange, :cyan, :black]
+    end
+
+    plot_theme = Theme(
+        palette = (color = colorline, linestyle = ls),
+        Lines = (cycle = Cycle([:color, :linestyle], covary = true),)
+    )
+
+    set_theme!(plot_theme)
+
+    # Some checks
+    t = typeof(legend)
+    if legend.active
+        if !hasfield(t, :position)
+            legend_position = :rt
+        else
+            legend_position = legend.position
+        end
+
+        if !hasfield(t, :entry)
+            if isa(y, Vector)
+                legend_entry = ["Data 1"]
+            else
+                legend_entry = ["Data $i" for i in 1:size(y, 1)]
+            end
+        else
+            if isa(y, Matrix)
+                if length(legend.entry) != size(y, 1)
+                    error("The number of entries in the legend must be equal to the number of rows in y")
+                end
+            end
+            entry = legend.entry
+        end
+
+        leg = (active = legend.active, position = legend_position, entry = legend_entry)
+    else
+        if isa(y, Vector)
+            legend_entry = [" "]
+        else
+            legend_entry = [" " for i in 1:size(y, 1)]
+        end
+
+        leg = (active = false, entry = legend_entry)
+    end
+
+
+    fig = Figure()
+    ax = Axis(fig[1,1], xlabel = xlabel, ylabel = ylabel, xscale = xscale, yscale = yscale)
+
+    if isa(y, Vector)
+        lines!(ax, x, y, linewidth = lw, label = leg.entry)
+    else
+        for (yi, labeli) in zip(eachrow(y), leg.entry)
+            lines!(ax, x, yi, linewidth = lw, label = labeli)
+        end
+    end
+
+    if leg.active
+        axislegend(ax, position = leg.position, backgroundcolor = (:white, 0.5))
+    end
+
+    if axis_tight
+        xlims!(ax, minimum(x), maximum(x))
+    end
+
+    return fig
+end
+
+
+"""
+    bode_plot(freq, y; lw = 1., xlab = "Frequency (Hz)", ylab = "Magnitude (dB)", xscale = identity, axis_tight = true, isdeg = false, layout = :vertical, ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
 
 Plot Bode diagram of a frequency response or a FRF.
 
 # Inputs
-- `freq`: Frequency range of interest
-- `y`: Frequency response or FRF
-- `lw`: Line width
-- `colorline`: Line color
-- `xlab`: x-axis label
-- `xscale`: x-axis scale (default: :log)
-- `axis_tight`: Tight axis (default: false)
+* `freq`: Frequency range of interest
+* `y`: Frequency response or FRF
+* `lw`: Line width
+* `colorline`: Line color
+* `xlab`: x-axis label
+* `xscale`: x-axis scale (default: :log)
+* `axis_tight`: Tight axis (default: false)
+* `isdeg`: Phase in degrees (default: false)
+* `layout`: Layout of the plot (default: :vertical)
+* `ref_dB`: Reference value for magnitude (default: 1.)
+* `legend`: Legend parameters (default: (active = false, position = :rt, entry = " "))
+
+# Output
+* `fig`: Figure
 """
-function bode_plot(freq, y; lw = 1., colorline = :blue, xlab = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vertical, ref_dB = 1.)
+function bode_plot(freq, y; lw = 1., xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
+    # Some checks
+    t = typeof(legend)
+    if !hasfield(t, :active)
+        error("legend must be a NamedTuple with at least the fields active")
+    end
+
+    if legend.active
+        if !hasfield(t, :position)
+            legend_position = :rt
+        else
+            legend_position = legend.position
+        end
+
+        if !hasfield(t, :entry)
+            if isa(y, Vector)
+                legend_entry = ["Data 1"]
+            else
+                ny = size(y, 1)
+                legend_entry = ["Data $i" for i in 1:ny]
+            end
+        else
+            entry = legend.entry
+        end
+
+        leg = (active = legend.active, position = legend_position, entry = legend_entry)
+    else
+        if isa(y, Vector)
+            legend_entry = [" "]
+        else
+            ny = size(y, 1)
+            legend_entry = [" " for i in 1:ny]
+        end
+
+        leg = (active = false, entry = [" "])
+    end
+
     ymag = abs.(y)
     ylab1 = "Magnitude (dB)"
     if isdeg
@@ -24,28 +165,178 @@ function bode_plot(freq, y; lw = 1., colorline = :blue, xlab = "Frequency (Hz)",
     end
 
     fig = Figure()
-    if layout == :vertical
+    if layout == :vert
         ax1 = Axis(fig[1,1], xscale = xscale)
         ax2 = Axis(fig[2,1], xscale = xscale)
         ax1.ylabel = ylab1
-        ax2.xlabel = xlab
+        ax2.xlabel = xlabel
         ax2.ylabel = ylab2
     else
-        fig = Figure()
         ax1 = Axis(fig[1,1], xscale = xscale)
         ax2 = Axis(fig[1,2], xscale = xscale)
-        ax1.xlabel = xlab
+        ax1.xlabel = xlabel
         ax1.ylabel = ylab1
-        ax2.xlabel = xlab
+        ax2.xlabel = xlabel
         ax2.ylabel = ylab2
     end
-    lines!(ax1, freq, 20log10.(ymag/ref_dB), color = colorline, linewidth = lw)
-    lines!(ax2, freq, unwrap(ϕ), color = colorline, linewidth = lw)
+
+    if isa(y, Vector)
+        lines!(ax1, freq, 20log10.(ymag/ref_dB), linewidth = lw, label = leg.entry[1])
+        lines!(ax2, freq, unwrap(ϕ), linewidth = lw)
+    elseif isa(y, Matrix)
+        for (yi, ϕi, labeli) in zip(eachrow(ymag), eachrow(ϕ), leg.entry)
+            lines!(ax1, freq, 20log10.(abs.(yi)/ref_dB), linewidth = lw, label = labeli)
+            lines!(ax2, freq, unwrap(ϕi), linewidth = lw, label = labeli)
+        end
+    end
+
+    if layout == :vert
+        if leg.active
+            axislegend(ax1, position = leg.position, backgroundcolor = (:white, 0.5))
+        end
+    else
+        if leg.active
+            axislegend(ax1, position = leg.position, backgroundcolor = (:white, 0.5))
+            axislegend(ax2, position = leg.position, backgroundcolor = (:white, 0.5))
+        end
+    end
 
     if axis_tight
         xlims!(ax1, minimum(freq), maximum(freq))
         xlims!(ax2, minimum(freq), maximum(freq))
     end
+
+    return fig
+end
+
+"""²
+    nyquist_plot(y)
+
+Plot Nyquist diagram
+
+# Inputs
+* `y::Vector`: Complex vector
+
+# Output
+* `fig`: Figure
+"""
+function nyquist_plot(y::Vector{Float64})
+    fig = Figure()
+    ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part", aspect = 1)
+    lines!(ax, real.(y), imag.(y))
+
+    return fig
+end
+
+"""
+    nyquist_plot(freq, y, xlab = "Frequency (Hz)")
+
+Plot Nyquist diagram in 3D
+
+# Inputs
+* `freq`: Frequency range
+* `y`: Complex vector
+* `xlab`: x-axis label
+
+# Output
+* `fig`: Figure
+"""
+function nyquist_plot(freq, y, xlabel = "Frequency (Hz)")
+    fig = Figure()
+    ax = Axis3(fig[1,1], xlabel = xlabel, ylabel = "Real part", zlabel = "Imaginary part")
+    lines!(ax, freq, real.(y), imag.(y))
+
+    return fig
+end
+
+"""
+    waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlab = "x", ylab = "y", zlab = "z", edge = true, axis_tight = false)
+
+Plot a waterfall plot.
+
+# Inputs
+* `x::Vector`: x-axis values
+* `y::Vector`: y-axis values
+* `z::Matrix`: z-axis values
+* `zmin::Real`: minimum value of z-axis
+* `lw::Real`: linewidth
+* `colorline::Symbol`: color of the lines
+* `colmap::Symbol`: Name of the colormap
+* `colorband`: Tuple defining the color of the band
+    * color : Color
+    * alpha : Alpha value for transparency
+* `xlab`: x-axis label
+* `ylab`: y-axis label
+* `zlab`: z-axis label
+* `edge`: Display edges (default: true)
+* `axis_tight`: Tight axis (default: false)
+
+# Output
+* `fig`: Figure
+"""
+function waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)])
+    # Initialisation
+    ny = length(y)
+    I₂ = ones(2)
+
+    fig = Figure(fonts = (; regular = "Gulliver-Regular", bold = "Gulliver Bold"))
+    ax = Axis3(fig[1,1], xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
+    for (j, yv) in enumerate(reverse(y))
+        idz = ny - j + 1
+        zj = z[idz, :]
+        lower = Point3f.(x, yv, zmin)
+        upper = Point3f.(x, yv, zj)
+        band!(ax, lower, upper, color = colorband)
+
+        if edge
+            edge_start = [Point3f(x[1], yv, zmin), Point3f(x[1], yv, zj[1])]
+            edge_end = [Point3f(x[end], yv, zmin), Point3f(x[end], yv, zj[end])]
+        end
+
+        if colorline == :auto
+            lines!(ax, upper, color = zj, colormap = colmap, linewidth = lw)
+
+            if edge
+                lines!(ax, edge_start, color = zj[1]*I₂, colormap = colmap, linewidth = lw)
+                lines!(ax, edge_end, color = zj[end]*I₂, colormap = colmap, linewidth = lw)
+            end
+        else
+            lines!(ax, upper, color = colorline, linewidth = lw)
+
+            if edge
+                lines!(ax, edge_start, color = colorline, linewidth = lw)
+                lines!(ax, edge_end, color = colorline, linewidth = lw)
+            end
+        end
+    end
+
+    if axis_tight
+        xlims!(ax, minimum(x), maximum(x))
+        ylims!(ax, minimum(y), 1.01*maximum(y))
+        zlims!(ax, zmin, maximum(z))
+    else
+        xlims!(ax, xlim[1], xlim[2])
+        ylims!(ax, ylim[1], ylim[2])
+        zlims!(ax, zlim[1], zlim[2])
+    end
+
+    # Font
+    labelsize = 18.
+    ticklabelsize = 14.
+
+    ax.xlabelsize = labelsize
+    ax.xlabelfont = :bold
+
+    ax.ylabelsize = labelsize
+    ax.ylabelfont = :bold
+
+    ax.zlabelsize = labelsize
+    ax.zlabelfont = :bold
+    ax.zticklabelpad = 5.
+
+    ax.xticklabelsize = ticklabelsize
+    ax.yticklabelsize = ticklabelsize
+    ax.zticklabelsize = ticklabelsize
 
     return fig
 end

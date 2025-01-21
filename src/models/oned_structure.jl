@@ -1,5 +1,5 @@
 abstract type OneDStructure end
-abstract type BarRod <: OneDStructure end
+abstract type BarRodString <: OneDStructure end
 
 """
     Bar(L, S, E, ρ)
@@ -17,7 +17,7 @@ Structure containing the data of a homogeneous and isotropic longitudinal bar
 * m : Line mass [kg/m]
 * D : Stiffness coefficient [Pa]
 """
-@with_kw struct Bar <: BarRod
+@with_kw struct Bar <: BarRodString
     L::Float64
     m::Float64
     D::Float64
@@ -47,8 +47,8 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 * m : Line mass [kg/m]
 * D : Stiffness coefficient [Pa]
 """
-@with_kw struct Rod <: BarRod
-    L :: Float64
+@with_kw struct Rod <: BarRodString
+    L::Float64
     m::Float64
     D::Float64
 
@@ -61,26 +61,42 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 end
 
 """
+    Strings(L, m, D)
+
+Structure containing the data of a homogeneous and isotropic string
+
+# Fields
+* L : Length [m]
+* m : Linear mass density [kg/m]
+* D : Tension [N]
+"""
+@with_kw struct Strings <: BarRodString
+    L :: Float64
+    m :: Float64
+    D :: Float64
+end
+
+"""
     Beam(L, S, I, E, ρ)
 
 Structure containing the data of a homogeneous and isotropic bending beam
 
 # Constructor parameters
-* L : Length [m]
-* S : Cross-section area [m²]
-* I : Second moment of area [m⁴]
-* E : Young's modulus [Pa]
-* ρ : Density [kg/m³]
+* L: Length [m]
+* S: Cross-section area [m²]
+* I: Second moment of area [m⁴]
+* E: Young's modulus [Pa]
+* ρ: Density [kg/m³]
 
 # Fields
-* L : Length [m]
-* M : Linear mass density [kg/m]
-* D : Bending stiffness [N.m²]
+* L: Length [m]
+* M: Linear mass density [kg/m]
+* D: Bending stiffness [N.m²]
 """
 @with_kw struct Beam <: OneDStructure
     L :: Float64
-    m::Float64
-    D::Float64
+    m :: Float64
+    D :: Float64
 
     function Beam(L::Float64, S::Float64, I::Float64, E::Float64, ρ::Float64)
         m = ρ*S
@@ -92,7 +108,8 @@ end
 
 """
     modefreq(b::Bar, fmax, bc)
-    modefreq(b::Rod, fmax, bc)
+    modefreq(r::Rod, fmax, bc)
+    modefreq(s::Strings, fmax, bc)
 
 Computes the natural frequencies of a longitudinal or torsional bar up to fmax
 
@@ -108,7 +125,7 @@ Computes the natural frequencies of a longitudinal or torsional bar up to fmax
 * ωₙ: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
 * kₙ: Vector of modal wavenumbers
 """
-function modefreq(b::BarRod, fmax, bc = :CC)
+function modefreq(b::BarRodString, fmax, bc = :CC)
     (; L, m, D) = b
 
     c = sqrt(D/m)

@@ -3,7 +3,8 @@ using Parameters, DSP, FFTW, LinearAlgebra, Interpolations
 
 includet("../src/models/sdof.jl")
 includet("../src/solvers/sdof_solvers.jl")
-includet("../src/utils/excitation.jl")
+includet("../src/models/excitation.jl")
+includet("../src/utils/calculus.jl")
 
 
 ## SDOF system
@@ -30,8 +31,8 @@ F = excitation(rect, t)
 xexact = @. F₀*(Ω₀ - (Ω₀*cos(Ω₀*t) + ξ*ω₀*sin(Ω₀*t))*exp(-ξ*ω₀*t))/m/Ω₀/(Ω₀^2 + ξ^2*ω₀^2)
 
 # Duhamel's integral
-prob = SdofTimeProblem(sdof, F = F)
-x = solve(prob, [0., 0.], t, rect).x
+prob = SdofForcedTimeProblem(sdof, [0., 0.], t, F)
+x = solve(prob).D
 
 lines(t, xexact, color = :blue)
 lines!(t, x, color = :red, linestyle = :dash)
@@ -45,7 +46,7 @@ y = solve(prob_resp).y
 lines(freq, 20log10.(abs.(y)), color = :blue)
 
 ## FRF
-prob_frf = SdofFrequencyProblem(sdof)
-H = solve(prob_frf, freq).y
+prob_frf = SdofFRFProblem(sdof, freq, type_resp = :vel)
+H = solve(prob_frf).y
 lines(freq, 20log10.(abs.(H)), color = :blue)
 lines(freq, angle.(H), color = :blue)

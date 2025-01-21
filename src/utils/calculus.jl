@@ -11,6 +11,7 @@ Compute the gradient of a function `f` at points `t`.
 - `df`: Gradient of the vector `f` at points `t`
 """
 function gradient(f::Vector{Float64}, t)
+
     itp = LinearInterpolation(t, f)
 
     return only.(Interpolations.gradient.(Ref(itp), t))
@@ -31,7 +32,6 @@ Compute the gradient of a function `f` at points `t`.
 - `df`: Gradient of the each row of the matrix `f` at points `t`
 """
 function gradient(f::Matrix{Float64}, t)
-
     nx, nt = size(f)
     df = zeros(nx, nt)
     for i in 1:nx
