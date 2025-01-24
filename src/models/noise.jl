@@ -337,15 +337,21 @@ function noisevar1D_(x)
     λ = 10^only(Optim.minimizer(res))
 
     fₖ = @. (1. + λ*s²)/s²
-    gₖ = mean(@. abs2(z)/fₖ)
 
-    # γₐ = 1e-3
-    # γₛ = 1e-3
-    # βₐ = 1e-3
-    # βₛ = 1e-3
-    # gₖ = (sum(@. abs2(z)/fₖ) + βₐ + βₛ/λ)/(n + γₐ - γₛ)
+    # vary = mean(@. abs2(z)/fₖ)
 
-    return λ*gₖ
+    if eltype(x) == Complex{Float64}
+        α = 1.
+    else
+        α = 0.5
+    end
+    γₐ = 1e-3
+    γₛ = 1e-3
+    βₐ = 1e-3
+    βₛ = 1e-3
+    vary = (α*sum(@. abs2(z)/fₖ) + βₐ + βₛ/λ)/(2. + γₛ + γₐ +  α*n)
+
+    return λ*vary
 end
 
 """
@@ -365,18 +371,27 @@ Note: This function is not intended to be used directly
 """
 function func!(L, z, s²)
     n = length(z)
+
     fₖ = @. (1. + 10. ^L*s²)/s²
-    gₖ = mean(@. abs2(z)/fₖ)
 
-    return sum(log, fₖ) + (n - 2)*log(gₖ)
+    if eltype(x) == Complex{Float64}
+        α = 1.
+    else
+        α = 0.5
+    end
 
-    # γₐ = 1e-3
-    # γₛ = 1e-3
-    # βₐ = 1e-3
-    # βₛ = 1e-3
-    # gₖ = (sum(@. abs2(z)/fₖ) + βₐ .+ βₛ ./(10. .^L))/(n + γₐ - γₛ)
+    # vary = mean(@. abs2(z)/fₖ)
 
-    # return only(sum(log, fₖ) .+ (n + γₐ - γₛ - 2)*log.(gₖ) .+ (1. + γₛ)*log.(10. .^L))
+    # return α*sum(log, fₖ) + (α*n - 2)*log(vary)
+
+    γₐ = 1e-3
+    γₛ = 1e-3
+    βₐ = 1e-3
+    βₛ = 1e-3
+    M = 2. + γₛ + γₐ +  α*n
+    vary = (α*sum(@. abs2(z)/fₖ) + βₐ .+ βₛ ./(10. .^L))/M
+
+    return only(α*sum(log, fₖ) .+ (M - 2)*log.(vary) .+ (1. + γₛ)*log.(10. .^L))
 end
 
 """

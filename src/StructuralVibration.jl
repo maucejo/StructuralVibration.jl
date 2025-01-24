@@ -1,9 +1,9 @@
 module StructuralVibration
 
 using Parameters, ProgressMeter, LinearAlgebra, Statistics,
-      DSP, FFTW, Interpolations, PrecompileTools
+      DSP, FFTW, Interpolations, Optim, PrecompileTools
 
-# # Structs - Models
+# Structs - Models
 export Sdof, Bar, Rod, Strings, Beam, Plate, RectMembrane,
        ContinuousStateSpace, DiscreteStateSpace
 
@@ -18,7 +18,6 @@ export Rectangle, Triangle, Hammer, SmoothRect,
 export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
        SdofFRFProblem, SdofFrequencyProblem, StateSpaceTimeProblem, StateSpaceFRFProblem, StateSpaceFreqProblem,
        FreeModalTimeProblem, ForcedModalTimeProblem, ModalFRFProblem, DirectFRFProblem, ModalFreqProblem, DirectFreqProblem, DiscreteTimeProblem
-
 
 # Structs - Time solvers
 export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,

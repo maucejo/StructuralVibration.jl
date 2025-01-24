@@ -6,17 +6,17 @@ abstract type TwoDStructure end
 Structure containing the data of a homogeneous and isotropic bending plate
 
 # Constructor parameters
-* L : Length [m]
-* b : Width [m]
-* E : Young's modulus [Pa]
-* ρ : Density [kg/m³]
-* ν : Poisson's ratio
+* `L`: Length [m]
+* `b`: Width [m]
+* `E`: Young's modulus [Pa]
+* `ρ`: Density [kg/m³]
+* `ν`: Poisson's ratio
 
 # Fields
-* L : Length [m]
-* b : Width [m]
-* m : Surface mass [kg/m²]
-* D : Bending stiffness [N.m]
+* `L`: Length [m]
+* `b`: Width [m]
+* `m`: Surface mass [kg/m²]
+* `D`: Bending stiffness [N.m]
 """
 @with_kw struct Plate <: TwoDStructure
     L::Float64
@@ -39,10 +39,10 @@ end
 Structure containing the data of a homogeneous and isotropic rectangular membrane
 
 # Fields
-* L : Length [m]
-* b : Width [m]
-* m : Surface mass [kg/m²]
-* D : Tension [N]
+* `L`: Length [m]
+* `b`: Width [m]
+* `m`: Surface mass [kg/m²]
+* `D`: Tension [N]
 """
 @with_kw struct RectMembrane <: TwoDStructure
     L::Float64
@@ -56,13 +56,13 @@ end
 
 Computes the natural frequencies of a simply supported plate up to fmax
 
-# Parameters
-    * p : Structure containing the data related to the plate
-    * fmax : Maximum frequency for calculating the modal shapes [Hz]
+# Inputs
+    * `p`: Structure containing the data related to the plate
+    * `fmax`: Maximum frequency for calculating the modal shapes [Hz]
 
 # Outputs
-    * ωₘₙ : Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
-    * kₘₙ : Matrix of modal wave numbers
+    * `ωₘₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+    * `kₘₙ`: Matrix of modal wave numbers
 """
 function modefreq(p::TwoDStructure, fmax)
    (; L, b, m, D) = p
@@ -107,21 +107,34 @@ function modefreq(p::TwoDStructure, fmax)
 end
 
 """
-    modeshape(p::TwoDStructure, kₘₙ, X, Y)
+    modeshape(p::TwoDStructure, kₘₙ, x, y)
 
 Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane
 
 # Inputs
-    * p : Structure containing the data related to the structure
-    * kₘₙ : Matrix of modal wave numbers
-    * (X, Y): Coordinates of the points where the mode shapes are calculated
+    * `p`: Structure containing the data related to the structure
+    * `kₘₙ`: Matrix of modal wave numbers
+    * `(x, y)`: Coordinates of the points where the mode shapes are calculated
 
 # Output
-    * ϕ: Mass-normalized mode shapes
+    * `ϕ`: Mass-normalized mode shapes
 """
-@views function modeshape(p::TwoDStructure, kₘₙ, X, Y)
+@views function modeshape(p::TwoDStructure, kₘₙ, x, y)
     (; L, b, m) = p
+
+    if isa(eltype(x), Number)
+        x = [x]
+    else !isa(x, Array)
+        x = collect(x)
+    end
+
+    if isa(eltype(x), Number)
+        x = [x]
+    else !isa(x, Array)
+        x = collect(x)
+    end
+
     Mₙ = m*L*b/4
 
-    return sin.(X*kₘₙ[1, :]').*sin.(Y*kₘₙ[2, :]')./sqrt(Mₙ)
+    return sin.(x*kₘₙ[1, :]').*sin.(y*kₘₙ[2, :]')./sqrt(Mₙ)
 end

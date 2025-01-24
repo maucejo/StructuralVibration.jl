@@ -7,15 +7,15 @@ abstract type BarRodString <: OneDStructure end
 Structure containing the data of a homogeneous and isotropic longitudinal bar
 
 # Constructor parameters
-* L: Length [m]
-* S: Cross-section area [m²]
-* E: Young's modulus [Pa]
-* ρ: Mass density [kg/m³]
+* `L`: Length [m]
+* `S`: Cross-section area [m²]
+* `E`: Young's modulus [Pa]
+* `ρ`: Mass density [kg/m³]
 
 # Fields
-* L : Length [m]
-* m : Line mass [kg/m]
-* D : Stiffness coefficient [Pa]
+* `L`: Length [m]
+* `m`: Line mass [kg/m]
+* `D`: Stiffness coefficient [Pa]
 """
 @with_kw struct Bar <: BarRodString
     L::Float64
@@ -43,9 +43,9 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 * ρ: Mass density [kg/m³]
 
 # Fields
-* L : Length [m]
-* m : Line mass [kg/m]
-* D : Stiffness coefficient [Pa]
+* `L`: Length [m]
+* `m`: Line mass [kg/m]
+* `D`: Stiffness coefficient [Pa]
 """
 @with_kw struct Rod <: BarRodString
     L::Float64
@@ -66,9 +66,9 @@ end
 Structure containing the data of a homogeneous and isotropic string
 
 # Fields
-* L : Length [m]
-* m : Linear mass density [kg/m]
-* D : Tension [N]
+* `L`: Length [m]
+* `m`: Linear mass density [kg/m]
+* `D`: Tension [N]
 """
 @with_kw struct Strings <: BarRodString
     L :: Float64
@@ -82,16 +82,16 @@ end
 Structure containing the data of a homogeneous and isotropic bending beam
 
 # Constructor parameters
-* L: Length [m]
-* S: Cross-section area [m²]
-* I: Second moment of area [m⁴]
-* E: Young's modulus [Pa]
-* ρ: Density [kg/m³]
+* `L`: Length [m]
+* `S`: Cross-section area [m²]
+* `I`: Second moment of area [m⁴]
+* `E`: Young's modulus [Pa]
+* `ρ`: Density [kg/m³]
 
 # Fields
-* L: Length [m]
-* M: Linear mass density [kg/m]
-* D: Bending stiffness [N.m²]
+* `L`: Length [m]
+* `M`: Linear mass density [kg/m]
+* `D`: Bending stiffness [N.m²]
 """
 @with_kw struct Beam <: OneDStructure
     L :: Float64
@@ -113,17 +113,17 @@ end
 
 Computes the natural frequencies of a longitudinal or torsional bar up to fmax
 
-# Parameters
-* p: Structure containing the bar data
-* fmax: Maximum frequency for calculating the mode shapes [Hz]
-* bc: Boundary conditions
-    * :CC : Clamped - Clamped
-    * :CF : Clamped - Free
-    * :FF : Free - Free
+# Inputs
+* `p`: Structure containing the bar data
+* `fmax`: Maximum frequency for calculating the mode shapes [Hz]
+* `bc`: Boundary conditions
+    * :CC: Clamped - Clamped
+    * :CF: Clamped - Free
+    * :FF: Free - Free
 
 # Outputs
-* ωₙ: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
-* kₙ: Vector of modal wavenumbers
+* `ωₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* `kₙ`: Vector of modal wavenumbers
 """
 function modefreq(b::BarRodString, fmax, bc = :CC)
     (; L, m, D) = b
@@ -174,24 +174,24 @@ function modefreq(b::BarRodString, fmax, bc = :CC)
 end
 
 """
-    modefreq(b::Beam, fmaxs, bc)
+    modefreq(b::Beam, fmax, bc)
 
 Computes the natural frequencies of a beam in bending up to fmax
 
-# Parameters
-* p: Structure containing the data related to the beam
-* fmax: Maximum frequency for calculating the modal shapes [Hz]
-* bc: Boundary conditions
-    * :SS : Simply Supported - Simply Supported
-    * :CC : Clamped - Clamped
-    * :SC : Simply Supported - Clamped
-    * :CF : Clamped - Free
-    * :SF : Simply Supported - Free
-    * :FF : Free - Free
+# Inputs
+* `p`: Structure containing the data related to the beam
+* `fmax`: Maximum frequency for calculating the modal shapes [Hz]
+* `bc`: Boundary conditions
+    * :SS: Simply Supported - Simply Supported
+    * :CC: Clamped - Clamped
+    * :SC: Simply Supported - Clamped
+    * :CF: Clamped - Free
+    * :SF: Simply Supported - Free
+    * :FF: Free - Free
 
 # Outputs
-* ωₙ: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
-* kₙ: Vector of modal wave numbers
+* `ωₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* `kₙ`: Vector of modal wave numbers
 """
 function modefreq(b::Beam, fmax, bc = :SS)
     (; L, m, D) = b
@@ -295,23 +295,25 @@ end
 
 Computes the mass-normalized mode shapes of a longitudinal or torsional bar
 
-# Parameters
-* b: Structure containing the bar data
-* kₙ: Array of modal wavenumbers
-* x: Coordinates of calculation points of the mode shapes
-* bc: Boundary conditions
-    * :CC : Clamped - Clamped
-    * :CF : Clamped - Free
-    * :FF : Free - Free
+# Inputs
+* `b`: Structure containing the bar data
+* `kₙ`: Array of modal wavenumbers
+* `x`: Coordinates of calculation points of the mode shapes
+* `bc`: Boundary conditions
+    * :CC: Clamped - Clamped
+    * :CF: Clamped - Free
+    * :FF: Free - Free
 
 # Output
-* ϕ: Mass-normalized mode shapes
+* `ϕ`: Mass-normalized mode shapes
 """
-function modeshape(b::BarRod, kₙ, x, bc = :CC)
+function modeshape(b::BarRodString, kₙ, x, bc = :CC)
     (; L, m) = b
 
-    if !isa(x, Array)
-        x = collect(x);
+    if isa(eltype(x), Number)
+        x = [x]
+    else !isa(x, Array)
+        x = collect(x)
     end
 
     if bc == :CC
@@ -337,26 +339,28 @@ end
 
 Calculates the mass-normalized mode shapes of a beam in bending
 
-# Parameters
-* b: Structure containing the data related to the beam
-* kₙ: Vector of modal wave numbers
-* x: Coordinates of the points where the mode shapes are calculated
-* bc: Boundary conditions
-    * :SS : Simply Supported - Simply Supported
-    * :CC : Clamped - Clamped
-    * :CS : Clamped - Simply Supported
-    * :CF : Clamped - Free
-    * :SF : Simply Supported - Free
-    * :FF : Free - Free
+# Inputs
+* `b`: Structure containing the data related to the beam
+* `kₙ`: Vector of modal wave numbers
+* `x`: Coordinates of the points where the mode shapes are calculated
+* `bc`: Boundary conditions
+    * :SS: Simply Supported - Simply Supported
+    * :CC: Clamped - Clamped
+    * :CS: Clamped - Simply Supported
+    * :CF: Clamped - Free
+    * :SF: Simply Supported - Free
+    * :FF: Free - Free
 
 # Output
-* ϕ: Mass-normalized mode shapes
+* `ϕ`: Mass-normalized mode shapes
 """
 function modeshape(b::Beam, kₙ, x, bc = :SS)
     (; L, m) = b
 
-    if !isa(x, Array)
-        x = collect(x);
+    if isa(eltype(x), Number)
+        x = [x]
+    else !isa(x, Array)
+        x = collect(x)
     end
 
     if bc == :SS

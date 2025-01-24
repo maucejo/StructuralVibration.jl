@@ -1,5 +1,5 @@
 """
-    DiscreteTimeProblem(K, M, C, u0::Tuple{Vector{Float64}, Vector{Float64}}, h::Float64, F::Matrix{Float64})
+    DirectTimeProblem(K, M, C, u0::Tuple{Vector{Float64}, Vector{Float64}}, h::Float64, F::Matrix{Float64})
 
 Structure containing data for the time solver
 
@@ -13,7 +13,7 @@ Structure containing data for the time solver
 * h: Time step
 * F: External force matrix
 """
-@with_kw struct DiscreteTimeProblem
+@with_kw struct DirectTimeProblem
     K
     M
     C
@@ -23,7 +23,7 @@ Structure containing data for the time solver
 end
 
 """
-    DiscreteTimeSolution(D, V, A)
+    DirectTimeSolution(D, V, A)
 
 Structure containing problem solutions
 
@@ -32,7 +32,7 @@ Structure containing problem solutions
 * V: Velocity matrix or vector
 * A: Acceleration matrix or vector
 """
-@with_kw struct DiscreteTimeSolution
+@with_kw struct DirectTimeSolution
     D
     V
     A
@@ -190,7 +190,7 @@ end
 
 ## Algorithms
 # Central-difference
-function solve(prob::DiscreteTimeProblem, alg::CentralDiff)
+function solve(prob::DirectTimeProblem, alg::CentralDiff)
     (; K, M, C, u0, h, F) = prob
 
     Nddl, nt = size(F)
@@ -227,11 +227,11 @@ function solve(prob::DiscreteTimeProblem, alg::CentralDiff)
         A[:, n+1] = M\rhs
     end
 
-    return DiscreteTimeSolution(D, V, A)
+    return DirectTimeSolution(D, V, A)
 end
 
 # Fourth-order Runge-Kutta
-function solve(prob::DiscreteTimeProblem, alg::RK4)
+function solve(prob::DirectTimeProblem, alg::RK4)
     (; K, M, C, u0, h, F) = prob
 
     Nddl, nt = size(F)
@@ -274,11 +274,11 @@ function solve(prob::DiscreteTimeProblem, alg::RK4)
         A[:, n+1] .= M\(F[:, n+1] - C*V[:, n+1] - K*D[:, n+1])
     end
 
-    return DiscreteTimeSolution(D, V, A)
+    return DirectTimeSolution(D, V, A)
 end
 
 #Newmark family
-function solve(prob::DiscreteTimeProblem, alg::NewmarkFamily)
+function solve(prob::DirectTimeProblem, alg::NewmarkFamily)
     (; K, M, C, u0, h, F) = prob
     (; αf, αₘ, γ₀, β₀, name) = alg
 
@@ -331,8 +331,8 @@ function solve(prob::DiscreteTimeProblem, alg::NewmarkFamily)
         D[:, n+1] = @. D[:, n] + h*V[:, n] + a₂*A[:, n] + a₄*A[:, n+1]
     end
 
-    return DiscreteTimeSolution(D, V, A)
+    return DirectTimeSolution(D, V, A)
 end
 
 # Default solver
-solve(prob:: DiscreteTimeProblem) = solve(prob, GeneralizedAlpha())
+solve(prob:: DirectTimeProblem) = solve(prob, GeneralizedAlpha())

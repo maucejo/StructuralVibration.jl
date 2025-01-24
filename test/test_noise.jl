@@ -1,0 +1,51 @@
+using Parameters, LinearAlgebra, DSP, Interpolations, ProgressMeter, Random, FFTW, Optim, Statistics
+
+includet("../src/models/oned_structure.jl")
+includet("../src/models/modal_model.jl")
+includet("../src/models/excitation.jl")
+includet("../src/models/noise.jl")
+includet("../src/solvers/direct_time_solvers.jl")
+includet("../src/utils/calculus.jl")
+
+## Beam definition
+L = 1.                      # Length of the beam [m]
+b = 3e-2                    # Width of the beam [m]
+h = 1e-2                    # Thickness of the beam [m]
+E = 2.1e11                  # Young's modulus [Pa]
+ρ = 7850.                   # Mass density [kg/m³]
+ξn = 1e-2                   # Damping factor
+
+S = b*h
+Iz = b*h^3/12.
+beam = Beam(L, S, Iz, E, ρ)  # Structure definition
+
+## Définition du maillage de mesure
+Δx = 5e-2                            # Pas de discrétisation
+Npoint = 20                          # Nombre de points de mesure
+Xm = LinRange(Δx, L - Δx, Npoint)    # Maillage de mesure
+
+## Modes calculation
+ωn, kn = modefreq(beam, 2000.)
+ϕm = modeshape(beam, kn, Xm)
+ϕe = modeshape(beam, kn, [Xm[13]])
+
+## Modal model
+Kn, Mn = modal_matrices(ωn, ξn)[1:2]
+
+## Problem definition & solution
+tmax = 0.5
+nt = 10000
+t = LinRange(0., tmax, nt)
+
+harmo = SineWave(1e4, 0., tmax, 2π*10.)
+F = excitation(harmo, t)
+Fn = ϕe'*F'
+
+u0 = (zeros(length(ωn)), zeros(length(ωn)))
+prob = DirectTimeProblem(Kn, Mn, Cn, u0, t[2] - t[1], Fn)
+sol = solve(prob)
+
+u = ϕm*sol.D
+
+# Noise
+y = agwn(u, 25.)

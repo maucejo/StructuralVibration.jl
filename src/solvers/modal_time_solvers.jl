@@ -371,7 +371,7 @@ function solve(prob::ForcedModalTimeProblem)
             @. h = exp(-Ξₘ*t)*sinh(βₘ*t)/βₘ
         end
 
-        q[:, m] .= qₕ .+ Δt*conv(Lₙ[n, :], h)[1:nt]
+        q[:, m] .= qh .+ Δt*conv(Lₙ[m, :], h)[1:nt]
     end
 
     D = Φₘ*q';
