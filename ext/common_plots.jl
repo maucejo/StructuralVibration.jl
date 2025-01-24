@@ -1,5 +1,44 @@
 """
-    plot(x, y; lw = 1., color_auto = true, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
+    theme_choice(name::Symbol)
+
+Choose the theme for the plots.
+
+# Inputs
+* `name`: Name of the theme
+    * :makie
+    * :article
+
+# Output
+* `theme`: Theme
+"""
+function theme_choice(name::Symbol)
+    labelsize = 18.
+    ticklabelsize = 14.
+    linestyle = [:solid, :dash, :dashdot, :dashdotdot, :dot]
+    if name == :makie
+        colorline = Makie.wong_colors()
+    else name == :article
+        colorline = [:blue, :red, :green, :magenta, :orange, :cyan, :black]
+    end
+
+    theme = Theme(
+        palette = (color = colorline, linestyle = linestyle),
+        Lines = (cycle = Cycle([:color, :linestyle], covary = true), ),
+        Axis = (
+            xlabelsize = labelsize,
+            xlabelfont = :bold,
+            ylabelsize = labelsize,
+            ylabelfont = :bold,
+            xticklabelsize = ticklabelsize,
+            yticklabelsize = ticklabelsize
+        )
+    )
+
+    return theme
+end
+
+"""
+    plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
 
 Plot a 2D plot.
 
@@ -7,7 +46,7 @@ Plot a 2D plot.
 * `x`: x-axis values
 * `y`: y-axis values
 * `lw`: linewidth
-* `color_auto`: Automatic color selection
+* `theme`: Theme (default: :makie)
 * `xscale`: x-axis scale (default: identity)
 * `yscale`: y-axis scale (default: identity)
 * `axis_tight`: Tight axis (default: true)
@@ -21,21 +60,8 @@ Plot a 2D plot.
 # Output
 * `fig`: Figure
 """
-function plot(x, y; lw = 1., color_auto = true, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
-    # For cycling
-    ls = [:solid, :dash, :dashdot, :dashdotdot, :dot]
-    if color_auto
-        colorline = Makie.wong_colors()
-    else
-        colorline = [:blue, :red, :green, :magenta, :orange, :cyan, :black]
-    end
-
-    plot_theme = Theme(
-        palette = (color = colorline, linestyle = ls),
-        Lines = (cycle = Cycle([:color, :linestyle], covary = true),)
-    )
-
-    set_theme!(plot_theme)
+function plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
+    set_theme!(theme_choice(theme))
 
     # Some checks
     t = typeof(legend)
@@ -105,7 +131,7 @@ Plot Bode diagram of a frequency response or a FRF.
 * `freq`: Frequency range of interest
 * `y`: Frequency response or FRF
 * `lw`: Line width
-* `colorline`: Line color
+* `theme`: Theme (default: :makie)
 * `xlab`: x-axis label
 * `xscale`: x-axis scale (default: :log)
 * `axis_tight`: Tight axis (default: false)
@@ -117,7 +143,9 @@ Plot Bode diagram of a frequency response or a FRF.
 # Output
 * `fig`: Figure
 """
-function bode_plot(freq, y; lw = 1., xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
+function bode_plot(freq, y; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
+
+    set_theme!(theme_choice(theme))
     # Some checks
     t = typeof(legend)
     if !hasfield(t, :active)
@@ -210,7 +238,7 @@ function bode_plot(freq, y; lw = 1., xlabel = "Frequency (Hz)", xscale = identit
 end
 
 """²
-    nyquist_plot(y)
+    nyquist_plot(y, theme = :makie)
 
 Plot Nyquist diagram
 
@@ -220,7 +248,8 @@ Plot Nyquist diagram
 # Output
 * `fig`: Figure
 """
-function nyquist_plot(y::Vector{Float64})
+function nyquist_plot(y::Vector{Float64}, theme = :makie)
+    set_theme!(theme_choice(theme))
     fig = Figure()
     ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part", aspect = 1)
     lines!(ax, real.(y), imag.(y))
@@ -241,7 +270,8 @@ Plot Nyquist diagram in 3D
 # Output
 * `fig`: Figure
 """
-function nyquist_plot(freq, y, xlabel = "Frequency (Hz)")
+function nyquist_plot(freq, y, xlabel = "Frequency (Hz)", theme = :makie)
+    set_theme!(theme_choice(theme))
     fig = Figure()
     ax = Axis3(fig[1,1], xlabel = xlabel, ylabel = "Real part", zlabel = "Imaginary part")
     lines!(ax, freq, real.(y), imag.(y))
