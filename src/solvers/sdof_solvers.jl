@@ -78,19 +78,19 @@ Structure containing the data of a time problem for a sdof system subject to an 
 end
 
 """
-    SdofTimeSolution(x, xh, xp)
+    SdofTimeSolution(u, du, ddu)
 
 Structure containing the data of the solution of the forced response of a sdof system
 
 # Fields
-* `D`: Displacement solution
-* `V`: Velocity solution
-* `A`: Acceleration solution
+* `u`: Displacement solution
+* `du`: Velocity solution
+* `ddu`: Acceleration solution
 """
 @with_kw struct SdofTimeSolution
-    D :: Vector{Float64}
-    V :: Vector{Float64}
-    A :: Vector{Float64}
+    u :: Vector{Float64}
+    du :: Vector{Float64}
+    ddu :: Vector{Float64}
 end
 
 """
@@ -146,17 +146,17 @@ Structure containing the data for computing the frequency response of a sdof sys
 end
 
 """
-    SdofFrequencySolution(x)
+    SdofFrequencySolution(u)
 
 Structure containing the data of the solution of a frequency problem for a sdof system
 
 # Fields
-* `x`: Solution of the frequency problem
+* `u`: Solution of the frequency problem
    * Response spectrum (displacement, velocity, acceleration) [m, m/s, m/s²]
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
 @with_kw struct SdofFrequencySolution
-    y :: Vector{Complex{Float64}}
+    u :: Vector{Complex{Float64}}
 end
 
 """

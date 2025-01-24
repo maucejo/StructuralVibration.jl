@@ -19,7 +19,7 @@ function agwn(x, snr_dB, rst = true)
 
     N, L = size(x)                          # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    En = mean(abs2, x, dims = 2)[:]         # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
@@ -57,7 +57,7 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = 
 
     N, L = size(x)                          # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    En = mean(abs2, x, dims = 2)[:]         # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
@@ -113,7 +113,7 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :white,  band_freq = Floa
 
     N, L = size(x)                          # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    En = mean(abs2, x, dims = 2)[:]         # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
@@ -180,6 +180,7 @@ Adds a multiplicative Gaussian White Noise (AWGN) to a signal `x` with a given S
 * `y`: noisy signal
 """
 function mult_noise(x, snr_dB, rst = true)
+
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -206,6 +207,7 @@ Adds both additive and multiplicative Gaussian White Noise to a signal `x` with 
 * `y`: noisy signal
 """
 function mixed_noise(x, snr_dB, rst = true)
+
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -213,7 +215,7 @@ function mixed_noise(x, snr_dB, rst = true)
 
     N, L = size(x)                          # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = sum(abs2, x, dims = 2)/L           # Signal energy
+    En = mean(abs2, x, dims = 2)[:]         # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
@@ -237,8 +239,7 @@ Estimates the SNR of a signal `x` with a given variance `var`.
 * `SNR`: signal to noise ratio [dB] - Float64
 """
 function estimated_SNR(x, var)
-    L = size(x, 2)
-    En = sum(abs2, x, dims = 2)/L
+    En = mean(abs2, x, dims = 2)[:]
 
     SNR = En./var
 
@@ -285,6 +286,7 @@ Estimates the noise variance of a signal `x` using Bayesian denoising.
 * `noisevar`: Noise variance - Vector{Float64}
 """
 function noisevar1D(x)
+
     # Initialisation
     ndim = ndims(x)
 
@@ -315,6 +317,7 @@ Note: This function is not intended to be used directly
 * `noisevar`: Noise variance - Float64
 """
 function noisevar1D_(x)
+
     # Valeurs propres de la matrice de lissage d'ordre 1
     n = length(x)
     s = Vector{Float64}(undef, n)
@@ -374,7 +377,7 @@ function func!(L, z, s²)
 
     fₖ = @. (1. + 10. ^L*s²)/s²
 
-    if eltype(x) == Complex{Float64}
+    if eltype(z) == Complex{Float64}
         α = 1.
     else
         α = 0.5
@@ -435,6 +438,7 @@ Note: This function is not intended to be used directly
 * `noisevar`: Noise variance - Float64
 """
 function estimatenoise_(x)
+
     nd, ns = size(x)
     # The idea here is to form a linear combination of successive elements
     # of the series. If the underlying form is locally nearly linear, then

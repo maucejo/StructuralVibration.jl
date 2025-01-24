@@ -109,19 +109,19 @@ Structure containing data for modal time solver for computing the forced respons
 end
 
 """
-    ModalTimeSolution(D, V, A)
+    ModalTimeSolution(u, du, ddu)
 
 Structure containing problem solutions
 
 # Fields
-* `D`: Displacement matrix or vector
-* `V`: Velocity matrix or vector
-* `A`: Acceleration matrix or vector
+* `u`: Displacement matrix or vector
+* `du`: Velocity matrix or vector
+* `ddu`: Acceleration matrix or vector
 """
 @with_kw struct ModalTimeSolution
-    D
-    V
-    A
+    u
+    du
+    ddu
 end
 
 """
@@ -198,11 +198,11 @@ function solve(prob::FreeModalTimeProblem)
     end
 
     # Computation of the displacement
-    D = Φₘ*q';
-    V = Φₘ*dq';
-    A = Φₘ*ddq';
+    u = Φₘ*q';
+    du = Φₘ*dq';
+    ddu = Φₘ*ddq';
 
-    return ModalTimeSolution(D, V, A)
+    return ModalTimeSolution(u, du, ddu)
 end
 
 """
@@ -293,11 +293,11 @@ function solve(prob::HarmonicModalTimeProblem)
         @. ddq[:, m] = ddqh - ρₘ*ω^2*cos(ω*t + ϕₘ)
     end
 
-    D = Φₘ*q';
-    V = Φₘ*dq';
-    A = Φₘ*ddq';
+    u = Φₘ*q';
+    du = Φₘ*dq';
+    ddu = Φₘ*ddq';
 
-    return ModalTimeSolution(D, V, A)
+    return ModalTimeSolution(u, du, ddu)
 end
 
 
@@ -374,9 +374,9 @@ function solve(prob::ForcedModalTimeProblem)
         q[:, m] .= qh .+ Δt*conv(Lₙ[m, :], h)[1:nt]
     end
 
-    D = Φₘ*q';
-    V = gradient(D, t);
-    A = gradient(V, t);
+    u = Φₘ*q';
+    du = gradient(u, t);
+    ddu = gradient(du, t);
 
-    return ModalTimeSolution(D, V, A)
+    return ModalTimeSolution(u, du, ddu)
 end

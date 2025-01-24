@@ -1,4 +1,4 @@
-using Parameters, LinearAlgebra, DSP, Interpolations, ProgressMeter, Random, FFTW, Optim, Statistics
+using Parameters, LinearAlgebra, DSP, Interpolations, ProgressMeter, Random, FFTW, Optim, Statistics, SpecialFunctions
 
 includet("../src/models/oned_structure.jl")
 includet("../src/models/modal_model.jl")
@@ -30,7 +30,7 @@ Xm = LinRange(Δx, L - Δx, Npoint)    # Maillage de mesure
 ϕe = modeshape(beam, kn, [Xm[13]])
 
 ## Modal model
-Kn, Mn = modal_matrices(ωn, ξn)[1:2]
+Kn, Mn, Cn = modal_matrices(ωn, ξn)
 
 ## Problem definition & solution
 tmax = 0.5
@@ -45,7 +45,19 @@ u0 = (zeros(length(ωn)), zeros(length(ωn)))
 prob = DirectTimeProblem(Kn, Mn, Cn, u0, t[2] - t[1], Fn)
 sol = solve(prob)
 
-u = ϕm*sol.D
+u = ϕm*sol.u
 
-# Noise
-y = agwn(u, 25.)
+# Gaussian White Noise
+y1 = agwn(u, 25.) # Noisy signal
+vary1 = varest(y1) # Variance estimation
+SNRy1 = estimated_SNR(y1, vary1) # Signal to noise ratio estimation
+
+# Multiplicative noise
+y2 = mult_noise(u, 25.) # Noisy signal
+vary2 = varest(y2) # Variance estimation
+SNRy2 = estimated_SNR(y2, vary2) # Signal to noise ratio estimation
+
+# Mixed noise
+y3 = mixed_noise(u, 25.) # Noisy signal
+vary3 = varest(y3) # Variance estimation
+SNRy3 = estimated_SNR(y3, vary3) # Signal to noise ratio estimation

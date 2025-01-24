@@ -23,19 +23,19 @@ Structure containing data for the time solver
 end
 
 """
-    DirectTimeSolution(D, V, A)
+    DirectTimeSolution(u, du, ddu)
 
 Structure containing problem solutions
 
 # Fields
-* D: Displacement matrix or vector
-* V: Velocity matrix or vector
-* A: Acceleration matrix or vector
+* u: Displacement matrix or vector
+* du: Velocity matrix or vector
+* ddu: Acceleration matrix or vector
 """
 @with_kw struct DirectTimeSolution
-    D
-    V
-    A
+    u
+    du
+    ddu
 end
 
 # Solvers

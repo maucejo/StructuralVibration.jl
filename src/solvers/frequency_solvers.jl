@@ -110,27 +110,27 @@ Structure containing the data feeding the direct solver for calculating the moda
 end
 
 """
-    FRFSolution(y)
+    FRFSolution(u)
 
 Structure containing the solution of the frequency response problem
 
 # Fields
-* H: Transfer function matrix
+* u: Transfer function matrix
 """
 @with_kw struct FRFSolution
-    y :: Union{Matrix{ComplexF64}, Vector{Matrix{ComplexF64}}}
+    u :: Union{Matrix{ComplexF64}, Vector{Matrix{ComplexF64}}}
 end
 
 """
-    FrequencySolution(y)
+    FrequencySolution(u)
 
 Structure containing the solution of the frequency response problem
 
 # Fields
-* y: Frequency response matrix
+* u: Frequency response matrix
 """
 @with_kw struct FrequencySolution
-    y :: Matrix{ComplexF64}
+    u :: Matrix{ComplexF64}
 end
 
 """
