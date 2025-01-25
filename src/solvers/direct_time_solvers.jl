@@ -3,6 +3,14 @@
 
 Structure containing data for the time solver
 
+# Constructor
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `C`: Damping matrix
+* `u0`: Initial conditions
+* `t`: Time steps
+* `F`: External force matrix
+
 # Fields
 * K: Stiffness matrix
 * M: Mass matrix
@@ -18,8 +26,10 @@ Structure containing data for the time solver
     M
     C
     u0 :: Tuple{Vector{Float64}, Vector{Float64}}
-    h :: Float64
+    h
     F
+
+    DirectTimeProblem(K, M, C, u0, t, F) = new(K, M, C, u0, t[2] - t[1], F)
 end
 
 """

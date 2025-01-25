@@ -4,6 +4,7 @@ includet("../src/models/oned_structure.jl")
 includet("../src/models/modal_model.jl")
 includet("../src/models/excitation.jl")
 includet("../src/models/noise.jl")
+includet("../src/estimation/noise_estimation.jl")
 includet("../src/solvers/direct_time_solvers.jl")
 includet("../src/utils/calculus.jl")
 
@@ -27,7 +28,7 @@ Xm = LinRange(Δx, L - Δx, Npoint)    # Maillage de mesure
 ## Modes calculation
 ωn, kn = modefreq(beam, 2000.)
 ϕm = modeshape(beam, kn, Xm)
-ϕe = modeshape(beam, kn, [Xm[13]])
+ϕe = modeshape(beam, kn, Xm[13])
 
 ## Modal model
 Kn, Mn, Cn = modal_matrices(ωn, ξn)
@@ -36,13 +37,14 @@ Kn, Mn, Cn = modal_matrices(ωn, ξn)
 tmax = 0.5
 nt = 10000
 t = LinRange(0., tmax, nt)
+h = t[2] - t[1]
 
 harmo = SineWave(1e4, 0., tmax, 2π*10.)
 F = excitation(harmo, t)
 Fn = ϕe'*F'
 
 u0 = (zeros(length(ωn)), zeros(length(ωn)))
-prob = DirectTimeProblem(Kn, Mn, Cn, u0, t[2] - t[1], Fn)
+prob = DirectTimeProblem(Kn, Mn, Cn, u0, t, Fn)
 sol = solve(prob)
 
 u = ϕm*sol.u
@@ -61,3 +63,8 @@ SNRy2 = estimated_SNR(y2, vary2) # Signal to noise ratio estimation
 y3 = mixed_noise(u, 25.) # Noisy signal
 vary3 = varest(y3) # Variance estimation
 SNRy3 = estimated_SNR(y3, vary3) # Signal to noise ratio estimation
+
+# Colored noise
+y4 = acn(u, 25., 1/h, :white) # Noisy signal
+vary4 = varest(y4) # Variance estimation
+SNRy4 = estimated_SNR(y4, vary4) # Signal to noise ratio estimation

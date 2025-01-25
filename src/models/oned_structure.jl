@@ -310,7 +310,7 @@ Computes the mass-normalized mode shapes of a longitudinal or torsional bar
 function modeshape(b::BarRodString, kₙ, x, bc = :CC)
     (; L, m) = b
 
-    if isa(eltype(x), Number)
+    if isa(x, Number)
         x = [x]
     else !isa(x, Array)
         x = collect(x)
@@ -357,7 +357,7 @@ Calculates the mass-normalized mode shapes of a beam in bending
 function modeshape(b::Beam, kₙ, x, bc = :SS)
     (; L, m) = b
 
-    if isa(eltype(x), Number)
+    if isa(x, Number)
         x = [x]
     else !isa(x, Array)
         x = collect(x)

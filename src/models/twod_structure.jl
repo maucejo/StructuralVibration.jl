@@ -122,16 +122,16 @@ Computes the mass-normalized mode shapes of a simply supported rectangular plate
 @views function modeshape(p::TwoDStructure, kₘₙ, x, y)
     (; L, b, m) = p
 
-    if isa(eltype(x), Number)
+    if isa(x, Number)
         x = [x]
     else !isa(x, Array)
         x = collect(x)
     end
 
-    if isa(eltype(x), Number)
-        x = [x]
-    else !isa(x, Array)
-        x = collect(x)
+    if isa(y, Number)
+        y = [y]
+    else !isa(y, Array)
+        y = collect(y)
     end
 
     Mₙ = m*L*b/4
