@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
@@ -27,6 +28,7 @@ GLMakieExt = "GLMakie"
 
 [compat]
 DSP = "0.8.0"
+DataInterpolations = "7.0.1"
 FFTW = "1.8.0"
 Interpolations = "0.15.1"
 LazyGrids = "1.0.0"

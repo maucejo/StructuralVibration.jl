@@ -12,11 +12,10 @@ Compute the gradient of a function `f` at points `t`.
 """
 function gradient(f::Vector{Float64}, t)
 
-    itp = LinearInterpolation(t, f)
+    itp = linear_interpolation(t, f)
 
     return only.(Interpolations.gradient.(Ref(itp), t))
 end
-
 
 """
     gradient(f::Matrix{Float64}, t)
@@ -39,4 +38,14 @@ function gradient(f::Matrix{Float64}, t)
     end
 
     return df
+end
+
+function curvature(x::Vector{Float64}, y::Vector{Float64}, p)
+    dx = gradient(x, p)
+    ddx = gradient(dx, p)
+
+    dy = gradient(y, p)
+    ddy = gradient(dy, p)
+
+    return (dx.*ddy - dy.*ddx)./(dx.^2 + dy.^2).^(3/2)
 end

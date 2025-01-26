@@ -65,6 +65,6 @@ vary3 = varest(y3) # Variance estimation
 SNRy3 = estimated_SNR(y3, vary3) # Signal to noise ratio estimation
 
 # Colored noise
-y4 = acn(u, 25., 1/h, :white) # Noisy signal
+y4 = acn(u, 25., 1/h, :pink) # Noisy signal
 vary4 = varest(y4) # Variance estimation
 SNRy4 = estimated_SNR(y4, vary4) # Signal to noise ratio estimation

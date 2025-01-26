@@ -12,6 +12,11 @@ Adds a Gaussian White Noise (AWGN) to a signal `x` with a given SNR.
 * `y`: noisy signal - Matrix{ComplexF64}
 """
 function agwn(x, snr_dB, rst = true)
+
+    if x isa Vector
+        x = transpose(x)
+    end
+
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -25,7 +30,12 @@ function agwn(x, snr_dB, rst = true)
     σ = sqrt.(V)                            # Standard deviation
     n = σ.*randn(rng, eltype(x), N, L)      # Gaussian noise
 
-    return x .+ n
+    y = x .+ n
+    if x isa Vector
+        return y[:]
+    else
+        return y
+    end
 end
 
 """
@@ -50,6 +60,11 @@ Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
 * `y`: noisy signal
 """
 function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = true)
+
+    if x isa Vector
+        x = transpose(x)
+    end
+
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -81,7 +96,12 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = 
     # Colored noise with scaled variance
     colored_noise .*= σ/std(colored_noise)
 
-    return x .+ colored_noise
+    y = x .+ colored_noise
+    if x isa Vector
+        return y[:]
+    else
+        return y
+    end
 end
 
 """
@@ -106,6 +126,10 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
 * `y`: noisy signal
 """
 function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :white, band_freq = Float64[], rst = true)
+
+    if x isa Vector
+        x = transpose(x)
+    end
 
     # Reset the RNG if required
     if rst
@@ -164,7 +188,12 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :white, band_fre
         end
     end
 
-    return x .+ colored_noise
+    y = x .+ colored_noise
+    if x isa Vector
+        return y[:]
+    else
+        return y
+    end
 end
 
 """
@@ -182,6 +211,10 @@ Adds a multiplicative Gaussian White Noise (AWGN) to a signal `x` with a given S
 """
 function mult_noise(x, snr_dB, rst = true)
 
+    if x isa Vector
+        x = transpose(x)
+    end
+
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -191,7 +224,12 @@ function mult_noise(x, snr_dB, rst = true)
     SNR = 10^(snr_dB/10.)
     n = randn(rng, eltype(x), N, L)/sqrt(SNR)
 
-    return @. (1. + n)*x
+    y = @. (1. + n)*x
+    if x isa Vector
+        return y[:]
+    else
+        return y
+    end
 end
 
 """
@@ -209,6 +247,10 @@ Adds both additive and multiplicative Gaussian White Noise to a signal `x` with 
 """
 function mixed_noise(x, snr_dB, rst = true)
 
+    if x isa Vector
+        x = transpose(x)
+    end
+
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
@@ -224,5 +266,10 @@ function mixed_noise(x, snr_dB, rst = true)
 
     muln = randn(rng, eltype(x), N, L)/sqrt(SNR)
 
-    return @. (1. + muln)*x + addn
+    y = @. (1. + muln)*x + addn
+    if x isa Vector
+        return y[:]
+    else
+        return y
+    end
 end
