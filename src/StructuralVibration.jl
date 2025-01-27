@@ -14,7 +14,7 @@ export Mesh
 export Rectangle, Triangle, Hammer, SmoothRect,
        SineWave, SweptSine, GaussianPulse, ColoredNoise
 
-# # Structs - Problems
+# Structs - Problems
 export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
        SdofFRFProblem, SdofFrequencyProblem, StateSpaceTimeProblem, StateSpaceFRFProblem, StateSpaceFreqProblem,
        FreeModalTimeProblem, ForcedModalTimeProblem, ModalFRFProblem, DirectFRFProblem, ModalFreqProblem, DirectFreqProblem, DirectTimeProblem
@@ -22,6 +22,9 @@ export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
 # Structs - Time solvers
 export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
        Newmark, HHT, WBZ, GeneralizedAlpha, MidPoint
+
+# Structs - Noise estimation
+export BayesianEst, GCVEst, LcurveEst, DerricoEst
 
 # Functions
 export excitation, modefreq, modeshape, eigenmode, modal_matrices, solve,

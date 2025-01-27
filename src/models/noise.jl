@@ -13,29 +13,19 @@ Adds a Gaussian White Noise (AWGN) to a signal `x` with a given SNR.
 """
 function agwn(x, snr_dB, rst = true)
 
-    if x isa Vector
-        x = transpose(x)
-    end
-
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
     end
 
-    N, L = size(x)                          # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = 2)[:]         # Signal energy
+    En = mean(abs2, x, dims = ndims(x))[:]         # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
-    n = σ.*randn(rng, eltype(x), N, L)      # Gaussian noise
+    n = σ.*randn(rng, eltype(x), size(x))      # Gaussian noise
 
-    y = x .+ n
-    if x isa Vector
-        return y[:]
-    else
-        return y
-    end
+    return x .+ n
 end
 
 """
@@ -61,24 +51,19 @@ Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
 """
 function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = true)
 
-    if x isa Vector
-        x = transpose(x)
-    end
-
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
     end
 
-    N, L = size(x)                          # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = 2)[:]         # Signal energy
+    En = mean(abs2, x, dims = ndims(x))[:]  # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
 
-    white_noise = randn(rng, eltype(x), N, L)
-    scale = ones(L)
+    white_noise = randn(rng, eltype(x), size(x))
+    scale = ones(size(x, ndims(x)))
     if color == :pink
         @. scale[2:end] = 1/sqrt(freq[2:end])
     elseif color == :blue
@@ -96,12 +81,7 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = 
     # Colored noise with scaled variance
     colored_noise .*= σ/std(colored_noise)
 
-    y = x .+ colored_noise
-    if x isa Vector
-        return y[:]
-    else
-        return y
-    end
+    return x .+ colored_noise
 end
 
 """
@@ -127,23 +107,20 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
 """
 function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :white, band_freq = Float64[], rst = true)
 
-    if x isa Vector
-        x = transpose(x)
-    end
-
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
     end
 
-    N, L = size(x)                          # Data dimensions
+    ndx = ndims(x)
+    L = size(x, ndx)                        # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = 2)[:]         # Signal energy
+    En = mean(abs2, x, dims = ndx)[:]         # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
 
-    white_fft = rfft(randn(rng, N, L), 2)
+    white_fft = rfft(randn(rng, size(x)), ndx)
     freq = rfftfreq(L, fs)
 
     scale = ones(length(freq))
@@ -162,7 +139,7 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :white, band_fre
     colored_fft = white_fft.*scale'
 
     # Colored noise with scaled variance
-    colored_noise = irfft(colored_fft, L, 2)
+    colored_noise = irfft(colored_fft, L, ndx)
     colored_noise .*= σ/std(colored_noise)
 
     if length(band_freq) > 0
@@ -188,12 +165,7 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :white, band_fre
         end
     end
 
-    y = x .+ colored_noise
-    if x isa Vector
-        return y[:]
-    else
-        return y
-    end
+    return x .+ colored_noise
 end
 
 """
@@ -211,25 +183,15 @@ Adds a multiplicative Gaussian White Noise (AWGN) to a signal `x` with a given S
 """
 function mult_noise(x, snr_dB, rst = true)
 
-    if x isa Vector
-        x = transpose(x)
-    end
-
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
     end
 
-    N, L = size(x)
     SNR = 10^(snr_dB/10.)
-    n = randn(rng, eltype(x), N, L)/sqrt(SNR)
+    n = randn(rng, eltype(x), size(x))/sqrt(SNR)
 
-    y = @. (1. + n)*x
-    if x isa Vector
-        return y[:]
-    else
-        return y
-    end
+    return @. (1. + n)*x
 end
 
 """
@@ -247,29 +209,19 @@ Adds both additive and multiplicative Gaussian White Noise to a signal `x` with 
 """
 function mixed_noise(x, snr_dB, rst = true)
 
-    if x isa Vector
-        x = transpose(x)
-    end
-
     # Reset the RNG if required
     if rst
         rng = MersenneTwister(1000)
     end
 
-    N, L = size(x)                          # Data dimensions
-    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = 2)[:]         # Signal energy
-    V = En/SNR                              # Noise variance
+    SNR = 10^(snr_dB/10.)                      # SNR in linear scale
+    En = mean(abs2, x, dims = ndims(x))[:]     # Signal energy
+    V = En/SNR                                 # Noise variance
 
-    σ = sqrt.(V)                            # Standard deviation
-    addn = σ.*randn(rng, eltype(x), N, L)   # Gaussian noise
+    σ = sqrt.(V)                               #Standard deviation
+    addn = σ.*randn(rng, eltype(x), size(x))   # Gaussian noise
 
-    muln = randn(rng, eltype(x), N, L)/sqrt(SNR)
+    muln = randn(rng, eltype(x), size(x))/sqrt(SNR)
 
-    y = @. (1. + muln)*x + addn
-    if x isa Vector
-        return y[:]
-    else
-        return y
-    end
+    return @. (1. + muln)*x + addn
 end

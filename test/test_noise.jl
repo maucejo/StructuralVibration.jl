@@ -50,21 +50,21 @@ sol = solve(prob)
 u = ϕm*sol.u
 
 # Gaussian White Noise
-y1 = agwn(u, 25.) # Noisy signal
-vary1 = varest(y1) # Variance estimation
+y1 = agwn(u, 25.)                # Noisy signal
+vary1 = varest(y1)               # Variance estimation
 SNRy1 = estimated_SNR(y1, vary1) # Signal to noise ratio estimation
 
 # Multiplicative noise
-y2 = mult_noise(u, 25.) # Noisy signal
-vary2 = varest(y2) # Variance estimation
+y2 = mult_noise(u, 25.)          # Noisy signal
+vary2 = varest(y2)               # Variance estimation
 SNRy2 = estimated_SNR(y2, vary2) # Signal to noise ratio estimation
 
 # Mixed noise
-y3 = mixed_noise(u, 25.) # Noisy signal
-vary3 = varest(y3) # Variance estimation
+y3 = mixed_noise(u, 25.)         # Noisy signal
+vary3 = varest(y3)               # Variance estimation
 SNRy3 = estimated_SNR(y3, vary3) # Signal to noise ratio estimation
 
 # Colored noise
-y4 = acn(u, 25., 1/h, :pink) # Noisy signal
-vary4 = varest(y4) # Variance estimation
+y4 = acn(u, 25., 1/h, :pink)     # Noisy signal
+vary4 = varest(y4)               # Variance estimation
 SNRy4 = estimated_SNR(y4, vary4) # Signal to noise ratio estimation
