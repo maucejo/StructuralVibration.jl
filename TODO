@@ -1,0 +1,11 @@
+In estimation/sdof_extraction.jl
+* modal parameters extraction for one dofs (half-bandwidth, nyquist)
+
+In estimation/signal_processing.jl
+* Transfer function estimation
+
+Rigid body modes
+
+MDOF Systems
+
+Damping matrices

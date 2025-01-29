@@ -18,7 +18,7 @@ Structure containing the data of a homogeneous and isotropic bending plate
 * `m`: Surface mass [kg/m²]
 * `D`: Bending stiffness [N.m]
 """
-@with_kw struct Plate <: TwoDStructure
+struct Plate <: TwoDStructure
     L::Float64
     b::Float64
     m::Float64
@@ -34,7 +34,7 @@ Structure containing the data of a homogeneous and isotropic bending plate
 end
 
 """
-    RectMembrane(L, b, m, T)
+    Membrane(L, b, m, T)
 
 Structure containing the data of a homogeneous and isotropic rectangular membrane
 
@@ -44,7 +44,7 @@ Structure containing the data of a homogeneous and isotropic rectangular membran
 * `m`: Surface mass [kg/m²]
 * `D`: Tension [N]
 """
-@with_kw struct RectMembrane <: TwoDStructure
+struct Membrane <: TwoDStructure
     L::Float64
     b::Float64
     m::Float64

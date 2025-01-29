@@ -13,7 +13,7 @@ Structure containing the data of a time problem for a sdof system
     * :force: External force (default)
     * :base: Base motion
 """
-@with_kw struct SdofFreeTimeProblem
+struct SdofFreeTimeProblem
     sdof :: Sdof
     u0 :: Vector{Float64}
     t
@@ -39,7 +39,7 @@ Structure containing the data of a time problem for a sdof system subject to a h
     * :force: External force (default)
     * :base: Base motion
 """
-@with_kw struct SdofHarmonicTimeProblem
+struct SdofHarmonicTimeProblem
     sdof :: Sdof
     u0 :: Vector{Float64}
     t
@@ -67,7 +67,7 @@ Structure containing the data of a time problem for a sdof system subject to an 
     * :force: External force (default)
     * :base: Base motion
 """
-@with_kw struct SdofForcedTimeProblem
+struct SdofForcedTimeProblem
     sdof :: Sdof
     u0 :: Vector{Float64}
     t
@@ -87,7 +87,7 @@ Structure containing the data of the solution of the forced response of a sdof s
 * `du`: Velocity solution
 * `ddu`: Acceleration solution
 """
-@with_kw struct SdofTimeSolution
+struct SdofTimeSolution
     u :: Vector{Float64}
     du :: Vector{Float64}
     ddu :: Vector{Float64}
@@ -109,7 +109,7 @@ Structure containing the data for computing the FRF a sdof system
     * :vel: Velocity spectrum or Mobility
     * :acc: Acceleration spectrum or Accelerance
 """
-@with_kw struct SdofFRFProblem
+struct SdofFRFProblem
     sdof :: Sdof
     freq
     type_exc :: Symbol
@@ -135,7 +135,7 @@ Structure containing the data for computing the frequency response of a sdof sys
     - :vel: Velocity spectrum or Mobility
     - :acc: Acceleration spectrum or Accelerance
 """
-@with_kw struct SdofFrequencyProblem
+struct SdofFrequencyProblem
     sdof :: Sdof
     freq
     F :: Vector{Float64}
@@ -155,7 +155,7 @@ Structure containing the data of the solution of a frequency problem for a sdof 
    * Response spectrum (displacement, velocity, acceleration) [m, m/s, m/s²]
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
-@with_kw struct SdofFrequencySolution
+struct SdofFrequencySolution
     u :: Vector{Complex{Float64}}
 end
 
@@ -175,7 +175,11 @@ function solve(prob::SdofFreeTimeProblem)
     (; ω₀, ξ) = sdof
     x₀, v₀ = u0
 
-    if ξ < 1.
+    if ω₀ == 0.
+        x = @. x₀ + v₀*t
+        v = @. v₀*ones(length(t))
+        a = @. zeros(length(t))
+    elseif ξ < 1.
         Ω₀ = ω₀*√(1 - ξ^2)
         A = x₀
         B = (v₀ + ξ*ω₀*x₀)/Ω₀
@@ -221,38 +225,59 @@ function solve(prob::SdofHarmonicTimeProblem)
     (; m, ω₀, ξ) = sdof
     x₀, v₀ = u0
 
-    if type_exc == :force
-        X = F/m/(ω₀^2 - ω^2 + 2im*ξ*ω*ω₀)
+    if ξ == 0. && ω₀ == ω
+        # Variation parameters
+        if type_exc == :force
+            α = 1/m
+        else
+            α = ω^2
+        end
+
+        ρ₀ = α*F/2ω
+        A = x₀
+        B = v₀/ω
+        x = @. A*cos(ω*t) + B*sin(ω*t) + ρ₀*t*sin(ω*t)
+        v = @. -A*ω*sin(ω*t) + B*ω*cos(ω*t) + ρ₀*(sin(ω*t) + ω*t*cos(ω*t))
+        a = @. -A*ω^2*cos(ω*t) - B*ω^2*sin(ω*t) + ρ₀*(2ω*cos(ω*t) - ω^2*t*sin(ω*t))
     else
-        X = F*(ω₀^2 + 2im*ξ*ω*ω₀)/(ω₀^2 - ω^2 + 2im*ξ*ω*ω₀)
+        if type_exc == :force
+            X = F/m/(ω₀^2 - ω^2 + 2im*ξ*ω*ω₀)
+        else
+            X = F*(ω₀^2 + 2im*ξ*ω*ω₀)/(ω₀^2 - ω^2 + 2im*ξ*ω*ω₀)
+        end
+
+        ρ₀ = abs.(X)
+        ϕ = angle.(X)
+
+        A = x₀ - ρ₀*cos(ϕ)
+        if ω₀ == 0.
+            B = v₀ + ρ₀*ω*sin(ϕ)
+            xh = @. A + B*t
+            vh = @. B*ones(length(t))
+            ah = @. zeros(length(t))
+        elseif ξ < 1.
+            Ω₀ = ω₀*√(1 - ξ^2)
+            B = (v₀ + ξ*ω₀*A + ρ₀*ω*sin(ϕ))/Ω₀
+            xh = @. (A*cos(Ω₀*t) + B*sin(Ω₀*t))*exp(-ξ*ω₀*t)
+            vh = @. Ω₀*(-A*sin(Ω₀*t) + B*cos(Ω₀*t))*exp(-ξ*ω₀*t) - ξ*ω₀*xh
+            ah = @. -2ξ*ω₀*vh - ω₀^2*xh
+        elseif ξ == 1.
+            B = v₀ + ω₀*A + ρ₀*ω*sin(ϕ)
+            xh = @. (A + B*t)*exp(-ω₀*t)
+            vh = @. B*exp(-ω₀*t) - ω₀*xh
+            ah = @. -2ω₀*vh - ω₀^2*xh
+        else
+            β = ω₀*√(ξ^2 - 1)
+            B = (v₀ + ξ*ω₀*A + ρ₀*ω*sin(ϕ))/β
+            xh = @. (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω₀*t)
+            vh = @. β*(A*sinh(β*t) + B*cosh(β*t))*exp(-ξ*ω₀*t) - ξ*ω₀*xh
+            ah = @. -2ξ*ω₀*vh - ω₀^2*xh
+        end
+
+        x = @. xh + ρ₀*cos(ω*t + ϕ)
+        v = @. vh - ρ₀*ω*sin(ω*t + ϕ)
+        a = @. ah - ρ₀*ω^2*cos(ω*t + ϕ)
     end
-
-    ρ₀ = abs.(X)
-    ϕ = angle.(X)
-
-    A = x₀ - ρ₀*cos(ϕ)
-    if ξ < 1.
-        Ω₀ = ω₀*√(1 - ξ^2)
-        B = (v₀ + ξ*ω₀*A + ρ₀*ω*sin(ϕ))/Ω₀
-        xh = @. (A*cos(Ω₀*t) + B*sin(Ω₀*t))*exp(-ξ*ω₀*t)
-        vh = @. Ω₀*(-A*sin(Ω₀*t) + B*cos(Ω₀*t))*exp(-ξ*ω₀*t) - ξ*ω₀*xh
-        ah = @. -2ξ*ω₀*vh - ω₀^2*xh
-    elseif ξ == 1.
-        B = v₀ + ω₀*A + ρ₀*ω*sin(ϕ)
-        xh = @. (A + B*t)*exp(-ω₀*t)
-        vh = @. B*exp(-ω₀*t) - ω₀*xh
-        ah = @. -2ω₀*vh - ω₀^2*xh
-    else
-        β = ω₀*√(ξ^2 - 1)
-        B = (v₀ + ξ*ω₀*A + ρ₀*ω*sin(ϕ))/β
-        xh = @. (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω₀*t)
-        vh = @. β*(A*sinh(β*t) + B*cosh(β*t))*exp(-ξ*ω₀*t) - ξ*ω₀*xh
-        ah = @. -2ξ*ω₀*vh - ω₀^2*xh
-    end
-
-    x = xh .+ ρ₀*cos.(ω*t .+ ϕ)
-    v = vh .- ρ₀*ω*sin.(ω*t .+ ϕ)
-    a = ah .- ρ₀*ω^2*cos.(ω*t .+ ϕ)
 
     return SdofTimeSolution(x, v, a)
 end
@@ -278,20 +303,22 @@ function solve(prob::SdofForcedTimeProblem)
     Δt = t[2] - t[1]
 
     # Impulse response
-    if ξ < 1.
+    A = x₀
+    if ω₀ == 0.
+        B = v₀
+        xh = @. A + B*t
+        h = @. t/m
+    elseif ξ < 1.
         Ω₀ = ω₀*√(1 - ξ^2)
-        A = x₀
         B = (v₀ + ξ*ω₀*x₀)/Ω₀
         xh = @. (A*cos(Ω₀*t) + B*sin(Ω₀*t))*exp(-ξ*ω₀*t)
         h = @. exp(-ξ*ω₀*t)*sin(Ω₀*t)/m/Ω₀
     elseif ξ == 1.
-        A = x₀
         B = v₀ + ω₀*x₀
         xh = @. (A + B*t)*exp(-ω₀*t)
         h = @. t*exp(-ω₀*t)/m
     else
         β = ω₀*√(ξ^2 - 1)
-        A = x₀
         B = (v₀ + ξ*ω₀*x₀)/β
         xh = @. (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω₀*t)
         h = @. exp(-ξ*ω₀*t)*sinh(β*t)/m/β

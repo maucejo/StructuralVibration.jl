@@ -1,12 +1,4 @@
-using Parameters, LinearAlgebra, DSP, Interpolations, ProgressMeter, Random, FFTW, Optim, Statistics, SpecialFunctions
-
-includet("../src/models/oned_structure.jl")
-includet("../src/models/modal_model.jl")
-includet("../src/models/excitation.jl")
-includet("../src/models/noise.jl")
-includet("../src/estimation/noise_estimation.jl")
-includet("../src/solvers/direct_time_solvers.jl")
-includet("../src/utils/calculus.jl")
+using StructuralVibration
 
 ## Beam definition
 L = 1.                      # Length of the beam [m]

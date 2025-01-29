@@ -15,7 +15,7 @@ Structure containing data for the state-space model
 * h: Time step
 * F: External force matrix
 """
-@with_kw struct StateSpaceTimeProblem
+struct StateSpaceTimeProblem
     css :: ContinuousStateSpace
     u0 :: Vector{Float64}
     h :: Float64
@@ -32,7 +32,7 @@ Structure containing the solution of the state-space model
 * `V`: Velocity matrix or vector
 * `A`: Acceleration matrix or vector
 """
-@with_kw struct StateSpaceTimeSolution
+struct StateSpaceTimeSolution
     D
     V
     A
@@ -51,7 +51,7 @@ Structure containing the data feeding the direct solver for calculating an FRF
 
 # Note: It is assumed that the output equation is of the form y = Sₒ*x
 """
-@with_kw struct StateSpaceFRFProblem
+struct StateSpaceFRFProblem
     css :: ContinuousStateSpace
     freq
     Sₒ
@@ -68,7 +68,7 @@ Structure containing the solution of the state-space model
 # Fields
 * `y`: FRF matrix
 """
-@with_kw struct StateSpaceFRFSolution
+struct StateSpaceFRFSolution
     y :: Union{Matrix{ComplexF64}, Vector{Matrix{ComplexF64}}}
 end
 
@@ -86,7 +86,7 @@ Structure containing the data feeding the modal solver for calculating the frequ
 # Output
 * `StateSpaceFreqSolution`: Solution of the state-space model
 """
-@with_kw struct StateSpaceFreqProblem
+struct StateSpaceFreqProblem
     css :: ContinuousStateSpace
     freq
     F
@@ -95,7 +95,7 @@ Structure containing the data feeding the modal solver for calculating the frequ
     StateSpaceFreqProblem(css, freq, F, Sₒ = I(Int(size(css.Ac, 1)/2))) = new(css, freq, F, Sₒ)
 end
 
-@with_kw struct StateSpaceFreqSolution
+struct StateSpaceFreqSolution
     y
 end
 
@@ -159,15 +159,15 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4)
 
     n, nt = size(F)
     m = Int(n/2)
-    x = zeros(n, nt)
-    A = zeros(m, nt)
+    x = undefs(n, nt)
+    A = undefs(m, nt)
 
     # Intermediate vectors
-    k₁ = zeros(n)
-    k₂ = zeros(n)
-    k₃ = zeros(n)
-    k₄ = zeros(n)
-    Fn_2 = zeros(n)
+    k₁ = undefs(n)
+    k₂ = undefs(n)
+    k₃ = undefs(n)
+    k₄ = undefs(n)
+    Fn_2 = undefs(n)
 
     x[:, 1] .= u0[:]
 
@@ -200,6 +200,7 @@ Computes the FRF matrix by direct method
 * sol: FRFSolution structure
 """
 function solve(m::StateSpaceFRFProblem, type = :dis, ismat = false)
+
     # Initialisation
     (; css, freq, Sₒ, Sₑ) = m
     Ac, Bc = css
@@ -209,22 +210,26 @@ function solve(m::StateSpaceFRFProblem, type = :dis, ismat = false)
     Ns = Int(Nstate/2)
     Nf = length(freq)
 
-    FRF = [Matrix{ComplexF64}(undef, Nₒ, Nₑ) for _ in 1:Nf]
-    D = Matrix{ComplexF64}(undef, Nstate, Nu)
-    Is = I(Nstate)
+    FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
+    M = undefs(ComplexF64, Nstate, Nu)
+
+    if type == :acc
+        C = S₀*Ac[Ns+1:end, :]
+        D = S₀*Bc[Ns+1:end, :]
+    end
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "FRF calculation - Direct method...", showspeed = true)
-    @inbounds for (f, ω) in enumerate(ωf)
+    for (f, ω) in enumerate(ωf)
         next!(p)
-        D .= (1im*Is - Ac)\Bc
+        M .= (1im*ω*I - Ac)\Bc
 
         if type == :dis
-            FRF[f] .= Sₒ*D[1:Ns, :]*Sₑ'
+            FRF[f] .= Sₒ*M[1:Ns, :]*Sₑ'
         elseif type == :vel
-            FRF[f] .= Sₒ*D[Ns+1:end, :]*Sₑ'
+            FRF[f] .= Sₒ*M[Ns+1:end, :]*Sₑ'
         elseif type == :acc
-            FRF[f] .= -ω^2*Sₒ*D[1:Ns, :]*Sₑ'
+            FRF[f] .= (C*M .+ D)*Sₑ'
         end
     end
 
@@ -250,6 +255,7 @@ Computes the FRF matrix by modal method
 * sol: StateSpaceFRFSolution
 """
 function solve(m::StateSpaceFRFProblem, Nₘ::Int, type = :dis, ismat = false)
+
     # Initialisation
     (; css, freq, Sₒ, Sₑ) = m
     Nₒ = size(Sₒ, 1)
@@ -260,29 +266,33 @@ function solve(m::StateSpaceFRFProblem, Nₘ::Int, type = :dis, ismat = false)
 
     # Compute modal information
     λ, Ψ = eigenmode(Ac, Nₘ)
-    Bc = Ψ\css.Bc
+    B = Ψ\css.Bc
 
-    if type == :dis || type == :acc
+    if type == :dis
         Ψₒ = Sₒ*Ψ[1:Ns, :]
     elseif type == :vel
         Ψₒ = Sₒ*Ψ[Ns+1:end, :]
+    elseif type == :acc
+        C = Sₒ*Ac[Ns+1:end, :]*Ψ
+        D = Sₒ*Bc[Ns+1:end, :]*Sₑ'
     end
-    Ψₑ = Bc*Sₑ'
+    Bₑ = B*Sₑ'
     Nm = length(λ)
 
-    FRF = [Matrix{ComplexF64}(undef, Nₒ, Nₑ) for _ in 1:Nf]
-    M = Diagonal{ComplexF64}(undef, Nm)
+    FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
+    M = undefs(Diagonal{ComplexF64}, Nm)
     indm = diagind(M)
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "FRF calculation - Modal approach...", showspeed = true)
-    @inbounds for (f, ω) in enumerate(ωf)
+    for (f, ω) in enumerate(ωf)
         next!(p)
         @. M[indm] = 1/(1im*ω - λ)
 
-        FRF[f] .= Ψₒ*M*Ψₑ
-        if type == :acc
-            FRF[f] .*= -ω^2
+        if type == :dis || type == :vel
+            FRF[f] .= Ψₒ*M*Bₑ
+        elseif type == :acc
+            FRF[f] .*= C*M*Bₑ + D
         end
     end
 
@@ -317,22 +327,26 @@ function solve(m::StateSpaceFreqProblem, type = :dis)
     Ns = Int(Nstate/2)
     Nf = length(freq)
 
-    y = Matrix{ComplexF64}(undef, Nₒ, Nf)
-    D = Matrix{ComplexF64}(undef, Nstate, Nu)
-    Is = I(Nstate)
+    y = undefs(ComplexF64, Nₒ, Nf)
+    M = undefs(ComplexF64, Nstate, Nu)
+
+    if type == :acc
+        C = Sₒ*Ac[Ns+1:end, :]
+        D = Sₒ*Bc[Ns+1:end, :]
+    end
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "Frequency response - Direct method...", showspeed = true)
-    @inbounds for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
+    for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
         next!(p)
-        D .= (1im*Is - Ac)\Bc
+        M .= (1im*ω*I - Ac)\Bc
 
         if type == :dis
-            y[:, f] .= Sₒ*D[1:Ns, :]*Fₑ
+            y[:, f] .= Sₒ*M[1:Ns, :]*Fₑ
         elseif type == :vel
-            y[:, f] .= Sₒ*D[Ns+1:end, :]*Fₑ
+            y[:, f] .= Sₒ*M[Ns+1:end, :]*Fₑ
         elseif type == :acc
-            y[:, f] .= -ω^2*Sₒ*D[1:Ns, :]*Fₑ
+            y[:, f] .= (C*M + D)*Fₑ
         end
     end
 
@@ -376,13 +390,13 @@ function solve(m::StateSpaceFreqProblem, Nₘ::Int, type = :dis)
     u = Bc*F
     Nm = length(λ)
 
-    y = Matrix{ComplexF64}(undef, Nₒ, Nf)
+    y = undefs(ComplexF64, Nₒ, Nf)
     M = Diagonal{ComplexF64}(undef, Nm)
     indm = diagind(M)
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "Frequency response - Modal approach...", showspeed = true)
-    @inbounds for (f, (ω, uₑ)) in enumerate(zip(ωf, eachcol(u)))
+    for (f, (ω, uₑ)) in enumerate(zip(ωf, eachcol(u)))
         next!(p)
         @. M[indm] = 1/(1im*ω - λ)
 

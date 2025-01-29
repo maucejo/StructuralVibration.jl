@@ -4,28 +4,28 @@
 Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 
 # Constructor parameters
-* s: Structure containing the data related to the 1D system
-* xmin: starting position of the beam
-* Nelt: number of elements
-* bc: Boundary conditions type
-    * :CC : Clamped - Clamped
-    * :FF : Free - Free
-    * :CF : Clamped - Free
-    * :SS : Simply Supported - Simply Supported (specific to beam)
-    * :CS : Clamped - Simply Supported (specific to beam)
-    * :SF : Simply Supported - Free (specific to beam)
+* `s`: Structure containing the data related to the 1D system
+* `xmin`: starting position of the beam
+* `Nelt`: number of elements
+* `bc`: Boundary conditions type
+    * `:CC`: Clamped - Clamped
+    * `:FF`: Free - Free
+    *  `:CF`: Clamped - Free
+    * `:SS`: Simply Supported - Simply Supported (specific to beam)
+    * `:CS`: Clamped - Simply Supported (specific to beam)
+    * `:SF`: Simply Supported - Free (specific to beam)
 
 # Fields
-* xmin: Starting position of the beam
-* L: Length of the beam
-* Nodes: Nodes of the mesh
-* Elt: Elements of the mesh
-* Ndof_per_node: Number of degrees of freedom per node
-* elem_size: Size of the elements
-* constrained_dofs: Constrained degrees of freedom
-* free_dofs: Free degrees of freedom
+* `xmin`: Starting position of the beam
+* `L`: Length of the beam
+* `Nodes`: Nodes of the mesh
+* `Elt`: Elements of the mesh
+* `Ndof_per_node: Number of degrees of freedom per node
+* elem_size`: Size of the elements
+* `constrained_dofs`: Constrained degrees of freedom
+* `free_dofs`: Free degrees of freedom
 """
-@with_kw struct Mesh
+struct Mesh
     xmin :: Float64
     L :: Float64
     Nodes :: Matrix{Float64}
@@ -37,8 +37,8 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 
     function Mesh(s :: OneDStructure, xmin, Nelt, bc = :CC)
         Nnodes = Nelt + 1
-        Nodes = zeros(Nnodes, 2)
-        Elt = zeros(Nelt, 3)
+        Nodes = undefs(Nnodes, 2)
+        Elt = undefs(Nelt, 3)
         elem_size = s.L/Nelt
 
         for i = 1:Nnodes
@@ -95,8 +95,8 @@ end
 Compute the global stiffness and mass matrices for a beam with a given mesh.
 
 # Inputs
-* s: Structure containing the data related to the 1D system
-* mesh: Mesh
+* `s`: Structure containing the data related to the 1D system
+* `mesh`: Mesh
 
 # Outputs
 * `K`: global stiffness matrix
@@ -131,8 +131,8 @@ end
 Compute the elemental stiffness and mass matrices for a beam with a element size `h`.
 
 # Inputs
-* s: Structure containing the data related to the 1D system
-* h: element size
+* `s`: Structure containing the data related to the 1D system
+* `h`: element size
 
 # Outputs
 * `kₑ`: elemental stiffness matrix
@@ -206,13 +206,13 @@ end
 Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 
 # Inputs
-    * K : Stiffness matrix
-    * M : Mass matrix
-    * Nₘ : Number of modes to be keep in the modal basis
+    * `K`: Stiffness matrix
+    * `M`: Mass matrix
+    * `Nₘ`: Number of modes to be keep in the modal basis
 
 # Outputs
-    * ωₘ : Vector of natural frequencies
-    * Φₘ : Modal shapes
+    * `ωₘ`: Vector of natural frequencies
+    * `Φₘ`: Modal shapes
 
 Note: The mode shapes are mass-normalized, so Mₙ = I
 """
@@ -223,4 +223,44 @@ function eigenmode(K::Matrix{Float64}, M::Matrix{Float64}, Nₘ = size(K, 1))
     Φₘ = Φ[:, 1:Nₘ]
 
     return ωₘ, Φₘ
+end
+
+"""
+    rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+
+Compute the Rayleigh damping matrix for a given stiffness and mass matrices
+
+# Inputs
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `α`: Mass proportional damping coefficient
+* `β`: Stiffness proportional damping coefficient
+
+# Output
+* `C`: Rayleigh damping matrix
+"""
+function rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+    return α*M + β*K
+end
+
+"""
+    rayleigh_damping_matrix(K, M, ω₁::Float64, ω₂::Float64, ξ₁::Float64, ξ₂::Float64)
+
+Compute the Rayleigh damping matrix for a given stiffness and mass matrices
+
+# Inputs
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `ω₁`: First natural frequency
+* `ω₂`: Second natural frequency
+* `ξ₁`: Damping ratio for the first natural frequency
+* `ξ₂`: Damping ratio for the second natural frequency
+
+# Output
+* `C`: Rayleigh damping matrix
+"""
+function rayleigh_damping_matrix(K, M, ω₁::Float64, ω₂::Float64, ξ₁::Float64, ξ₂::Float64)
+    β = 2(ξ₂*ω₂ - ξ₁*ω₁)/(ω₂^2 - ω₁^2)
+    α = 2ξ₁*ω₁ - ω₁^2*β
+    return α*M + β*K
 end

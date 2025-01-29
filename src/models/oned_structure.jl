@@ -17,7 +17,7 @@ Structure containing the data of a homogeneous and isotropic longitudinal bar
 * `m`: Line mass [kg/m]
 * `D`: Stiffness coefficient [Pa]
 """
-@with_kw struct Bar <: BarRodString
+struct Bar <: BarRodString
     L::Float64
     m::Float64
     D::Float64
@@ -47,7 +47,7 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 * `m`: Line mass [kg/m]
 * `D`: Stiffness coefficient [Pa]
 """
-@with_kw struct Rod <: BarRodString
+struct Rod <: BarRodString
     L::Float64
     m::Float64
     D::Float64
@@ -70,7 +70,7 @@ Structure containing the data of a homogeneous and isotropic string
 * `m`: Linear mass density [kg/m]
 * `D`: Tension [N]
 """
-@with_kw struct Strings <: BarRodString
+struct Strings <: BarRodString
     L :: Float64
     m :: Float64
     D :: Float64
@@ -93,7 +93,7 @@ Structure containing the data of a homogeneous and isotropic bending beam
 * `M`: Linear mass density [kg/m]
 * `D`: Bending stiffness [N.m²]
 """
-@with_kw struct Beam <: OneDStructure
+struct Beam <: OneDStructure
     L :: Float64
     m :: Float64
     D :: Float64

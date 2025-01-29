@@ -10,7 +10,7 @@ Structure containing data for the modal time solver
 * `Nₘ`: Number of modes to retain inf the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-@with_kw struct FreeModalTimeProblem
+struct FreeModalTimeProblem
     K :: Matrix{Float64}
     M :: Matrix{Float64}
     ξₙ :: Vector{Float64}
@@ -48,7 +48,7 @@ Structure containing data for the modal time solver for computing the forced res
 * `Nₘ`: Number of modes to retain in the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-@with_kw struct HarmonicModalTimeProblem
+struct HarmonicModalTimeProblem
     K :: Matrix{Float64}
     M :: Matrix{Float64}
     ξₙ :: Vector{Float64}
@@ -87,7 +87,7 @@ Structure containing data for modal time solver for computing the forced respons
 * `Nₘ`: Number of modes to retain in the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-@with_kw struct ForcedModalTimeProblem
+struct ForcedModalTimeProblem
     K
     M
     ξₙ :: Vector{Float64}
@@ -118,7 +118,7 @@ Structure containing problem solutions
 * `du`: Velocity matrix or vector
 * `ddu`: Acceleration matrix or vector
 """
-@with_kw struct ModalTimeSolution
+struct ModalTimeSolution
     u
     du
     ddu
@@ -163,7 +163,11 @@ function solve(prob::FreeModalTimeProblem)
     dq = Matrix{Float64}(undef, nt, Nₘ)
     ddq = Matrix{Float64}(undef, nt, Nₘ)
     for (m, (ωₘ, ξₘ, Aₘ, qₘ))  in enumerate(zip(ωₙ, ξₙ, qₓ, qᵥ))
-        if ξₘ < 1.
+        if ωₘ == 0.
+            @. q[:, m] = Aₘ + qₘ*t
+            @. dq[:, m] = qₘ
+            @. ddq[:, m] = 0.
+        elseif ξₘ < 1.
             Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
             Ξₘ = ξₘ*ωₘ
 
@@ -262,35 +266,50 @@ function solve(prob::HarmonicModalTimeProblem)
     qh = Vector{Float64}(undef, nt)
     dqh = Vector{Float64}(undef, nt)
     dqh = Vector{Float64}(undef, nt)
+
     for (m, (ωₘ, ξₘ, Aₘ, qₘ, ρₘ, ϕₘ))  in enumerate(zip(ωₙ, ξₙ, A, qᵥ, ρ, ϕ))
-        if ξₘ < 1.
-            Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
-            Ξₘ = ξₘ*ωₘ
+        if ξₘ == 0. && ωₘ == ω
+            Aₘ = qₓ[m]
+            Bₘ = qₘ/ω
+            ρₘ = Lₙ[m]/2ω
 
-            # Constant Bₙ
-            Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/Ωₘ
-
-            @. qh = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
-            @. dqh = Ωₘ*(-Aₘ*sin(Ωₘ*t) + Bₘ*cos(Ωₘ*t))*exp(-Ξₘ*t) - Ξₘ*qh
-            @. ddqh = -2Ξₘ*dqₕ - ωₘ^2*qₕ
-        elseif ξₘ == 1.
-            Bₘ = qₘ + ωₘ*Aₘ + ρₘ*ω*sin(ϕₘ)
-
-            @. qh = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
-            @. dqh = Bₘ*exp(-ωₘ*t) - ωₘ*qh
-            @. ddqh = -2ωₘ*dqh - ωₘ^2*qh
+            @. q[:, m] = Aₘ*cos(ω*t) + Bₘ*sin(ω*t) + ρₘ*t*sin(ω*t)
+            @. dq[:, m] = -Aₘ*ω*sin(ω*t) + Bₘ*ω*cos(ω*t) + ρₘ*(sin(ω*t) + ω*t*cos(ω*t))
+            @. ddq[:, m] = -Aₘ*ω^2*cos(ω*t) - Bₘ*ω^2*sin(ω*t) + ρₘ*(2ω*cos(ω*t) - ω^2*t*sin(ω*t))
         else
-            βₘ = ωₘ*sqrt(ξₘ^2 - 1)
-            Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/βₘ
+            if ωₘ == 0.
+                @. qh = Aₘ + qₘ*t
+                @. dqh = qₘ
+                @. ddqh = 0.
+            elseif ξₘ < 1.
+                Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
+                Ξₘ = ξₘ*ωₘ
 
-            @. qh = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
-            @. dqh = βₘ*(Aₘ*sinh(βₘ*t) + Bₘ*cosh(βₘ*t))*exp(-Ξₘ*t) - Ξₘ*qh
-            @. ddqh = -2Ξₘ*dqh - ωₘ^2*qh
+                # Constant Bₙ
+                Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/Ωₘ
+
+                @. qh = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
+                @. dqh = Ωₘ*(-Aₘ*sin(Ωₘ*t) + Bₘ*cos(Ωₘ*t))*exp(-Ξₘ*t) - Ξₘ*qh
+                @. ddqh = -2Ξₘ*dqₕ - ωₘ^2*qₕ
+            elseif ξₘ == 1.
+                Bₘ = qₘ + ωₘ*Aₘ + ρₘ*ω*sin(ϕₘ)
+
+                @. qh = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
+                @. dqh = Bₘ*exp(-ωₘ*t) - ωₘ*qh
+                @. ddqh = -2ωₘ*dqh - ωₘ^2*qh
+            else
+                βₘ = ωₘ*sqrt(ξₘ^2 - 1)
+                Bₘ = (qₘ + Ξₘ*Aₘ + ω*ρₘ*sin(ϕₘ))/βₘ
+
+                @. qh = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
+                @. dqh = βₘ*(Aₘ*sinh(βₘ*t) + Bₘ*cosh(βₘ*t))*exp(-Ξₘ*t) - Ξₘ*qh
+                @. ddqh = -2Ξₘ*dqh - ωₘ^2*qh
+            end
+
+            @. q[:, m] = qh + ρₘ*cos(ω*t + ϕₘ)
+            @. dq[:, m] = dqh - ρₘ*ω*sin(ω*t + ϕₘ)
+            @. ddq[:, m] = ddqh - ρₘ*ω^2*cos(ω*t + ϕₘ)
         end
-
-        @. q[:, m] = qh + ρₘ*cos(ω*t + ϕₘ)
-        @. dq[:, m] = dqh - ρₘ*ω*sin(ω*t + ϕₘ)
-        @. ddq[:, m] = ddqh - ρₘ*ω^2*cos(ω*t + ϕₘ)
     end
 
     u = Φₘ*q';
@@ -350,7 +369,10 @@ function solve(prob::ForcedModalTimeProblem)
     qh = Vector{Float64}(undef, nt)
     h = Vector{Float64}(undef, nt)
     for (m, (ωₘ, ξₘ, qxₘ, qvₘ)) in enumerate(zip(ωₙ, ξₙ, qₓ, qᵥ))
-        if ξₘ < 1.
+        if ωₘ == 0.
+            @. qh = qxₘ + qvₘ*t
+            @. h = t
+        elseif ξₘ < 1.
             Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
             Ξₘ = ξₘ*ωₘ
             Aₘ = qxₘ
@@ -359,7 +381,7 @@ function solve(prob::ForcedModalTimeProblem)
             @. h = exp(-Ξₘ*t)*sin(Ωₘ*t)/Ωₘ
         elseif ξₘ == 1.
             Aₘ = qxₘ
-            Bₘ = qv₍ + ωₘ*qxₘ
+            Bₘ = qvₘ + ωₘ*qxₘ
             @. qh = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
             @. h = t*exp(-ωₘ*t)
         else

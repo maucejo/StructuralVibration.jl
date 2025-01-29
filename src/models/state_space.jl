@@ -7,7 +7,7 @@ Continuous-time state-space model
 * `Ac`: Continuous-time state matrix A
 * `Bc`: Continuous-time input matrix B
 """
-@with_kw struct ContinuousStateSpace
+struct ContinuousStateSpace
     Ac::Matrix{Float64}
     Bc::Matrix{Float64}
 end
@@ -22,7 +22,7 @@ Discrete-time state-space model
 * `Bd`: Discrete-time input matrix B
 * `Bdp`: Discrete-time input matrix Bp (only for `:foh` method)
 """
-@with_kw struct DiscreteStateSpace
+struct DiscreteStateSpace
     Ad::Matrix{Float64}
     Bd::Matrix{Float64}
     Bdp::Matrix{Float64}
@@ -115,8 +115,64 @@ function eigenmode(Ac::Matrix{Float64}, Nₘ = Int[])
     λ, Ψ = eigen(Ac)
 
     if length(Nₘ) > 0
-        return λ[1:Nₘ], Ψ[:, 1:Nₘ]
+        return λ[1:2Nₘ], Ψ[:, 1:2Nₘ]
     end
 
     return λ, Ψ
+end
+
+"""
+    modal_parameters(λ)
+
+Computes the natural angular frequencies and damping ratios from the complex eigenvalues
+
+# Input
+* `λ`: Complex eigenvalues
+
+# Outputs
+* `ωₙ`: Natural angular frequencies
+* `ξₙ`: Damping ratios
+"""
+function modal_parameters(λ)
+
+    λₙ = λ[1:2:end]
+    ωₙ = abs.(λₙ)
+    ξₙ = -real(λₙ)./ωₙ
+
+    return ωₙ, ξₙ
+end
+
+"""
+    c2r_modeshapes(Ψ)
+
+Converts the complex modes to real modes
+
+# Input
+* `Ψ`: Complex modes
+
+# Output
+* `ϕₙ`: Real modes
+"""
+function c2r_modeshapes(Ψ)
+
+    M, Nmodes = size(Ψ)
+    Ψₙ = Ψ[1:2:M, :]
+    ϕₙ = zeros(1:2:M, Nmodes)
+    oneN = ones(Int(M/2))
+
+    for (i, Ψᵢ) in enumerate(eachcol(Ψₙ))
+        x = real(Ψᵢ)
+        y = imag(Ψᵢ)
+
+        # Fit a first order line to the data
+        A = [x oneN]
+        p = (A'A)\(A'y)
+
+        # Angle of maximum correlation line
+        θ = atan.(p[1])
+
+        ϕₙ[:, i] = real(Ψᵢ*exp(-1im*θ))
+    end
+
+    return ϕₙ
 end

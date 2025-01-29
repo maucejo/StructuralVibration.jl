@@ -11,7 +11,7 @@ Bayesian noise estimation
     * `:invgamma`: Inverse gamma distribution (default)
     * `:uniform`: Uniform distribution
 """
-@with_kw struct BayesianEst <: OptimFamily
+struct BayesianEst <: OptimFamily
     prior :: Symbol
 
     BayesianEst(prior = :invgamma) = new(prior)
@@ -144,7 +144,7 @@ function varest_optim(x, method::OptimFamily)
         noisevar = varestfun(x)
     elseif ndim == 2
         nx = size(x, 1)
-        noisevar = Vector{Float64}(undef, nx)
+        noisevar = undefs(nx)
         @views for (idx, xi) in enumerate(eachrow(x))
              noisevar[idx] = varestfun(xi)
         end
@@ -173,8 +173,8 @@ function varest_bayesian(x, prior = :invgamma)
 
     # Eigenvalues of the first-order smoothing matrix
     n = length(x)
-    s = Vector{Float64}(undef, n)
-    z = Vector{eltype(x)}(undef, n)
+    s = undefs(n)
+    z = undefs(eltype(x), n)
 
     @. s = 2(cos((0:n-1)π/n) - 1.)
     @. s[s == 0.] = 1e-8
@@ -269,8 +269,8 @@ Estimates the noise variance of a signal `x` using the Generalized Cross-Validat
 """
 function varest_gcv(x)
     n = length(x)
-    s = Vector{Float64}(undef, n)
-    z = Vector{eltype(x)}(undef, n)
+    s = undefs(n)
+    z = undefs(eltype(x), n)
 
     @. s = 2(cos((0:n-1)π/n) - 1.)
     @. s[s == 0.] = 1e-8
@@ -278,9 +278,9 @@ function varest_gcv(x)
 
     z .= dct(x)
 
-    hMin = 1e-6; hMax = 0.99;
-    lb = (((1 + sqrt(1+8*hMax.^(2)))/4hMax^2)^2 - 1)/16;
-    ub = (((1 + sqrt(1+8*hMin.^(2)))/4hMin^2)^2 - 1)/16;
+    hMin = 1e-6; hMax = 0.99
+    lb = (((1 + sqrt(1+8*hMax.^(2)))/4hMax^2)^2 - 1)/16
+    ub = (((1 + sqrt(1+8*hMin.^(2)))/4hMin^2)^2 - 1)/16
 
     optimfunc = L -> gcvfun!(L, z, s²)
     res = optimize(optimfunc, log10(lb), log10(ub))
@@ -330,8 +330,8 @@ Estimates the noise variance of a signal `x` using the L-curve method as propose
 """
 function varest_lcurve(x)
     n = length(x)
-    s = Vector{Float64}(undef, n)
-    z = Vector{eltype(x)}(undef, n)
+    s = undefs(n)
+    z = undefs(eltype(x), n)
 
     @. s = 2(cos((0:n-1)π/n) - 1.)
     @. s[s == 0.] = 1e-8
@@ -340,10 +340,12 @@ function varest_lcurve(x)
     z .= dct(x)
 
     npoints = 500
-    L = 10 .^LinRange(-22, 22, npoints)
+    lb = -22.
+    ub = 22.
+    L = 10 .^LinRange(lb, ub, npoints)
 
-    ρ = Vector{Float64}(undef, npoints)
-    η = Vector{Float64}(undef, npoints)
+    ρ = undefs(npoints)
+    η = undefs(npoints)
 
     for (i, λ) in enumerate(L)
         fₖ = @. 1/(1 + λ*s²)
@@ -355,7 +357,7 @@ function varest_lcurve(x)
     notnan = findall(@. !isnan(k))
     pos_max = argmax(k[notnan])
 
-    return ρ[pos_max]
+    return ρ[notnan][pos_max]
 end
 
 """
@@ -385,8 +387,8 @@ function varest_derrico(x)
     # iid, N(0,σ²), then we can try to back out the noise variance.
     nfda = 6
     np = 14
-    fda = Vector{Vector{Float64}}(undef, nfda)
-    perc = Vector{Float64}(undef, np)
+    fda = undefs(Vector{Float64}, nfda)
+    perc = undefs(np)
     # Normalization to unit norm
     fda[1] = [1., -1.]./√(2.)
     fda[2] = [1., -2., 1.]./√(6.)
@@ -400,14 +402,14 @@ function varest_derrico(x)
     perc .= [0.05; range(0.1, 0.4, step = 0.025)]
     z = @. √(2)*erfinv(1. - 2perc)
 
-    noisevar = Vector{Float64}(undef, nd)
+    noisevar = undefs(nd)
     σₑ = fill(NaN, nd, nfda)
-    Q = Matrix{Float64}(undef, nd, np)
+    Q = undefs(nd, np)
     @views for (i, fdai) in enumerate(fda)
         posnd = (i+1):ns
         ntrim = ns - i
-        noisedata = Matrix{Float64}(undef, nd, ntrim)
-        p = Vector{Float64}(undef, ntrim)
+        noisedata = undefs(nd, ntrim)
+        p = undefs(ntrim)
         for (j, xj) in enumerate(eachrow(x))
             noisedata[j, :] .= conv(xj, fdai)[posnd]
         end
@@ -419,7 +421,6 @@ function varest_derrico(x)
 
             for (k, nk) in enumerate(eachrow(noisedata))
                 itp = linear_interpolation(p, nk)
-                # itp = LinearInterpolation(nk, p)
                 @. Q[k, :] = (itp(1 - perc) - itp(perc))/2z
             end
 
@@ -437,9 +438,7 @@ function varest_derrico(x)
     notnan = findall(@. !isnan(@view σₑ[1, :]))
 
     # Use median of these estimates to get a noise estimate.
-    @views for j ∈ 1:nd
-        noisevar[j] = median(σₑ[j, notnan])^2.
-    end
+    noisevar .= median(σₑ[:, notnan], dims = 2).^2.
 
     # Use an adhoc correction to remove the bias in the noise estimate. This correction was determined by examination of a large number of random samples.
     noisevar ./= (1. + 15(ns + 1.225)^(-1.245))
@@ -460,7 +459,7 @@ Estimates the SNR of a signal `x` with a given variance `var`.
 * `SNR`: signal to noise ratio [dB] - Float64
 """
 function estimated_SNR(x, var)
-    En = mean(abs2, x, dims = 2)[:]
+    En = mean(abs2, x, dims = ndims(x))[:]
 
     SNR = En./var
 

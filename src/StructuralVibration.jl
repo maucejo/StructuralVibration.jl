@@ -1,10 +1,10 @@
 module StructuralVibration
 
-using Parameters, ProgressMeter, LinearAlgebra, Statistics,
+using ProgressMeter, LinearAlgebra, Statistics, Random,
       DSP, FFTW, Interpolations, Optim, SpecialFunctions, PrecompileTools
 
 # Structs - Models
-export Sdof, Bar, Rod, Strings, Beam, Plate, RectMembrane,
+export Sdof, Bar, Rod, Strings, Beam, Plate, Membrane,
        ContinuousStateSpace, DiscreteStateSpace
 
 # Structs - FE and discrete models
@@ -28,10 +28,14 @@ export BayesianEst, GCVEst, LcurveEst, DerricoEst
 
 # Functions
 export excitation, modefreq, modeshape, eigenmode, modal_matrices, solve,
-       assembly, selection_matrix, agwn, acn, mult_noise, mix_noise, varest, estimated_SNR, c2d, ss_model
+       assembly, selection_matrix, agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, c2d, ss_model, modal_parameters, c2r_modeshapes, gradient, detrend
 
 # Functions for plotting
 export plot, bode_plot, nyquist_plot, waterfall_plot
+
+# Include files - Utils
+include("utils/gradient.jl")
+include("utils/utils.jl")
 
 # Include files - Sdof
 include("models/sdof.jl")
@@ -57,9 +61,7 @@ include("models/excitation.jl")
 
 # Include files - Noise models
 include("models/noise.jl")
-
-# Include files - Utils
-include("utils/calculus.jl")
+include("estimation/noise_estimation.jl")
 
 # Include files - Visualization
 include("utils/visualization.jl")
