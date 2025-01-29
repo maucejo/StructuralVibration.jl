@@ -280,7 +280,7 @@ function solve(m::StateSpaceFRFProblem, Nₘ::Int, type = :dis, ismat = false)
     Nm = length(λ)
 
     FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
-    M = undefs(Diagonal{ComplexF64}, Nm)
+    M = Diagonal(undefs(ComplexF64, Nm))
     indm = diagind(M)
 
     ωf = 2π*freq
@@ -391,7 +391,7 @@ function solve(m::StateSpaceFreqProblem, Nₘ::Int, type = :dis)
     Nm = length(λ)
 
     y = undefs(ComplexF64, Nₒ, Nf)
-    M = Diagonal{ComplexF64}(undef, Nm)
+    M = Diagonal(undefs(ComplexF64, Nm))
     indm = diagind(M)
 
     ωf = 2π*freq

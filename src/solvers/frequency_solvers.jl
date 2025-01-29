@@ -153,8 +153,8 @@ function solve(m::ModalFRFProblem, type = :dis, ismat = false)
     Nₒ = size(ϕₒ, 1)
     Nf = length(freq)
 
-    FRF = [Matrix{ComplexF64}(undef, Nₒ, Nₑ) for _ in 1:Nf]
-    M = Diagonal{ComplexF64}(undef, Nₘ)
+    FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
+    M = Diagonal(undefs(ComplexF64, Nₘ))
     indm = diagind(M)
 
     ωf = 2π*freq
@@ -243,8 +243,8 @@ function solve(m::ModalFreqProblem, type = :dis)
 
     ωf = 2π*freq
 
-    y = Matrix{ComplexF64}(undef, Nₒ, Nf)
-    M = Diagonal{ComplexF64}(undef, Nₘ)
+    y = undefs(ComplexF64, Nₒ, Nf)
+    M = Diagonal(undefs(ComplexF64, Nₘ))
     indm = diagind(M)
 
     p = Progress(Nf, color = :black, desc = "Frequency Response - Modal approach...", showspeed = true)
