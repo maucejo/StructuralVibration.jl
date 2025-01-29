@@ -197,10 +197,10 @@ function excitation(type::Rectangle, t)
     (; F₀, tstart, duration) = type
     Ft = zeros(length(t))
 
-    pos_start = argmin((t .- tstart).^2.)
-    pos_end = argmin((t .- tstart .- duration).^2.)
+    pos_start = argmin(@. (t - tstart)^2.)
+    pos_end = argmin(@. (t - tstart - duration)^2.)
 
-    pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+    pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
     Ft[pos_exc_t] .= F₀
 
@@ -215,13 +215,13 @@ function excitation(type::Triangle, t)
     Ft = zeros(length(t))
 
     trise = (2tstart + duration)/2.
-    pos_start = argmin((t .- tstart).^2.)
-    pos_middle = argmin((t .- trise).^2.)
-    pos_end = argmin((t .- tstart .- duration).^2.)
+    pos_start = argmin(@. (t .- tstart)^2.)
+    pos_middle = argmin(@. (t - trise)^2.)
+    pos_end = argmin(@. (t - tstart - duration)^2.)
     amp = 2F₀/duration
 
-    Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] .- type.tstart)
-    Ft[pos_middle + 1:pos_end] = F₀ .- amp*(t[pos_middle + 1:pos_end] .- trise)
+    @. Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] - type.tstart)
+    @. Ft[pos_middle + 1:pos_end] = F₀ - amp*(t[pos_middle + 1:pos_end] - trise)
 
     return Ft
 end
@@ -237,11 +237,11 @@ function excitation(type::Hammer, t)
         t = collect(t);
     end
 
-    pos_start = argmin((t .- tstart).^2.)
+    pos_start = argmin(@. (t - tstart)^2.)
 
-    t_hammer = t[pos_start:end] .- tstart
+    t_hammer = @. t[pos_start:end] - tstart
 
-    Ft[pos_start:end] = F₀*t_hammer.^(k - 1.).*exp.(-t_hammer./θ)/((k - 1.)*θ)^(k - 1.)/exp(1. - k)
+    @. Ft[pos_start:end] = F₀*t_hammer^(k - 1.)*exp(-t_hammer/θ)/((k - 1.)*θ)^(k - 1.)/exp(1. - k)
 
     return Ft
 end
@@ -253,28 +253,28 @@ function excitation(type::SmoothRect, t)
 
     Ft = zeros(length(t))
 
-    pos_start = argmin((t .- tstart).^2.)
-    pos_end = argmin((t .- tstart .- duration).^2.)
+    pos_start = argmin(@. (t - tstart)^2.)
+    pos_end = argmin(@. (t - tstart - duration)^2.)
 
     Trect = duration - 2trise
     if isless(Trect, 0.)
         error("Il faut que duration >= 2trise")
     end
 
-    pos_rect_start = argmin((t .- tstart .- trise).^2.)
-    pos_rect_end = argmin((t .- tstart .- duration .+ trise).^2.)
+    pos_rect_start = argmin(@. (t - tstart - trise)^2.)
+    pos_rect_end = argmin(@. (t - tstart - duration + trise).^2.)
 
     α = 2trise/duration
 
     t_rise = t[pos_start:pos_rect_start] .- tstart
-    Frise = 0.5*F₀*(1. .- cos.(2π*t_rise/α/duration))
+    Frise = @. 0.5*F₀*(1. - cos(2π*t_rise/α/duration))
 
-    t_desc = t[pos_rect_end:pos_end] .- tstart .- duration
-    Fdesc = 0.5*F₀*(1. .- cos.(2π*t_desc/α/duration))
+    t_desc = @. t[pos_rect_end:pos_end] - tstart - duration
+    Fdesc = @. 0.5*F₀*(1. - cos(2π*t_desc/α/duration))
 
-    Ft[pos_start:pos_rect_start] = Frise
+    Ft[pos_start:pos_rect_start] .= Frise
     Ft[pos_rect_start:pos_rect_end] .= F₀
-    Ft[pos_rect_end:pos_end] = Fdesc
+    Ft[pos_rect_end:pos_end] .= Fdesc
 
     return Ft
 end
@@ -286,7 +286,7 @@ function excitation(type::SineWave, t)
     nt = length(t)
     Ft = zeros(nt)
 
-    pos_start = argmin((t .- tstart).^2.)
+    pos_start = argmin(@. (t - tstart)^2.)
 
     # Period
     T = 2π/ω
@@ -299,17 +299,17 @@ function excitation(type::SineWave, t)
         pos_end = nt
     else
         if zero_end
-            pos_end = argmin((t .- tstart .- n*T).^2.)
+            pos_end = argmin(@. (t - tstart - n*T)^2.)
 
             if tstart + n*T ≥ t[end]
                 warning("The duration of the sine wave is too long to performed zero-end operation.")
             end
         else
-            pos_end = argmin((t .- tsw).^2.)
+            pos_end = argmin(@. (t - tsw)^2.)
         end
     end
 
-    pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+    pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
     @. Ft[pos_exc_t] = F₀*sin(ω*(t[pos_exc_t] - tstart))
 
@@ -322,9 +322,9 @@ function excitation(type::SweptSine, t)
 
     Ft = zeros(length(t))
 
-    pos_start = argmin((t .- tstart).^2.)
-    pos_end = argmin((t .- tstart .- duration).^2.)
-    pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+    pos_start = argmin(@. (t - tstart)^2.)
+    pos_end = argmin(@. (t - tstart - duration)^2.)
+    pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
     if fstart == fend
         ϕ = @. 2π*fstart*(t[pos_exc_t] - tstart)
@@ -334,8 +334,8 @@ function excitation(type::SweptSine, t)
                 n = round((fstart + fend)*duration/2)
                 duration = 2n/(fstart + fend)
 
-                pos_end = argmin((t .- tstart .- duration).^2.)
-                pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+                pos_end = argmin(@. (t - tstart - duration)^2.)
+                pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
             end
 
             β = (fend - fstart)/duration
@@ -346,8 +346,8 @@ function excitation(type::SweptSine, t)
                 n = round((2fstart + fend)*duration/3)
                 duration = 3n/(2fstart + fend)
 
-                pos_end = argmin((t .- tstart .- duration).^2.)
-                pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+                pos_end = argmin(@. (t - tstart - duration)^2.)
+                pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
             end
 
             β = (fend - fstart)/duration^2
@@ -366,8 +366,8 @@ function excitation(type::SweptSine, t)
                    warning("The duration of the swept sine is too long to performed zero-end operation.")
                 end
 
-                pos_end = argmin((t .- tstart .- duration).^2.)
-                pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+                pos_end = argmin(@. (t - tstart - duration)^2.)
+                pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
             end
 
             β = (fend/fstart)^(1/duration)
@@ -456,8 +456,8 @@ function excitation(type::ColoredNoise, t)
         Ft .= filtfilt(df, Ft)
     end
 
-    pos_start = argmin((t .- tstart).^2.)
-    pos_end = argmin((t .- tstart .- duration).^2.)
+    pos_start = argmin(@. (t - tstart)^2.)
+    pos_end = argmin(@. (t - tstart - duration).^2.)
 
     Ft[1:pos_start] .= 0.
     Ft[pos_end:end] .= 0.
