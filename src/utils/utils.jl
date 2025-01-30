@@ -62,15 +62,11 @@ Fit a polynomial of order `order` to the data `x` and `y`.
 function polyfit(x::AbstractArray, y::AbstractArray, order::Int = 1)
     if order == 0
         return mean(y)
-
-    elseif order == 1
-        A = [x ones(length(x))]
-        return (A'A)\(A'y)
-    elseif order == 2
-        A = [x.^2 x ones(length(x))]
-        return (A'A)\(A'y)
     else
-        error("Order > 2 not supported")
+        orders = 0:order
+        A = [xi^(order - ordj) for xi in x, ordj in orders]
+
+        return (A'A)\(A'y)
     end
 end
 
@@ -87,13 +83,12 @@ end
 - `y`: Value of the polynomial at `x`
 """
 function polyval(p, x)
-    if length(p) == 1
-        return p[1]*ones(length(x))
+    y = zeros(length(x))
+    order = length(p) - 1
 
-    elseif length(p) == 2
-        return @. p[1]*x + p[2]
-
-    else
-        return @. p[1]*x^2 + p[2]*x + p[3]
+    for (i, ci) in enumerate(p)
+         y .+= ci*x.^(order - i + 1)
     end
+
+    return y
 end

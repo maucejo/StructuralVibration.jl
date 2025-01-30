@@ -28,7 +28,7 @@ export BayesianEst, GCVEst, LcurveEst, DerricoEst
 
 # Functions
 export excitation, modefreq, modeshape, eigenmode, modal_matrices, solve,
-       assembly, selection_matrix, agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, c2d, ss_model, modal_parameters, c2r_modeshapes, gradient, detrend
+       assembly, selection_matrix, agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, c2d, ss_model, modal_parameters, c2r_modeshapes, gradient, detrend, rayleigh_damping_matrix, modal_damping_matrix
 
 # Functions for plotting
 export plot, bode_plot, nyquist_plot, waterfall_plot

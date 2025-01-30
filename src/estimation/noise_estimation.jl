@@ -100,7 +100,7 @@ function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
         batches = [x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
         nb = length(batches)
 
-        noisevar = zeros(nr, nb)
+        noisevar = undefs(nr, nb)
         @views for (b, batch) in enumerate(batches)
             if length(batch) < batch_size
                 continue

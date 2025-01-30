@@ -264,3 +264,23 @@ function rayleigh_damping_matrix(K, M, ω₁::Float64, ω₂::Float64, ξ₁::Fl
     α = 2ξ₁*ω₁ - ω₁^2*β
     return α*M + β*K
 end
+
+"""
+    modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)
+
+Compute the damping matrix C from modal parameters
+
+# Inputs
+* `M`: Mass matrix
+* `ωₙ`: Natural angular frequencies
+* `ξₙ`: Damping ratios
+* `Φₙ`: Mass-normalized mode shapes
+
+# Output
+* `C`: Damping matrix
+"""
+function modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)
+    Cn = Diagonal(2ξₙ.*ωₙ)
+
+    return Φₙ*M*Cₙ*M*Φₙ'
+end
