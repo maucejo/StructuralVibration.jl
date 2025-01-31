@@ -25,7 +25,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 * `constrained_dofs`: Constrained degrees of freedom
 * `free_dofs`: Free degrees of freedom
 """
-struct Mesh
+@with_kw struct Mesh
     xmin :: Float64
     L :: Float64
     Nodes :: Matrix{Float64}

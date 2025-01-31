@@ -13,7 +13,7 @@ Structure containing the data feeding the modal solver for calculating an FRF
 # Note
 The mode shapes must be mass-normalized
 """
-struct ModalFRFProblem
+@with_kw struct ModalFRFProblem
     ωₙ :: Vector{Float64}
     ξₙ :: Vector{Float64}
     freq
@@ -44,7 +44,7 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * Sₒ: Selection matrix for observation points
 * Sₑ: Selection matrix for excitation points
 """
-struct DirectFRFProblem
+@with_kw struct DirectFRFProblem
     K
     M
     C
@@ -67,7 +67,7 @@ Structure containing the data feeding the modal solver for calculating the frequ
 * freq: Frequencies of interest
 * ϕₒ: Mode shapes at observation points
 """
-struct ModalFreqProblem
+@with_kw struct ModalFreqProblem
     ωₙ :: Vector{Float64}
     ξₙ :: Vector{Float64}
     Fₙ
@@ -98,7 +98,7 @@ Structure containing the data feeding the direct solver for calculating the moda
 * freq: Frequencies of interest
 * Sₒ: Selection matrix for observation points
 """
-struct DirectFreqProblem
+@with_kw struct DirectFreqProblem
     K
     M
     C
@@ -117,7 +117,7 @@ Structure containing the solution of the frequency response problem
 # Fields
 * u: Transfer function matrix
 """
-struct FRFSolution
+@with_kw struct FRFSolution
     u :: Union{Matrix{ComplexF64}, Vector{Matrix{ComplexF64}}}
 end
 
@@ -129,7 +129,7 @@ Structure containing the solution of the frequency response problem
 # Fields
 * u: Frequency response matrix
 """
-struct FrequencySolution
+@with_kw struct FrequencySolution
     u :: Matrix{ComplexF64}
 end
 

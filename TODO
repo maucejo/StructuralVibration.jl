@@ -4,8 +4,4 @@ In estimation/sdof_extraction.jl
 In estimation/signal_processing.jl
 * Transfer function estimation
 
-Rigid body modes
-
 MDOF Systems
-
-Damping matrices

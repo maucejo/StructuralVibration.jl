@@ -21,7 +21,7 @@ Structure containing data for the time solver
 * h: Time step
 * F: External force matrix
 """
-struct DirectTimeProblem
+@with_kw struct DirectTimeProblem
     K
     M
     C
@@ -42,7 +42,7 @@ Structure containing problem solutions
 * du: Velocity matrix or vector
 * ddu: Acceleration matrix or vector
 """
-struct DirectTimeSolution
+@with_kw struct DirectTimeSolution
     u
     du
     ddu
