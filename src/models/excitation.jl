@@ -26,7 +26,7 @@ Struct to define a triangular excitation signal
 * `tstart` : Starting time of the excitation [s]
 * `duration` : Duration of the excitation [s]
 """
-@with_kw struct Triangle <: ArbitraryExc
+struct Triangle <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     duration::Float64
@@ -43,7 +43,7 @@ Struct to define a hammer impact excitation signal
 * `k` : Shape parameter
 * `θ` : Intensity parameter [s]
 """
-@with_kw struct Hammer <: ArbitraryExc
+struct Hammer <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     k::Float64
@@ -61,7 +61,7 @@ Struct to define a smooth rectangular excitation signal
 * `trise` : Rise time from 0 to F₀ [s]
 * `duration` : Duration of the excitation [s]
 """
-@with_kw struct SmoothRect <: ArbitraryExc
+struct SmoothRect <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     trise::Float64
@@ -81,7 +81,7 @@ Struct to define a sine wave excitation signal
 * `ϕ` : Phase of the excitation [rad] (default = 0.)
 * `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
-@with_kw struct SineWave <: ArbitraryExc
+struct SineWave <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     duration::Float64
@@ -109,7 +109,7 @@ Struct to define a swept sine excitation signal
     * `:log` - logarithmic
 * `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = false)
 """
-@with_kw struct SweptSine <: ArbitraryExc
+struct SweptSine <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     duration::Float64
@@ -133,7 +133,7 @@ Struct to define a Gaussian pulse excitation signal
 * `fc` : Center frequency of the pulse [Hz]
 * `precision` : Precision of the pulse (default = 4)
 """
-@with_kw struct GaussianPulse <: ArbitraryExc
+struct GaussianPulse <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     duration::Float64
@@ -161,7 +161,7 @@ Struct to define a colored noise excitation signal
     * `:purple`
 * `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
 """
-@with_kw struct ColoredNoise <: ArbitraryExc
+struct ColoredNoise <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     duration::Float64

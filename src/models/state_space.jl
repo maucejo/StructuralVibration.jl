@@ -7,7 +7,7 @@ Continuous-time state-space model
 * `Ac`: Continuous-time state matrix A
 * `Bc`: Continuous-time input matrix B
 """
-@with_kw struct ContinuousStateSpace
+struct ContinuousStateSpace
     Ac::Matrix{Float64}
     Bc::Matrix{Float64}
 end
@@ -22,7 +22,7 @@ Discrete-time state-space model
 * `Bd`: Discrete-time input matrix B
 * `Bdp`: Discrete-time input matrix Bp (only for `:foh` method)
 """
-@with_kw struct DiscreteStateSpace
+struct DiscreteStateSpace
     Ad::Matrix{Float64}
     Bd::Matrix{Float64}
     Bdp::Matrix{Float64}

@@ -139,6 +139,7 @@ function varest_optim(x, method::OptimFamily)
     end
 
     ndim = ndims(x)
+
     if ndim == 1
         noisevar = varestfun(x)
     elseif ndim == 2
@@ -170,12 +171,12 @@ Note: This function is not intended to be used directly
 """
 function varest_bayesian(x, prior = :invgamma)
 
-    # Eigenvalues of the second difference matrix
+    # Eigenvalues of the first-order smoothing matrix
     n = length(x)
     s = undefs(n)
     z = undefs(eltype(x), n)
 
-    @. s = 2(1. - cos((0:n-1)π/n))
+    @. s = 2(cos((0:n-1)π/n) - 1.)
     @. s[s == 0.] = 1e-8
     s² = s.^2
 
