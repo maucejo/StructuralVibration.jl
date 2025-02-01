@@ -1,6 +1,6 @@
 module StructuralVibration
 
-using ProgressMeter, LinearAlgebra, Statistics, Random,
+using Parameters, ProgressMeter, LinearAlgebra, Statistics, Random,
       DSP, FFTW, Interpolations, Optim, SpecialFunctions, PrecompileTools
 
 # Structs - Models
@@ -26,9 +26,20 @@ export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
 # Structs - Noise estimation
 export BayesianEst, GCVEst, LcurveEst, DerricoEst
 
+# Structs - Noise denoising
+export RegDenoising, KalmanDenoising
+
 # Functions
-export excitation, modefreq, modeshape, eigenmode, modal_matrices, solve,
-       assembly, selection_matrix, agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, c2d, ss_model, modal_parameters, c2r_modeshapes, gradient, detrend, rayleigh_damping_matrix, modal_damping_matrix
+export excitation, solve
+
+export modefreq, modeshape, eigenmode, modal_matrices, assembly,
+       selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
+
+export agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, denoising
+
+export c2d, ss_model, modal_parameters, c2r_modeshapes
+
+export gradient, detrend
 
 # Functions for plotting
 export plot, bode_plot, nyquist_plot, waterfall_plot
@@ -62,6 +73,7 @@ include("models/excitation.jl")
 # Include files - Noise models
 include("models/noise.jl")
 include("estimation/noise_estimation.jl")
+include("estimation/denoising.jl")
 
 # Include files - Visualization
 include("utils/visualization.jl")

@@ -13,7 +13,9 @@ Create an array of undefs of type `T` and dimensions `dims`. If `T` is not provi
 - `arr`: Array of undefs
 """
 undefs(::Type{T}, dims::Int...) where T = Array{T}(undef, dims)
+undefs(::Type{T}, dims::Tuple{Vararg{Int}}) where T = Array{T}(undef, dims...)
 undefs(dims::Int...) = Array{Float64}(undef, dims)
+undefs(dims::Tuple{Vararg{Int}}) = Array{Float64}(undef, dims)
 
 """
 detrend(t, y, order=1)
@@ -64,7 +66,7 @@ function polyfit(x::AbstractArray, y::AbstractArray, order::Int = 1)
         return mean(y)
     else
         orders = 0:order
-        A = [xi^(order - ordj) for xi in x, ordj in orders]
+        A = [xi^ordj for xi in x, ordj in reverse(orders)]
 
         return (A'A)\(A'y)
     end
@@ -84,10 +86,10 @@ end
 """
 function polyval(p, x)
     y = zeros(length(x))
-    order = length(p) - 1
+    orders = 0:length(p)-1
 
-    for (i, ci) in enumerate(p)
-         y .+= ci*x.^(order - i + 1)
+    for (i, (ci, ordi)) in enumerate(zip(p, reverse(orders)))
+        @. y += ci*x^ordi
     end
 
     return y
