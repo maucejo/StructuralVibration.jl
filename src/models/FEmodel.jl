@@ -25,17 +25,17 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 * `constrained_dofs`: Constrained degrees of freedom
 * `free_dofs`: Free degrees of freedom
 """
-@with_kw struct Mesh
-    xmin :: Float64
-    L :: Float64
-    Nodes :: Matrix{Float64}
-    Elt :: Matrix{Int64}
-    Ndof_per_node :: Int64
-    elem_size :: Float64
-    constrained_dofs :: Vector{Int}
-    free_dofs :: Vector{Int}
+@with_kw struct OneDMesh
+    xmin::Float64
+    L::Float64
+    Nodes::Matrix{Float64}
+    Elt::Matrix{Int}
+    Ndof_per_node::Int
+    elem_size::Float64
+    constrained_dofs::Vector{Int}
+    free_dofs::Vector{Int}
 
-    function Mesh(s :: OneDStructure, xmin, Nelt, bc = :CC)
+    function OneDMesh(s::OneDStructure, xmin, Nelt, bc = :CC)
         Nnodes = Nelt + 1
         Nodes = undefs(Nnodes, 2)
         Elt = undefs(Nelt, 3)
@@ -54,7 +54,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 
         if isa(s, Beam)
             Ndof_per_node = 2
-            dofs = collect(1:2Nnodes)
+            dofs = 1:2Nnodes
             if bc == :SS
                 constrained_dofs = [1, 2Nnodes - 1]
             elseif bc == :CC
@@ -70,9 +70,9 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
             else
                 error("Boundary conditions not implemented")
             end
-        elseif isa(s, BarRod)
+        elseif isa(s, BarRodString)
             Ndof_per_node = 1
-            dofs = collect(1:Nnodes)
+            dofs = 1:Nnodes
             if bc == :CC
                 constrained_dofs = [1, Nnodes]
             elseif bc == :CF
@@ -90,7 +90,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 end
 
 """
-    assembly(s, mesh)
+    assembly(s::Sdof, mesh::OneDMesh)
 
 Compute the global stiffness and mass matrices for a beam with a given mesh.
 
@@ -102,7 +102,7 @@ Compute the global stiffness and mass matrices for a beam with a given mesh.
 * `K`: global stiffness matrix
 * `M`: global mass matrix
 """
-function assembly(s::OneDStructure, mesh::Mesh)
+function assembly(s::OneDStructure, mesh::OneDMesh)
     # Compute elemental matrices
     kₑ, mₑ = element_matrix(s, mesh.elem_size)
 
@@ -126,7 +126,7 @@ end
 
 """
     element_matrix(s::Beam, h)
-    element_matrix(s::BarRod, h)
+    element_matrix(s::BarRodString, h)
 
 Compute the elemental stiffness and mass matrices for a beam with a element size `h`.
 
@@ -187,7 +187,7 @@ Compute the selection matrix for the selected dofs.
 # Output
 - `S`: Selection matrix
 """
-function selection_matrix(mesh :: Mesh, selected_dofs)
+function selection_matrix(mesh :: OneDMesh, selected_dofs)
     N = length(selected_dofs)
     S = zeros(N, length(mesh.free_dofs))
     for (i, dof) in enumerate(selected_dofs)
@@ -198,6 +198,24 @@ function selection_matrix(mesh :: Mesh, selected_dofs)
     end
 
     return S
+end
+
+"""
+    apply_bc(A, mesh)
+
+Apply boundary conditions to a given matrix
+
+# Inputs
+* `A`: Matrix to apply the boundary conditions
+* `mesh`: Mesh of the system
+
+# Output
+* `A_bc`: Matrix with boundary conditions applied
+"""
+function apply_bc(A, mesh)
+    (; free_dofs) = mesh
+
+    return A[free_dofs, free_dofs]
 end
 
 """

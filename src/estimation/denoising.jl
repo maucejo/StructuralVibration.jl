@@ -1,17 +1,49 @@
 abstract type DenoisingMethod end
 
+"""
+    RegDenoising(prior = :invgamma)
+
+Bayesian Regularization denoising method
+
+# Fields
+* `prior`: Prior distribution over the hyperparameters used for computing the regularization parameter
+    * `:invgamma`: Inverse Gamma distribution
+    * `:uniform`: Uniform distribution
+"""
 struct RegDenoising <: DenoisingMethod
     prior::Symbol
 
     RegDenoising(prior = :invgamma) = new(prior)
 end
 
+"""
+    KalmanDenoising(; rts = false)
+
+Kalman filter denoising method
+
+# Fields
+* `rts`: Flag to enable the Rauch-Tung-Striebel smoother
+"""
 struct KalmanDenoising <: DenoisingMethod
     rts::Bool
 
     KalmanDenoising(; rts = false) = new(rts)
 end
 
+"""
+    denoising(y::AbstractArray, alg::RegDenoising)
+
+Denoises a signal `y`
+
+# Inputs
+* `y`: Noisy signal
+* `alg`: Denoising method
+    * `RegDenoising`: Bayesian Regularization denoising method
+    * `KalmanDenoising`: Kalman filter denoising method
+
+# Output
+* `x`: Denoised signal
+"""
 function denoising(y::AbstractArray, alg::RegDenoising)
    ndim = ndims(y)
    sy = size(y)

@@ -165,8 +165,7 @@ function c2r_modeshapes(Ψ)
         y = imag(Ψᵢ)
 
         # Fit a first order line to the data
-        A = [x oneN]
-        p = (A'A)\(A'y)
+        p = polyfit(x, y, 1)
 
         # Angle of maximum correlation line
         θ = atan.(p[1])

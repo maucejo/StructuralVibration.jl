@@ -373,6 +373,8 @@ function excitation(type::SweptSine, t)
             β = (fend/fstart)^(1/duration)
 
             ϕ = @. 2π*fstart*(β^(t[pos_exc_t] - tstart) - 1)/log(β)
+        else
+            error("The type of swept sine is not defined.")
         end
     end
 

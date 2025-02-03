@@ -1,17 +1,11 @@
-using Parameters, DSP, FFTW, LinearAlgebra, Interpolations
+using StructuralVibration
 @usingany GLMakie
-
-includet("../src/models/sdof.jl")
-includet("../src/solvers/sdof_solvers.jl")
-includet("../src/models/excitation.jl")
-includet("../src/utils/calculus.jl")
-
 
 ## SDOF system
 m = 1.
-ω₀ = 2π*10.
+f₀ = 10.
 ξ = 0.01
-sdof = Sdof(m, ω₀, ξ)
+sdof = Sdof(m, f₀, ξ)
 
 ## Excitation
 
@@ -42,11 +36,11 @@ lines!(t, x, color = :red, linestyle = :dash)
 # Response calculation
 freq = 1.:0.01:30.
 prob_resp = SdofFrequencyProblem(sdof, freq, 1e-2ones(length(freq)))
-y = solve(prob_resp).y
+y = solve(prob_resp).u
 lines(freq, 20log10.(abs.(y)), color = :blue)
 
 ## FRF
 prob_frf = SdofFRFProblem(sdof, freq, type_resp = :vel)
-H = solve(prob_frf).y
+H = solve(prob_frf).u
 lines(freq, 20log10.(abs.(H)), color = :blue)
 lines(freq, angle.(H), color = :blue)

@@ -1,14 +1,13 @@
 module StructuralVibration
 
-using Parameters, ProgressMeter, LinearAlgebra, Statistics, Random,
-      DSP, FFTW, Interpolations, Optim, SpecialFunctions, PrecompileTools
+using DSP, FFTW, Interpolations, LinearAlgebra, Optim, Parameters, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
 
 # Structs - Models
-export Sdof, Bar, Rod, Strings, Beam, Plate, Membrane,
+export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
        ContinuousStateSpace, DiscreteStateSpace
 
 # Structs - FE and discrete models
-export Mesh
+export OneDMesh, MdofMesh
 
 # Structs - Excitations
 export Rectangle, Triangle, Hammer, SmoothRect,
@@ -29,15 +28,25 @@ export BayesianEst, GCVEst, LcurveEst, DerricoEst
 # Structs - Noise denoising
 export RegDenoising, KalmanDenoising
 
+# Structs - Modal extraction
+export BodeExtract, NyquistExtract
+
+# Structs - Signal processing
+export FFTParameters
+
 # Functions
 export excitation, solve
 
-export modefreq, modeshape, eigenmode, modal_matrices, assembly,
+export modefreq, modeshape, eigenmode, modal_matrices, assembly, apply_bc,
        selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
 
 export agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, denoising
 
 export c2d, ss_model, modal_parameters, c2r_modeshapes
+
+export freq_extraction, modeshape_extraction
+
+export tfestimation
 
 export gradient, detrend
 
@@ -45,11 +54,18 @@ export gradient, detrend
 export plot, bode_plot, nyquist_plot, waterfall_plot
 
 # Include files - Utils
-include("utils/gradient.jl")
 include("utils/utils.jl")
 
+# Include files - Estimation
+include("estimation/gradient.jl")
+include("estimation/detrend.jl")
+include("estimation/noise_estimation.jl")
+include("estimation/denoising.jl")
+include("estimation/modal_extraction.jl")
+include("estimation/signal_processing.jl")
+
 # Include files - Sdof
-include("models/sdof.jl")
+include("models/sdof_mdof.jl")
 include("solvers/sdof_solvers.jl")
 
 # Include files - Continuous structures
@@ -72,8 +88,6 @@ include("models/excitation.jl")
 
 # Include files - Noise models
 include("models/noise.jl")
-include("estimation/noise_estimation.jl")
-include("estimation/denoising.jl")
 
 # Include files - Visualization
 include("utils/visualization.jl")
