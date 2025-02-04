@@ -35,6 +35,6 @@ prob = SdofForcedTimeProblem(sdof, [0., 0.], t, x)
 y = solve(prob).u
 
 ## FRF estimation
-overlap_ratio = 0.9
-win = tukey(block_size, 0.1)
-H1 = tfestimate(x, y, fft_params, win, type_frf = :hv, overlap_ratio = overlap_ratio)[1]
+overlap_ratio = 0.
+win = planck(block_size)
+H1 = tfestimate(x, y, fft_params, win, type_frf = :h1, overlap_ratio = overlap_ratio)[1]

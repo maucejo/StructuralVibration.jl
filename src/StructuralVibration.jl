@@ -46,7 +46,7 @@ export c2d, ss_model, modal_parameters, c2r_modeshapes
 
 export freq_extraction, modeshape_extraction
 
-export tfestimation, exponential, flattop, nutall, blackman_nutall, parzen,
+export tfestimation, exponential, force, flattop, nutall, blackman_nutall, parzen,
        planck
 
 

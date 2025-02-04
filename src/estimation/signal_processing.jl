@@ -87,6 +87,7 @@ Estimation of the transfer function between two signals
 
 ## From StructuralVibration.jl
 * exponential
+* force
 * flattop
 * nutall
 * blackman_nutall
@@ -98,17 +99,6 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
     # FFT Parameters
     (; freq, block_size, sample_rate) = fft_params
 
-    # Signal length
-    N = length(input_signal)
-
-    # Length of the overlap segment
-    noverlap = floor(Int, block_size*overlap_ratio)
-    step = block_size - noverlap
-    step == 0 ? step = 1 : nothing
-
-    # Number of signal segments
-    n_segments = floor(Int, (N - block_size)/step) + 1
-
     # Initialization
     Gxx = zeros(ComplexF64, block_size)
     Gyy = zeros(ComplexF64, block_size)
@@ -116,23 +106,16 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
     H = undefs(ComplexF64, block_size)
     coh = undefs(Float64, block_size)
 
-    # Correcting factors for energy due to windowing
-    energy_correction_input = 1/rms(window_input)
-    energy_correction_output = 1/rms(window_output)
+    # Signal segmentation
+    input_segments, n_segments = signal_segmentation(input_signal, block_size, window_input, overlap_ratio)
+    output_segments = signal_segmentation(output_signal, block_size, window_output, overlap_ratio)[1]
 
     # Auto and Cross-spectral densities estimation
-    for i in 1:n_segments
-        # Indices defining the segment
-        start_idx = (i-1)*step + 1
-        end_idx = start_idx + block_size - 1
-
-        # Segments extraction
-        input_segment = input_signal[start_idx:end_idx].*window_input
-        output_segment = output_signal[start_idx:end_idx].*window_output
+    for (iseg, oseg) in zip(input_segments, output_segments)
 
         # FFT of the segments
-        X = fft(input_segment)
-        Y = fft(output_segment)
+        X = fft(iseg)
+        Y = fft(oseg)
 
         # Spectral densities
         @. Gxx += abs2(X)
@@ -145,10 +128,14 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
     Gyy ./= n_segments
     Gxy ./= n_segments
 
+    # Correcting factors for energy due to windowing
+    energy_correction_input = 1/rms(window_input)
+    energy_correction_output = 1/rms(window_output)
+
     # Energy correction
     Gxx .*= energy_correction_input
     Gyy .*= energy_correction_output
-    Gxy .*= sqrt(energy_correction_input * energy_correction_output)
+    Gxy .*= sqrt(energy_correction_input*energy_correction_output)
 
     # Tranfer function estimation
     if type_frf == :h1
@@ -173,5 +160,90 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
 
     pos_useful_freqs = findall(freqs[idx_pos] .<= freq[end])
 
-    return H[pos_useful_freqs], coh[pos_useful_freqs]
+    return H[pos_useful_freqs], coh[pos_useful_freqs], freqs[pos_useful_freqs]
+end
+
+"""
+    psd(input_signal::Vector{Float64}, fft_params::FFTParameters, window = hanning(fft_params.block_size); overlap_ratio = 0.5)
+
+Estimation of the Power Spectral Density (PSD) of a signal using the Welch method
+
+# Inputs
+* `input_signal`: Input signal
+* `fft_params`: FFT parameters
+* `window`: Window function
+
+# Output
+* `psd`: Power Spectral Density
+* `freq`: Frequency vector
+
+# Available window functions
+
+## From DSP.jl
+* rect
+* hanning
+* hamming
+* tukey
+* cosine
+* lanczos
+* triang
+* bartlett
+* gaussian
+* bartlett_hann
+* blackman
+* kaiser
+* dpss
+
+## From StructuralVibration.jl
+* exponential
+* force
+* flattop
+* nutall
+* blackman_nutall
+* parzen
+* planck
+"""
+function psd(input_signal, fft_params::FFTParameters, window = hanning(fft_params.block_size); overlap_ratio = 0.5)
+    # FFT Parameters
+    (; df, block_size, sample_rate) = fft_params
+
+    # Signal segmentation
+    signal, n_segments = signal_segmentation(input_signal, block_size, window, overlap_ratio)
+
+    # Initialize storage for periodograms of each segment
+    Pxx = zeros(block_size)
+    for segment in signal
+        Pxx .+= abs2.(fft(segment))
+    end
+
+    # Window energy
+    w_norm = sum(abs2, window)
+
+    # Normalize the periodograms by the window energy and the sampling rate
+    Pxx ./= (w_norm*sample_rate*n_segments)
+
+    # Convert full-spectrum PSD to one-sided PSD.
+    if iseven(block_size)
+        pxx = [Pxx[1]; 2Pxx[2:(block_size ÷ 2)]; Pxx[block_size ÷ 2 + 1]]
+        freq = df.*(0:(block_size ÷ 2))
+    else
+        pxx = [Pxx[1]; 2Pxx[2:((block_size + 1) ÷ 2)]]
+        freq = df.*(0:((block_size + 1) ÷ 2 - 1))
+    end
+
+    return pxx, freq
+end
+
+function signal_segmentation(signal, block_size, window, overlap_ratio)
+    # Signal length
+    N = length(signal)
+
+    # block_sizeength of the overlap segment
+    noverlap = floor(Int, block_size*overlap_ratio)
+    step = block_size - noverlap
+
+    # Number of signal segments
+    n_segments = step == 0 ? 1 : floor(Int, (N - block_size)/step) + 1
+
+    return [signal[(i - 1)*step .+ (1:block_size)].*window for i in 1:n_segments], n_segments
 end

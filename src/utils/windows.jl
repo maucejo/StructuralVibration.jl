@@ -15,6 +15,25 @@ function exponential(N, exponential_end = 0.01)
 end
 
 """
+    force(N, width = 0.1)
+
+Create a force window
+
+# Inputs
+* `N`: Number of points
+* `width`: Width of the force window
+
+# Output
+* `w`: Force window
+"""
+function force(N, width = 0.1)
+    w = zeros(N)
+    w[1:round(Int, width*N)] .= 1
+
+    return w
+end
+
+"""
     flattop(N)
 
 Create a flat top window
@@ -33,7 +52,7 @@ function flattop(N)
     a3 = 0.083578947
     a4 = 0.006947368
 
-    return @. a0 - a1*cos(2πn/(N-1)) + a2*cos(4π* n /(N-1)) .- a3*cos(6πn/(N-1)) + a4*cos(8πn/(N-1))
+    return @. a0 - a1*cos(2π*n/(N-1)) + a2*cos(4π*n/(N-1)) .- a3*cos(6π*n/(N-1)) + a4*cos(8π*n/(N-1))
 end
 
 """
@@ -54,7 +73,7 @@ function nutall(N)
     a2 = 0.144232
     a3 = 0.012604
 
-    return @. a0 - a1*cos(2πn/(N-1)) + a2*cos(4π* n /(N-1)) .- a3*cos(6πn/(N-1))
+    return @. a0 - a1*cos(2π*n/(N-1)) + a2*cos(4π*n/(N-1)) .- a3*cos(6π*n/(N-1))
 end
 
 """
@@ -75,7 +94,7 @@ function blackman_nutall(N)
     a2 = 0.1365995
     a3 = 0.0106411
 
-    return @. a0 - a1*cos(2πn/(N-1)) + a2*cos(4π* n /(N-1)) .- a3*cos(6πn/(N-1))
+    return @. a0 - a1*cos(2π*n/(N-1)) + a2*cos(4π*n/(N-1)) - a3*cos(6π*n/(N-1))
 end
 
 """
