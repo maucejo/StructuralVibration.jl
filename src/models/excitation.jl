@@ -118,7 +118,7 @@ Struct to define a swept sine excitation signal
     type_swept::Symbol
     zero_end::Bool
 
-    SweptSine(F₀, tstart, duration, fstart, fend, type_swept = :linear; zero_end = false) = new(F₀, tstart, duration, fstart, fend, type_swept, zero_end)
+    SweptSine(F₀, tstart, duration, fstart, fend, type_swept = :lin; zero_end = false) = new(F₀, tstart, duration, fstart, fend, type_swept, zero_end)
 end
 
 """

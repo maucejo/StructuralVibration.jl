@@ -16,8 +16,10 @@ Structure to store the time and frequency parameters for the FFT analysis
 @with_kw struct FFTParameters
     t
     dt::Float64
+    tspan
     freq
     df::Float64
+    freq_span
     sample_rate::Int
     block_size::Int
 
@@ -28,41 +30,84 @@ Structure to store the time and frequency parameters for the FFT analysis
 
         # Block size
         block_size = nextpow(2, block_size)
-        useful_spectral_lines = block_size/2.56
 
         # Time vector
         dt = 1/sample_rate
         tmax = block_size*dt
-        t = 0:dt:(tmax - dt)
+        t = 0.:dt:(tmax - dt)
+        tspan = (0., tmax)
 
         # Frequency vector
-        df = useful_bandwidth/useful_spectral_lines
+        df = sample_rate/block_size
         fmax = useful_bandwidth
-        freq = 0:df:(fmax - df)
+        freq = 0.:df:(fmax - df)
+        freq_span = (0., fmax)
 
-        return new(t, dt, freq, df, sample_rate, block_size)
+        return new(t, dt, tspan, freq, df, freq_span, sample_rate, block_size)
     end
 end
 
-function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64}, fft_params::FFTParameters, window_input, window_output, overlap_ratio::Float64; type_frf::Symbol = :h1)
+"""
+    tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64}, fft_params::FFTParameters, window_input = hanning(fft_params.block_size), window_output = window_input; overlap_ratio::Float64 = 0., type_frf::Symbol = :h1)
+
+Estimation of the transfer function between two signals
+
+# Inputs
+* `input_signal`: Input signal
+* `output_signal`: Output signal
+* `fft_params`: FFT parameters
+* `window_input`: Window function for the input signal
+* `window_output`: Window function for the output signal
+* `overlap_ratio`: Overlap ratio between the segments
+* `type_frf`: Type of transfer function to estimate
+    * :h1 (default)
+    * :h2
+    * :hv
+
+# Outputs
+* `H`: Transfer function
+* `coh`: Coherence
+
+# Available window functions
+
+## From DSP.jl
+* rect
+* hanning
+* hamming
+* tukey
+* cosine
+* lanczos
+* triang
+* bartlett
+* gaussian
+* bartlett_hann
+* blackman
+* kaiser
+* dpss
+
+## From StructuralVibration.jl
+* exponential
+* flattop
+* nutall
+* blackman_nutall
+* parzen
+* planck
+"""
+function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64}, fft_params::FFTParameters, window_input = hanning(fft_params.block_size), window_output = window_input; overlap_ratio::Float64 = 0., type_frf::Symbol = :h1)
+
     # FFT Parameters
     (; freq, block_size, sample_rate) = fft_params
 
     # Signal length
     N = length(input_signal)
 
-    # Segment length
-    segment_length = block_size
-
-    # Window generation
-    win = window_input(segment_length)
-    wout = window_output(segment_length)
-
     # Length of the overlap segment
-    overlap = round(Int, overlap_ratio*segment_length)
+    noverlap = floor(Int, block_size*overlap_ratio)
+    step = block_size - noverlap
+    step == 0 ? step = 1 : nothing
 
     # Number of signal segments
-    n_segments = floor(Int, (N - overlap)/(segment_length - overlap))
+    n_segments = floor(Int, (N - block_size)/step) + 1
 
     # Initialization
     Gxx = zeros(ComplexF64, block_size)
@@ -72,18 +117,18 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
     coh = undefs(Float64, block_size)
 
     # Correcting factors for energy due to windowing
-    energy_correction_input = 1/rms(win)
-    energy_correction_output = 1/rms(wout)
+    energy_correction_input = 1/rms(window_input)
+    energy_correction_output = 1/rms(window_output)
 
     # Auto and Cross-spectral densities estimation
     for i in 1:n_segments
         # Indices defining the segment
-        start_idx = (i-1)*(segment_length - overlap) + 1
-        end_idx = start_idx + segment_length - 1
+        start_idx = (i-1)*step + 1
+        end_idx = start_idx + block_size - 1
 
         # Segments extraction
-        input_segment = input_signal[start_idx:end_idx].*win
-        output_segment = output_signal[start_idx:end_idx].*wout
+        input_segment = input_signal[start_idx:end_idx].*window_input
+        output_segment = output_signal[start_idx:end_idx].*window_output
 
         # FFT of the segments
         X = fft(input_segment)
@@ -112,7 +157,7 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
         @. H = Gyy/conj(Gxy)
     elseif type_frf == :hv
         # Hv = sqrt(H1*H2)
-        @. H = Gxy*sqrt(Gxx/Gyy)/abs(Gxy)
+        @. H = Gxy*sqrt(Gyy/Gxx)/abs(Gxy)
     end
 
     # Coherence calculation - coh = H1/H2
@@ -128,5 +173,5 @@ function tfestimate(input_signal::Vector{Float64}, output_signal::Vector{Float64
 
     pos_useful_freqs = findall(freqs[idx_pos] .<= freq[end])
 
-    return H[pos_useful_freqs], coherence[pos_useful_freqs]
+    return H[pos_useful_freqs], coh[pos_useful_freqs]
 end

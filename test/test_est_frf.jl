@@ -1,8 +1,10 @@
-using DSP, FFTW, Parameters, LinearAlgebra, Statistics
+using DSP, FFTW, Parameters, Interpolations, LinearAlgebra, Statistics
 @usingany GLMakie
 
 ## Include files
-includet("../src/utils/utils.jl")
+includet("../src/utils/undefs.jl")
+includet("../src/utils/windows.jl")
+includet("../src/estimation/gradient.jl")
 includet("../src/models/sdof_mdof.jl")
 includet("../src/solvers/sdof_solvers.jl")
 includet("../src/models/excitation.jl")
@@ -16,16 +18,23 @@ sdof = Sdof(m, f₀, ξ)
 
 ## FFT Parameters
 sample_rate = 128
-block_size = 256
+block_size = 512
 fft_params = FFTParameters(sample_rate, block_size)
 
 ## Signal reference FRF
-t = fft_params.t
 freq = fft_params.freq
-prob = SdofFRFProblem(sdof, freq)
-H = solve(prob).u
+prob_frf = SdofFRFProblem(sdof, freq)
+H = solve(prob_frf).u
 
-## Signal acquisition
+## Signal generation
 F₀ = 1.
-chirp = SweptSine(F₀, t[1], t[end], freq[1], freq[end], zero_end = true)
-F = excitation(chirp, t)
+t = fft_params.t
+chirp = SweptSine(F₀, t[1], 0.8t[end], freq[1], freq[end], zero_end = true)
+x = excitation(chirp, t)
+prob = SdofForcedTimeProblem(sdof, [0., 0.], t, x)
+y = solve(prob).u
+
+## FRF estimation
+overlap_ratio = 0.9
+win = tukey(block_size, 0.1)
+H1 = tfestimate(x, y, fft_params, win, type_frf = :hv, overlap_ratio = overlap_ratio)[1]

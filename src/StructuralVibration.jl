@@ -46,15 +46,21 @@ export c2d, ss_model, modal_parameters, c2r_modeshapes
 
 export freq_extraction, modeshape_extraction
 
-export tfestimation
+export tfestimation, exponential, flattop, nutall, blackman_nutall, parzen,
+       planck
+
 
 export gradient, detrend
 
 # Functions for plotting
 export plot, bode_plot, nyquist_plot, waterfall_plot
 
+# Utility functions
+export undefs
+
 # Include files - Utils
-include("utils/utils.jl")
+include("utils/undefs.jl")
+include("utils/windows.jl")
 
 # Include files - Estimation
 include("estimation/gradient.jl")
