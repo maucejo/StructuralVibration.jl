@@ -179,7 +179,7 @@ function bode_plot(freq, y; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", 
             legend_entry = [" " for i in 1:ny]
         end
 
-        leg = (active = false, entry = [" "])
+        leg = (active = false, entry = legend_entry)
     end
 
     ymag = abs.(y)
@@ -213,7 +213,7 @@ function bode_plot(freq, y; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", 
         lines!(ax2, freq, unwrap(ϕ), linewidth = lw)
     elseif isa(y, Matrix)
         for (yi, ϕi, labeli) in zip(eachrow(ymag), eachrow(ϕ), leg.entry)
-            lines!(ax1, freq, 20log10.(abs.(yi)/ref_dB), linewidth = lw, label = labeli)
+            lines!(ax1, freq, 20log10.(yi/ref_dB), linewidth = lw, label = labeli)
             lines!(ax2, freq, unwrap(ϕi), linewidth = lw, label = labeli)
         end
     end

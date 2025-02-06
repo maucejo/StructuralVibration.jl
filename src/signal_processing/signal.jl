@@ -377,3 +377,16 @@ function signal_segmentation(signal, bs, window, overlap)
 
     return [signal[(i - 1)*step .+ (1:bs)].*window for i in 1:n_segments], n_segments
 end
+
+function anti_aliasing_filter(signal, fs)
+    # Nyquist frequency
+    fn = fs/2
+
+    # Filter design
+    order = 200        # Filter order
+    fb = 0.05*fn       # Filter bandwith = 2*fb
+    freq_filt = [(0., fn - fb) => 1]
+    filt_coeff = remez(order, freq_filt, Hz = fs, maxiter = 50)
+
+    return filtfilt(filt_coeff, signal)
+end

@@ -108,7 +108,7 @@ function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
             noisevar[:, b] .= varestfun(batch)
         end
 
-        return summary(noisevar, dims = 2)[:]
+        return vec(summary(noisevar, dims = 2))
     end
 end
 
@@ -459,7 +459,7 @@ Estimates the SNR of a signal `x` with a given variance `var`.
 * `SNR`: signal to noise ratio [dB] - Float64
 """
 function estimated_SNR(x, var)
-    En = mean(abs2, x, dims = ndims(x))[:]
+    En = vec(mean(abs2, x, dims = ndims(x)))
 
     SNR = En./var
 
