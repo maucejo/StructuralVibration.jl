@@ -46,14 +46,13 @@ export c2d, ss_model, modal_parameters, c2r_modeshapes
 
 export freq_extraction, modeshape_extraction
 
-export tfestimation, exponential, force, flattop, nutall, blackman_nutall, parzen,
-       planck
-
+export tfestimation, welch, spectrum, exponential, force, flattop, nutall,
+       blackman_nutall, parzen, planck
 
 export gradient, detrend
 
 # Functions for plotting
-export plot, bode_plot, nyquist_plot, waterfall_plot
+export sv_plot, bode_plot, nyquist_plot, waterfall_plot
 
 # Utility functions
 export undefs
@@ -63,12 +62,12 @@ include("utils/undefs.jl")
 include("utils/windows.jl")
 
 # Include files - Estimation
-include("estimation/gradient.jl")
-include("estimation/detrend.jl")
-include("estimation/noise_estimation.jl")
-include("estimation/denoising.jl")
-include("estimation/modal_extraction.jl")
-include("estimation/signal_processing.jl")
+include("signal_processing/gradient.jl")
+include("signal_processing/detrend.jl")
+include("signal_processing/noise_estimation.jl")
+include("signal_processing/denoising.jl")
+include("signal_processing/modal_extraction.jl")
+include("signal_processing/signal.jl")
 
 # Include files - Sdof
 include("models/sdof_mdof.jl")

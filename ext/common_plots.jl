@@ -38,7 +38,7 @@ function theme_choice(name::Symbol)
 end
 
 """
-    plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
+    sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
 
 Plot a 2D plot.
 
@@ -60,7 +60,7 @@ Plot a 2D plot.
 # Output
 * `fig`: Figure
 """
-function plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
+function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "))
     set_theme!(theme_choice(theme))
 
     # Some checks
@@ -84,7 +84,7 @@ function plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identit
                     error("The number of entries in the legend must be equal to the number of rows in y")
                 end
             end
-            entry = legend.entry
+            legend_entry = legend.entry
         end
 
         leg = (active = legend.active, position = legend_position, entry = legend_entry)
