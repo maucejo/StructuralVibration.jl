@@ -6,4 +6,4 @@ signal = cos(2*pi*100*t);
 
 plot(fmat, 10*log10(pxx_mat))
 
-save test_psd.mat pxx_mat fmat signal
+% save test_psd.mat pxx_mat fmat signal

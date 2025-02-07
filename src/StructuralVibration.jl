@@ -98,5 +98,5 @@ include("models/noise.jl")
 include("utils/visualization.jl")
 
 # Include files - Precompilation
-# include("precompilation/precompilation.jl")
+include("precompilation/precompilation.jl")
 end

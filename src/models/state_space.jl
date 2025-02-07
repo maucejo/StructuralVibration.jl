@@ -158,7 +158,6 @@ function c2r_modeshapes(Ψ)
     M, Nmodes = size(Ψ)
     Ψₙ = Ψ[1:2:M, :]
     ϕₙ = zeros(1:2:M, Nmodes)
-    oneN = ones(Int(M/2))
 
     for (i, Ψᵢ) in enumerate(eachcol(Ψₙ))
         x = real(Ψᵢ)

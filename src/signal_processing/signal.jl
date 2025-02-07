@@ -65,7 +65,8 @@ Estimation of the one-sided transfer function between two signals
 * `type`: Type of transfer function to estimate
     * :h1 (default)
     * :h2
-    * :hv
+    * :h3 - h3 = (h1 + h2)/2
+    * :hv - hv = sqrt(h1*h2)
 
 # Outputs
 * `H`: Transfer function
@@ -150,6 +151,8 @@ function tfestimation(input_signal::Vector{Float64}, output_signal::Vector{Float
         @. H = Gxy/Gxx
     elseif type == :h2
         @. H = Gyy/conj(Gxy)
+    elseif type == :h3
+        @. H = (abs2(Gxy) + Gyy*Gxx)/2(Gxx*conj(Gxy))
     elseif type == :hv
         # Hv = sqrt(H1*H2)
         @. H = Gxy*sqrt(Gyy/Gxx)/abs(Gxy)

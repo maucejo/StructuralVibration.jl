@@ -18,12 +18,12 @@ function agwn(x, snr_dB, rst = true)
         rng = MersenneTwister(1000)
     end
 
-    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = ndims(x))[:]         # Signal energy
-    V = En/SNR                              # Noise variance
+    SNR = 10^(snr_dB/10.)                     # SNR in linear scale
+    En = vec(mean(abs2, x, dims = ndims(x)))  # Signal energy
+    V = En/SNR                                # Noise variance
 
-    σ = sqrt.(V)                            # Standard deviation
-    n = σ.*randn(rng, eltype(x), size(x))      # Gaussian noise
+    σ = sqrt.(V)                              # Standard deviation
+    n = σ.*randn(rng, eltype(x), size(x))     # Gaussian noise
 
     return x .+ n
 end
@@ -56,11 +56,11 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq, color = :white, rst = 
         rng = MersenneTwister(1000)
     end
 
-    SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = ndims(x))[:]  # Signal energy
-    V = En/SNR                              # Noise variance
+    SNR = 10^(snr_dB/10.)                     # SNR in linear scale
+    En = vec(mean(abs2, x, dims = ndims(x)))  # Signal energy
+    V = En/SNR                                # Noise variance
 
-    σ = sqrt.(V)                            # Standard deviation
+    σ = sqrt.(V)                              # Standard deviation
 
     white_noise = randn(rng, eltype(x), size(x))
     scale = ones(size(x, ndims(x)))
@@ -115,7 +115,7 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :white, band_fre
     ndx = ndims(x)
     L = size(x, ndx)                        # Data dimensions
     SNR = 10^(snr_dB/10.)                   # SNR in linear scale
-    En = mean(abs2, x, dims = ndx)[:]         # Signal energy
+    En = vec(mean(abs2, x, dims = ndx))     # Signal energy
     V = En/SNR                              # Noise variance
 
     σ = sqrt.(V)                            # Standard deviation
