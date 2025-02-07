@@ -27,6 +27,18 @@ end
 
 Structure containing the data of a time problem for a sdof system subject to a harmonic excitation
 
+# Constructor
+* `sdof`: Sdof structure
+* `u0`: Initial conditions
+    * `x₀`: Initial displacement [m]
+    * `v₀`: Initial velocity [m/s]
+* `t`: Time points at which to evaluate the response
+* `F`: Amplitude of the force excitation [N] or base motion [m]
+* `f`: Frequency of the excitation [Hz]
+* `type_exc`: Type of excitation
+    * :force: External force (default)
+    * :base: Base motion
+
 # Fields
 * `sdof`: Sdof structure
 * `u0`: Initial conditions
@@ -47,7 +59,7 @@ struct SdofHarmonicTimeProblem
     ω :: Float64
     type_exc :: Symbol
 
-    SdofHarmonicTimeProblem(sdof, u0, t, F, ω, type_exc = :force) = new(sdof, u0, t, F, ω, type_exc)
+    SdofHarmonicTimeProblem(sdof, u0, t, F, f, type_exc = :force) = new(sdof, u0, t, F, 2π*f, type_exc)
 end
 
 """
@@ -62,7 +74,6 @@ Structure containing the data of a time problem for a sdof system subject to an 
     * `v₀`: Initial velocity [m/s]
 * `t`: Time points at which to evaluate the response
 * `F`: Amplitude of the force excitation [N] or base motion [m]
-* `ω`: Frequency of the excitation [rad/s]
 * `type_exc`: Type of excitation
     * :force: External force (default)
     * :base: Base motion
@@ -205,7 +216,7 @@ function solve(prob::SdofFreeTimeProblem)
         a = @. -2ξ*ω₀*v - ω₀^2*x
     end
 
-    return SdofFreeTimeSolution(x, v, a)
+    return SdofTimeSolution(x, v, a)
 end
 
 """

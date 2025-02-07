@@ -27,7 +27,7 @@ Discrete-time state-space model
     Bd::Matrix{Float64}
     Bdp::Matrix{Float64}
 
-    function DiscreteStateSpace(Ad, Bd, Bdp = Matrix{Float64}[])
+    function DiscreteStateSpace(Ad, Bd, Bdp = undefs(size(Bd)))
         return new(Ad, Bd, Bdp)
     end
 end
@@ -51,17 +51,17 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
     * `Bd`: Discrete-time state-space matrix B
     * `Bdp`: Discrete-time state-space matrix Bp (only for `:foh` method)
 """
-function c2d(css::ContinuousStateSpace, h, method)
+function c2d(css::ContinuousStateSpace, h, method = :zoh)
     (; Ac, Bc) = css
 
     if method == :zoh
         Ad = exp(Ac*h)
-        Bd = (Ad .- I)*(Ac\Βc)
+        Bd = (Ad - I)*(Ac\Bc)
         return DiscreteStateSpace(Ad, Bd)
     elseif method == :foh
         Ad = exp(Ac*h)
-        Bd = (Ad .- I)*(Ac\Βc)
-        Bg = (Ad .- Ac*h .- I)*(Ac^2\Bc)/h
+        Bd = (Ad - I)*(Ac\Bc)
+        Bg = (Ad .- Ac*h - I)*(Ac^2\Bc)/h
         return DiscreteStateSpace(Ad, Bd .- Bg, Bg)
     elseif method == :blh
         Ad = exp(Ac*h)
@@ -89,6 +89,7 @@ Generates a continuous-time state-space model from the mass, damping, and stiffn
 `css`: ContinuousStateSpace
 """
 function ss_model(K, M, C)
+
     n = size(K, 1)
     lu!(M)
     Ac = [zeros(n, n) I; -M\K -M\C]
@@ -112,6 +113,7 @@ Computes the eigenmodes of a continuous-time state-space model
 """
 
 function eigenmode(Ac::Matrix{Float64}, Nₘ = Int[])
+
     λ, Ψ = eigen(Ac)
 
     if length(Nₘ) > 0
@@ -157,7 +159,7 @@ function c2r_modeshapes(Ψ)
 
     M, Nmodes = size(Ψ)
     Ψₙ = Ψ[1:2:M, :]
-    ϕₙ = zeros(1:2:M, Nmodes)
+    ϕₙ = zeros(Int(M/2), Nmodes)
 
     for (i, Ψᵢ) in enumerate(eachcol(Ψₙ))
         x = real(Ψᵢ)

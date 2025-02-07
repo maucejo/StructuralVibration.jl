@@ -85,7 +85,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
         end
         free_dofs = setdiff(dofs, constrained_dofs)
 
-        new(xmin, s.L, Nodes, Elt, Ndof_per_node, constrained_dofs, free_dofs)
+        new(xmin, s.L, Nodes, Elt, Ndof_per_node, elem_size, constrained_dofs, free_dofs)
     end
 end
 
@@ -107,6 +107,7 @@ function assembly(s::OneDStructure, mesh::OneDMesh)
     kₑ, mₑ = element_matrix(s, mesh.elem_size)
 
     (; Elt, Ndof_per_node) = mesh
+    Nelt = size(Elt, 1)
 
     # Assemble global matrices
     Nddl = size(mesh.Nodes, 1)*Ndof_per_node
@@ -188,6 +189,7 @@ Compute the selection matrix for the selected dofs.
 - `S`: Selection matrix
 """
 function selection_matrix(mesh :: OneDMesh, selected_dofs)
+
     N = length(selected_dofs)
     S = zeros(N, length(mesh.free_dofs))
     for (i, dof) in enumerate(selected_dofs)
@@ -213,6 +215,7 @@ Apply boundary conditions to a given matrix
 * `A_bc`: Matrix with boundary conditions applied
 """
 function apply_bc(A, mesh)
+
     (; free_dofs) = mesh
 
     return A[free_dofs, free_dofs]
@@ -235,9 +238,10 @@ Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 Note: The mode shapes are mass-normalized, so Mₙ = I
 """
 function eigenmode(K::Matrix{Float64}, M::Matrix{Float64}, Nₘ = size(K, 1))
+
     λ, Φ = eigen(K, M)
 
-    ωₘ = .√λ[1:Nₘ]
+    ωₘ = @. √abs(λ[1:Nₘ])
     Φₘ = Φ[:, 1:Nₘ]
 
     return ωₘ, Φₘ
@@ -298,7 +302,7 @@ Compute the damping matrix C from modal parameters
 * `C`: Damping matrix
 """
 function modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)
-    Cn = Diagonal(2ξₙ.*ωₙ)
+    Cₙ = Diagonal(2ξₙ.*ωₙ)
 
     return Φₙ*M*Cₙ*M*Φₙ'
 end

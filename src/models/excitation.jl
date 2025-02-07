@@ -58,14 +58,14 @@ Struct to define a smooth rectangular excitation signal
 # Fields
 * `F₀` : Amplitude of the force [N]
 * `tstart` : Starting time of the excitation [s]
-* `trise` : Rise time from 0 to F₀ [s]
 * `duration` : Duration of the excitation [s]
+* `trise` : Rise time from 0 to F₀ [s]
 """
 @with_kw struct SmoothRect <: ArbitraryExc
     F₀::Float64
     tstart::Float64
-    trise::Float64
     duration::Float64
+    trise::Float64
 end
 
 """
@@ -73,12 +73,19 @@ end
 
 Struct to define a sine wave excitation signal
 
+# Constructor
 # Fields
 * `F₀` : Amplitude of the force [N]
-* `ω` : Frequency of the excitation [rad/s]
 * `tstart` : Starting time of the excitation [s]
 * `duration` : Duration of the excitation [s]
-* `ϕ` : Phase of the excitation [rad] (default = 0.)
+* `f` : Frequency of the excitation [Hz]
+* `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = true)
+
+# Fields
+* `F₀` : Amplitude of the force [N]
+* `tstart` : Starting time of the excitation [s]
+* `duration` : Duration of the excitation [s]
+* `ω` : Frequency of the excitation [Hz]
 * `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
 @with_kw struct SineWave <: ArbitraryExc
@@ -86,10 +93,9 @@ Struct to define a sine wave excitation signal
     tstart::Float64
     duration::Float64
     ω::Float64
-    ϕ::Float64
     zero_end::Bool
 
-    SineWave(F₀, tstart, duration, ω, ϕ = 0., zero_end = true) = new(F₀, tstart, duration, ω, ϕ, zero_end)
+    SineWave(F₀, tstart, duration, f; zero_end = true) = new(F₀, tstart, duration, 2π*f, zero_end)
 end
 
 """
@@ -118,7 +124,7 @@ Struct to define a swept sine excitation signal
     type_swept::Symbol
     zero_end::Bool
 
-    SweptSine(F₀, tstart, duration, fstart, fend, type_swept = :lin; zero_end = false) = new(F₀, tstart, duration, fstart, fend, type_swept, zero_end)
+    SweptSine(F₀, tstart, duration, fstart, fend, type_swept = :lin; zero_end = true) = new(F₀, tstart, duration, fstart, fend, type_swept, zero_end)
 end
 
 """

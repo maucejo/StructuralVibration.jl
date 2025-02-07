@@ -48,11 +48,11 @@ end
     b = 3e-2
     h = 1e-2
     S = b*h
-    I = b*h^3/12.
+    Iz = b*h^3/12.
     E = 2.1e11
     ρ = 7800.
 
-    beam = Beam(L, S, I, E, ρ)
+    beam = Beam(L, S, Iz, E, ρ)
 
     fmax = 1e3
     ωₙ = eigval(beam, fmax)[1]

@@ -48,7 +48,7 @@ struct MdofMesh
     function MdofMesh(model::Mdof, Nelt, bc = :CC)
         Nnodes = Nelt + 1
         Elt = undefs(Nelt, 3)
-        Nnodes = length(Mdof.m)
+        Nnodes = length(model.m)
 
         for i = 1:Nelt
             Elt[i, 1] = i
@@ -65,7 +65,7 @@ struct MdofMesh
             constrained_dofs = []
         end
 
-        free_dofs = setdiff(collect(1:2Nnodes), constrained_dofs)
+        free_dofs = setdiff(dofs, constrained_dofs)
 
         new(Elt, constrained_dofs, free_dofs)
     end
@@ -92,8 +92,8 @@ function assembly(model::Mdof)
     Nk = length(k)
     Nc = length(c)
 
-    if Nk != Nm - 2
-        error("The number of masses must be equal to the number of springs plus 2")
+    if Nk != Nm - 1
+        error("The number of masses must be equal to the number of springs plus 1")
     end
 
     M = Diagonal(m)
@@ -104,8 +104,8 @@ function assembly(model::Mdof)
     else
         flag = true
 
-        if Nc != Nm - 2
-            error("The number of masses must be equal to the number of springs plus 2")
+        if Nc != Nm - 1
+            error("The number of masses must be equal to the number of dampers plus 1")
         end
 
         if Nk != Nc

@@ -6,6 +6,7 @@ m = 1.
 f₀ = 10.
 ξ = 0.01
 sdof = Sdof(m, f₀, ξ)
+(; ω₀) = sdof
 
 ## Excitation
 
@@ -26,7 +27,7 @@ xexact = @. F₀*(Ω₀ - (Ω₀*cos(Ω₀*t) + ξ*ω₀*sin(Ω₀*t))*exp(-ξ*�
 
 # Duhamel's integral
 prob = SdofForcedTimeProblem(sdof, [0., 0.], t, F)
-x = solve(prob).D
+x = solve(prob).u
 
 lines(t, xexact, color = :blue)
 lines!(t, x, color = :red, linestyle = :dash)
