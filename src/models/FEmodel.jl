@@ -237,7 +237,7 @@ Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 
 Note: The mode shapes are mass-normalized, so Mₙ = I
 """
-function eigenmode(K::Matrix{Float64}, M::Matrix{Float64}, Nₘ = size(K, 1))
+function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, Nₘ = size(K, 1))
 
     λ, Φ = eigen(K, M)
 

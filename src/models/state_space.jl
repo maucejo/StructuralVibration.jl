@@ -112,11 +112,11 @@ Computes the eigenmodes of a continuous-time state-space model
 * `Ψ`: Eigenvectors
 """
 
-function eigenmode(Ac::Matrix{Float64}, Nₘ = Int[])
+function eigenmode(Ac::Matrix{Float64}, Nₘ::Int = 0)
 
     λ, Ψ = eigen(Ac)
 
-    if length(Nₘ) > 0
+    if Nₘ > 0
         return λ[1:2Nₘ], Ψ[:, 1:2Nₘ]
     end
 

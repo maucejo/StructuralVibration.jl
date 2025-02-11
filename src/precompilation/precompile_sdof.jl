@@ -13,4 +13,5 @@ prob_sdof_freq = SdofFrequencyProblem(sdof, freqs, ones(length(freqs)))
     sol_forced = solve(prob_sdof_forced)
     sol_frf = solve(prob_sdof_frf)
     sol_freq = solve(prob_sdof_freq)
+    h = impulse_response(sdof, t)
 end

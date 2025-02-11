@@ -1,0 +1,7 @@
+@compile_workload begin
+    prob = DirectTimeProblem(k_ss, m_ss, zeros(2, 2), (zeros(2), zeros(2)), t, [zeros(length(t)) Fexc]')
+
+    sol_cd = solve(prob, CentralDiff())
+    sol_rk4 = solve(prob, RK4())
+    sol_newmarkfamily = solve(prob)
+end

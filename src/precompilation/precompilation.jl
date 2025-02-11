@@ -1,17 +1,17 @@
 @setup_workload begin
     # Excitation
     Δt = 1e-3
-    t = 0.:Δt:10.
+    t = 0.:Δt:0.1
     F₀ = 1.
-    tstart = 5Δt
-    duration = 5.
+    tstart = Δt
+    duration = 0.04
     include("precompile_excitation.jl")
 
     # Sdof
     m = 1.
     f₀ = 10.
     ξ = 0.01
-    freqs = 1.:0.01:500.
+    freqs = 1.:2.:20.
     include("precompile_sdof.jl")
 
     # OneD structure
@@ -43,12 +43,31 @@
     c_mdof = [0.1, 0.1]
     include("precompile_mdof.jl")
 
-    # State space
+    # Modal Time solvers
     m_ss = Diagonal([2., 1.])
     k_ss = [6. -2.; -2. 4.]
     c_ss = [0.67 -0.11; -0.11 0.39]
+    sine_exc = SineWave(F₀, tstart, duration, 10.)
+    Fexc = excitation(sine_exc, t)
+    include("precompile_modal_time_solvers.jl")
+
+    # Direct Time solvers
+    include("precompile_direct_time_solvers.jl")
+
+    # State space
     include("precompile_state_space.jl")
+
+    # State space solvers
+    css = ss_model(k_ss, m_ss, c_ss)
+    include("precompile_state_space_solvers.jl")
 
     # FEmodel
     include("precompile_FEmodel.jl")
+
+    # Noise model
+    x = zeros(100)
+
+    # Signal processing - Noise estimation and denoising
+
+    # Signal processing - Signal
 end

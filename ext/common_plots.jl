@@ -237,7 +237,7 @@ function bode_plot(freq, y; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", 
     return fig
 end
 
-"""²
+"""
     nyquist_plot(y, theme = :makie)
 
 Plot Nyquist diagram
@@ -249,10 +249,53 @@ Plot Nyquist diagram
 * `fig`: Figure
 """
 function nyquist_plot(y::Vector{Float64}, theme = :makie)
+    (freq, y, ylabel = "Frequency (Hz)", theme = :makie; projection = false)
     set_theme!(theme_choice(theme))
     fig = Figure()
-    ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part", aspect = 1)
-    lines!(ax, real.(y), imag.(y))
+    ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part")
+
+    yr = real.(y)
+    yi = imag.(y)
+    lines!(ax, yr, freq, yi)
+
+    minyr, maxyr = extrema(yr)
+    minf, maxf = extrema(freq)
+    minyi, maxyi = extrema(yi)
+
+    if minyr == 0.
+        minyr = -abs(maxyr)
+    end
+
+    if maxyr == 0.
+        maxyr = abs(minyr)
+    end
+
+    if minyi == 0.
+        minyi = -abs(maxyi)
+    end
+
+    if maxyi == 0.
+        maxyi = abs(minyi)
+    end
+
+    if minf == 0.
+        minf = -1.
+    end
+
+    maxyrr = maximum(abs.(yr))
+    maxyii = maximum(abs.(yi))
+
+    ax.yreversed = true
+
+    if projection
+        lines!(ax, yr, yi, color = :black, linewidth = 0.5, transformation = (:xz, minf))
+        lines!(ax, freq, yi, color = :black, linewidth = 0.5, transformation = (:yz, 1.09maxyr))
+        lines!(ax, yr, freq, color = :black, linewidth = 0.5, transformation = (:yx, 1.09minyi))
+    end
+
+    xlims!(ax, -1.1maxyrr, 1.1maxyrr)
+    ylims!(ax, maxf, minf)
+    zlims!(ax, -1.1maxyii, 1.1maxyii)
 
     return fig
 end

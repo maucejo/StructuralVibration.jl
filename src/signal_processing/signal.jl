@@ -152,9 +152,10 @@ function tfestimation(input_signal::Vector{Float64}, output_signal::Vector{Float
     elseif type == :h2
         @. H = Gyy/conj(Gxy)
     elseif type == :h3
+        # H3 = (H1 + H2)/2 - Arithmetic mean
         @. H = (abs2(Gxy) + Gyy*Gxx)/2(Gxx*conj(Gxy))
     elseif type == :hv
-        # Hv = sqrt(H1*H2)
+        # Hv = sqrt(H1*H2) - Geometric mean
         @. H = Gxy*sqrt(Gyy/Gxx)/abs(Gxy)
     end
 

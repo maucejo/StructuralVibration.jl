@@ -98,10 +98,22 @@ Structure containing the data of the solution of the forced response of a sdof s
 * `du`: Velocity solution
 * `ddu`: Acceleration solution
 """
-struct SdofTimeSolution
+@with_kw struct SdofTimeSolution
     u :: Vector{Float64}
     du :: Vector{Float64}
     ddu :: Vector{Float64}
+end
+
+"""
+    SdofImpulseSolution(u)
+
+Structure containing the data of the solution of the impulse response of a sdof system
+
+# Field
+* `u`: Solution of the impulse response
+"""
+@with_kw struct SdofImpulseSolution
+    u :: Vector{Float64}
 end
 
 """
@@ -161,12 +173,12 @@ end
 
 Structure containing the data of the solution of a frequency problem for a sdof system
 
-# Fields
+# Field
 * `u`: Solution of the frequency problem
    * Response spectrum (displacement, velocity, acceleration) [m, m/s, m/s²]
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
-struct SdofFrequencySolution
+@with_kw struct SdofFrequencySolution
     u :: Vector{Complex{Float64}}
 end
 
@@ -413,4 +425,40 @@ function solve(prob::SdofFrequencyProblem)
     end
 
     return SdofFrequencySolution(x)
+end
+
+"""
+    impulse_response(sdof, t)
+
+Compute the impulse response of a single degree of freedom (Sdof) system
+
+# Inputs
+* `sdof`: Sdof structure
+* `t`: Time points at which to evaluate the response
+
+# Output
+* `sol`: SdofImpulseSolution
+"""
+function impulse_response(sdof, t)
+    prob = SdofFreeTimeProblem(sdof, [0., 1/sdof.m], t)
+
+    return SdofImpulseSolution(solve(prob).u)
+end
+
+function srs(base_exc, freq, t, ξ = 0.05)
+    nf = length(freq)
+
+    srs = undefs(nf)
+    x = undefs(nt)
+    for (f, f₀) in freq
+        ω₀ = 2π*f₀
+        sdof = Sdof(1., f₀, ξ)
+        prob = SdofForcedTimeProblem(sdof, [0., 0.], t, -base_exc)
+        (; u, du) = solve(prob)
+
+        x .= -2ξ*ω₀*du - ω₀^2*u
+        srs[f] = maximum(abs, x)
+    end
+
+    return srs
 end

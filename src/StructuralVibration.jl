@@ -10,8 +10,8 @@ export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
 export OneDMesh, MdofMesh
 
 # Structs - Excitations
-export Rectangle, Triangle, Hammer, SmoothRect,
-       SineWave, SweptSine, GaussianPulse, ColoredNoise
+export Rectangle, Triangle, Hammer, SmoothRect, SineWave,
+       HalfSine, HaverSine,SweptSine, GaussianPulse, ColoredNoise
 
 # Structs - Problems
 export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
@@ -35,10 +35,10 @@ export BodeExtract, NyquistExtract
 export FFTParameters
 
 # Functions
-export excitation, solve
+export excitation, solve, impulse_response, srs
 
-export modefreq, modeshape, eigenmode, modal_matrices, assembly, apply_bc,
-       selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
+export modefreq, modeshape, eigenmode, modal_matrices, effective_mass,
+       assembly, apply_bc, selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
 
 export agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, denoising
 

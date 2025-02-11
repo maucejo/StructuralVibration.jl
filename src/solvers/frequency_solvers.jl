@@ -118,7 +118,7 @@ Structure containing the solution of the frequency response problem
 * u: Transfer function matrix
 """
 @with_kw struct FRFSolution
-    u :: Union{Matrix{ComplexF64}, Vector{Matrix{ComplexF64}}}
+    u :: Union{Array{ComplexF64, 3}, Vector{Matrix{ComplexF64}}}
 end
 
 """
@@ -134,7 +134,7 @@ Structure containing the solution of the frequency response problem
 end
 
 """
-    solve(m::ModalFRFProblem, type = :dis, ismat = false)
+    solve(m::ModalFRFProblem, type = :dis; ismat = false)
 
 Computes the FRF matrix by modal approach
 
@@ -146,7 +146,7 @@ Computes the FRF matrix by modal approach
 # Output
 * sol: FRFSolution structure
 """
-function solve(m::ModalFRFProblem, type = :dis, ismat = false)
+function solve(m::ModalFRFProblem, type = :dis; ismat = false)
     # Initialisation
     (; ωₙ, ξₙ, freq, ϕₒ, ϕₑ) = m
     Nₑ = size(ϕₑ, 1)
@@ -172,14 +172,14 @@ function solve(m::ModalFRFProblem, type = :dis, ismat = false)
     end
 
     if ismat
-        return reshape(reduce(hcat, FRF), Nₒ, Nₑ, :)
+        return FRFSolution(reshape(reduce(hcat, FRF), Nₒ, Nₑ, :))
     end
 
     return FRFSolution(FRF)
 end
 
 """
-    solve(m::DirectFRF, type = :dis, ismat = false)
+    solve(m::DirectFRF, type = :dis; ismat = false)
 
 Computes the FRF matrix by direct method
 
@@ -191,7 +191,7 @@ Computes the FRF matrix by direct method
 # Output
 * sol: FRFSolution structure
 """
-function solve(m::DirectFRFProblem, type = :dis, ismat = false)
+function solve(m::DirectFRFProblem, type = :dis; ismat = false)
     # Initialisation
     (; K, M, C, freq, Sₒ, Sₑ) = m
     Nₒ = size(Sₒ, 1)
@@ -199,8 +199,8 @@ function solve(m::DirectFRFProblem, type = :dis, ismat = false)
     Ndofs = size(K, 1)
     Nf = length(freq)
 
-    FRF = [Matrix{ComplexF64}(undef, Nₒ, Nₑ) for _ in 1:Nf]
-    D = Matrix{ComplexF64}(undef, Ndofs, Ndofs)
+    FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
+    D = undefs(ComplexF64, Ndofs, Ndofs)
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "FRF calculation - Direct method...", showspeed = true)
@@ -217,7 +217,7 @@ function solve(m::DirectFRFProblem, type = :dis, ismat = false)
     end
 
     if ismat
-        return reshape(reduce(hcat, FRF), Nₒ, Nₑ, :)
+        return FRFSolution(reshape(reduce(hcat, FRF), Nₒ, Nₑ, :))
     end
 
     return FRFSolution(FRF)
@@ -289,8 +289,8 @@ function solve(m::DirectFreqProblem, type = :dis)
 
     ωf = 2π*freq
 
-    y = Matrix{ComplexF64}(undef, Nₒ, Nf)
-    D = Matrix{ComplexF64}(undef, Ndofs, Ndofs)
+    y = undefs(ComplexF64, Nₒ, Nf)
+    D = undefs(ComplexF64, Ndofs, Ndofs)
 
     p = Progress(Nf, color = :black, desc = "Frequency Response - Direct method...", showspeed = true)
     @inbounds for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
