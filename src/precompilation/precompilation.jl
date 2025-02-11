@@ -1,10 +1,10 @@
 @setup_workload begin
     # Excitation
     Δt = 1e-3
-    t = 0.:Δt:0.1
+    t = 0.:Δt:0.035
     F₀ = 1.
     tstart = Δt
-    duration = 0.04
+    duration = 0.03
     include("precompile_excitation.jl")
 
     # Sdof
@@ -65,9 +65,14 @@
     include("precompile_FEmodel.jl")
 
     # Noise model
-    x = zeros(100)
+    x = sin.(2π*10*t)
+    fs = 1/Δt
+    snr_dB = 25.
+    include("precompile_noise.jl")
 
     # Signal processing - Noise estimation and denoising
+    y = agwn(x, snr_dB)
+    include("precompile_noise_estimation.jl")
 
     # Signal processing - Signal
 end
