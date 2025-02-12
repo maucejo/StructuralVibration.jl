@@ -312,11 +312,14 @@ Computes the forced response of a single degree of freedom (Sdof) system due to 
 
 # Inputs
 * `prob`: Structure containing the parameters of the Sdof forced problem
+* `method`: Method to compute the Duhamel's integral
+    * :interp: Interpolation + Gaussian quadrature (default)
+    * :conv: Convolution
 
 # Output
 * `sol`: The response of the system at the given time points
 """
-function solve(prob::SdofForcedTimeProblem)
+function solve(prob::SdofForcedTimeProblem; method = :interp)
 
     (; sdof, u0, t, F, type_exc) = prob
     (; m, ω₀, ξ) = sdof
@@ -356,13 +359,40 @@ function solve(prob::SdofForcedTimeProblem)
         F = k*xb .+ c*vb
     end
 
-    xp = Δt*conv(F, h)[1:length(F)]
+    if method == :interp
+        xp = duhamel_integral(F, h, t)
+    else
+        xp = Δt*conv(F, h)[1:length(F)]
+    end
 
     x = xh .+ xp
     v = gradient(x, t)
     a = gradient(v, t)
 
     return SdofTimeSolution(x, v, a)
+end
+
+function duhamel_integral(F, h, t)
+    # Interpolation
+    fc = cubic_spline_interpolation(t, F)
+    hc = cubic_spline_interpolation(t, h)
+
+    # Gauss-Legendre quadrature
+    nodes, weights = gausslegendre(500)
+    n = length(nodes)
+    nt = length(t)
+
+    # Initialization
+    x = undefs(nt)
+    scaled_nodes = undefs(n)
+    scaled_weights = undefs(n)
+    for (i, ti) in enumerate(t)
+        @. scaled_nodes = (nodes + 1)*ti/2
+        @. scaled_weights = weights*ti/2
+        x[i] = sum(fc(τ) * hc(ti - τ) * w for (τ, w) in zip(scaled_nodes, scaled_weights))
+    end
+
+    return x
 end
 
 """

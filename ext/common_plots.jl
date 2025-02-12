@@ -118,6 +118,18 @@ function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = iden
         xlims!(ax, minimum(x), maximum(x))
     end
 
+    labelsize = 18.
+    ticklabelsize = 14.
+
+    ax.xlabelsize = labelsize
+    ax.xlabelfont = :bold
+
+    ax.ylabelsize = labelsize
+    ax.ylabelfont = :bold
+
+    ax.xticklabelsize = ticklabelsize
+    ax.yticklabelsize = ticklabelsize
+
     return fig
 end
 

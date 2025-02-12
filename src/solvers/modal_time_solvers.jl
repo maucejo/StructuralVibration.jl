@@ -362,11 +362,14 @@ Compute the forced response of a multi-degrees of freedom (Mdof) system due to a
 
 # Inputs
 * `prob`: Structure containing the parameters of the Mdof problem
+* `method`: Method to compute the Duhamel's integral
+    * :interp: Interpolation + Gaussian quadrature (default)
+    * :conv: Convolution
 
 # Output
 * `sol`: ModalTimeSolution structure containing the response of the system at the given time points
 """
-function solve(prob::ForcedModalTimeProblem)
+function solve(prob::ForcedModalTimeProblem, method = :interp)
     (; K, M, ξₙ, u0, t, F, Nₘ, ismodal) = prob
     x₀, v₀ = u0
     nt = length(t)
@@ -432,7 +435,11 @@ function solve(prob::ForcedModalTimeProblem)
             @. h = exp(-Ξₘ*t)*sinh(βₘ*t)/βₘ
         end
 
-        q[:, m] .= qh .+ Δt*conv(Lₙ[m, :], h)[1:nt]
+        if method == :interp
+            q[:, m] .= qh .+ duhamel_integral(Lₙ[m, :], h, t)
+        else
+            q[:, m] .= qh .+ Δt*conv(Lₙ[m, :], h)[1:nt]
+        end
     end
 
     u = Φₘ*q';

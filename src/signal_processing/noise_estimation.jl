@@ -375,9 +375,6 @@ function varest_derrico(x)
 
     nd, ns = size(x)
 
-    # The function throws an error when ns < 35
-    ns < 35 ? error("The length of the sample must greater than 35") : nothing
-
     # The idea here is to form a linear combination of successive elements
     # of the series. If the underlying form is locally nearly linear, then
     # a [1 -2 1] combination (for equally spaced data) will leave only
@@ -418,8 +415,7 @@ function varest_derrico(x)
             p .= (0.5 .+ collect(Float64, 1:ntrim))./(ntrim + 0.5)
 
             for (k, nk) in enumerate(eachrow(noisedata))
-                # ns should be greater than 35 to avoid interpolation errors
-                itp = linear_interpolation(p, nk)
+                itp = linear_interpolation(p, nk, extrapolation_bc = Line())
                 @. Q[k, :] = (itp(1 - perc) - itp(perc))/2z
             end
 

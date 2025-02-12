@@ -11,7 +11,7 @@ sdof = Sdof(m, f₀, ξ)
 ## Excitation
 
 #Time vector
-Δt = 1e-3
+Δt = 1e-2
 t = 0.:Δt:10.
 
 # Excitation
@@ -29,8 +29,7 @@ xexact = @. F₀*(Ω₀ - (Ω₀*cos(Ω₀*t) + ξ*ω₀*sin(Ω₀*t))*exp(-ξ*�
 prob = SdofForcedTimeProblem(sdof, [0., 0.], t, F)
 x = solve(prob).u
 
-lines(t, xexact, color = :blue)
-lines!(t, x, color = :red, linestyle = :dash)
+sv_plot(t, [xexact x]', lw = 2., legend = (active = true, entry = ["Exact", "Duhamel"]))
 
 ## Frequency response
 
@@ -41,7 +40,6 @@ y = solve(prob_resp).u
 lines(freq, 20log10.(abs.(y)), color = :blue)
 
 ## FRF
-prob_frf = SdofFRFProblem(sdof, freq, type_resp = :vel)
+prob_frf = SdofFRFProblem(sdof, freq)
 H = solve(prob_frf).u
-lines(freq, 20log10.(abs.(H)), color = :blue)
-lines(freq, angle.(H), color = :blue)
+bode_plot(freq, H)
