@@ -248,10 +248,10 @@ Plot Nyquist diagram
 # Output
 * `fig`: Figure
 """
-function nyquist_plot(y::Vector{Float64}, theme = :makie)
+function nyquist_plot(y::Vector{ComplexF64}, theme = :makie)
     set_theme!(theme_choice(theme))
     fig = Figure()
-    ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part")
+    ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part", aspect = DataAspect())
     lines!(ax, real.(y), imag.(y))
 
     labelsize = 18.
@@ -263,13 +263,8 @@ function nyquist_plot(y::Vector{Float64}, theme = :makie)
     ax.ylabelsize = labelsize
     ax.ylabelfont = :bold
 
-    ax.zlabelsize = labelsize
-    ax.zlabelfont = :bold
-    ax.zticklabelpad = 5.
-
     ax.xticklabelsize = ticklabelsize
     ax.yticklabelsize = ticklabelsize
-    ax.zticklabelsize = ticklabelsize
 
     return fig
 end
