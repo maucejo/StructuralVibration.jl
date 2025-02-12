@@ -75,4 +75,8 @@
     include("precompile_noise_estimation.jl")
 
     # Signal processing - Signal
+    ts = 0:Δt:3-Δt
+    sig = cos.(2π*10*ts)
+    ref = randn(length(ts))
+    include("precompile_signal.jl")
 end

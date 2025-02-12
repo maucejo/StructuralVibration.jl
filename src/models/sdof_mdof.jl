@@ -92,41 +92,30 @@ function assembly(model::Mdof)
     Nk = length(k)
     Nc = length(c)
 
-    if Nk != Nm - 1
-        error("The number of masses must be equal to the number of springs plus 1")
-    end
+    Nk != Nm - 1 ? error("The number of masses must be equal to the number of springs plus 1") : nothing
 
     M = Diagonal(m)
-    K = undefs(Nm, Nm)
+    K = zeros(Nm, Nm)
 
     if Nc == 0
         flag = false
     else
         flag = true
 
-        if Nc != Nm - 1
-            error("The number of masses must be equal to the number of dampers plus 1")
-        end
+        Nc != Nm - 1 ? error("The number of masses must be equal to the number of dampers plus 1") : nothing
 
-        if Nk != Nc
-            error("The number of springs must be equal to the number of dampers")
-        end
+        Nk != Nc ? error("The number of springs must be equal to the number of dampers") : nothing
 
-        C = undefs(Nm, Nm)
+        C = zeros(Nm, Nm)
     end
 
     for (i, ki) in enumerate(k)
-        K[i:i+1, i:i+1] .= element_matrix(ki)
-        if flag
-            C[i:i+1, i:i+1] .= element_matrix(c[i])
-        end
+        K[i:i+1, i:i+1] .+= element_matrix(ki)
+
+        flag ? C[i:i+1, i:i+1] .+= element_matrix(c[i]) : nothing
     end
 
-    if flag
-        return K, M, C
-    else
-        return K, M
-    end
+    return flag ? (K, M, C) : (K, M)
 end
 
 """

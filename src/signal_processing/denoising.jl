@@ -94,7 +94,11 @@ end
 
 function denoising(y::AbstractArray, alg::KalmanDenoising)
 
+    # Conversion
+    y isa Vector ? y = transpose(y) : nothing
+
     v̂ = varest(y)
+
     R = Diagonal(v̂)
     ny = size(y, 1)
 
@@ -154,10 +158,10 @@ function kalman_denoise(y, Q, R, alg)
             P .= Pest[k] .+ Kk*(P .- Pest[k + 1])*Kk'
         end
 
-        return x
-    else
-        return xest
+        xest .= x
     end
+
+    return nx == 1 ? vec(xest) : xest
 end
 
 function kf_objfun!(λ, y, R)

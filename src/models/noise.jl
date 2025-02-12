@@ -105,7 +105,7 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
 # Output
 * `y`: noisy signal
 """
-function acn(x::VecOrMat{Float64}, snr_dB, fs::Float64, color = :pink; band_freq = Float64[], rst = true)
+function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
 
     # Reset the RNG if required
     if rst

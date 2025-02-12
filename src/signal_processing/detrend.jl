@@ -8,9 +8,10 @@ function detrend(t::AbstractArray, y::AbstractArray, order = 1, bp = Float64[])
         return y - polyval(polyfit(t, y, order[1]), t)
     else
         idb = findall(@. bp ≥ t[1] || bp ≤ t[end])
-        if length(idb) == 1
-            idb = only(idb)
-        end
+
+        # If there is only one breakpoint, convert it to a scalar
+        length(idb) == 1 ? idb = only(idb) : nothing
+
         bpi = unique([t[1]; bp[idb]; t[end]])
 
         if length(order) == 1
@@ -67,9 +68,9 @@ end
 """
 function polyval(p, x)
     y = zeros(length(x))
-    orders = 0:length(p)-1
+    orders = 0:length(p) - 1
 
-    for (i, (ci, ordi)) in enumerate(zip(p, reverse(orders)))
+    for (ci, ordi) in zip(p, reverse(orders))
         @. y += ci*x^ordi
     end
 

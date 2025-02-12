@@ -91,9 +91,8 @@ function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
     if batch_size == 0
         return varestfun(x)
     else
-        if x isa Vector
-            x = transpose(x)
-        end
+        # Check type of x
+        x isa Vector ? x = transpose(x) : nothing
 
         nr, nc = size(x)
         batches = [x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
@@ -190,11 +189,9 @@ function varest_bayesian(x, prior = :invgamma)
     if prior == :uniform
         vₖ = mean(@. abs2(z)/fₖ)
     elseif prior == :invgamma
-        if eltype(x) == Complex{Float64}
-            α = 1.
-        else
-            α = 0.5
-        end
+        # Define α depending on the type of x
+        eltype(x) == Complex{Float64} ? α = 1. : α = 0.5
+
         γₐ = 1.
         γₛ = 1.
         βₐ = 1e-10
@@ -225,11 +222,8 @@ function bayesfun!(L, z, s², prior)
 
     fₖ = @. (1. + 10. ^L*s²)/s²
 
-    if eltype(z) == Complex{Float64}
-        α = 1.
-    else
-        α = 0.5
-    end
+    # Define α depending on the type of x
+    eltype(z) == Complex{Float64} ? α = 1. : α = 0.5
 
     if prior == :uniform
         vₖ = mean(@. abs2(z)/fₖ)
@@ -377,15 +371,12 @@ function varest_derrico(x)
     end
 
     ndim = ndims(x)
-    if ndim == 1
-        x = transpose(x)
-    end
+    ndim == 1 ? x = transpose(x) : nothing
 
     nd, ns = size(x)
+
     # The function throws an error when ns < 35
-    if ns < 35
-        return NaN
-    end
+    ns < 35 ? error("The length of the sample must greater than 35") : nothing
 
     # The idea here is to form a linear combination of successive elements
     # of the series. If the underlying form is locally nearly linear, then
@@ -449,11 +440,7 @@ function varest_derrico(x)
     # Use an adhoc correction to remove the bias in the noise estimate. This correction was determined by examination of a large number of random samples.
     noisevar ./= (1. + 15(ns + 1.225)^(-1.245))
 
-    if ndim == 1
-        return only(noisevar)
-    else
-        return noisevar
-    end
+    return ndim == 1 ? only(noisevar) : noisevar
 end
 
 """

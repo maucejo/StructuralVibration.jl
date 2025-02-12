@@ -249,53 +249,27 @@ Plot Nyquist diagram
 * `fig`: Figure
 """
 function nyquist_plot(y::Vector{Float64}, theme = :makie)
-    (freq, y, ylabel = "Frequency (Hz)", theme = :makie; projection = false)
     set_theme!(theme_choice(theme))
     fig = Figure()
-    ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part")
+    ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part")
+    lines!(ax, real.(y), imag.(y))
 
-    yr = real.(y)
-    yi = imag.(y)
-    lines!(ax, yr, freq, yi)
+    labelsize = 18.
+    ticklabelsize = 14.
 
-    minyr, maxyr = extrema(yr)
-    minf, maxf = extrema(freq)
-    minyi, maxyi = extrema(yi)
+    ax.xlabelsize = labelsize
+    ax.xlabelfont = :bold
 
-    if minyr == 0.
-        minyr = -abs(maxyr)
-    end
+    ax.ylabelsize = labelsize
+    ax.ylabelfont = :bold
 
-    if maxyr == 0.
-        maxyr = abs(minyr)
-    end
+    ax.zlabelsize = labelsize
+    ax.zlabelfont = :bold
+    ax.zticklabelpad = 5.
 
-    if minyi == 0.
-        minyi = -abs(maxyi)
-    end
-
-    if maxyi == 0.
-        maxyi = abs(minyi)
-    end
-
-    if minf == 0.
-        minf = -1.
-    end
-
-    maxyrr = maximum(abs.(yr))
-    maxyii = maximum(abs.(yi))
-
-    ax.yreversed = true
-
-    if projection
-        lines!(ax, yr, yi, color = :black, linewidth = 0.5, transformation = (:xz, minf))
-        lines!(ax, freq, yi, color = :black, linewidth = 0.5, transformation = (:yz, 1.09maxyr))
-        lines!(ax, yr, freq, color = :black, linewidth = 0.5, transformation = (:yx, 1.09minyi))
-    end
-
-    xlims!(ax, -1.1maxyrr, 1.1maxyrr)
-    ylims!(ax, maxf, minf)
-    zlims!(ax, -1.1maxyii, 1.1maxyii)
+    ax.xticklabelsize = ticklabelsize
+    ax.yticklabelsize = ticklabelsize
+    ax.zticklabelsize = ticklabelsize
 
     return fig
 end
@@ -313,11 +287,57 @@ Plot Nyquist diagram in 3D
 # Output
 * `fig`: Figure
 """
-function nyquist_plot(freq, y, xlabel = "Frequency (Hz)", theme = :makie)
+function nyquist_plot(freq, y, ylabel = "Frequency (Hz)", theme = :makie; projection = false)
     set_theme!(theme_choice(theme))
     fig = Figure()
-    ax = Axis3(fig[1,1], xlabel = xlabel, ylabel = "Real part", zlabel = "Imaginary part")
-    lines!(ax, freq, real.(y), imag.(y))
+    ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part")
+
+    yr = real.(y)
+    yi = imag.(y)
+    lines!(ax, yr, freq, yi)
+
+    minyr, maxyr = extrema(yr)
+    minf, maxf = extrema(freq)
+    minyi, maxyi = extrema(yi)
+
+    # Some checks
+    minyr == 0. ? minyr = -abs(maxyr) : nothing
+    maxyr == 0. ? maxyr = abs(minyr) : nothing
+    minyi == 0. ? minyi = -abs(maxyi) : nothing
+    maxyi == 0. ? maxyi = abs(minyi) : nothing
+    minf == 0. ? minf = -1. : nothing
+
+    maxyrr = maximum(abs.(yr))
+    maxyii = maximum(abs.(yi))
+
+    ax.yreversed = true
+
+    if projection
+        lines!(ax, yr, yi, color = :black, linewidth = 0.5, transformation = (:xz, minf))
+        lines!(ax, freq, yi, color = :black, linewidth = 0.5, transformation = (:yz, 1.09maxyr))
+        lines!(ax, yr, freq, color = :black, linewidth = 0.5, transformation = (:yx, 1.09minyi))
+    end
+
+    xlims!(ax, -1.1maxyrr, 1.1maxyrr)
+    ylims!(ax, maxf, minf)
+    zlims!(ax, -1.1maxyii, 1.1maxyii)
+
+    labelsize = 18.
+    ticklabelsize = 14.
+
+    ax.xlabelsize = labelsize
+    ax.xlabelfont = :bold
+
+    ax.ylabelsize = labelsize
+    ax.ylabelfont = :bold
+
+    ax.zlabelsize = labelsize
+    ax.zlabelfont = :bold
+    ax.zticklabelpad = 5.
+
+    ax.xticklabelsize = ticklabelsize
+    ax.yticklabelsize = ticklabelsize
+    ax.zticklabelsize = ticklabelsize
 
     return fig
 end

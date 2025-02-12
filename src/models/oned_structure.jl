@@ -22,12 +22,7 @@ Structure containing the data of a homogeneous and isotropic longitudinal bar
     m::Float64
     D::Float64
 
-    function Bar(L::Float64, S::Float64, E::Float64, ρ::Float64)
-        m = ρ*S
-        D = E*S
-
-        return new(L, m, D)
-    end
+    Bar(L::Float64, S::Float64, E::Float64, ρ::Float64) = new(L, ρ*S, E*S)
 end
 
 """
@@ -52,12 +47,7 @@ Structure containing the data of a homogeneous and isotropic torsional bar
     m::Float64
     D::Float64
 
-    function Rod(L::Float64, I::Float64, J::Float64, G::Float64, ρ::Float64)
-        m = ρ*I
-        D = G*J
-
-        return new(L, m, D)
-    end
+    Rod(L::Float64, I::Float64, J::Float64, G::Float64, ρ::Float64) = new(L, ρ*I, G*J)
 end
 
 """
@@ -98,12 +88,7 @@ Structure containing the data of a homogeneous and isotropic bending beam
     m :: Float64
     D :: Float64
 
-    function Beam(L::Float64, S::Float64, I::Float64, E::Float64, ρ::Float64)
-        m = ρ*S
-        D = E*I
-
-        return new(L, m, D)
-    end
+    Beam(L::Float64, S::Float64, I::Float64, E::Float64, ρ::Float64) = new(L, ρ*S, E*I)
 end
 
 """

@@ -59,7 +59,6 @@ export undefs
 
 # Include files - Utils
 include("utils/undefs.jl")
-include("utils/windows.jl")
 
 # Include files - Estimation
 include("signal_processing/gradient.jl")
@@ -67,6 +66,7 @@ include("signal_processing/detrend.jl")
 include("signal_processing/noise_estimation.jl")
 include("signal_processing/denoising.jl")
 include("signal_processing/modal_extraction.jl")
+include("signal_processing/windows.jl")
 include("signal_processing/signal.jl")
 
 # Include files - Sdof

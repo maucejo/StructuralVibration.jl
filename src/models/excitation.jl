@@ -272,9 +272,8 @@ function excitation(type::Hammer, t)
 
     Ft = zeros(length(t))
 
-    if !isa(t, Array)
-        t = collect(t);
-    end
+    # Check the type of t
+    !isa(t, Array) ? t = collect(t) : nothing
 
     pos_start = argmin(@. (t - tstart)^2.)
 
@@ -295,10 +294,9 @@ function excitation(type::SmoothRect, t)
     pos_start = argmin(@. (t - tstart)^2.)
     pos_end = argmin(@. (t - tstart - duration)^2.)
 
+    # Check duration
     Trect = duration - 2trise
-    if isless(Trect, 0.)
-        error("Il faut que duration >= 2trise")
-    end
+    Trect < 0. ? error("duration must >= 2trise") : nothing
 
     pos_rect_start = argmin(@. (t - tstart - trise)^2.)
     pos_rect_end = argmin(@. (t - tstart - duration + trise).^2.)
@@ -341,9 +339,8 @@ function excitation(type::SineWave, t)
         if zero_end
             pos_end = argmin(@. (t - tstart - n*T)^2.)
 
-            if tstart + n*T ≥ t[end]
-                warning("The duration of the sine wave is too long to performed zero-end operation.")
-            end
+            # Check duration
+            tstart + n*T ≥ t[end] ? warning("The duration of the sine wave is too long to performed zero-end operation.") : nothing
         else
             pos_end = argmin(@. (t - tsw)^2.)
         end
@@ -427,17 +424,15 @@ function excitation(type::SweptSine, t)
             ϕ = @. 2π*(fstart*(t[pos_exc_t] - tstart) + β*(t[pos_exc_t] - tstart)^3/3)
 
         elseif type_swept == :log
-            if fstart*fend ≤ 0.
-                error("fstart and fend must have the same sign and be different from 0.")
-            end
+            # Check frequency condition
+            fstart*fend ≤ 0. ? error("fstart and fend must have the same sign and be different from 0.") : nothing
 
             if zero_end
                 n = round((fend - fstart)*duration/log(fend/fstart))
                 duration = n*log(fend/fstart)/(fend - fstart)
 
-                if tstart + duration ≥ t[end]
-                   warning("The duration of the swept sine is too long to performed zero-end operation.")
-                end
+                # Check duration
+                tstart + duration ≥ t[end] ? warning("The duration of the swept sine is too long to performed zero-end operation.") : nothing
 
                 pos_end = argmin(@. (t - tstart - duration)^2.)
                 pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])

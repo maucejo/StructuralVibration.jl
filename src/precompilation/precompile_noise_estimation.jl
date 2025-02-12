@@ -4,6 +4,6 @@
     noisevar = varest(y, LcurveEst())
     noisevar = varest(y, DerricoEst())
 
-    # y_clean = denoising(y, RegDenoising())
-    # y_clean .= denoising(y, KalmanDenoising())
+    y_clean = denoising(y, RegDenoising())
+    y_clean .= denoising(y, KalmanDenoising(rts = true))
 end

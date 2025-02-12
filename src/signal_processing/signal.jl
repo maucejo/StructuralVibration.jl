@@ -21,10 +21,10 @@ Structure to store the time and frequency parameters for the FFT analysis
     freq
     df::Float64
     freq_span
-    fs::Int
+    fs
     bs::Int
 
-    function FFTParameters(fs::Int, bs::Int; pow2 = true)
+    function FFTParameters(fs, bs::Int; pow2 = true)
         # Sample rate & block size
         if pow2
             fs = nextpow(2, fs)
@@ -104,11 +104,10 @@ function tfestimation(input_signal::Vector{Float64}, output_signal::Vector{Float
     (; freq) = FFTParameters(fs, bs, pow2 = false)
 
     # Initialization
-    if iseven(bs)
-        N = bs ÷ 2 + 1
-    else
-        N = bs ÷ 2
-    end
+
+    # Check if the block size is even or odd
+    N = iseven(bs) ? bs ÷ 2 + 1 : bs ÷ 2
+
     Gxx = zeros(ComplexF64, N)
     Gyy = zeros(ComplexF64, N)
     Gxy = zeros(ComplexF64, N)
@@ -225,12 +224,8 @@ function welch(input_signal, bs, window = hanning(bs); fs = 1, overlap = 0.5, sc
     # Signal segmentation
     signal, n_segments = signal_segmentation(input_signal, bs, window, overlap)
 
-    # Initialize storage for periodograms of each segment
-    if iseven(bs)
-        N = bs ÷ 2 + 1
-    else
-        N = bs ÷ 2
-    end
+    # Check if the block size is even or odd
+    N = iseven(bs) ? bs ÷ 2 + 1 : bs ÷ 2
 
     Pxx = zeros(N)
     for segment in signal
@@ -245,10 +240,9 @@ function welch(input_signal, bs, window = hanning(bs); fs = 1, overlap = 0.5, sc
         win_corr = sum(abs2, window)
         scale *= win_corr*fs
 
-        if scaling == :esd
-            # Explanation - ESD = T*PSD where T is the the acquisition block time
-            scale /= tspan[2]
-        end
+        # Explanation - ESD = T*PSD where T is the the acquisition block time
+        scaling == :esd ? scale /= tspan[2] : nothing
+
     elseif scaling == :spectrum || scaling == :linear
         # Explanation: By definition, the double-sided autopower is Pxx = abs2.(fft(x))/N^2, where N is the bs. This result must take into account the amplitude correction factor (ECF) to compensate for the windowing effect and preserve the signal amplitude. By definition, ACF = 1/mean(window) = N/sum(window)). Therefore, Pxx_corrected = Pxx*ACF^2 = abs2.(fft(x))/sum(window)^2. Hence, the value of scale...
         scale = sum(window)^2
@@ -260,14 +254,13 @@ function welch(input_signal, bs, window = hanning(bs); fs = 1, overlap = 0.5, sc
     # Convert full-spectrum to one-sided spectrum
     # Extracting the positive frequencies
     freqs = rfftfreq(bs, fs)
-    if iseven(bs)
-        pxx = [Pxx[1]; 2Pxx[2:end-1]; Pxx[end]]
-    else
-        pxx = [Pxx[1]; 2Pxx[2:end]]
-    end
+
+    # Correcting the amplitude of the spectrum
+    pxx = iseven(bs) ? [Pxx[1]; 2Pxx[2:end-1]; Pxx[end]] : [Pxx[1]; 2Pxx[2:end]]
 
     useful_freqs = findall(freqs .<= freq[end])
 
+    # Linear scaling
     if scaling == :linear
         @. pxx = sqrt(pxx)
     end
@@ -325,11 +318,8 @@ function spectrum(input_signal, bs, window = hanning(bs); fs = 1., overlap = 0.5
     # Signal segmentation
     signal, n_segments = signal_segmentation(input_signal, bs, window, overlap)
 
-    if iseven(bs)
-        N = bs ÷ 2 + 1
-    else
-        N = bs ÷ 2
-    end
+    # Check if the block size is even or odd
+    N = iseven(bs) ? bs ÷ 2 + 1 : bs ÷ 2
 
     y = zeros(ComplexF64, N)
     for segment in signal
@@ -342,11 +332,9 @@ function spectrum(input_signal, bs, window = hanning(bs); fs = 1., overlap = 0.5
     # Convert full-spectrum to one-sided spectrum
     # Extracting the positive frequencies
     freqs = rfftfreq(bs, fs)
-    if iseven(bs)
-        y = [y[1]; 2y[2:end-1]; y[end]]
-    else
-        y = [y[1]; 2y[2:end]]
-    end
+
+    # Correcting the amplitude of the spectrum
+    y .= iseven(bs) ? [y[1]; 2y[2:end-1]; y[end]] : [y[1]; 2y[2:end]]
 
     useful_freqs = findall(freqs .<= freq[end])
 
