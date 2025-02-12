@@ -1,6 +1,6 @@
 module StructuralVibration
 
-using DSP, FFTW, Interpolations, LinearAlgebra, Optim, Parameters, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
+using DSP, FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Parameters, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
 
 # Structs - Models
 export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
