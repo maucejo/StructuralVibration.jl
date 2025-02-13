@@ -92,9 +92,10 @@ Struct to define a sine wave excitation signal
     tstart::Float64
     duration::Float64
     ω::Float64
+    ϕ::Float64
     zero_end::Bool
 
-    SineWave(F₀, tstart, duration, freq; zero_end = true) = new(F₀, tstart, duration, 2π*freq, zero_end)
+    SineWave(F₀, tstart, duration, freq, ϕ = 0.; zero_end = true) = new(F₀, tstart, duration, 2π*freq, ϕ, zero_end)
 end
 
 """
@@ -330,17 +331,21 @@ function excitation(type::SineWave, t)
     T = 2π/ω
 
     # Number of periods in the duration
-    n = floor(Int, duration/T)
+    # n = floor(Int, duration/T)
+    n = round(Int, (ω*duration + ϕ)/2π)
     tsw = tstart + duration
 
     if tsw ≥ t[end]
         pos_end = nt
     else
         if zero_end
-            pos_end = argmin(@. (t - tstart - n*T)^2.)
+            duration = (2π*n - ϕ)/ω
+            pos_end = argmin(@. (t - tstart - duration)^2.)
+            # pos_end = argmin(@. (t - tstart - n*T)^2.)
 
             # Check duration
-            tstart + n*T ≥ t[end] ? warning("The duration of the sine wave is too long to performed zero-end operation.") : nothing
+            tstart + duration ≥ t[end] ? Warn("The duration of the sine wave is too long to performed zero-end operation.") : nothing
+            # tstart + n*T ≥ t[end] ? Warn("The duration of the sine wave is too long to performed zero-end operation.") : nothing
         else
             pos_end = argmin(@. (t - tsw)^2.)
         end
