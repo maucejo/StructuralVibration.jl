@@ -78,7 +78,7 @@ struct FoxGoodwin <: NewmarkFamily
     β₀::Float64
     name::String
 
-    FoxGoodwin() = new(0., 0., 0.5, 1/12, "Fox-Goodwin...")
+    FoxGoodwin() = new(0., 0., 0.5, 1/12, "Direct Time Problem - Fox-Goodwin...")
 end
 
 """
@@ -93,7 +93,7 @@ struct LinearAcceleration <: NewmarkFamily
     β₀::Float64
     name::String
 
-    LinearAcceleration() = new(0., 0., 0.5, 1/6, "Linear acceleration...")
+    LinearAcceleration() = new(0., 0., 0.5, 1/6, "Direct Time Problem - Linear acceleration...")
 end
 
 """
@@ -108,7 +108,7 @@ struct Newmark <: NewmarkFamily
     β₀::Float64
     name::String
 
-    Newmark(; γ₀ = 0.5, β₀ = 0.25) = new(0., 0., γ₀, β₀, "Newmark...")
+    Newmark(; γ₀ = 0.5, β₀ = 0.25) = new(0., 0., γ₀, β₀, "Direct Time Problem - Newmark...")
 end
 
 """
@@ -126,10 +126,10 @@ struct HHT <: NewmarkFamily
     function HHT(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf)
         if αf ≠ Inf
             (0. < αf < 1/3) ? error("αf must be in [0, 1/3[") : nothing
-            return new(αf, 0., γ₀, β₀, "HHT...")
+            return new(αf, 0., γ₀, β₀, "Direct Time Problem - HHT...")
         else
             ρ < 0.5 ? error("ρ must be in [0.5, 1]") : nothing
-            return new((1. - ρ)/(1. + ρ), 0., γ₀, β₀, "HHT...")
+            return new((1. - ρ)/(1. + ρ), 0., γ₀, β₀, "Direct Time Problem - HHT...")
         end
     end
 end
@@ -149,10 +149,10 @@ struct WBZ <: NewmarkFamily
     function WBZ(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αₘ = Inf)
         if αₘ ≠ Inf
             (αₘ ≤ 0.5) ? error("αₘ must be ≤ 0.5") : nothing
-            return new(0., αₘ, γ₀, β₀, "WBZ...")
+            return new(0., αₘ, γ₀, β₀, "Direct Time Problem - WBZ...")
         else
             (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
-            return new(0., (ρ - 1.)/(ρ + 1.), γ₀, β₀, "WBZ...")
+            return new(0., (ρ - 1.)/(ρ + 1.), γ₀, β₀, "Direct Time Problem - WBZ...")
         end
     end
 end
@@ -179,7 +179,7 @@ struct GeneralizedAlpha <: NewmarkFamily
             αₘ = 3αf - 1.
         end
 
-        return new(αf, αₘ, γ₀, β₀, "Generalized-α...")
+        return new(αf, αₘ, γ₀, β₀, "Direct Time Problem - Generalized-α...")
     end
 end
 
@@ -195,12 +195,31 @@ struct MidPoint <: NewmarkFamily
     β₀::Float64
     name::String
 
-    MidPoint() = new(0.5, 0.5, 0.5, 0.25, "Mid-point rule...")
+    MidPoint() = new(0.5, 0.5, 0.5, 0.25, "Direct Time Problem - Mid-point rule...")
 end
 
 ## Algorithms
-# Central-difference
-function solve(prob::DirectTimeProblem, alg::CentralDiff)
+"""
+    solve(prob::DirectTimeProblem, alg; progress = true)
+
+Direct time integration solver
+
+# Inputs
+* `prob`: DirectTimeProblem structure
+* `alg`: Numerical integration algorithm
+    * CentralDiff(): Central difference
+    * RK4(): Fourth-order Runge-Kutta
+    * Newmark(): Newmark
+    * HHT(): Hilber-Hughes-Taylor
+    * WBZ(): Wood-Bossak-Zienkiewicz
+    * GeneralizedAlpha(): Generalized-α
+    * MidPoint(): Mid-point rule
+* `progress`: Show progress bar
+
+# Output
+* `sol`: DirectTimeSolution structure
+"""
+function solve(prob::DirectTimeProblem, alg::CentralDiff; progress = true)
     (; K, M, C, u0, h, F) = prob
 
     Nddl, nt = size(F)
@@ -222,9 +241,10 @@ function solve(prob::DirectTimeProblem, alg::CentralDiff)
 
     D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
 
-    p = Progress(nt - 1, desc = "Central difference...", color = :black, showspeed = true)
+    p = Progress(nt - 1, desc = "Direct Time Problem - Central difference...", color = :black, showspeed = true)
     @views @inbounds for n in 1:nt-1
-        next!(p)
+        progress ? next!(p) : nothing
+
         if n == 1
             D[:, n+1] = 2D[:, n] - D_1 + (h^2*A[:, n])
         else
@@ -241,7 +261,7 @@ function solve(prob::DirectTimeProblem, alg::CentralDiff)
 end
 
 # Fourth-order Runge-Kutta
-function solve(prob::DirectTimeProblem, alg::RK4)
+function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
     (; K, M, C, u0, h, F) = prob
 
     Nddl, nt = size(F)
@@ -267,9 +287,10 @@ function solve(prob::DirectTimeProblem, alg::RK4)
     lu!(M)
     A[:, 1] = M\rhs0
 
-    p = Progress(nt - 1, desc = "RK4...", color=:black, showspeed=true)
+    p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", color = :black, showspeed = true)
     @views @inbounds for n = 1:nt-1
-        next!(p)
+        progress ? next!(p) : nothing
+
         Fn_2 .= (F[:, n+1] + F[:, n])/2
         CK .= (C + h.*K./2)*V[:, n]
         KD .= K*D[:, n]
@@ -288,7 +309,7 @@ function solve(prob::DirectTimeProblem, alg::RK4)
 end
 
 #Newmark family
-function solve(prob::DirectTimeProblem, alg::NewmarkFamily)
+function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     (; K, M, C, u0, h, F) = prob
     (; αf, αₘ, γ₀, β₀, name) = alg
 
@@ -333,7 +354,8 @@ function solve(prob::DirectTimeProblem, alg::NewmarkFamily)
 
     p = Progress(nt - 1, desc = name, color = :black, showspeed = true)
     @views @inbounds for n = 1:nt-1
-        next!(p)
+        progress ? next!(p) : nothing
+
         rhs .= b₈*F[:, n+1] + b₉*F[:, n] - C*(b₁*A[:, n] + V[:, n]) - K*(b₂*A[:, n] + b₅*V[:, n] + D[:, n]) - b₇*M*A[:, n]
 
         A[:, n+1] = S\rhs
@@ -345,4 +367,4 @@ function solve(prob::DirectTimeProblem, alg::NewmarkFamily)
 end
 
 # Default solver
-solve(prob:: DirectTimeProblem) = solve(prob, GeneralizedAlpha())
+solve(prob:: DirectTimeProblem; progress = true) = solve(prob, GeneralizedAlpha(), progress = progress)

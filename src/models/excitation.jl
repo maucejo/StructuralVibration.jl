@@ -320,32 +320,25 @@ end
 # Sine wave excitation
 function excitation(type::SineWave, t)
 
-    (; F₀, tstart, duration, ω, zero_end) = type
+    (; F₀, tstart, duration, ω, ϕ, zero_end) = type
 
     nt = length(t)
     Ft = zeros(nt)
 
     pos_start = argmin(@. (t - tstart)^2.)
 
-    # Period
-    T = 2π/ω
-
-    # Number of periods in the duration
-    # n = floor(Int, duration/T)
-    n = round(Int, (ω*duration + ϕ)/2π)
     tsw = tstart + duration
 
     if tsw ≥ t[end]
         pos_end = nt
     else
         if zero_end
+            n = round(Int, (ω*duration + ϕ)/2π)
             duration = (2π*n - ϕ)/ω
             pos_end = argmin(@. (t - tstart - duration)^2.)
-            # pos_end = argmin(@. (t - tstart - n*T)^2.)
 
             # Check duration
             tstart + duration ≥ t[end] ? Warn("The duration of the sine wave is too long to performed zero-end operation.") : nothing
-            # tstart + n*T ≥ t[end] ? Warn("The duration of the sine wave is too long to performed zero-end operation.") : nothing
         else
             pos_end = argmin(@. (t - tsw)^2.)
         end
@@ -353,7 +346,7 @@ function excitation(type::SineWave, t)
 
     pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
-    @. Ft[pos_exc_t] = F₀*sin(ω*(t[pos_exc_t] - tstart))
+    @. Ft[pos_exc_t] = F₀*sin(ω*(t[pos_exc_t] - tstart) + ϕ)
 
     return Ft
 end

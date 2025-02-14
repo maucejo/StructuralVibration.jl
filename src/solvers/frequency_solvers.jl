@@ -139,14 +139,15 @@ end
 Computes the FRF matrix by modal approach
 
 # Parameter
-* m: Structure containing the problem data
-* type: Type of FRF to compute (:dis, :vel, :acc)
-* ismat: Return the FRF matrix as a 3D array (default = false)
+* `m`: Structure containing the problem data
+* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `ismat`: Return the FRF matrix as a 3D array (default = false)
+* `progress`: Show progress bar (default = true)
 
 # Output
-* sol: FRFSolution structure
+* `sol`: FRFSolution structure
 """
-function solve(m::ModalFRFProblem, type = :dis; ismat = false)
+function solve(m::ModalFRFProblem, type = :dis; ismat = false, progress = true)
     # Initialisation
     (; ωₙ, ξₙ, freq, ϕₒ, ϕₑ) = m
     Nₑ = size(ϕₑ, 1)
@@ -160,7 +161,8 @@ function solve(m::ModalFRFProblem, type = :dis; ismat = false)
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "FRF calculation - Modal approach...", showspeed = true)
     @inbounds for (f, ω) in enumerate(ωf)
-        next!(p)
+        progress ? next!(p) : nothing
+
         @. M[indm] = 1/(ωₙ^2 - ω^2 + 2im*ξₙ*ωₙ*ω)
         FRF[f] .= ϕₒ*M*ϕₑ'
 
@@ -191,7 +193,7 @@ Computes the FRF matrix by direct method
 # Output
 * sol: FRFSolution structure
 """
-function solve(m::DirectFRFProblem, type = :dis; ismat = false)
+function solve(m::DirectFRFProblem, type = :dis; ismat = false, progress = true)
     # Initialisation
     (; K, M, C, freq, Sₒ, Sₑ) = m
     Nₒ = size(Sₒ, 1)
@@ -205,7 +207,8 @@ function solve(m::DirectFRFProblem, type = :dis; ismat = false)
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "FRF calculation - Direct method...", showspeed = true)
     @inbounds for (f, ω) in enumerate(ωf)
-        next!(p)
+        progress ? next!(p) : nothing
+
         D .= (K + 1im*ω*C  - ω^2*M)\I
         FRF[f] .= Sₒ*D*Sₑ'
 
@@ -235,7 +238,7 @@ Computes the frequency response by modal approach
 # Output
 * sol: FrequencySolution structure
 """
-function solve(m::ModalFreqProblem, type = :dis)
+function solve(m::ModalFreqProblem, type = :dis; progress = true)
     # Initialisation
     (; ωₙ, ξₙ, Fₙ, freq, ϕₒ) = m
     Nₒ, Nₘ = size(ϕₒ)
@@ -249,7 +252,8 @@ function solve(m::ModalFreqProblem, type = :dis)
 
     p = Progress(Nf, color = :black, desc = "Frequency Response - Modal approach...", showspeed = true)
     @inbounds for (f, (ω, F)) in enumerate(zip(ωf, eachcol(Fₙ)))
-        next!(p)
+        progress ? next!(p) : nothing
+
         @. M[indm] = 1/(ωₙ^2 - ω^2 + 2im*ξₙ*ωₙ*ω)
         y[:, f] .= ϕₒ*M*F
 
@@ -281,7 +285,7 @@ Computes the frequency response by direct method
 # Output
 * sol: FrequencySolution structure
 """
-function solve(m::DirectFreqProblem, type = :dis)
+function solve(m::DirectFreqProblem, type = :dis; progress = true)
     # Initialisation
     (; K, M, C, F, freq, Sₒ) = m
     Ndofs = size(K, 1)
@@ -294,7 +298,8 @@ function solve(m::DirectFreqProblem, type = :dis)
 
     p = Progress(Nf, color = :black, desc = "Frequency Response - Direct method...", showspeed = true)
     @inbounds for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
-        next!(p)
+        progress ? next!(p) : nothing
+
         D .= (K + 1im*ω*C  - ω^2*M)\Fₑ
         y[:, f] .= Sₒ*D
 

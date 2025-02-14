@@ -154,7 +154,7 @@ Structure containing the solution of the state-space model
 end
 
 """
-    solve(prob::StateSpaceTimeProblem, method = :zoh)
+    solve(prob::StateSpaceTimeProblem, method = :zoh; progress = true)
 
 Solves a discrete-time problem using the state-space model
 
@@ -165,11 +165,12 @@ Solves a discrete-time problem using the state-space model
     * `:foh`: First-order Hold method
     * `:blh`: Band-limited Hold method
     * `:rk4`: Runge-Kutta 4th order method
+* `progress`: Show progress bar (default = true)
 
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
 """
-function solve(prob::StateSpaceTimeProblem, method::Symbol = :zoh)
+function solve(prob::StateSpaceTimeProblem, method::Symbol = :zoh; progress = true)
 
     (; css, u0, h, F) = prob
     dss = c2d(css, h, method)
@@ -183,7 +184,20 @@ function solve(prob::StateSpaceTimeProblem, method::Symbol = :zoh)
     x[:, 1] .= u0[:]
     A[:, 1] .= css.Bc[m+1:end, :]*F[:, 1] .+ css.Ac[m+1:end, :]*x[:, 1]
 
+    if method == :zoh
+        name = "State Space Time problem - ZOH..."
+    elseif method == :foh
+        name = "Time problem - FOH..."
+    elseif method == :blh
+        name = "Time problem - BLH..."
+    elseif method == :rk4
+        name = "Time problem - RK4..."
+    end
+
+    p = Progress(nt, color = :black, desc = name, showspeed = true)
     @views @inbounds for k in 1:nt-1
+        progress ? next!(p) : nothing
+
         if method == :zoh || method == :blh
             x[:, k+1] .= dss.Ad*x[:, k] .+ dss.Bd*F[:, k]
         elseif method == :foh || method == :rk4
@@ -198,18 +212,19 @@ end
 
 
 """
-    solve(prob::StateTimeSpaceProblem, alg = RK4())
+    solve(prob::StateTimeSpaceProblem, alg = RK4(); progress = true)
 
 Solves a continuous-time problem using the state-space model
 
 # Inputs
 * `prob`: Continuous-time problem
 * `alg`: Time integration algorithm
+* `progress`: Show progress bar (default = true)
 
 # Output
 * `StateSpaceSolution`: Solution of the state-space model
 """
-function solve(prob::StateSpaceTimeProblem, alg::RK4)
+function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
     (; css, u0, h, F) = prob
     (; Ac, Bc) = css
 
@@ -228,7 +243,10 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4)
 
     x[:, 1] .= u0[:]
 
+    p = Progress(nt, color = :black, desc = "State Space Time Problem - RK4...", showspeed = true)
     @views @inbounds for k in 1:nt-1
+        progress ? next!(p) : nothing
+
         Fn_2 .= (F[:, k] .+ F[:, k+1])/2
 
         k₁ .= Ac*x[:, k] .+ Bc*F[:, k]
@@ -244,19 +262,20 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4)
 end
 
 """
-    solve(m::StateSpaceFRFProblem, type = :dis, ismat = false)
+    solve(m::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
 
 Computes the FRF matrix by direct method
 
 # Parameter
-* m: Structure containing the problem data
-* type: Type of FRF to compute (:dis, :vel, :acc)
-* ismat: Return the FRF matrix as a 3D array (default = false)
+* `m`: Structure containing the problem data
+* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `ismat`: Return the FRF matrix as a 3D array (default = false)
+* `progress`: Show progress bar (default = true)
 
 # Output
-* sol: FRFSolution structure
+* `sol`: FRFSolution structure
 """
-function solve(m::StateSpaceFRFProblem, type::Symbol = :dis, ismat = false)
+function solve(m::StateSpaceFRFProblem, type::Symbol = :dis; ismat = false, progress = true)
 
     # Initialisation
     (; css, freq, So, Se) = m
@@ -276,9 +295,10 @@ function solve(m::StateSpaceFRFProblem, type::Symbol = :dis, ismat = false)
     end
 
     ωf = 2π*freq
-    p = Progress(Nf, color = :black, desc = "FRF calculation - Direct method...", showspeed = true)
+    p = Progress(Nf, color = :black, desc = "State Space FRF Problem - Direct method...", showspeed = true)
     for (f, ω) in enumerate(ωf)
-        next!(p)
+        progress ? next!(p) : nothing
+
         M .= (1im*ω*I - Ac)\Bc
 
         if type == :dis
@@ -298,19 +318,20 @@ function solve(m::StateSpaceFRFProblem, type::Symbol = :dis, ismat = false)
 end
 
 """
-    solve(m::StateSpaceModalFRFProblem, type = :dis, ismat = false)
+    solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
 
 Computes the FRF matrix by modal method
 
 # Parameter
-* m: Structure containing the problem data
-* type: Type of FRF to compute (:dis, :vel, :acc)
-* ismat: Return the FRF matrix as a 3D array (default = false)
+* `m`: Structure containing the problem data
+* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `ismat`: Return the FRF matrix as a 3D array (default = false)
+* `progress`: Show progress bar
 
 # Output
-* sol: StateSpaceFRFSolution
+* `sol`: StateSpaceFRFSolution
 """
-function solve(m::StateSpaceModalFRFProblem, type = :dis, ismat = false)
+function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
 
     # Initialisation
     (; css, freq, So, Se, Nm) = m
@@ -340,9 +361,10 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis, ismat = false)
     indm = diagind(M)
 
     ωf = 2π*freq
-    p = Progress(Nf, color = :black, desc = "FRF calculation - Modal approach...", showspeed = true)
+    p = Progress(Nf, color = :black, desc = "State Space FRF Problem - Modal approach...", showspeed = true)
     for (f, ω) in enumerate(ωf)
-        next!(p)
+        progress ? next!(p) : nothing
+
         @. M[indm] = 1/(1im*ω - λ)
 
         if type == :dis || type == :vel
@@ -360,7 +382,7 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis, ismat = false)
 end
 
 """
-    solve(m::StateSpaceFreqProblem, type = :dis)
+    solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
 
 Computes the frequency response by direct method
 
@@ -370,11 +392,12 @@ Computes the frequency response by direct method
     * `:dis`: Displacement
     * `:vel`: Velocity
     * `:acc`: Acceleration
+* `progress`: Show progress bar
 
 # Output
 `sol`: StateSpaceFreqSolution
 """
-function solve(m::StateSpaceFreqProblem, type = :dis)
+function solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
     # Initialisation
     (; css, freq, F, So) = m
     (; Ac, Bc) = css
@@ -392,9 +415,10 @@ function solve(m::StateSpaceFreqProblem, type = :dis)
     end
 
     ωf = 2π*freq
-    p = Progress(Nf, color = :black, desc = "Frequency response - Direct method...", showspeed = true)
+    p = Progress(Nf, color = :black, desc = "State Space Frequency Problem - Direct method...", showspeed = true)
     for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
-        next!(p)
+        progress ? next!(p) : nothing
+
         M .= (1im*ω*I - Ac)\Bc
 
         if type == :dis
@@ -410,7 +434,7 @@ function solve(m::StateSpaceFreqProblem, type = :dis)
 end
 
 """
-    solve(m::StateSpaceFreqProblem, Nm::Int = 0, type::Symbol = :dis)
+    solve(m::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)
 
 Computes the frequency response by modal method
 
@@ -421,11 +445,12 @@ Computes the frequency response by modal method
     * `:dis`: Displacement
     * `:vel`: Velocity
     * `:acc`: Acceleration
+* `progress`: Show progress bar
 
 # Output
 `sol`: StateSpaceFreqSolution
 """
-function solve(m::StateSpaceModalFreqProblem, type = :dis)
+function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
     # Initialisation
     (; css, freq, F, So, Nm) = m
     Nₒ = size(So, 1)
@@ -450,9 +475,10 @@ function solve(m::StateSpaceModalFreqProblem, type = :dis)
     indm = diagind(M)
 
     ωf = 2π*freq
-    p = Progress(Nf, color = :black, desc = "Frequency response - Modal approach...", showspeed = true)
+    p = Progress(Nf, color = :black, desc = "State Space Frequency Problem - Modal approach...", showspeed = true)
     for (f, (ω, uₑ)) in enumerate(zip(ωf, eachcol(u)))
-        next!(p)
+        progress ? next!(p) : nothing
+
         @. M[indm] = 1/(1im*ω - λ)
 
         y[:, f] .= Ψₒ*M*uₑ
