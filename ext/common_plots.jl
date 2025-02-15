@@ -1,4 +1,4 @@
-const DEFAULT_MAKIE_FONTS = (; regular = "TeX Gyre Heros Makie", bold = "TeX Gyre Heros Makie Bold", italic = "TeX Gyre Heros Makie Italic", bolditalic = "TeX Gyre Heros Makie Bold Italic")
+const DEFAULT_MAKIE_FONTS = Makie.theme(:fonts)
 
 """
     theme_choice(name::Symbol)
