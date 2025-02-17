@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.6">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -71,10 +71,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-04bc85c7675eb93047aefffee8b8c772.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-0b1a4009208c27a357555fb8e49f98af.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f0681912ecb9235b0f321e3f0fb419dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-eedcee31928b7a633529dc56a3eb19c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -255,28 +255,29 @@ Warning
 <li><strong>Discrete models</strong>
 <ul>
 <li>Spring-mass-damper SDOF system</li>
-<li>Spring-mass-damper MDOF system (TODO)</li>
-<li>FE models of bar, rod and beams</li>
+<li>Spring-mass-damper MDOF system</li>
+<li>FE models of bar, rod, strings and beams</li>
 </ul></li>
 <li><strong>Continuous models</strong>
 <ul>
-<li>Longitudinal and torsional bars for various boundary conditions
+<li>Longitudinal bars</li>
+<li>Torsional bars</li>
+<li>Strings</li>
+<li>Beams</li>
+<li>Rectangular plates</li>
+<li>Rectangular membranes</li>
+</ul></li>
+<li><strong>State space model</strong>
 <ul>
-<li>Clamped-clamped</li>
-<li>Clamped-free</li>
-<li>Free-free</li>
-</ul></li>
-<li>Euler-Bernoulli beams for various boundary conditions
+<li>Continuous state-space representation</li>
+<li>Discrete state-space representation
 <ul>
-<li>Simply-supported at both ends</li>
-<li>Clamped-clamped</li>
-<li>Clamped-simply-supported</li>
-<li>Clamped-free</li>
-<li>Simply-supported-free</li>
+<li>Zero-order hold (ZOH)</li>
+<li>First-order hold (FOH)</li>
+<li>Band-limited hold (BLH)</li>
+<li>RK4</li>
 </ul></li>
-<li>Simply-supported plate</li>
 </ul></li>
-<li><strong>State space model</strong></li>
 </ul>
 </section>
 <section id="vibration-data-generation" class="level3">
@@ -284,11 +285,13 @@ Warning
 <ul>
 <li><strong>Excitation signals</strong>
 <ul>
-<li>Triangle wave</li>
 <li>Rectangular wave</li>
+<li>Triangular wave</li>
 <li>Hammer impact</li>
 <li>Smoothed rectangular wave</li>
 <li>Sine wave</li>
+<li>Half-sine pulse</li>
+<li>Harversine pulse</li>
 <li>Swept sine wave</li>
 <li>Gaussian pulse</li>
 <li>Colored noise</li>
@@ -322,15 +325,57 @@ Warning
 <li>Direct method</li>
 </ul></li>
 </ul></li>
+<li><strong>State-space solvers</strong>
+<ul>
+<li>Time domain
+<ul>
+<li>RK4 for continuous systems</li>
+<li>ZOH, FOH, BLH, RK4 for discrete models</li>
+</ul></li>
+<li>Frequency spectrum
+<ul>
+<li>Modal summation</li>
+<li>Direct method</li>
+</ul></li>
+<li>Frequency response function (FRF)
+<ul>
+<li>Modal summation</li>
+<li>Direct method</li>
+</ul></li>
+</ul></li>
 <li><strong>Measurement noise</strong>
 <ul>
-<li>Addition of Gaussian white noise with a prescribed SNR</li>
+<li>Additive Gaussian white noise (agwn) with a prescribed SNR</li>
+<li>Additive Colored noise (acn)</li>
+<li>Multiplicative noise</li>
+<li>Mixed - agwn + multiplicative noise</li>
+</ul></li>
+<li><strong>Signal processing</strong>
+<ul>
 <li>Measurement noise variance estimation algorithms from noisy data
 <ul>
 <li>Bayesian estimation</li>
 <li>D’Errico’s method - <a href="https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise">Link to the Matlab version</a></li>
 </ul></li>
 <li>SNR estimation from estimated measurement noise variance</li>
+<li>Denoising algorithms
+<ul>
+<li>Regularization</li>
+<li>Kalman filtering</li>
+</ul></li>
+<li>Modal extraction - SDOF methods
+<ul>
+<li>Bode diagram</li>
+<li>Nyquiste circle</li>
+</ul></li>
+<li>Detrending data using polynomial fit</li>
+<li>Gradient calculation using interpolation</li>
+<li>Signal estimation
+<ul>
+<li>Transfer functions estimation (H1, H2, H3, Hv)</li>
+<li>Welch method (PSD, ESD, Autopower, Autopower linear)</li>
+<li>Signal spectrum estimation</li>
+</ul></li>
 </ul></li>
 </ul>
 </section>
@@ -351,14 +396,20 @@ Project direct dependencies
 <div class="callout-body-container callout-body">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Project StructuralVibration v0<span class="fl">.1.0</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Status</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">717857</span><span class="er">b8</span>] DSP v0<span class="fl">.8.0</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  [a98d9a8b] Interpolations v0<span class="fl">.15.1</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">7031</span><span class="er">d0ef</span>] LazyGrids v1<span class="fl">.0.0</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  [d96e819e] Parameters v0<span class="fl">.12.3</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  [aea7be01] PrecompileTools v1<span class="fl">.2.1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">92933</span><span class="er">f4c</span>] ProgressMeter v1<span class="fl">.10.2</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">1</span><span class="er">c621080</span>] TestItems v1<span class="fl">.0.0</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">37e2</span><span class="er">e46d</span>] LinearAlgebra v1<span class="fl">.11.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">717857</span><span class="er">b8</span>] DSP v0<span class="fl">.8.2</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">7</span><span class="er">a1cc6ca</span>] FFTW v1<span class="fl">.8.1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">442</span><span class="er">a2c76</span>] FastGaussQuadrature v1<span class="fl">.0.2</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  [a98d9a8b] Interpolations v0<span class="fl">.15.1</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">429524</span><span class="er">aa</span>] Optim v1<span class="fl">.11.0</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  [d96e819e] Parameters v0<span class="fl">.12.3</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">18e31</span><span class="er">ff7</span>] Peaks v0<span class="fl">.5.3</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  [aea7be01] PrecompileTools v1<span class="fl">.2.1</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">92933</span><span class="er">f4c</span>] ProgressMeter v1<span class="fl">.10.2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">276</span><span class="er">daf66</span>] SpecialFunctions v2<span class="fl">.5.0</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">10745</span><span class="er">b16</span>] Statistics v1<span class="fl">.11.1</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">1</span><span class="er">c621080</span>] TestItems v1<span class="fl">.0.0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">37e2</span><span class="er">e46d</span>] LinearAlgebra v1<span class="fl">.11.0</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">9</span><span class="er">a3f8284</span>] Random v1<span class="fl">.11.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -374,8 +425,8 @@ Julia version and machine information
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Julia Version <span class="fl">1.11.2</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Commit <span class="fl">5e9</span><span class="er">a32e7af</span> (<span class="dv">2024</span><span class="op">-</span><span class="dv">12</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span> <span class="dv">20</span>:<span class="dv">0</span><span class="er">2</span> UTC)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Julia Version <span class="fl">1.11.3</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Commit d63adeda50 (<span class="dv">2025</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">21</span> <span class="dv">19</span>:<span class="dv">42</span> UTC)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Build Info:</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  Official https:<span class="op">//</span>julialang.org<span class="op">/</span> release</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>Platform Info:</span>
@@ -831,7 +882,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>2025 Mathieu Aucejo ∙ Powered by <a href="https://quarto.org"><img src="./assets/logo/quarto.png" class="img-fluid" style="width:4mm"></a> and <a href="https://julialang.org"><img src="./assets/logo/julia.svg" class="img-fluid" style="width:4mm"></a></p>
+<p>2025 Mathieu Aucejo ∙ Powered by <a href="https://quarto.org"><img src=".\assets/logo/quarto.png" class="img-fluid" style="width:4mm"></a> and <a href="https://julialang.org"><img src=".\assets/logo/julia.svg" class="img-fluid" style="width:4mm"></a></p>
 </div>
     <div class="nav-footer-right">
       &nbsp;
