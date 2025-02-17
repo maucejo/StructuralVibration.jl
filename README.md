@@ -17,38 +17,41 @@ The package is not yet registered in the Julia General Registry. To install the 
 (Yourenv) pkg> add "git@https://github.com/maucejo/StructuralVibration.jl.git"
 ```
 
-## Package features
+## Features
 
-The package is organized into the following functionalities:
+The package provides the following features:
 
 ### Mechanical models
 
 - **Discrete models**
     - Spring-mass-damper SDOF system
-    - Spring-mass-damper MDOF system (TODO)
-    - FE models of bar, rod and beams
-- **Continuous model**
-    - Longitudinal and torsional bars for various boundary conditions
-        - Clamped-clamped
-        - Clamped-free
-        - Free-free
-    - Euler-Bernoulli beams for various boundary conditions
-        - Simply-supported at both ends
-        - Clamped-clamped
-        - Clamped-simply-supported
-        - Clamped-free
-        - Simply-supported-free
-    - Simply-supported plate
+    - Spring-mass-damper MDOF system
+    - FE models of bar, rod, strings and beams
+- **Continuous models**
+    - Longitudinal bars
+    - Torsional bars
+    - Strings
+    - Beams
+    - Rectangular plates
+    - Rectangular membranes
 - **State space model**
+    - Continuous state-space representation
+    - Discrete state-space representation
+        - Zero-order hold (ZOH)
+        - First-order hold (FOH)
+        - Band-limited hold (BLH)
+        - RK4
 
 ### Vibration data generation
 
 - **Excitation signals**
-    - Triangle wave
     - Rectangular wave
+    - Triangular wave
     - Hammer impact
     - Smoothed rectangular wave
     - Sine wave
+    - Half-sine pulse
+    - Harversine pulse
     - Swept sine wave
     - Gaussian pulse
     - Colored noise
@@ -56,9 +59,9 @@ The package is organized into the following functionalities:
 - **Solution for SDOF systems**
     - Free response
     - Forced response due to a harmonic force or a base motion
-    - Forced response due to any external force
+    - Forced response due to any external force or base motion (Duhamel's integral)
 
-- **Time-domain integration schemes for linear systems**
+- **Time-domain integration schemes for linear second order systems**
     - Central difference scheme
     - RK4
     - Newmark-beta method
@@ -75,9 +78,34 @@ The package is organized into the following functionalities:
         - Modal summation
         - Direct method
 
+- **State-space solvers**
+    - Time domain
+        - RK4 for continuous systems
+        - ZOH, FOH, BLH, RK4 for discrete models
+    - Frequency spectrum
+        - Modal summation
+        - Direct method
+    - Frequency response function (FRF)
+        - Modal summation
+        - Direct method
+
 - **Measurement noise**
     - Addition of Gaussian white noise with a prescribed SNR
+
+- **Signal processing**
     - Measurement noise variance estimation algorithms from noisy data
         - Bayesian estimation
         - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
     - SNR estimation from estimated measurement noise variance
+    - Denoising algorithms
+        - Regularization
+        - Kalman filtering
+    - Modal extraction - SDOF methods
+        - Bode diagram
+        - Nyquiste circle
+    - Detrending data using polynomial fit
+    - Gradient calculation using interpolation
+    - Signal estimation
+        - Transfer functions estimation (H1, H2, H3, Hv)
+        - Welch method (PSD, ESD, Autopower, Autopower linear)
+        - Signal spectrum estimation

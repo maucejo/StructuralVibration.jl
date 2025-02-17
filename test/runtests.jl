@@ -6,7 +6,7 @@ using TestItems
 
     ## Définition des fréquences jusqu'à fmax
     fmax = 1e3
-    ωₙ = eigval(plate, fmax)[1]
+    ωₙ = modefreq(plate, fmax)[1]
 
     @test round(ωₙ[1]/2π, digits = 2) == 111.33
     @test round(ωₙ[end]/2π, digits = 2) == 933.48
@@ -21,7 +21,7 @@ end
     bar = Bar(L, S, E, ρ)
 
     fmax = 10e3
-    ωₙ = eigval(bar, fmax)[1]
+    ωₙ = modefreq(bar, fmax)[1]
 
     @test round(ωₙ[1]/2π, digits = 2) == 2594.37
     @test round(ωₙ[end]/2π, digits = 2) == 7783.12
@@ -37,7 +37,7 @@ end
     rod = Rod(L, I, J, G, ρ)
 
     fmax = 10e3
-    ωₙ = eigval(rod, fmax)[1]
+    ωₙ = modefreq(rod, fmax)[1]
 
     @test round(ωₙ[1]/2π, digits = 2) == 1590.71
     @test round(ωₙ[end]/2π, digits = 2) == 9544.27
@@ -55,11 +55,12 @@ end
     beam = Beam(L, S, Iz, E, ρ)
 
     fmax = 1e3
-    ωₙ = eigval(beam, fmax)[1]
+    ωₙ = modefreq(beam, fmax)[1]
 
     @test round(ωₙ[1]/2π, digits = 2) == 23.53
     @test round(ωₙ[end]/2π, digits = 2) == 847.02
 end
+
 
 @testitem "Rectangular shape force" begin
     Δt = 1e-6 # Pas de temps
@@ -103,7 +104,7 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    srect = SmoothRect(1., 8e-3, 5e-3, 5e-2)
+    srect = SmoothRect(1., 8e-3, 5e-2, 5e-3)
     Ft = excitation(srect, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
@@ -115,7 +116,7 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    randexc = RandomExc(1., 8e-3, 5e-2, 0.1)
+    randexc = ColoredNoise(1., 8e-3, 5e-2, 0.1)
     Ft = excitation(randexc, t)
 
     Frand = Ft[8e-3 .≤ t .≤ 5.8e-2]
@@ -129,10 +130,10 @@ end
     plate = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
 
     fmax = 1e3
-    ωₙ, kₙ = eigval(plate, fmax)
+    ωₙ, kₙ = modefreq(plate, fmax)
     Nmodes = length(ωₙ)
 
-    Kₙ, Mₙ, Cₙ = modal_model(ωₙ, 1e-2)
+    Kₙ, Mₙ, Cₙ = modal_matrices(ωₙ, 1e-2)
 
     Δt = 1e-6 # Pas de temps
     tf = 0.07 # instant final
@@ -141,58 +142,57 @@ end
 
     hammer = Hammer(1., 8e-3, 9.7, 6e-4)
     F = excitation(hammer, t)
-    ϕₑ = eigmode(plate, kₙ, loc[1], loc[2])
+    ϕₑ = modeshape(plate, kₙ, loc[1], loc[2])
     Fₙ = (F*ϕₑ)'
 
-    ϕₒ = eigmode(plate, kₙ, loc[1], loc[2])
+    ϕₒ = modeshape(plate, kₙ, loc[1], loc[2])
 
-    prob = DiscreteTimeProblem(Kₙ, Mₙ, Cₙ, Fₙ, t)
-    CI = (D₀ = zeros(Nmodes), V₀ = zeros(Nmodes))
+    prob = DirectTimeProblem(Kₙ, Mₙ, Cₙ, (zeros(Nmodes), zeros(Nmodes)), t, Fₙ)
 
     # Generalized-α
-    solGα = solve(prob, CI, GeneralizedAlpha())
-    (; A) = solGα
-    AccGα = ϕₒ*A
+    solGα = solve(prob)
+    (; ddu) = solGα
+    AccGα = ϕₒ*ddu
 
     # Central difference
-    solCD = solve(prob, CI, CentralDiff())
-    (; A) = solCD
-    AccCD = ϕₒ*A
+    solCD = solve(prob, CentralDiff())
+    (; ddu) = solCD
+    AccCD = ϕₒ*ddu
 
     # HHT
-    solHHT = solve(prob, CI, HHT())
-    (; A) = solHHT
-    AccHHT = ϕₒ*A
+    solHHT = solve(prob, HHT())
+    (; ddu) = solHHT
+    AccHHT = ϕₒ*ddu
 
     # Fox-Goodwin
-    solFG = solve(prob, CI, FoxGoodwin())
-    (; A) = solFG
-    AccFG = ϕₒ*A
+    solFG = solve(prob, FoxGoodwin())
+    (; ddu) = solFG
+    AccFG = ϕₒ*ddu
 
     # Linear acceleration
-    solLA = solve(prob, CI, LinearAcceleration())
-    (; A) = solLA
-    AccLA = ϕₒ*A
+    solLA = solve(prob, LinearAcceleration())
+    (; ddu) = solLA
+    AccLA = ϕₒ*ddu
 
     # Newmark
-    solNM = solve(prob, CI, Newmark())
-    (; A) = solNM
-    AccNM = ϕₒ*A
+    solNM = solve(prob, Newmark())
+    (; ddu) = solNM
+    AccNM = ϕₒ*ddu
 
     # WBZ
-    solWBZ = solve(prob, CI, WBZ())
-    (; A) = solWBZ
-    AccWBZ = ϕₒ*A
+    solWBZ = solve(prob, WBZ())
+    (; ddu) = solWBZ
+    AccWBZ = ϕₒ*ddu
 
     # Mid-point
-    solMP = solve(prob, CI, MidPoint())
-    (; A) = solMP
-    AccMP = ϕₒ*A
+    solMP = solve(prob, MidPoint())
+    (; ddu) = solMP
+    AccMP = ϕₒ*ddu
 
     # RK4
-    solRK4 = solve(prob, CI, RK4())
-    (; A) = solRK4
-    AccRK4 = ϕₒ*A
+    solRK4 = solve(prob, RK4())
+    (; ddu) = solRK4
+    AccRK4 = ϕₒ*ddu
 
     energyGα = sum(abs2, AccGα)
     energyCD = sum(abs2, AccCD)
@@ -220,27 +220,25 @@ end
 
     ## Définition des fréquences jusqu'à fmax
     fmax = 1e3
-    ωₙ, kₙ = eigval(plaq, fmax)
+    ωₙ, kₙ = modefreq(plaq, fmax)
     Nmodes = length(ωₙ)
 
     ## Définition du modèle modal
-    Kₙ, Mₙ, Cₙ = modal_model(ωₙ, 1e-2)
+    Kₙ, Mₙ, Cₙ = modal_matrices(ωₙ, 1e-2)
 
     # Définition de la déformée modale
     loc = [0.1, 0.1]
-    ϕₑ = eigmode(plaq, kₙ, loc[1], loc[2])
+    ϕₑ = modeshape(plaq, kₙ, loc[1], loc[2])
 
     # Calcul des coordonnées généralisées
     freq = 70:125
     ξ = 1e-2
-    prob = ModalFRF(ωₙ, ξ, ϕₑ, ϕₑ, freq)
+    prob = ModalFRFProblem(ωₙ, ξ, freq, ϕₑ, ϕₑ)
 
-    _FRF = frf(prob, :acc)
-
-    FRF = reduce(hcat, _FRF)[:]
+    FRF = solve(prob, :acc, ismat = true).u
 
     f = ωₙ[1]/2π
-    pos_max = argmax(abs.(FRF))
+    pos_max = argmax(abs.(FRF[:]))
     @test (abs(freq[pos_max] - f))/f ≤ 1e-2
 
     maxAccth = ϕₑ[:, 1][1]^2/2ξ

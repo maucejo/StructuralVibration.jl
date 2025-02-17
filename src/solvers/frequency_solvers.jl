@@ -147,9 +147,10 @@ Computes the FRF matrix by modal approach
 # Output
 * `sol`: FRFSolution structure
 """
-function solve(m::ModalFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::ModalFRFProblem, type = :dis; ismat = false, progress = true)
     # Initialisation
-    (; ωₙ, ξₙ, freq, ϕₒ, ϕₑ) = m
+    (; ωₙ, ξₙ, freq, ϕₒ, ϕₑ) = prob
+    Nₘ = length(ωₙ)
     Nₑ = size(ϕₑ, 1)
     Nₒ = size(ϕₒ, 1)
     Nf = length(freq)

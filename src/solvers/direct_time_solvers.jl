@@ -1,5 +1,5 @@
 """
-    DirectTimeProblem(K, M, C, u0::Tuple{Vector{Float64}, Vector{Float64}}, h::Float64, F::Matrix{Float64})
+    DirectTimeProblem(K, M, C, u0::Tuple{Vector{Float64}, Vector{Float64}}, t, F::Matrix{Float64})
 
 Structure containing data for the time solver
 
