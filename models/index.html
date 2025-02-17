@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction – StructuralVibration.jl</title>
+<title>Structural models – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,10 +20,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -36,10 +70,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0b1a4009208c27a357555fb8e49f98af.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23de9a1c3ba6cf3e248e28706c3df3a2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-eedcee31928b7a633529dc56a3eb19c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-585a77d67552b4a34eb0de6c9603dd02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,7 +102,42 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -105,6 +174,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Solvers</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../signal_processing/index.html"> 
+<span class="menu-text">Signal processing</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../visualization/index.html"> 
 <span class="menu-text">Visualization</span></a>
   </li>  
@@ -126,7 +199,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models/index.html">Introduction</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models/index.html">Structural models</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -141,7 +214,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../models/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Introduction</span></a>
+ <span class="menu-text">Structural models</span></a>
   </div>
 </li>
     </ul>
@@ -149,15 +222,31 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#continuous-models" id="toc-continuous-models" class="nav-link active" data-scroll-target="#continuous-models"><span class="header-section-number">1</span> Continuous models</a>
+  <ul class="collapse">
+  <li><a href="#sec-1d-models" id="toc-sec-1d-models" class="nav-link" data-scroll-target="#sec-1d-models"><span class="header-section-number">1.1</span> 1D models</a></li>
+  <li><a href="#d-models" id="toc-d-models" class="nav-link" data-scroll-target="#d-models"><span class="header-section-number">1.2</span> 2D models</a></li>
+  </ul></li>
+  <li><a href="#discrete-models" id="toc-discrete-models" class="nav-link" data-scroll-target="#discrete-models"><span class="header-section-number">2</span> Discrete models</a>
+  <ul class="collapse">
+  <li><a href="#sdof-systems" id="toc-sdof-systems" class="nav-link" data-scroll-target="#sdof-systems"><span class="header-section-number">2.1</span> Sdof systems</a></li>
+  <li><a href="#mdof-systems" id="toc-mdof-systems" class="nav-link" data-scroll-target="#mdof-systems"><span class="header-section-number">2.2</span> Mdof systems</a></li>
+  <li><a href="#fe-model" id="toc-fe-model" class="nav-link" data-scroll-target="#fe-model"><span class="header-section-number">2.3</span> FE model</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Introduction</h1>
+<h1 class="title">Structural models</h1>
 </div>
 
 
@@ -174,8 +263,497 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="continuous-models" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="continuous-models"><span class="header-section-number">1</span> Continuous models</h2>
+<section id="sec-1d-models" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="sec-1d-models"><span class="header-section-number">1.1</span> 1D models</h3>
+</section>
+<section id="d-models" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="d-models"><span class="header-section-number">1.2</span> 2D models</h3>
+</section>
+</section>
+<section id="discrete-models" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="discrete-models"><span class="header-section-number">2</span> Discrete models</h2>
+<section id="sdof-systems" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="sdof-systems"><span class="header-section-number">2.1</span> Sdof systems</h3>
+<p>Single degree of freedom (Sdof) systems are classically composed of a mass <span class="math inline">\(m\)</span>, a stiffness <span class="math inline">\(k\)</span> and a viscous damper <span class="math inline">\(c\)</span> (see <a href="#fig-1dof" class="quarto-xref">Figure&nbsp;1</a>).</p>
+<div id="fig-1dof" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1dof-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../assets/images/1dof.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1dof-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Classical representation of an Sdof system
+</figcaption>
+</figure>
+</div>
+<p>Mathematically, their dynamic behavior is governed by the following normalized equation of motion : <span class="math display">\[
+\ddot x(t) + 2\xi\,\omega_0\, \dot x(t) + \omega_0^2 x(t) = \frac{F(t)}{m}.
+\]</span> where <span class="math inline">\(F(t)\)</span> can be either a base or an external excitation applied to the system.</p>
+<p>The Sdof system can thus be defined by:</p>
+<ul>
+<li>its mass <span class="math inline">\(m\)</span></li>
+<li>its natural angular frequency <span class="math inline">\(\omega_0\)</span> (or its natural frequency <span class="math inline">\(f_0\)</span>)</li>
+<li>its damping ratio <span class="math inline">\(\xi\)</span></li>
+</ul>
+<section id="api" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">2.1.1</span> API</h4>
+<div class="api">
+<p><strong>Sdof</strong></p>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Sdof(m, ω₀, ξ)</code></pre>
+<p>Structure containing the data of a sdof system</p>
+<p><strong>Constructor</strong></p>
+<ul>
+<li><p><code>m</code>: Mass [kg]</p>
+</li>
+<li><p><code>f₀</code>: Natural frequency [Hz]</p>
+</li>
+<li><p><code>ξ</code>: Damping ratio</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>m</code>: Mass [kg]</p>
+</li>
+<li><p><code>ω₀</code>: Natural frequency [rad/s]</p>
+</li>
+<li><p><code>ξ</code>: Damping ratio</p>
+</li>
+</ul>
 
 
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">2.1.2</span> Example</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the structural parameters</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f₀ <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an instance of Sdof</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, ξ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="mdof-systems" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="mdof-systems"><span class="header-section-number">2.2</span> Mdof systems</h3>
+<p><code>StructuralVibration.jl</code> considers Multi-degrees of freedom (Mdof) systems, which topology is presented in <a href="#fig-mdof" class="quarto-xref">Figure&nbsp;2</a>. This choice has been made, because it allows modeling a large variety of possible configurations.</p>
+<div id="fig-mdof" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mdof-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../assets/images/mdof.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mdof-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: General topology of an Mdof system
+</figcaption>
+</figure>
+</div>
+<p>The dynamic behavior of such a system is governed by the following matrix system: <span class="math display">\[
+\mathbf{M} \ddot{\mathbf{X}}(t) + \mathbf{K} \mathbf{X}(t) = \mathbf{F}(t),
+\]</span> where:</p>
+<ul>
+<li><p><span class="math inline">\(\mathbf{M} = \text{diag}(m_1, \dots, m_j, \dots, m_N)\)</span> is the mass matrix.</p></li>
+<li><p><span class="math inline">\(\mathbf{K}\)</span> is the stiffness matrix such that: <span class="math display">\[
+\mathbf{K} = \begin{bmatrix}
+k_1 &amp; -k_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
+-k_1 &amp; k_1 + k_2 &amp; -k_2 &amp; \ddots &amp; \vdots &amp; \vdots \\
+0 &amp; -k_2 &amp; \ddots &amp; \ddots &amp; 0 &amp; \vdots \\
+\vdots &amp; 0 &amp; \ddots &amp; \ddots &amp; -k_{N-1} &amp; 0 \\
+\vdots &amp; \vdots &amp; \ddots &amp; -k_{N-1} &amp; k_{N-1} + k_N &amp; -k_N \\
+0 &amp; 0 &amp; \ldots &amp; 0 &amp; -k_N &amp; k_N
+\end{bmatrix}.
+\]</span></p></li>
+<li><p><span class="math inline">\(\mathbf{X}(t) = \left[x_1(t), \dots, x_j(t), \dots, x_N(t)\right]^\mathsf{T}\)</span> is the displacement vector.</p></li>
+<li><p><span class="math inline">\(\mathbf{F}(t) = \left[F_1(t), \dots, F_j(t), \dots, F_N(t)\right]^\mathsf{T}\)</span> is the external force vector.</p></li>
+</ul>
+<section id="sec-api-mdof" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="sec-api-mdof"><span class="header-section-number">2.2.1</span> API</h4>
+<p><strong>Data structures</strong></p>
+<div class="api">
+<p><strong>Mdof</strong></p>
+<div id="6" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Mdof(k, m, c = Float64[])</code></pre>
+<p>Structure containing the data for building a mdof system</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>k</code>: Stiffness coefficients of the spring elements</p>
+</li>
+<li><p><code>m</code>: Masses of the mdof system</p>
+</li>
+<li><p><code>c</code>: Damping coefficients of the viscous dampers</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="About the damping matrix C">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+About the damping matrix C
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>If viscous dampers are defined, the damping matrix <span class="math inline">\(\mathbf{C}\)</span> is consistent with the stiffness matrix <span class="math inline">\(\mathbf{K}\)</span>, meaning that: <span class="math display">\[
+\mathbf{C} = \begin{bmatrix}
+c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
+-c_1 &amp; c_1 + c_2 &amp; -c_2 &amp; \ddots &amp; \vdots &amp; \vdots \\
+0 &amp; -k_2 &amp; \ddots &amp; \ddots &amp; 0 &amp; \vdots \\
+\vdots &amp; 0 &amp; \ddots &amp; \ddots &amp; -c_{N-1} &amp; 0 \\
+\vdots &amp; \vdots &amp; \ddots &amp; -c_{N-1} &amp; c_{N-1} + c_N &amp; -c_N \\
+0 &amp; 0 &amp; \ldots &amp; 0 &amp; -c_N &amp; c_N
+\end{bmatrix}.
+\]</span></p>
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>MdofMesh</strong></p>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>MdofMesh(Elt, constrained_dofs, free_dofs)</code></pre>
+<p>Structure containing the data for building a mdof mesh</p>
+<p><strong>Constructor</strong></p>
+<ul>
+<li><p><code>model</code>: Mdof model</p>
+</li>
+<li><p><code>bc</code>: Boundary conditions</p>
+<ul>
+<li><p><code>:CC</code>: Clamped - Clamped</p>
+</li>
+<li><p><code>:CF</code>: Clamped - Free</p>
+</li>
+<li><p><code>:FF</code>: Free - Free</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>Elt</code>: Element connectivity matrix</p>
+</li>
+<li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>
+</li>
+<li><p><code>free_dofs</code>: Free degrees of freedom</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Associated function</strong></p>
+<div class="api">
+<p><strong>assembly</strong></p>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>assembly(model::Mdof)</code></pre>
+<p>Assembly of the mass, stiffness and damping matrices of a mdof system</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>model</code>: Mdof model</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>K</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>C</code>: Damping matrix (if viscous dampers are defined in <code>model</code>)</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>apply_bc</strong></p>
+<div id="12" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>apply_bc(A, mesh)</code></pre>
+<p>Apply boundary conditions to a given matrix</p>
+<h1>Inputs</h1>
+<ul>
+<li><p><code>A</code>: Matrix to apply the boundary conditions</p>
+</li>
+<li><p><code>mesh</code>: Mesh of the system</p>
+</li>
+</ul>
+<h1>Output</h1>
+<ul>
+<li><p><code>A_bc</code>: Matrix with boundary conditions applied</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>eigenmode</strong></p>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>eigenmode(K, M, Nₘ = size(K, 1))</code></pre>
+<p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
+<p><strong>Inputs</strong>     * <code>K</code>: Stiffness matrix     * <code>M</code>: Mass matrix     * <code>Nₘ</code>: Number of modes to be keep in the modal basis</p>
+<p><strong>Outputs</strong>     * <code>ωₘ</code>: Vector of natural frequencies     * <code>Φₘ</code>: Mass-normalized mode shapes</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2.2</span> Example</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the structural parameters</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>k_mdof <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">1</span>.]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>m_mdof <span class="op">=</span> <span class="fu">ones</span>(<span class="fl">3</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>c_mdof <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.1</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an instance of Mdof</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>mdof <span class="op">=</span> <span class="fu">Mdof</span>(k_mdof, m_mdof, c_mdof)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of a MdofMesh</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>mdof_mesh <span class="op">=</span> <span class="fu">MdofMesh</span>(mdof, bc <span class="op">=</span> <span class="op">:</span>FF)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># System assembly</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>K_mdof, M_mdof, C_mdof <span class="op">=</span> <span class="fu">assembly</span>(mdof)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply boundary conditions (if any)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>K_bc <span class="op">=</span> <span class="fu">apply_bc</span>(K_mdof, mesh)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>M_bc <span class="op">=</span> <span class="fu">apply_bc</span>(M_mdof, mesh)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>C_bc <span class="op">=</span> <span class="fu">apply_bc</span>(C_mdof, mesh)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the eigenmodes of the systems</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ωₙ, Φₙ <span class="op">=</span> <span class="fu">eigenmode</span>(K_bc, M_bc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="fe-model" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="fe-model"><span class="header-section-number">2.3</span> FE model</h3>
+<p>Finite element models are available for the 1D continuous systems defined in <a href="#sec-1d-models" class="quarto-xref">Section&nbsp;1.1</a>.</p>
+<section id="api-1" class="level4" data-number="2.3.1">
+<h4 data-number="2.3.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.3.1</span> API</h4>
+<p><strong>Data structure</strong></p>
+<div class="api">
+<p><strong>OneDMesh</strong></p>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>OneDMesh(model, xmin, Nelt, bc)</code></pre>
+<p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the data related to the 1D system</p>
+</li>
+<li><p><code>xmin</code>: starting position of the beam</p>
+</li>
+<li><p><code>Nelt</code>: number of elements</p>
+</li>
+<li><p><code>bc</code>: Boundary conditions type</p>
+<ul>
+<li><p><code>:CC</code>: Clamped - Clamped</p>
+</li>
+<li><p><code>:FF</code>: Free - Free</p>
+</li>
+<li><p><code>:CF</code>: Clamped - Free</p>
+</li>
+<li><p><code>:SS</code>: Simply Supported - Simply Supported (specific to beam)</p>
+</li>
+<li><p><code>:CS</code>: Clamped - Simply Supported (specific to beam)</p>
+</li>
+<li><p><code>:SF</code>: Simply Supported - Free (specific to beam)</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>xmin</code>: Starting position of the beam</p>
+</li>
+<li><p><code>L</code>: Length of the beam</p>
+</li>
+<li><p><code>Nodes</code>: Nodes of the mesh</p>
+</li>
+<li><p><code>Elt</code>: Elements of the mesh</p>
+</li>
+<li><p>`Ndof<em>per</em>node: Number of degrees of freedom per node</p>
+</li>
+<li><p>elem_size`: Size of the elements</p>
+</li>
+<li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>
+</li>
+<li><p><code>free_dofs</code>: Free degrees of freedom</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Associated functions</strong></p>
+<div class="api">
+<p><strong>assemby</strong></p>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>assembly(model::OneDstructure, mesh::OneDMesh)</code></pre>
+<p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: OneDStructure</p>
+<ul>
+<li><p><code>Beam</code>: Beam model</p>
+</li>
+<li><p><code>WaveEquation</code>: Bar, Rod or String model</p>
+</li>
+</ul>
+</li>
+<li><p><code>mesh</code>: OneDMesh</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>K</code>: global stiffness matrix</p>
+</li>
+<li><p><code>M</code>: global mass matrix</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>rayleigh_damping_matrix</strong></p>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>rayleigh_damping_matrix(K, M, α, β)
+rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
+<p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>K</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p>Construction parameters</p>
+<ul>
+<li><p>Method 1</p>
+<ul>
+<li><p><code>α</code>: Mass proportional damping coefficient</p>
+</li>
+<li><p><code>β</code>: Stiffness proportional damping coefficient</p>
+</li>
+</ul>
+</li>
+<li><p>Method 2</p>
+<ul>
+<li><p><code>ω₁</code>: First natural frequency</p>
+</li>
+<li><p><code>ω₂</code>: Second natural frequency</p>
+</li>
+<li><p><code>ξ₁</code>: Damping ratio for the first natural frequency</p>
+</li>
+<li><p><code>ξ₂</code>: Damping ratio for the second natural frequency</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>C</code>: Rayleigh damping matrix</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modal_damping_matrix</strong></p>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)</code></pre>
+<p>Compute the damping matrix C from modal parameters</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>ωₙ</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ξₙ</code>: Damping ratios</p>
+</li>
+<li><p><code>Φₙ</code>: Mass-normalized mode shapes</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>C</code>: Damping matrix</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>Selection matrix</strong></p>
+<div id="24" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>selection_matrix(mesh, selected_dofs)</code></pre>
+<p>Compute the selection matrix for the selected dofs.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>mesh</code>: OneDmesh</p>
+</li>
+<li><p><code>selected_dofs</code>: Selected dofs</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>S</code>: Selection matrix</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>apply_bc</strong> - See <a href="#sec-api-mdof" class="quarto-xref">Section&nbsp;2.2.1</a>.</p>
+</div>
+<div class="api">
+<p><strong>eigenmode</strong> - See <a href="#sec-api-mdof" class="quarto-xref">Section&nbsp;2.2.1</a>.</p>
+</div>
+
+
+</section>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
