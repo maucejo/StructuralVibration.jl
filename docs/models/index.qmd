@@ -1,7 +1,258 @@
 ---
-title: Introduction
+title: Structural models
+engine: julia
 format:
   html:
     toc: true
     number-sections: true
+execute:
+  freeze: true
 ---
+
+```{julia}
+#| echo: false
+using StructuralVibration
+```
+
+## Continuous models
+
+### 1D models {#sec-1d-models}
+
+
+### 2D models
+
+## Discrete models
+
+### Sdof systems
+
+Single degree of freedom (Sdof) systems are classically composed of a mass $m$, a stiffness $k$ and a viscous damper $c$ (see @fig-1dof).
+
+::: {#fig-1dof}
+![](../assets/images/1dof.svg)
+
+Classical representation of an Sdof system
+:::
+
+Mathematically, their dynamic behavior is governed by the following normalized equation of motion :
+$$
+\ddot x(t) + 2\xi\,\omega_0\, \dot x(t) + \omega_0^2 x(t) = \frac{F(t)}{m}.
+$$
+where $F(t)$ can be either a base or an external excitation applied to the system.
+
+The Sdof system can thus be defined by:
+
+- its mass $m$
+- its natural angular frequency $\omega_0$ (or its natural frequency $f_0$)
+- its damping ratio $\xi$
+
+#### API
+
+:::::: {.api}
+**Sdof**
+```{julia}
+#| echo: false
+@doc Sdof
+```
+:::
+
+#### Example
+
+```julia
+# Definition of the structural parameters
+m = 1.
+f₀ = 10.
+ξ = 0.01
+
+# Create an instance of Sdof
+sdof = Sdof(m, f₀, ξ)
+```
+
+### Mdof systems
+
+`StructuralVibration.jl` considers Multi-degrees of freedom (Mdof) systems, which topology is presented in @fig-mdof. This choice has been made, because it allows modeling a large variety of possible configurations.
+
+::: {#fig-mdof}
+![](../assets/images/mdof.svg)
+
+General topology of an Mdof system
+:::
+
+The dynamic behavior of such a system is governed by the following matrix system:
+$$
+\mathbf{M} \ddot{\mathbf{X}}(t) + \mathbf{K} \mathbf{X}(t) = \mathbf{F}(t),
+$$
+where:
+
+- $\mathbf{M} = \text{diag}(m_1, \dots, m_j, \dots, m_N)$ is the mass matrix.
+
+- $\mathbf{K}$ is the stiffness matrix such that:
+$$
+\mathbf{K} = \begin{bmatrix}
+k_1 & -k_1 & 0 & \ldots & 0 & 0 \\
+-k_1 & k_1 + k_2 & -k_2 & \ddots & \vdots & \vdots \\
+0 & -k_2 & \ddots & \ddots & 0 & \vdots \\
+\vdots & 0 & \ddots & \ddots & -k_{N-1} & 0 \\
+\vdots & \vdots & \ddots & -k_{N-1} & k_{N-1} + k_N & -k_N \\
+0 & 0 & \ldots & 0 & -k_N & k_N
+\end{bmatrix}.
+$$
+
+- $\mathbf{X}(t) = \left[x_1(t), \dots, x_j(t), \dots, x_N(t)\right]^\mathsf{T}$ is the displacement vector.
+
+- $\mathbf{F}(t) = \left[F_1(t), \dots, F_j(t), \dots, F_N(t)\right]^\mathsf{T}$ is the external force vector.
+
+#### API {#sec-api-mdof}
+
+**Data structures**
+
+:::: {.api}
+**Mdof**
+```{julia}
+#| echo: false
+@doc Mdof
+```
+
+::: {.callout-note title="About the damping matrix C" collapse="true"}
+If viscous dampers are defined, the damping matrix $\mathbf{C}$ is consistent with the stiffness matrix $\mathbf{K}$, meaning that:
+$$
+\mathbf{C} = \begin{bmatrix}
+c_1 & -c_1 & 0 & \ldots & 0 & 0 \\
+-c_1 & c_1 + c_2 & -c_2 & \ddots & \vdots & \vdots \\
+0 & -k_2 & \ddots & \ddots & 0 & \vdots \\
+\vdots & 0 & \ddots & \ddots & -c_{N-1} & 0 \\
+\vdots & \vdots & \ddots & -c_{N-1} & c_{N-1} + c_N & -c_N \\
+0 & 0 & \ldots & 0 & -c_N & c_N
+\end{bmatrix}.
+$$
+:::
+::::
+
+::: {.api}
+**MdofMesh**
+```{julia}
+#| echo: false
+@doc MdofMesh
+```
+:::
+
+**Associated function**
+
+::: {.api}
+**assembly**
+```{julia}
+#| echo: false
+
+@doc assembly(model::Mdof)
+```
+:::
+
+::: {.api}
+**apply_bc**
+```{julia}
+#| echo: false
+
+@doc apply_bc
+```
+:::
+
+::: {.api}
+**eigenmode**
+
+```{julia}
+#| echo: false
+
+@doc eigenmode(K::Matrix{Float64}, M::Matrix{Float64})
+```
+:::
+
+#### Example
+
+```julia
+# Definition of the structural parameters
+k_mdof = [1., 1.]
+m_mdof = ones(3)
+c_mdof = [0.1, 0.1]
+
+# Create an instance of Mdof
+mdof = Mdof(k_mdof, m_mdof, c_mdof)
+
+# Definition of a MdofMesh
+mdof_mesh = MdofMesh(mdof, bc = :FF)
+
+# System assembly
+K_mdof, M_mdof, C_mdof = assembly(mdof)
+
+# Apply boundary conditions (if any)
+K_bc = apply_bc(K_mdof, mesh)
+M_bc = apply_bc(M_mdof, mesh)
+C_bc = apply_bc(C_mdof, mesh)
+
+# Compute the eigenmodes of the systems
+ωₙ, Φₙ = eigenmode(K_bc, M_bc)
+```
+
+### FE model
+
+Finite element models are available for the 1D continuous systems defined in @sec-1d-models.
+
+#### API
+**Data structure**
+
+::: {.api}
+**OneDMesh**
+```{julia}
+#| echo: false
+
+@doc OneDMesh
+```
+:::
+
+**Associated functions**
+
+::: {.api}
+**assemby**
+
+```{julia}
+#| echo: false
+
+@doc assembly(model::Beam, mesh::OneDMesh)
+```
+:::
+
+::: {.api}
+**rayleigh_damping_matrix**
+
+```{julia}
+#| echo: false
+
+@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+```
+:::
+
+::: {.api}
+**modal_damping_matrix**
+
+```{julia}
+#| echo: false
+
+@doc modal_damping_matrix
+```
+:::
+
+::: {.api}
+**Selection matrix**
+
+```{julia}
+#| echo: false
+
+@doc selection_matrix
+```
+:::
+
+::: {.api}
+**apply_bc** - See @sec-api-mdof.
+:::
+
+::: {.api}
+**eigenmode** - See @sec-api-mdof.
+:::

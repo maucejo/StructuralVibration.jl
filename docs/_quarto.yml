@@ -63,7 +63,8 @@ format:
       - cosmo
       - assets/doctheme.scss
     smooth-scroll: true
-    lightbox: true
+
+engine: julia
 
 execute:
   freeze: auto

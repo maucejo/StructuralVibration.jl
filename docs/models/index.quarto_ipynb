@@ -1,0 +1,70 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: Structural models\n",
+        "format:\n",
+        "  html:\n",
+        "    toc: true\n",
+        "    number-sections: true\n",
+        "---"
+      ],
+      "id": "e7809d55"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "using QuartoDocumenter\n",
+        "using StructuralVibration"
+      ],
+      "id": "a89a1c40",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "`StructuralVibration.jl` introduces several structural models for generating easily a wide range of mechanical data.\n",
+        "\n",
+        "## Sdof systems\n",
+        "\n",
+        "Single degree of freedom systems are defined by the following normalized equation of motion :\n",
+        "$$\n",
+        "\\ddot x(t) + 2\\xi\\,\\omega_0\\, \\dot x(t) + \\omega_0^2 = \\frac{F(t)}{m}.\n",
+        "$$\n",
+        "\n",
+        "The Sdof system can thus be defined by:\n",
+        "- its mass $m$\n",
+        "- its natural angular frequency $\\omega_0$ (or, equivalently, its natural frequency $f_0$)\n",
+        "- its damping ratio $\\xi$\n",
+        "\n",
+        "### Initilization\n",
+        "It results that a Sdof system with mass of 1 kg, a natural frequency of 10 Hz and a damping ratio if 1% can be initialized as follows:\n",
+        "```julia\n",
+        "m = 1.\n",
+        "f₀ = 10.\n",
+        "ξ = 0.01\n",
+        "\n",
+        "sdof = SDOF(m, f₀, ξ)\n",
+        "```"
+      ],
+      "id": "78e9a789"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-1.11",
+      "language": "julia",
+      "display_name": "Julia 1.11.1",
+      "path": "C:\\Users\\maucejo\\AppData\\Roaming\\jupyter\\kernels\\julia-1.11"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

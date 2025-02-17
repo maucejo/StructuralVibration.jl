@@ -1,21 +1,21 @@
 """
-    Mesh(s, xmin, Nelt, bc)
+    OneDMesh(model, xmin, Nelt, bc)
 
 Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 
-# Constructor parameters
-* `s`: Structure containing the data related to the 1D system
+**Constructor parameters**
+* `model`: Structure containing the data related to the 1D system
 * `xmin`: starting position of the beam
 * `Nelt`: number of elements
 * `bc`: Boundary conditions type
     * `:CC`: Clamped - Clamped
     * `:FF`: Free - Free
-    *  `:CF`: Clamped - Free
+    * `:CF`: Clamped - Free
     * `:SS`: Simply Supported - Simply Supported (specific to beam)
     * `:CS`: Clamped - Simply Supported (specific to beam)
     * `:SF`: Simply Supported - Free (specific to beam)
 
-# Fields
+**Fields**
 * `xmin`: Starting position of the beam
 * `L`: Length of the beam
 * `Nodes`: Nodes of the mesh
@@ -35,11 +35,11 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
     constrained_dofs::Vector{Int}
     free_dofs::Vector{Int}
 
-    function OneDMesh(s::OneDStructure, xmin, Nelt, bc = :CC)
+    function OneDMesh(model::OneDStructure, xmin, Nelt, bc = :CC)
         Nnodes = Nelt + 1
         Nodes = undefs(Nnodes, 2)
         Elt = undefs(Nelt, 3)
-        elem_size = s.L/Nelt
+        elem_size = model.L/Nelt
 
         for i = 1:Nnodes
             Nodes[i, 1] = i
@@ -52,7 +52,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
             Elt[i, 3] = i + 1
         end
 
-        if isa(s, Beam)
+        if isa(model, Beam)
             Ndof_per_node = 2
             dofs = 1:2Nnodes
             if bc == :SS
@@ -70,7 +70,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
             else
                 error("Boundary conditions not implemented")
             end
-        elseif isa(s, BarRodString)
+        elseif isa(model, BarRodString)
             Ndof_per_node = 1
             dofs = 1:Nnodes
             if bc == :CC
@@ -85,26 +85,26 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
         end
         free_dofs = setdiff(dofs, constrained_dofs)
 
-        new(xmin, s.L, Nodes, Elt, Ndof_per_node, elem_size, constrained_dofs, free_dofs)
+        new(xmin, model.L, Nodes, Elt, Ndof_per_node, elem_size, constrained_dofs, free_dofs)
     end
 end
 
 """
-    assembly(s::Sdof, mesh::OneDMesh)
+    assembly(model::OneDstructure, mesh::OneDMesh)
 
-Compute the global stiffness and mass matrices for a beam with a given mesh.
+Compute the global stiffness and mass matrices for a 1D structure with a given mesh.
 
-# Inputs
-* `s`: Structure containing the data related to the 1D system
-* `mesh`: Mesh
+**Inputs**
+* `model`: Structure containing the data related to the 1D system
+* `mesh`: OneDMesh
 
-# Outputs
+**Outputs**
 * `K`: global stiffness matrix
 * `M`: global mass matrix
 """
-function assembly(s::OneDStructure, mesh::OneDMesh)
+function assembly(model::OneDStructure, mesh::OneDMesh)
     # Compute elemental matrices
-    kₑ, mₑ = element_matrix(s, mesh.elem_size)
+    kₑ, mₑ = element_matrix(model, mesh.elem_size)
 
     (; Elt, Ndof_per_node) = mesh
     Nelt = size(Elt, 1)
@@ -126,16 +126,16 @@ function assembly(s::OneDStructure, mesh::OneDMesh)
 end
 
 """
-    element_matrix(s::Beam, h)
-    element_matrix(s::BarRodString, h)
+    element_matrix(model::Beam, h)
+    element_matrix(model::BarRodString, h)
 
 Compute the elemental stiffness and mass matrices for a beam with a element size `h`.
 
-# Inputs
-* `s`: Structure containing the data related to the 1D system
+**Inputs**
+* `model`: Structure containing the data related to the 1D system
 * `h`: element size
 
-# Outputs
+**Outputs**
 * `kₑ`: elemental stiffness matrix
 * `mₑ`: elemental mass matrix
 """
@@ -180,15 +180,15 @@ end
 
 Compute the selection matrix for the selected dofs.
 
-# Inputs
-* `mesh``: Structure mesh
+**Inputs**
+* `mesh`: OneDmesh
 * `selected_dofs`: Selected dofs
 
 
-# Output
+**Output**
 - `S`: Selection matrix
 """
-function selection_matrix(mesh :: OneDMesh, selected_dofs)
+function selection_matrix(mesh::OneDMesh, selected_dofs)
 
     N = length(selected_dofs)
     S = zeros(N, length(mesh.free_dofs))
@@ -222,20 +222,18 @@ function apply_bc(A, mesh)
 end
 
 """
-    eigenmode(K::Matrix{Float64}, M::Matrix{Float64}, Nₘ::Int)
+    eigenmode(K, M, Nₘ = size(K, 1))
 
 Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 
-# Inputs
+**Inputs**
     * `K`: Stiffness matrix
     * `M`: Mass matrix
     * `Nₘ`: Number of modes to be keep in the modal basis
 
-# Outputs
+**Outputs**
     * `ωₘ`: Vector of natural frequencies
-    * `Φₘ`: Modal shapes
-
-Note: The mode shapes are mass-normalized, so Mₙ = I
+    * `Φₘ`: Mass-normalized mode shapes
 """
 function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, Nₘ = size(K, 1))
 
@@ -248,39 +246,31 @@ function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, Nₘ = size(K
 end
 
 """
-    rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+    rayleigh_damping_matrix(K, M, α, β)
+    rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)
 
 Compute the Rayleigh damping matrix for a given stiffness and mass matrices
 
-# Inputs
+**Inputs**
 * `K`: Stiffness matrix
 * `M`: Mass matrix
-* `α`: Mass proportional damping coefficient
-* `β`: Stiffness proportional damping coefficient
+* Construction parameters
+    * Method 1
+        * `α`: Mass proportional damping coefficient
+        * `β`: Stiffness proportional damping coefficient
+    * Method 2
+        * `ω₁`: First natural frequency
+        * `ω₂`: Second natural frequency
+        * `ξ₁`: Damping ratio for the first natural frequency
+        * `ξ₂`: Damping ratio for the second natural frequency
 
-# Output
+**Output**
 * `C`: Rayleigh damping matrix
 """
 function rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
     return α*M + β*K
 end
 
-"""
-    rayleigh_damping_matrix(K, M, ω₁::Float64, ω₂::Float64, ξ₁::Float64, ξ₂::Float64)
-
-Compute the Rayleigh damping matrix for a given stiffness and mass matrices
-
-# Inputs
-* `K`: Stiffness matrix
-* `M`: Mass matrix
-* `ω₁`: First natural frequency
-* `ω₂`: Second natural frequency
-* `ξ₁`: Damping ratio for the first natural frequency
-* `ξ₂`: Damping ratio for the second natural frequency
-
-# Output
-* `C`: Rayleigh damping matrix
-"""
 function rayleigh_damping_matrix(K, M, ω₁::Float64, ω₂::Float64, ξ₁::Float64, ξ₂::Float64)
     β = 2(ξ₂*ω₂ - ξ₁*ω₁)/(ω₂^2 - ω₁^2)
     α = 2ξ₁*ω₁ - ω₁^2*β
@@ -292,13 +282,13 @@ end
 
 Compute the damping matrix C from modal parameters
 
-# Inputs
+**Inputs**
 * `M`: Mass matrix
 * `ωₙ`: Natural angular frequencies
 * `ξₙ`: Damping ratios
 * `Φₙ`: Mass-normalized mode shapes
 
-# Output
+**Output**
 * `C`: Damping matrix
 """
 function modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)

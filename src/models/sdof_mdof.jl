@@ -3,12 +3,12 @@
 
 Structure containing the data of a sdof system
 
-# Constructor
+**Constructor**
 * `m`: Mass [kg]
-* `f₀`: Natural frequency [rad/s]
+* `f₀`: Natural frequency [Hz]
 * `ξ`: Damping ratio
 
-# Fields
+**Fields**
 * `m`: Mass [kg]
 * `ω₀`: Natural frequency [rad/s]
 * `ξ`: Damping ratio
@@ -22,15 +22,14 @@ Structure containing the data of a sdof system
 end
 
 """
-
-    Mdof(k, m, c)
+    Mdof(k, m, c = Float64[])
 
 Structure containing the data for building a mdof system
 
-# Fields
+**Fields**
 * `k`: Stiffness coefficients of the spring elements
 * `m`: Masses of the mdof system
-* `c`: Damping coefficients of the dampers
+* `c`: Damping coefficients of the viscous dampers
 """
 @with_kw struct Mdof
     k::Vector{Float64}
@@ -40,15 +39,32 @@ Structure containing the data for building a mdof system
     Mdof(k, m, c = Float64[]) = new(k, m, c)
 end
 
-struct MdofMesh
+"""
+    MdofMesh(Elt, constrained_dofs, free_dofs)
+
+Structure containing the data for building a mdof mesh
+
+**Constructor**
+* `model`: Mdof model
+* `bc`: Boundary conditions
+    * `:CC`: Clamped - Clamped
+    * `:CF`: Clamped - Free
+    * `:FF`: Free - Free
+
+**Fields**
+* `Elt`: Element connectivity matrix
+* `constrained_dofs`: Constrained degrees of freedom
+* `free_dofs`: Free degrees of freedom
+"""
+@with_kw struct MdofMesh
     Elt::Matrix{Int}
     constrained_dofs::Vector{Int}
     free_dofs::Vector{Int}
 
-    function MdofMesh(model::Mdof, Nelt, bc = :CC)
-        Nnodes = Nelt + 1
-        Elt = undefs(Nelt, 3)
+    function MdofMesh(model::Mdof, bc = :CC)
+        Nelt = length(model.k)
         Nnodes = length(model.m)
+        Elt = undefs(Nelt, 3)
 
         for i = 1:Nelt
             Elt[i, 1] = i
@@ -67,7 +83,7 @@ struct MdofMesh
 
         free_dofs = setdiff(dofs, constrained_dofs)
 
-        new(Elt, constrained_dofs, free_dofs)
+        return new(Elt, constrained_dofs, free_dofs)
     end
 end
 
@@ -76,14 +92,13 @@ end
 
 Assembly of the mass, stiffness and damping matrices of a mdof system
 
-# Input
+**Input**
 * `model`: Mdof model
-* `mesh`: OneDMesh
 
-# Output
+**Outputs**
 * `K`: Stiffness matrix
 * `M`: Mass matrix
-* `C`: Damping matrix (if dampers are present)
+* `C`: Damping matrix (if viscous dampers are defined in `model`)
 """
 function assembly(model::Mdof)
     (; k, m, c) = model
@@ -123,10 +138,10 @@ end
 
 Elemental stiffness or damping matrix
 
-# Input
+**Input**
 * `coeff`: Stiffness or damping coefficient
 
-# Output
+**Output**
 * `Kₑ`: Elemental stiffness or damping matrix
 """
 element_matrix(coeff::Float64) = coeff.*[1. -1.; -1. 1.]
