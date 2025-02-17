@@ -109,3 +109,9 @@ The package provides the following features:
         - Transfer functions estimation (H1, H2, H3, Hv)
         - Welch method (PSD, ESD, Autopower, Autopower linear)
         - Signal spectrum estimation
+
+- **Visualization**
+    - Bode plot
+    - 2D and 3D Nyquist plot
+    - Waterfall plot
+    - General 2D plot

@@ -14,6 +14,8 @@ website:
         file: models/index.qmd
       - text: "Solvers"
         file: solvers/index.qmd
+      - text: "Signal processing"
+        file: signal_processing/index.qmd
       - text: "Visualization"
         file: visualization/index.qmd
     right:
