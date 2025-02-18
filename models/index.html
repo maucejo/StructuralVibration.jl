@@ -64,6 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../models/excitation.html" rel="next">
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -104,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -217,6 +215,12 @@ window.Quarto = {
  <span class="menu-text">Mechanical models</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/excitation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Excitation models</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -237,6 +241,11 @@ window.Quarto = {
   <li><a href="#sdof-systems" id="toc-sdof-systems" class="nav-link" data-scroll-target="#sdof-systems"><span class="header-section-number">2.1</span> Sdof systems</a></li>
   <li><a href="#mdof-systems" id="toc-mdof-systems" class="nav-link" data-scroll-target="#mdof-systems"><span class="header-section-number">2.2</span> Mdof systems</a></li>
   <li><a href="#fe-model" id="toc-fe-model" class="nav-link" data-scroll-target="#fe-model"><span class="header-section-number">2.3</span> FE model</a></li>
+  </ul></li>
+  <li><a href="#state-space-representation" id="toc-state-space-representation" class="nav-link" data-scroll-target="#state-space-representation"><span class="header-section-number">3</span> State space representation</a>
+  <ul class="collapse">
+  <li><a href="#continuous-model" id="toc-continuous-model" class="nav-link" data-scroll-target="#continuous-model"><span class="header-section-number">3.1</span> Continuous model</a></li>
+  <li><a href="#discrete-models-1" id="toc-discrete-models-1" class="nav-link" data-scroll-target="#discrete-models-1"><span class="header-section-number">3.2</span> Discrete models</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -267,9 +276,541 @@ window.Quarto = {
 <h2 data-number="1" class="anchored" data-anchor-id="continuous-models"><span class="header-section-number">1</span> Continuous models</h2>
 <section id="sec-1d-models" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="sec-1d-models"><span class="header-section-number">1.1</span> 1D models</h3>
+<section id="bar-rod-and-strings" class="level4" data-number="1.1.1">
+<h4 data-number="1.1.1" class="anchored" data-anchor-id="bar-rod-and-strings"><span class="header-section-number">1.1.1</span> Bar, Rod and strings</h4>
+<p>Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form: <span class="math display">\[
+m \ddot y(x, t) - D \frac{\partial^2 y(x,t)}{\partial x^2} = p(x, t),
+\]</span> where:</p>
+<ul>
+<li><p><span class="math inline">\(y(x, t)\)</span>: Kinematic data at location <span class="math inline">\(x\)</span> and time <span class="math inline">\(t\)</span></p></li>
+<li><p><span class="math inline">\(p(x, t)\)</span>: External excitation term</p></li>
+<li><p><span class="math inline">\(m\)</span>: Linear inertia of the type</p></li>
+<li><p><span class="math inline">\(D\)</span>: Stiffness of the type</p></li>
+</ul>
+<p><em>For a longitudinal bar:</em></p>
+<ul>
+<li><p><span class="math inline">\(y(x, t) = u(x, t)\)</span></p>
+<ul>
+<li><span class="math inline">\(u(x, t)\)</span>: Longitudinal displacement [m]</li>
+</ul></li>
+<li><p><span class="math inline">\(p(x, t)\)</span>: Distributed longitudinal force [N/m]</p></li>
+<li><p><span class="math inline">\(m = \rho S\)</span>: Linear mass density [Kg/m<sup>2</sup>]</p>
+<ul>
+<li><span class="math inline">\(\rho\)</span>: Mass density [kg/m<sup>3</sup>] and <span class="math inline">\(S\)</span>: Cross-section area [m<sup>2</sup>]</li>
+</ul></li>
+<li><p><span class="math inline">\(D = E S\)</span>: Longitudinal stiffness [N]</p>
+<ul>
+<li><span class="math inline">\(E\)</span>: Young’s modulus [Pa]</li>
+</ul></li>
+</ul>
+<p><em>For a torsional rod:</em></p>
+<ul>
+<li><p><span class="math inline">\(y(x, t) = \theta(x, t)\)</span></p>
+<ul>
+<li><span class="math inline">\(\theta\)</span>: Torsion angle [rad]</li>
+</ul></li>
+<li><p><span class="math inline">\(p(x, t)\)</span>: Distributed moment [N.m/m]</p></li>
+<li><p><span class="math inline">\(m = \rho I_G\)</span>: Linear rotational inertia [kg.m<sup>4</sup>]</p>
+<ul>
+<li><span class="math inline">\(I_G\)</span>: Polar moment of area [m<sup>4</sup>]</li>
+</ul></li>
+<li><p><span class="math inline">\(D = G J_T\)</span>: Rotational stiffness [N.m<sup>2</sup>]</p>
+<ul>
+<li><span class="math inline">\(G\)</span>: Shear modulus [Pa]</li>
+<li><span class="math inline">\(J_T\)</span>: Torsion constant [m<sup>4</sup>]</li>
+</ul></li>
+</ul>
+<p><em>For a string:</em></p>
+<ul>
+<li><p><span class="math inline">\(y(x, y)\)</span>: Transverse displacement [m]</p></li>
+<li><p><span class="math inline">\(m\)</span>: Linear mass density [kg/m]</p></li>
+<li><p><span class="math inline">\(D\)</span>: Tension force [N]</p></li>
+</ul>
+</section>
+<section id="beam" class="level4" data-number="1.1.2">
+<h4 data-number="1.1.2" class="anchored" data-anchor-id="beam"><span class="header-section-number">1.1.2</span> Beam</h4>
+<p>Euler-Bernoulli beams are governed by the following equation of motion: <span class="math display">\[
+m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
+\]</span> where:</p>
+<ul>
+<li><p><span class="math inline">\(v(x, t)\)</span>: Transverse displacement [m]</p></li>
+<li><p><span class="math inline">\(p(x, t)\)</span>: External excitation term [N/m]</p></li>
+<li><p><span class="math inline">\(m = \rho S\)</span>: Linear mass density [kg/m]</p></li>
+<li><p><span class="math inline">\(D = E I_z\)</span>: Bending stiffness [N.m<sup>2</sup>]</p>
+<ul>
+<li><span class="math inline">\(I_z\)</span>: Second moment of area [m<sup>4</sup>]</li>
+</ul></li>
+</ul>
+</section>
+<section id="api" class="level4" data-number="1.1.3">
+<h4 data-number="1.1.3" class="anchored" data-anchor-id="api"><span class="header-section-number">1.1.3</span> API</h4>
+<p><strong>Data types</strong></p>
+<p>All the following data types are a subtype of the super type <code>OneDtype</code>.</p>
+<div class="api">
+<p><strong>Bar</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Bar(L, S, E, ρ)</code></pre>
+<p>Structure containing the data of a homogeneous and isotropic longitudinal bar</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>S</code>: Cross-section area [m²]</p>
+</li>
+<li><p><code>E</code>: Young's modulus [Pa]</p>
+</li>
+<li><p><code>ρ</code>: Mass density [kg/m³]</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>m</code>: Line mass [kg/m]</p>
+</li>
+<li><p><code>D</code>: Stiffness coefficient [Pa]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>Rod</strong></p>
+<hr>
+<div id="6" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Rod(L, I, J, G, ρ)</code></pre>
+<p>Structure containing the data of a homogeneous and isotropic torsional bar</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p>L: Length [m]</p>
+</li>
+<li><p>I: Second-moment of area [m⁴]</p>
+</li>
+<li><p>J: Torsion constant [m⁴]</p>
+</li>
+<li><p>G: Shear modulus [Pa]</p>
+</li>
+<li><p>ρ: Mass density [kg/m³]</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>m</code>: Line mass [kg/m]</p>
+</li>
+<li><p><code>D</code>: Stiffness coefficient [Pa]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>Strings</strong></p>
+<hr>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Strings(L, S, D, ρ)</code></pre>
+<p>Structure containing the data of a homogeneous and isotropic string</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>S</code>: Cross-section area [m²]</p>
+</li>
+<li><p><code>D</code>: Tension [N]</p>
+</li>
+<li><p><code>ρ</code>: Mass density [kg/m³]</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>m</code>: Linear mass density [kg/m]</p>
+</li>
+<li><p><code>D</code>: Tension [N]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>Beam</strong></p>
+<hr>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Beam(L, S, I, E, ρ)</code></pre>
+<p>Structure containing the data of a homogeneous and isotropic bending beam</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>S</code>: Cross-section area [m²]</p>
+</li>
+<li><p><code>I</code>: Second moment of area [m⁴]</p>
+</li>
+<li><p><code>E</code>: Young's modulus [Pa]</p>
+</li>
+<li><p><code>ρ</code>: Density [kg/m³]</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>M</code>: Linear mass density [kg/m]</p>
+</li>
+<li><p><code>D</code>: Bending stiffness [N.m²]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Associated functions</strong></p>
+<div class="api">
+<p><strong>modefreq</strong></p>
+<hr>
+<div id="12" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modefreq(model::Bar, fmax, bc = :CC)
+modefreq(model::Rod, fmax, bc = :CC)
+modefreq(model::Strings, fmax, bc = :CC)
+modefreq(model::Beam, fmax, bc = :SS)</code></pre>
+<p>Computes the natural frequencies of a longitudinal or torsional bar up to fmax</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the bar data</p>
+</li>
+<li><p><code>fmax</code>: Maximum frequency for calculating the mode shapes [Hz]</p>
+</li>
+<li><p><code>bc</code>: Boundary conditions</p>
+<ul>
+<li><p>For all OneDStructure</p>
+<ul>
+<li><p><code>:CC</code>: Clamped - Clamped</p>
+</li>
+<li><p><code>:CF</code>: Clamped - Free</p>
+</li>
+<li><p><code>:FF</code>: Free - Free</p>
+</li>
+</ul>
+</li>
+<li><p>For beams</p>
+<ul>
+<li><p><code>:SS</code>: Simply Supported - Simply Supported</p>
+</li>
+<li><p><code>:SC</code>: Simply Supported - Clamped</p>
+</li>
+<li><p><code>:SF</code>: Simply Supported - Free</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>ωₙ</code>: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]</p>
+</li>
+<li><p><code>kₙ</code>: Vector of modal wavenumbers</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modeshape</strong></p>
+<hr>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modeshape(model::Bar, kₙ, x, bc = :CC)
+modeshape(model::Rod, kₙ, x, bc = :CC)
+modeshape(model::Strings, kₙ, x, bc = :CC)
+modeshape(model::Beam, kₙ, x, bc = :SS)</code></pre>
+<p>Computes the mass-normalized mode shapes of a longitudinal or torsional bar</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the bar data</p>
+</li>
+<li><p><code>kₙ</code>: Array of modal wavenumbers</p>
+</li>
+<li><p><code>x</code>: Coordinates of calculation points of the mode shapes</p>
+</li>
+<li><p><code>bc</code>: Boundary conditions</p>
+<ul>
+<li><p>For all OneDStructure</p>
+<ul>
+<li><p><code>:CC</code>: Clamped - Clamped</p>
+</li>
+<li><p><code>:CF</code>: Clamped - Free</p>
+</li>
+<li><p><code>:FF</code>: Free - Free</p>
+</li>
+</ul>
+</li>
+<li><p>For beams</p>
+<ul>
+<li><p><code>:SS</code>: Simply Supported - Simply Supported</p>
+</li>
+<li><p><code>:SC</code>: Simply Supported - Clamped</p>
+</li>
+<li><p><code>:SF</code>: Simply Supported - Free</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>ϕ</code>: Mass-normalized mode shapes</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example" class="level4" data-number="1.1.4">
+<h4 data-number="1.1.4" class="anchored" data-anchor-id="example"><span class="header-section-number">1.1.4</span> Example</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dimensions</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="fl">3e-2</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Section features</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> <span class="cn">π</span><span class="op">*</span>d<span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="fl">4</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Iz <span class="op">=</span> <span class="cn">π</span><span class="op">*</span>d<span class="op">^</span><span class="fl">4</span><span class="op">/</span><span class="fl">64</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>IG <span class="op">=</span> <span class="fl">2</span>Iz</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> IG</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Tension for string</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">100</span>.</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Material</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> <span class="fl">2.1e11</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ν <span class="op">=</span> <span class="fl">0.33</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> E<span class="op">/</span>(<span class="fl">1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>ν)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ρ <span class="op">=</span> <span class="fl">7800</span>.</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation parameters</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">2000</span>.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.9</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of the data types</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>bar <span class="op">=</span> <span class="fu">Bar</span>(L, S, E, ρ)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>rod <span class="op">=</span> <span class="fu">Rod</span>(L, IG, J, G, ρ)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>strings <span class="op">=</span> <span class="fu">Strings</span>(L, S, T, ρ)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ωₙ, kₙ <span class="op">=</span> <span class="fu">modefreq</span>(bar, fmax)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>ϕₙ <span class="op">=</span> <span class="fu">modeshape</span>(bar, kₙ, x, <span class="op">:</span>CC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 </section>
 <section id="d-models" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="d-models"><span class="header-section-number">1.2</span> 2D models</h3>
+<section id="rectangular-membranes" class="level4" data-number="1.2.1">
+<h4 data-number="1.2.1" class="anchored" data-anchor-id="rectangular-membranes"><span class="header-section-number">1.2.1</span> Rectangular membranes</h4>
+<p>Rectangular membranes are governed by the following equation of motion: <span class="math display">\[
+m \ddot w(x, y ,t) + D\Delta w(x, y, t) = p(x, y, t),
+\]</span> where:</p>
+<ul>
+<li><p><span class="math inline">\(w(x, y, t)\)</span>: Transverse displacement [m] at point <span class="math inline">\((x, y)\)</span> and time <span class="math inline">\(t\)</span></p></li>
+<li><p><span class="math inline">\(m\)</span>: Surface mass [kg/m]</p></li>
+<li><p><span class="math inline">\(D = \tau\)</span>: Linear tension [N/m]</p></li>
+<li><p><span class="math inline">\(\Delta = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}\)</span>: Laplacian operator</p></li>
+</ul>
+</section>
+<section id="rectangular-plate" class="level4" data-number="1.2.2">
+<h4 data-number="1.2.2" class="anchored" data-anchor-id="rectangular-plate"><span class="header-section-number">1.2.2</span> Rectangular plate</h4>
+<p>Rectangular plates are governed by the following equation of motion: <span class="math display">\[
+m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
+\]</span> where:</p>
+<ul>
+<li><p><span class="math inline">\(w(x, y, t)\)</span>: Transverse displacement [m] at point <span class="math inline">\((x, y)\)</span> and time <span class="math inline">\(t\)</span></p></li>
+<li><p><span class="math inline">\(m = \rho h\)</span>: Surface mass [kg/m<sup>2</sup>]</p>
+<ul>
+<li><span class="math inline">\(h\)</span>: Thickness [m]</li>
+</ul></li>
+<li><p><span class="math inline">\(D = \frac{Eh^3}{12(1 - \nu^2)}\)</span>: Bending stiffness [N.m]</p>
+<ul>
+<li><span class="math inline">\(\nu\)</span>: Poisson’s coefficient</li>
+</ul></li>
+<li><p><span class="math inline">\(\Delta^2 = \frac{\partial^4}{\partial x^4} + 2\frac{\partial^4}{\partial x^2 \partial y^2} + \frac{\partial^4}{\partial y^4}\)</span>: Bilaplacian operator</p></li>
+</ul>
+</section>
+<section id="api-1" class="level4" data-number="1.2.3">
+<h4 data-number="1.2.3" class="anchored" data-anchor-id="api-1"><span class="header-section-number">1.2.3</span> API</h4>
+<p><strong>Data type</strong></p>
+<p>All the following data types are a subtype of the super type <code>TwoDtype</code>.</p>
+<div class="api">
+<p><strong>Membrane</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Membrane(L, b, m, D)</code></pre>
+<p>Structure containing the data of a homogeneous and isotropic rectangular membrane</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>b</code>: Width [m]</p>
+</li>
+<li><p><code>m</code>: Surface mass [kg/m²]</p>
+</li>
+<li><p><code>D</code>: Tension per unit length [N/m]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>Plate</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Plate(L, b, h, E, ρ, ν)</code></pre>
+<p>Structure containing the data of a homogeneous and isotropic bending plate</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>b</code>: Width [m]</p>
+</li>
+<li><p><code>E</code>: Young's modulus [Pa]</p>
+</li>
+<li><p><code>ρ</code>: Density [kg/m³]</p>
+</li>
+<li><p><code>ν</code>: Poisson's ratio</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>L</code>: Length [m]</p>
+</li>
+<li><p><code>b</code>: Width [m]</p>
+</li>
+<li><p><code>m</code>: Surface mass [kg/m²]</p>
+</li>
+<li><p><code>D</code>: Bending stiffness [N.m]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Associated functions</strong></p>
+<div class="api">
+<p><strong>modefreq</strong></p>
+<hr>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modefreq(model::Plate, fmax)
+modefreq(model::Membrane, fmax)</code></pre>
+<p>Computes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the data related to the plate</p>
+</li>
+<li><p><code>fmax</code>: Maximum frequency for calculating the modal shapes [Hz]</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>ωₘₙ</code>: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]</p>
+</li>
+<li><p><code>kₘₙ</code>: Matrix of modal wave numbers</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modeshape</strong></p>
+<hr>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modeshape(model::Plate, kₘₙ, x, y)
+modeshape(model::Membrane, kₘₙ, x, y)</code></pre>
+<p>Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the data related to the structure</p>
+</li>
+<li><p><code>kₘₙ</code>: Matrix of modal wave numbers</p>
+</li>
+<li><p><code>(x, y)</code>: Coordinates of the points where the mode shapes are calculated</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>ϕ</code>: Mass-normalized mode shapes</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level4" data-number="1.2.4">
+<h4 data-number="1.2.4" class="anchored" data-anchor-id="example-1"><span class="header-section-number">1.2.4</span> Example</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dimensions</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Lp <span class="op">=</span> <span class="fl">0.6</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>bp <span class="op">=</span> <span class="fl">0.4</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>hp <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Material parameters</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> <span class="fl">2.1e11</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ρ <span class="op">=</span> <span class="fl">7800</span>.</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ν <span class="op">=</span> <span class="fl">0.33</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation parameters</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">1000</span>.</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>xp <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.5</span>]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>yp <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.3</span>]</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of the data types</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plate <span class="op">=</span> <span class="fu">Plate</span>(Lp, bp, hp, E, ρ, ν)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ωₙ, kₙ <span class="op">=</span> <span class="fu">modefreq</span>(plate, fmax)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ϕₙ <span class="op">=</span> <span class="fu">modeshape</span>(plate, kₙ, xp, yp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 </section>
 </section>
 <section id="discrete-models" class="level2" data-number="2">
@@ -296,11 +837,12 @@ Figure&nbsp;1: Classical representation of an Sdof system
 <li>its natural angular frequency <span class="math inline">\(\omega_0\)</span> (or its natural frequency <span class="math inline">\(f_0\)</span>)</li>
 <li>its damping ratio <span class="math inline">\(\xi\)</span></li>
 </ul>
-<section id="api" class="level4" data-number="2.1.1">
-<h4 data-number="2.1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">2.1.1</span> API</h4>
+<section id="api-2" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="api-2"><span class="header-section-number">2.1.1</span> API</h4>
 <div class="api">
 <p><strong>Sdof</strong></p>
-<div id="4" class="cell" data-execution_count="1">
+<hr>
+<div id="24" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>Sdof(m, ω₀, ξ)</code></pre>
 <p>Structure containing the data of a sdof system</p>
@@ -329,15 +871,15 @@ Figure&nbsp;1: Classical representation of an Sdof system
 </div>
 </div>
 </section>
-<section id="example" class="level4" data-number="2.1.2">
-<h4 data-number="2.1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">2.1.2</span> Example</h4>
-<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the structural parameters</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f₀ <span class="op">=</span> <span class="fl">10</span>.</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an instance of Sdof</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, ξ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-2" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">2.1.2</span> Example</h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the structural parameters</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>f₀ <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of Sdof</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, ξ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="mdof-systems" class="level3" data-number="2.2">
@@ -354,7 +896,7 @@ Figure&nbsp;2: General topology of an Mdof system
 </figure>
 </div>
 <p>The dynamic behavior of such a system is governed by the following matrix system: <span class="math display">\[
-\mathbf{M} \ddot{\mathbf{X}}(t) + \mathbf{K} \mathbf{X}(t) = \mathbf{F}(t),
+\mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{K}\mathbf{x}(t) = \mathbf{f}(t),
 \]</span> where:</p>
 <ul>
 <li><p><span class="math inline">\(\mathbf{M} = \text{diag}(m_1, \dots, m_j, \dots, m_N)\)</span> is the mass matrix.</p></li>
@@ -368,15 +910,16 @@ k_1 &amp; -k_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 0 &amp; 0 &amp; \ldots &amp; 0 &amp; -k_N &amp; k_N
 \end{bmatrix}.
 \]</span></p></li>
-<li><p><span class="math inline">\(\mathbf{X}(t) = \left[x_1(t), \dots, x_j(t), \dots, x_N(t)\right]^\mathsf{T}\)</span> is the displacement vector.</p></li>
-<li><p><span class="math inline">\(\mathbf{F}(t) = \left[F_1(t), \dots, F_j(t), \dots, F_N(t)\right]^\mathsf{T}\)</span> is the external force vector.</p></li>
+<li><p><span class="math inline">\(\mathbf{x}(t) = \left[x_1(t), \dots, x_j(t), \dots, x_N(t)\right]^\mathsf{T}\)</span> is the displacement vector.</p></li>
+<li><p><span class="math inline">\(\mathbf{f}(t) = \left[F_1(t), \dots, F_j(t), \dots, F_N(t)\right]^\mathsf{T}\)</span> is the external force vector.</p></li>
 </ul>
 <section id="sec-api-mdof" class="level4" data-number="2.2.1">
 <h4 data-number="2.2.1" class="anchored" data-anchor-id="sec-api-mdof"><span class="header-section-number">2.2.1</span> API</h4>
-<p><strong>Data structures</strong></p>
+<p><strong>Data types</strong></p>
 <div class="api">
 <p><strong>Mdof</strong></p>
-<div id="6" class="cell" data-execution_count="1">
+<hr>
+<div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>Mdof(k, m, c = Float64[])</code></pre>
 <p>Structure containing the data for building a mdof system</p>
@@ -422,7 +965,8 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 <div class="api">
 <p><strong>MdofMesh</strong></p>
-<div id="8" class="cell" data-execution_count="1">
+<hr>
+<div id="28" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>MdofMesh(Elt, constrained_dofs, free_dofs)</code></pre>
 <p>Structure containing the data for building a mdof mesh</p>
@@ -456,10 +1000,11 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 </div>
 </div>
-<p><strong>Associated function</strong></p>
+<p><strong>Associated functions</strong></p>
 <div class="api">
 <p><strong>assembly</strong></p>
-<div id="10" class="cell" data-execution_count="1">
+<hr>
+<div id="30" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>assembly(model::Mdof)</code></pre>
 <p>Assembly of the mass, stiffness and damping matrices of a mdof system</p>
@@ -485,7 +1030,8 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 <div class="api">
 <p><strong>apply_bc</strong></p>
-<div id="12" class="cell" data-execution_count="1">
+<hr>
+<div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>apply_bc(A, mesh)</code></pre>
 <p>Apply boundary conditions to a given matrix</p>
@@ -509,12 +1055,84 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 <div class="api">
 <p><strong>eigenmode</strong></p>
-<div id="14" class="cell" data-execution_count="1">
+<hr>
+<div id="34" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>eigenmode(K, M, Nₘ = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
-<p><strong>Inputs</strong>     * <code>K</code>: Stiffness matrix     * <code>M</code>: Mass matrix     * <code>Nₘ</code>: Number of modes to be keep in the modal basis</p>
-<p><strong>Outputs</strong>     * <code>ωₘ</code>: Vector of natural frequencies     * <code>Φₘ</code>: Mass-normalized mode shapes</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>K</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>Nₘ</code>: Number of modes to be keep in the modal basis</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>ωₘ</code>: Vector of natural frequencies</p>
+</li>
+<li><p><code>Φₘ</code>: Mass-normalized mode shapes</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modal_matrices</strong></p>
+<hr>
+<div id="36" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modal_matrices(ωₙ, ξₙ)</code></pre>
+<p>Computes the modal mass, stiffness, and damping matrices</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>ωₙ</code>: Vector of natural frequencies</p>
+</li>
+<li><p><code>ξₙ</code>: Modal damping</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>Kₙ</code>: Generalized stiffness matrix</p>
+</li>
+<li><p><code>Mₙ</code>: Generalized mass matrix (identity matrix, due to mass normalization)</p>
+</li>
+<li><p><code>Cₙ</code>: Generalized damping matrix</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modal_effective_mass</strong></p>
+<hr>
+<div id="38" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modal_effective_mass(M, ϕₙ, r)</code></pre>
+<p>Computes the effective mass of a mode</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>ϕₙ</code>: Mode shape</p>
+</li>
+<li><p><code>r</code>: Influence vector (rigid body mode)</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>meff</code>: Modal effective mass</p>
+</li>
+</ul>
+<p><em>Note: The modeshapes are supposed to be mass-normalized</em></p>
 
 
 </div>
@@ -522,40 +1140,47 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 </div>
 </section>
-<section id="example-1" class="level4" data-number="2.2.2">
-<h4 data-number="2.2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2.2</span> Example</h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the structural parameters</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>k_mdof <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">1</span>.]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>m_mdof <span class="op">=</span> <span class="fu">ones</span>(<span class="fl">3</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>c_mdof <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.1</span>]</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an instance of Mdof</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>mdof <span class="op">=</span> <span class="fu">Mdof</span>(k_mdof, m_mdof, c_mdof)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of a MdofMesh</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>mdof_mesh <span class="op">=</span> <span class="fu">MdofMesh</span>(mdof, bc <span class="op">=</span> <span class="op">:</span>FF)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># System assembly</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>K_mdof, M_mdof, C_mdof <span class="op">=</span> <span class="fu">assembly</span>(mdof)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply boundary conditions (if any)</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>K_bc <span class="op">=</span> <span class="fu">apply_bc</span>(K_mdof, mesh)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>M_bc <span class="op">=</span> <span class="fu">apply_bc</span>(M_mdof, mesh)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>C_bc <span class="op">=</span> <span class="fu">apply_bc</span>(C_mdof, mesh)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the eigenmodes of the systems</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ωₙ, Φₙ <span class="op">=</span> <span class="fu">eigenmode</span>(K_bc, M_bc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-3" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="example-3"><span class="header-section-number">2.2.2</span> Example</h4>
+<div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the structural parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>k_mdof <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">1</span>.]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>m_mdof <span class="op">=</span> <span class="fu">ones</span>(<span class="fl">3</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>c_mdof <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.1</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of Mdof</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>mdof <span class="op">=</span> <span class="fu">Mdof</span>(k_mdof, m_mdof, c_mdof)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of a MdofMesh</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>mdof_mesh <span class="op">=</span> <span class="fu">MdofMesh</span>(mdof, bc <span class="op">=</span> <span class="op">:</span>CF)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># System assembly</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>K_mdof, M_mdof, C_mdof <span class="op">=</span> <span class="fu">assembly</span>(mdof)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply boundary conditions (if any)</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>K_bc <span class="op">=</span> <span class="fu">apply_bc</span>(K_mdof, mdof_mesh)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>M_bc <span class="op">=</span> <span class="fu">apply_bc</span>(M_mdof, mdof_mesh)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>C_bc <span class="op">=</span> <span class="fu">apply_bc</span>(C_mdof, mdof_mesh)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the eigenmodes of the systems</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>ωₙ, Φₙ <span class="op">=</span> <span class="fu">eigenmode</span>(K_bc, M_bc)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the modal matrices</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>Kmodal, Mmodal, Cmodal <span class="op">=</span> <span class="fu">modal_matrices</span>(ωₙ, <span class="fl">0.01</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of modal effective mass</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>meff <span class="op">=</span> <span class="fu">modal_effective_mass</span>(M_bc, Φₙ, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="fe-model" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="fe-model"><span class="header-section-number">2.3</span> FE model</h3>
 <p>Finite element models are available for the 1D continuous systems defined in <a href="#sec-1d-models" class="quarto-xref">Section&nbsp;1.1</a>.</p>
-<section id="api-1" class="level4" data-number="2.3.1">
-<h4 data-number="2.3.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.3.1</span> API</h4>
-<p><strong>Data structure</strong></p>
+<section id="api-3" class="level4" data-number="2.3.1">
+<h4 data-number="2.3.1" class="anchored" data-anchor-id="api-3"><span class="header-section-number">2.3.1</span> API</h4>
+<p><strong>Data type</strong></p>
 <div class="api">
 <p><strong>OneDMesh</strong></p>
-<div id="16" class="cell" data-execution_count="1">
+<hr>
+<div id="40" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>OneDMesh(model, xmin, Nelt, bc)</code></pre>
 <p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>
@@ -594,9 +1219,9 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </li>
 <li><p><code>Elt</code>: Elements of the mesh</p>
 </li>
-<li><p>`Ndof<em>per</em>node: Number of degrees of freedom per node</p>
+<li><p><code>Ndof_per_node</code>`: Number of degrees of freedom per node</p>
 </li>
-<li><p>elem_size`: Size of the elements</p>
+<li><p><code>elem_size</code>: Size of the elements</p>
 </li>
 <li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>
 </li>
@@ -612,7 +1237,8 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <p><strong>Associated functions</strong></p>
 <div class="api">
 <p><strong>assemby</strong></p>
-<div id="18" class="cell" data-execution_count="1">
+<hr>
+<div id="42" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>assembly(model::OneDstructure, mesh::OneDMesh)</code></pre>
 <p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>
@@ -644,7 +1270,8 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 <div class="api">
 <p><strong>rayleigh_damping_matrix</strong></p>
-<div id="20" class="cell" data-execution_count="1">
+<hr>
+<div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>rayleigh_damping_matrix(K, M, α, β)
 rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
@@ -693,7 +1320,8 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 </div>
 <div class="api">
 <p><strong>modal_damping_matrix</strong></p>
-<div id="22" class="cell" data-execution_count="1">
+<hr>
+<div id="46" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)</code></pre>
 <p>Compute the damping matrix C from modal parameters</p>
@@ -721,7 +1349,8 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 </div>
 <div class="api">
 <p><strong>Selection matrix</strong></p>
-<div id="24" class="cell" data-execution_count="1">
+<hr>
+<div id="48" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>selection_matrix(mesh, selected_dofs)</code></pre>
 <p>Compute the selection matrix for the selected dofs.</p>
@@ -749,6 +1378,112 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <div class="api">
 <p><strong>eigenmode</strong> - See <a href="#sec-api-mdof" class="quarto-xref">Section&nbsp;2.2.1</a>.</p>
 </div>
+<div class="api">
+<p><strong>modal_matrices</strong> - See <a href="#sec-api-mdof" class="quarto-xref">Section&nbsp;2.2.1</a>.</p>
+</div>
+<div class="api">
+<p><strong>modal_effective_mass</strong> - See <a href="#sec-api-mdof" class="quarto-xref">Section&nbsp;2.2.1</a>.</p>
+</div>
+</section>
+<section id="example-4" class="level4" data-number="2.3.2">
+<h4 data-number="2.3.2" class="anchored" data-anchor-id="example-4"><span class="header-section-number">2.3.2</span> Example</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dimensions</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="fl">3e-2</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Section features</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> <span class="cn">π</span><span class="op">*</span>d<span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="fl">4</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>Iz <span class="op">=</span> <span class="cn">π</span><span class="op">*</span>d<span class="op">^</span><span class="fl">4</span><span class="op">/</span><span class="fl">64</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Material</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> <span class="fl">2.1e11</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>ρ <span class="op">=</span> <span class="fl">7800</span>.</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation parameters</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">2000</span>.</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of the data types</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Mesh definition</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>oned_mesh <span class="op">=</span> <span class="fu">OneDMesh</span>(beam, <span class="fl">0</span>., <span class="fl">20</span>, <span class="op">:</span>SS)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Construction of K and M</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>Kfe, Mfe <span class="op">=</span> <span class="fu">assembly</span>(beam, oned_mesh)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Application of the BCs</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>Kbc <span class="op">=</span> <span class="fu">apply_bc</span>(Kfe, oned_mesh)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>Mbc <span class="op">=</span> <span class="fu">apply_bc</span>(Mfe, oned_mesh)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation ofthe eigenmodes of the structure</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>ωfe, Φfe <span class="op">=</span> <span class="fu">eigenmode</span>(Kbc, Mbc)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculation of the damping matrix</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>Cray <span class="op">=</span> <span class="fu">rayleigh_damping_matrix</span>(Kbc, Mbc, <span class="fl">1</span>., <span class="fl">1</span>.)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>Cmodal <span class="op">=</span> <span class="fu">modal_damping_matrix</span>(Mbc, ωfe, <span class="fl">0.01</span>, Φfe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+</section>
+<section id="state-space-representation" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="state-space-representation"><span class="header-section-number">3</span> State space representation</h2>
+<p>The state space representation of a mechanical system is expressed as: <span class="math display">\[
+\dot{\mathbf{z}}(t) = \mathbf{A}_c \mathbf{z}(t) + \mathbf{B}_c \mathbf{u}(t),
+\]</span> where: - <span class="math inline">\(\mathbf{z}(t)\)</span>: State vector</p>
+<ul>
+<li><p><span class="math inline">\(\mathbf{u}(t)\)</span>: Input vector</p></li>
+<li><p><span class="math inline">\(\mathbf{A}_c\)</span>: System matrix</p></li>
+<li><p><span class="math inline">\(\mathbf{B}_c\)</span>: Input matrix</p></li>
+</ul>
+<section id="continuous-model" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="continuous-model"><span class="header-section-number">3.1</span> Continuous model</h3>
+<p>For a mechanical system, whose equation of motion is: <span class="math display">\[
+\mathbf{M}\ddot{\mathbf{x}}(t) + \mathbf{C}\dot{\mathbf{x}}(t) + \mathbf{K x}(t) = \mathbf{u}(t),
+\]</span> the corresponding continuous-time state equation is given by: <span class="math display">\[
+\begin{bmatrix}
+\dot{\mathbf{x}}(t) \\
+\ddot{\mathbf{x}}(t)
+\end{bmatrix} = \begin{bmatrix}
+\mathbf{0} &amp; \mathbf{I} \\
+-\mathbf{M}^{-1}\mathbf{K} &amp; -\mathbf{M}^{-1}\mathbf{C}
+\end{bmatrix}\begin{bmatrix}
+\mathbf{x}(t) \\
+\dot{\mathbf{x}}(t)
+\end{bmatrix}+ \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{M}^{-1}
+\end{bmatrix}\mathbf{u}(t).
+\]</span></p>
+<p>When using a modal expansion such that <span class="math display">\[
+\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t),
+\]</span> where <span class="math inline">\(\mathbf{\Phi}\)</span> is the mode shapes matrix and <span class="math inline">\(\mathbf{q}(t)\)</span> is the modal coordinate vector, a modal state space equation can be obtained. The latter is written: <span class="math display">\[
+\begin{bmatrix}
+\dot{\mathbf{q}}(t) \\
+\ddot{\mathbf{q}}(t)
+\end{bmatrix} = \begin{bmatrix}
+\mathbf{0} &amp; \mathbf{I} \\
+-\mathbf{\Omega}^2 &amp; -\mathbf{\Xi}
+\end{bmatrix}\begin{bmatrix}
+\mathbf{q}(t) \\
+\dot{\mathbf{q}}(t)
+\end{bmatrix}+ \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{\Phi}^\mathsf{T}
+\end{bmatrix}\mathbf{u}(t),
+\]</span> where <span class="math inline">\(\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_N^2)\)</span> and <span class="math inline">\(\mathbf{\Xi} = \text{diag}(2\xi_1\omega_1, \dots, 2\xi_N\omega_N)\)</span>.</p>
+<section id="api-4" class="level4" data-number="3.1.1">
+<h4 data-number="3.1.1" class="anchored" data-anchor-id="api-4"><span class="header-section-number">3.1.1</span> API</h4>
+</section>
+<section id="example-5" class="level4" data-number="3.1.2">
+<h4 data-number="3.1.2" class="anchored" data-anchor-id="example-5"><span class="header-section-number">3.1.2</span> Example</h4>
+</section>
+</section>
+<section id="discrete-models-1" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="discrete-models-1"><span class="header-section-number">3.2</span> Discrete models</h3>
+<section id="api-5" class="level4" data-number="3.2.1">
+<h4 data-number="3.2.1" class="anchored" data-anchor-id="api-5"><span class="header-section-number">3.2.1</span> API</h4>
+</section>
+<section id="example-6" class="level4" data-number="3.2.2">
+<h4 data-number="3.2.2" class="anchored" data-anchor-id="example-6"><span class="header-section-number">3.2.2</span> Example</h4>
 
 
 </section>
@@ -1173,6 +1908,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../models/excitation.html" class="pagination-link" aria-label="Excitation models">
+        <span class="nav-page-text">Excitation models</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
