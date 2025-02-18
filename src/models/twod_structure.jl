@@ -5,14 +5,14 @@ abstract type TwoDStructure end
 
 Structure containing the data of a homogeneous and isotropic bending plate
 
-# Constructor parameters
+**Constructor parameters**
 * `L`: Length [m]
 * `b`: Width [m]
 * `E`: Young's modulus [Pa]
 * `ρ`: Density [kg/m³]
 * `ν`: Poisson's ratio
 
-# Fields
+**Fields**
 * `L`: Length [m]
 * `b`: Width [m]
 * `m`: Surface mass [kg/m²]
@@ -34,15 +34,15 @@ Structure containing the data of a homogeneous and isotropic bending plate
 end
 
 """
-    Membrane(L, b, m, T)
+    Membrane(L, b, m, D)
 
 Structure containing the data of a homogeneous and isotropic rectangular membrane
 
-# Fields
+**Fields**
 * `L`: Length [m]
 * `b`: Width [m]
 * `m`: Surface mass [kg/m²]
-* `D`: Tension [N]
+* `D`: Tension per unit length [N/m]
 """
 @with_kw struct Membrane <: TwoDStructure
     L::Float64
@@ -52,20 +52,21 @@ Structure containing the data of a homogeneous and isotropic rectangular membran
 end
 
 """
-    modefreq(p::Plate, fmax)
+    modefreq(model::Plate, fmax)
+    modefreq(model::Membrane, fmax)
 
-Computes the natural frequencies of a simply supported plate up to fmax
+Computes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax
 
-# Inputs
-    * `p`: Structure containing the data related to the plate
-    * `fmax`: Maximum frequency for calculating the modal shapes [Hz]
+**Inputs**
+* `model`: Structure containing the data related to the plate
+* `fmax`: Maximum frequency for calculating the modal shapes [Hz]
 
-# Outputs
-    * `ωₘₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
-    * `kₘₙ`: Matrix of modal wave numbers
+**Outputs**
+* `ωₘₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* `kₘₙ`: Matrix of modal wave numbers
 """
-function modefreq(p::TwoDStructure, fmax)
-   (; L, b, m, D) = p
+function modefreq(model::TwoDStructure, fmax)
+   (; L, b, m, D) = model
 
     c = sqrt(D/m)
     ωmax = 2π*fmax
@@ -107,17 +108,18 @@ function modefreq(p::TwoDStructure, fmax)
 end
 
 """
-    modeshape(p::TwoDStructure, kₘₙ, x, y)
+    modeshape(model::Plate, kₘₙ, x, y)
+    modeshape(model::Membrane, kₘₙ, x, y)
 
 Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane
 
-# Inputs
-    * `p`: Structure containing the data related to the structure
-    * `kₘₙ`: Matrix of modal wave numbers
-    * `(x, y)`: Coordinates of the points where the mode shapes are calculated
+**Inputs**
+* `model`: Structure containing the data related to the structure
+* `kₘₙ`: Matrix of modal wave numbers
+* `(x, y)`: Coordinates of the points where the mode shapes are calculated
 
-# Output
-    * `ϕ`: Mass-normalized mode shapes
+**Output**
+* `ϕ`: Mass-normalized mode shapes
 """
 function modeshape(p::TwoDStructure, kₘₙ, x, y)
     (; L, b, m) = p

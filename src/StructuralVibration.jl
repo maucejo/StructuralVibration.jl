@@ -37,12 +37,12 @@ export FFTParameters
 # Functions
 export excitation, solve, impulse_response, srs
 
-export modefreq, modeshape, eigenmode, modal_matrices, effective_mass,
+export modefreq, modeshape, eigenmode, modal_matrices, modal_effective_mass,
        assembly, apply_bc, selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
 
 export agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, denoising
 
-export c2d, ss_model, modal_parameters, c2r_modeshapes
+export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshapes
 
 export freq_extraction, modeshape_extraction
 

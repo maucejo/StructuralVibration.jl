@@ -2,7 +2,7 @@
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "17673be6c446e828e1a4021c5294d9f1d84a7b75"
+project_hash = "91991ba16ac65e93cfe142d30d0edeaea12ad00c"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -689,6 +689,12 @@ deps = ["ConstructionBase", "Future", "MacroTools", "StaticArraysCore"]
 git-tree-sha1 = "e2cc6d8c88613c05e1defb55170bf5ff211fbeac"
 uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 version = "1.1.1"
+
+[[deps.ShareAdd]]
+deps = ["Pkg", "PrecompileTools", "REPL", "TOML"]
+git-tree-sha1 = "c6f04d17f45627d7f6e8878593f12b2603a2778f"
+uuid = "27c01619-3163-4fe3-a204-36d38c32eb7d"
+version = "2.1.0"
 
 [[deps.SharedArrays]]
 deps = ["Distributed", "Mmap", "Random", "Serialization"]

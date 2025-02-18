@@ -20,8 +20,8 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 * `L`: Length of the beam
 * `Nodes`: Nodes of the mesh
 * `Elt`: Elements of the mesh
-* `Ndof_per_node: Number of degrees of freedom per node
-* elem_size`: Size of the elements
+* `Ndof_per_node``: Number of degrees of freedom per node
+* `elem_size`: Size of the elements
 * `constrained_dofs`: Constrained degrees of freedom
 * `free_dofs`: Free degrees of freedom
 """
@@ -52,7 +52,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
             Elt[i, 3] = i + 1
         end
 
-        if isa(model, Beam)
+        if model isa Beam
             Ndof_per_node = 2
             dofs = 1:2Nnodes
             if bc == :SS
@@ -70,7 +70,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
             else
                 error("Boundary conditions not implemented")
             end
-        elseif isa(model, BarRodString)
+        elseif model isa WaveEquation
             Ndof_per_node = 1
             dofs = 1:Nnodes
             if bc == :CC
@@ -95,7 +95,9 @@ end
 Compute the global stiffness and mass matrices for a 1D structure with a given mesh.
 
 **Inputs**
-* `model`: Structure containing the data related to the 1D system
+* `model`: OneDStructure
+    * `Beam`: Beam model
+    * `WaveEquation`: Bar, Rod or String model
 * `mesh`: OneDMesh
 
 **Outputs**
@@ -127,7 +129,7 @@ end
 
 """
     element_matrix(model::Beam, h)
-    element_matrix(model::BarRodString, h)
+    element_matrix(model::WaveEquation, h)
 
 Compute the elemental stiffness and mass matrices for a beam with a element size `h`.
 
@@ -159,10 +161,10 @@ function element_matrix(beam::Beam, h)
     return kₑ, mₑ
 end
 
-function element_matrix(brs::BarRodString, h)
+function element_matrix(we::WaveEquation, h)
     # Constants
-    kc = brs.D/h
-    mc = brs.m*h/6.
+    kc = we.D/h
+    mc = we.m*h/6.
 
     # Elemental stiffness matrix
     kₑ = kc.*[1. -1.;
@@ -207,11 +209,11 @@ end
 
 Apply boundary conditions to a given matrix
 
-# Inputs
+**Inputs**
 * `A`: Matrix to apply the boundary conditions
 * `mesh`: Mesh of the system
 
-# Output
+**Output**
 * `A_bc`: Matrix with boundary conditions applied
 """
 function apply_bc(A, mesh)
@@ -227,13 +229,13 @@ end
 Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 
 **Inputs**
-    * `K`: Stiffness matrix
-    * `M`: Mass matrix
-    * `Nₘ`: Number of modes to be keep in the modal basis
+* `K`: Stiffness matrix
+* `M`: Mass matrix
+* `Nₘ`: Number of modes to be keep in the modal basis
 
 **Outputs**
-    * `ωₘ`: Vector of natural frequencies
-    * `Φₘ`: Mass-normalized mode shapes
+* `ωₘ`: Vector of natural frequencies
+* `Φₘ`: Mass-normalized mode shapes
 """
 function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, Nₘ = size(K, 1))
 

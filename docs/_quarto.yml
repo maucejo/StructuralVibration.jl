@@ -32,9 +32,7 @@ website:
     - title: "Models"
       contents:
         - models/index.qmd
-        # - models/discrete.qmd
-        # - models/continuous.qmd
-        # - models/excitation.qmd
+        - models/excitation.qmd
         # - models/noise.qmd
       # Discrete models
       # Continuous models
@@ -63,8 +61,3 @@ format:
       - cosmo
       - assets/doctheme.scss
     smooth-scroll: true
-
-engine: julia
-
-execute:
-  freeze: auto

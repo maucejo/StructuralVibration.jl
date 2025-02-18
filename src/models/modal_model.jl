@@ -3,11 +3,11 @@
 
 Computes the modal mass, stiffness, and damping matrices
 
-# Inputs
+**Inputs**
 * `ωₙ`: Vector of natural frequencies
 * `ξₙ`: Modal damping
 
-# Outputs
+**Outputs**
 * `Kₙ`: Generalized stiffness matrix
 * `Mₙ`: Generalized mass matrix (identity matrix, due to mass normalization)
 * `Cₙ`: Generalized damping matrix
@@ -17,21 +17,21 @@ function modal_matrices(ωₙ, ξₙ)
 end
 
 """
-    effective_mass(M, ϕₙ, r)
+    modal_effective_mass(M, ϕₙ, r)
 
 Computes the effective mass of a mode
 
-# Inputs
+**Inputs**
 * `M`: Mass matrix
 * `ϕₙ`: Mode shape
 * `r`: Influence vector (rigid body mode)
 
-# Outputs
+**Outputs**
 * `meff`: Modal effective mass
 
-# Note : The modeshapes are mass-normalized
+*Note: The modeshapes are supposed to be mass-normalized*
 """
-function effective_mass(M, ϕₙ, r)
+function modal_effective_mass(M, ϕₙ, r)
     Lₙ = ϕₙ'*M*r
 
     return Lₙ'*Lₙ

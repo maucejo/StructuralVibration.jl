@@ -37,7 +37,7 @@ end
 
 Converts a continuous-time state-space model to a discrete-time state-space model.
 
-# Inputs
+**Inputs**
 * `css`: Continuous-time state-space model
 * `h`: Sampling time.
 * `method::Symbol`: Discretization method
@@ -45,7 +45,7 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
     * `:foh`: First-order Hold method
     * `:blh`: Band-limited Hold method
 
-# Output
+**Output**
 * `DiscreteStateSpace`: Discrete-time state-space model
     * `Ad`: Discrete-time state-space matrix A
     * `Bd`: Discrete-time state-space matrix B
@@ -80,12 +80,12 @@ end
 
 Generates a continuous-time state-space model from the mass, damping, and stiffness matrices
 
-# Inputs
+**Inputs**
 * `K`: Stiffness matrix
 * `M`: Mass matrix
 * `C`: Damping matrix
 
-# Output
+**Output**
 `css`: ContinuousStateSpace
 """
 function ss_model(K, M, C)
@@ -99,15 +99,37 @@ function ss_model(K, M, C)
 end
 
 """
+    ss_modal_model(ωₙ , ξₙ, ϕₙ)
+
+Generates a continuous-time state-space model from the mass, damping, and stiffness matrices
+
+**Inputs**
+* `ωₙ`: Natural angular frequencies
+* `ξₙ`: Damping ratios
+* `ϕₙ`: Mass-normalized mode shapes
+
+**Output**
+`css`: ContinuousStateSpace
+"""
+function ss_modal_model(ωₙ , ξₙ, ϕₙ)
+
+    m, n = size(ϕₙ)
+    Ac = [zeros(n, n) I; -Diagonal(ωₙ.^2) -Diagonal(2ξₙ.*ωₙ)]
+    Bc = [zeros(n, m); ϕₙ']
+
+    return ContinuousStateSpace(Ac, Bc)
+end
+
+"""
     eigenmode(Ac, Nₘ)
 
 Computes the eigenmodes of a continuous-time state-space model
 
-# Inputs
+**Inputs**
 * `Ac`: Continuous-time state-space matrix
 * `Nₘ`: Number of eigenmodes to keep in the modal basis (default: empty)
 
-# Outputs
+**Outputs**
 * `λ`: Eigenvalues
 * `Ψ`: Eigenvectors
 """
@@ -131,7 +153,7 @@ Computes the natural angular frequencies and damping ratios from the complex eig
 # Input
 * `λ`: Complex eigenvalues
 
-# Outputs
+**Outputs**
 * `ωₙ`: Natural angular frequencies
 * `ξₙ`: Damping ratios
 """
@@ -152,7 +174,7 @@ Converts the complex modes to real modes
 # Input
 * `Ψ`: Complex modes
 
-# Output
+**Output**
 * `ϕₙ`: Real modes
 """
 function c2r_modeshapes(Ψ)

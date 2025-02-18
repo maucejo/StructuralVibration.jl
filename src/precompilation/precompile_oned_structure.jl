@@ -1,6 +1,6 @@
 bar = Bar(L, S, E, ρ)
 rod = Rod(L, Iz, J, G, ρ)
-strings = Strings(L, ρ*S, 100.)
+strings = Strings(L, S, 100., ρ)
 beam = Beam(L, S, Iz, E, ρ)
 
 @compile_workload begin

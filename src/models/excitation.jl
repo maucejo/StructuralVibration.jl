@@ -5,12 +5,12 @@ abstract type ArbitraryExc end
 
 Struct to define a rectangular excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
 """
-struct Rectangle <: ArbitraryExc
+@with_kw struct Rectangle <: ArbitraryExc
     F₀::Float64
     tstart::Float64
     duration::Float64
@@ -21,10 +21,10 @@ end
 
 Struct to define a triangular excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
 """
 @with_kw struct Triangle <: ArbitraryExc
     F₀::Float64
@@ -37,11 +37,11 @@ end
 
 Struct to define a hammer impact excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `k` : Shape parameter
-* `θ` : Intensity parameter [s]
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `k`: Shape parameter
+* `θ`: Intensity parameter [s]
 """
 @with_kw struct Hammer <: ArbitraryExc
     F₀::Float64
@@ -55,11 +55,11 @@ end
 
 Struct to define a smooth rectangular excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
-* `trise` : Rise time from 0 to F₀ [s]
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
+* `trise`: Rise time from 0 to F₀ [s]
 """
 @with_kw struct SmoothRect <: ArbitraryExc
     F₀::Float64
@@ -73,19 +73,19 @@ end
 
 Struct to define a sine wave excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
-* `freq` : Frequency of the excitation [Hz]
-* `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = true)
+**Constructor parameters**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
+* `freq`: Frequency of the excitation [Hz]
+* `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
-* `ω` : Frequency of the excitation [Hz]
-* `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = true)
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
+* `ω`: Frequency of the excitation [Hz]
+* `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
 @with_kw struct SineWave <: ArbitraryExc
     F₀::Float64
@@ -103,10 +103,10 @@ end
 
 Struct to define a half sine excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
 """
 @with_kw struct HalfSine <: ArbitraryExc
     F₀::Float64
@@ -119,10 +119,10 @@ end
 
 Struct to define a Haversine (or versed sine) excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
 """
 @with_kw struct HaverSine <: ArbitraryExc
     F₀::Float64
@@ -135,17 +135,17 @@ end
 
 Struct to define a swept sine excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
-* `fstart` : Starting frequency [Hz]
-* `fend` : Ending frequency [Hz]
-* `type` : Type of sweep
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
+* `fstart`: Starting frequency [Hz]
+* `fend`: Ending frequency [Hz]
+* `type`: Type of sweep
     * `:lin` - linear (default)
     * `:quad` - quadratic
     * `:log` - logarithmic
-* `zero_end` : Boolean to set the excitation to 0 at the end of the duration (default = false)
+* `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
 @with_kw struct SweptSine <: ArbitraryExc
     F₀::Float64
@@ -164,12 +164,16 @@ end
 
 Struct to define a Gaussian pulse excitation signal
 
-# Fields
-* `F₀` : Amplitude of the force [N]
-* `tstart` : Starting time of the excitation [s]
-* `duration` : Duration of the excitation [s]
-* `fc` : Center frequency of the pulse [Hz]
-* `precision` : Precision of the pulse (default = 4)
+**Fields**
+* `F₀`: Amplitude of the force [N]
+* `tstart`: Starting time of the excitation [s]
+* `duration`: Duration of the excitation [s]
+* `fc`: Center frequency of the pulse [Hz]
+* `precision`: Precision of the pulse (default = 4)
+
+*Note on the parameter `precision`*
+
+The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F₀*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
 """
 @with_kw struct GaussianPulse <: ArbitraryExc
     F₀::Float64
@@ -186,7 +190,7 @@ end
 
 Struct to define a colored noise excitation signal
 
-# Fields
+**Fields**
 * `F₀`: Mean amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
@@ -215,8 +219,8 @@ end
 
 Computes different types of excitation signals
 
-# Parameters
-* type : Struct of excitation type
+**Inputs**
+* type : Excitation type
     1. `Triangle`
     2. `Rectangle`
     3. `Hammer`
@@ -227,11 +231,11 @@ Computes different types of excitation signals
     8. `SweptSine`
     9. `GaussianPulse`
     10. `ColoredNoise`
+* `t`: Time vector
 
-# Output
-* `F` : Vector of excitation evolution over time [N]
+**Output**
+* `F`: Excitation signal
 """
-# Rectangle excitation
 function excitation(type::Rectangle, t)
 
     (; F₀, tstart, duration) = type
@@ -458,8 +462,7 @@ function excitation(type::GaussianPulse, t)
     pos_start = argmin((t .- tstart).^2.)
     tpulse = t[pos_start:end] .- tstart .- duration/2
 
-    # Standard deviation of the pulse - duration = n*σ (i.e. p ≈ 99,99%)
-    # we want that at t = duration, F₀*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision) at t = duration
+    # The precision parameter calibrates the standard deviation of the pulse, so that the duration = n*σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n*σ , the amplitude of F₀*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
     n = 2sqrt(precision*2log(10) + 2log(F₀))
     σ = duration/n
 
