@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction – StructuralVibration.jl</title>
+<title>Visualization extension – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,10 +20,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -68,6 +102,12 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
 
 
 </head>
@@ -130,7 +170,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../visualization/index.html">Introduction</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../visualization/index.html">Visualization extension</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -145,7 +185,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../visualization/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Introduction</span></a>
+ <span class="menu-text">Visualization extension</span></a>
   </div>
 </li>
     </ul>
@@ -153,15 +193,27 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#bode-plot" id="toc-bode-plot" class="nav-link active" data-scroll-target="#bode-plot"><span class="header-section-number">1</span> Bode plot</a></li>
+  <li><a href="#nyquist-plot" id="toc-nyquist-plot" class="nav-link" data-scroll-target="#nyquist-plot"><span class="header-section-number">2</span> Nyquist plot</a>
+  <ul class="collapse">
+  <li><a href="#d-plot" id="toc-d-plot" class="nav-link" data-scroll-target="#d-plot"><span class="header-section-number">2.1</span> 2D plot</a></li>
+  <li><a href="#d-plot-1" id="toc-d-plot-1" class="nav-link" data-scroll-target="#d-plot-1"><span class="header-section-number">2.2</span> 3D plot</a></li>
+  </ul></li>
+  <li><a href="#waterfall-plot" id="toc-waterfall-plot" class="nav-link" data-scroll-target="#waterfall-plot"><span class="header-section-number">3</span> Waterfall plot</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Introduction</h1>
+<h1 class="title">Visualization extension</h1>
 </div>
 
 
@@ -178,8 +230,194 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p><code>StructuralVibration.jl</code> is accompanied by two extensions <code>CairoMakieExt.jl</code> and <code>GLMakieExt.jl</code> providing visualization capabilities. The extensions provide a set of functions to visualize the results of the structural dynamics analysis.</p>
+<p>To use one of these extensions, you need to import the desired plotting package by running the following command:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">GLMakie</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="bode-plot" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="bode-plot"><span class="header-section-number">1</span> Bode plot</h2>
+<p>A Bode plot is a graph of the magnitude and phase of a transfer function versus frequency.</p>
+<div class="api">
+<p><strong>bode_plot</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>bode_plot(freq, y; lw = 1., xlab = "Frequency (Hz)",
+          ylab = "Magnitude (dB)", xscale = identity,
+          axis_tight = true, isdeg = false, layout = :vertical,
+          ref_dB = 1., legend = (active = false, position = :rt, entry = " "),
+          fonts = DEFAULT_MAKIE_FONTS)</code></pre>
+<p>Plot Bode diagram of a frequency response or a FRF.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>freq</code>: Frequency range of interest</p>
+</li>
+<li><p><code>y</code>: Frequency response or FRF</p>
+</li>
+<li><p><code>lw</code>: Line width</p>
+</li>
+<li><p><code>theme</code>: Theme (default: :makie)</p>
+</li>
+<li><p><code>xlab</code>: x-axis label</p>
+</li>
+<li><p><code>xscale</code>: x-axis scale (default: :log)</p>
+</li>
+<li><p><code>axis_tight</code>: Tight axis (default: false)</p>
+</li>
+<li><p><code>isdeg</code>: Phase in degrees (default: false)</p>
+</li>
+<li><p><code>layout</code>: Layout of the plot (default: :vertical)</p>
+</li>
+<li><p><code>ref_dB</code>: Reference value for magnitude (default: 1.)</p>
+</li>
+<li><p><code>legend</code>: Legend parameters (default: (active = false, position = :rt, entry = " "))</p>
+</li>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT<em>MAKIE</em>FONTS)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>fig</code>: Figure</p>
+</li>
+</ul>
 
 
+</div>
+</div>
+</div>
+</div>
+<div id="6" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize a Sdof type</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>f₀ <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, ξ)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation parameters</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">1</span>.<span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">30</span>.</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the FRF</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">SdofFRFProblem</span>(sdof, freq)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob_frf).u</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Bode plot</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">bode_plot</span>(freq, H)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-4-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nyquist-plot" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="nyquist-plot"><span class="header-section-number">2</span> Nyquist plot</h2>
+<p>The Nyquist plot is either a 2D or 3D plot. In 2D, it is a graph of the imaginary part versus the real part of the transfer function. In 3D, it is a graph of the imaginary part versus the real part of the transfer function and the frequency.</p>
+<section id="d-plot" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="d-plot"><span class="header-section-number">2.1</span> 2D plot</h3>
+<div class="api">
+<p><strong>nyquist_plot</strong></p>
+<hr>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>nyquist_plot(y; theme = :makie fonts = DEFAULT_MAKIE_FONTS)</code></pre>
+<p>Plot Nyquist diagram</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>y</code>: Complex vector</p>
+</li>
+<li><p><code>theme</code>: Theme (default: :makie)</p>
+</li>
+<li><p><code>fonts</code>: Fonts of the figure</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>fig</code>: Figure</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="10" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nyquist_plot</span>(H)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="d-plot-1" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="d-plot-1"><span class="header-section-number">2.2</span> 3D plot</h3>
+<div class="api">
+<p><strong>nyquist_plot</strong></p>
+<hr>
+<div id="12" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>nyquist_plot(freq, y, xlab = "Frequency (Hz)"; theme = :makie,
+             projection = false, fonts = DEFAULT_MAKIE_FONTS)</code></pre>
+<p>Plot Nyquist diagram in 3D</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>freq</code>: Frequency range</p>
+</li>
+<li><p><code>y</code>: Complex vector</p>
+</li>
+<li><p><code>ylabel</code>: y-axis label</p>
+</li>
+<li><p><code>theme</code>: Theme (default: :makie)</p>
+</li>
+<li><p><code>projection</code>: Projection of the curve on the xy, yz, and xz planes (default: false)</p>
+<ul>
+<li><p>on the xy plane: (freq, real(y))</p>
+</li>
+<li><p>on the yz plane: (imag(y), freq)</p>
+</li>
+<li><p>on the xz plane: (real(y), imag(y))</p>
+</li>
+</ul>
+</li>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT<em>MAKIE</em>FONTS)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>fig</code>: Figure</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nyquist_plot</span>(freq, H, projection <span class="op">=</span> <span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="waterfall-plot" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="waterfall-plot"><span class="header-section-number">3</span> Waterfall plot</h2>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
