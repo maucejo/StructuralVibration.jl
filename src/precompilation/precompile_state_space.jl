@@ -3,6 +3,7 @@
     dss = c2d(css, 1e-3, :zoh)
 
     λss, Ψss = eigenmode(css.Ac)
+    Ψr = c2r_modeshape(Ψss)
     ωss, ξss = modal_parameters(λss)
 
     ωₙ, ϕₙ = eigenmode(k_ss, m_ss)

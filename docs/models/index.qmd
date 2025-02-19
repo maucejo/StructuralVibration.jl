@@ -20,7 +20,7 @@ using StructuralVibration
 
 ### 1D models {#sec-1d-models}
 
-#### Bar, Rod and strings
+#### Bars, Rods and strings
 
 Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form:
 $$
@@ -43,8 +43,9 @@ where:
 
   - $p(x, t)$: Distributed longitudinal force [N/m]
 
-  - $m = \rho S$: Linear mass density [Kg/m^2^]
-      - $\rho$: Mass density [kg/m^3^] and $S$: Cross-section area [m^2^]
+  - $m = \rho S$: Linear mass density [kg/m^2^]
+      - $\rho$: Mass density [kg/m^3^]
+      - $S$: Cross-section area [m^2^]
 
   - $D = E S$: Longitudinal stiffness [N]
       - $E$: Young's modulus [Pa]
@@ -71,7 +72,7 @@ where:
 
   - $D$: Tension force [N]
 
-#### Beam
+#### Euler-Bernoulli beams
 
 Euler-Bernoulli beams are governed by the following equation of motion:
 $$
@@ -134,7 +135,7 @@ All the following data types are a subtype of the super type `OneDtype`.
 ```
 :::
 
-**Associated functions**
+**Related functions**
 
 ::: {.api}
 **modefreq**
@@ -213,9 +214,9 @@ where:
 
 - $\Delta = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}$: Laplacian operator
 
-#### Rectangular plate
+#### Rectangular Kirchhoff-Love plates
 
-Rectangular plates are governed by the following equation of motion:
+Rectangular Kirchhoff-Love plates are governed by the following equation of motion:
 $$
 m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 $$
@@ -235,7 +236,7 @@ where:
 
 **Data type**
 
-All the following data types are a subtype of the super type `TwoDtype`.
+All the following data types are a subtype of the super type `TwoDStructure`.
 
 ::: {.api}
 **Membrane**
@@ -257,7 +258,7 @@ All the following data types are a subtype of the super type `TwoDtype`.
 ```
 :::
 
-**Associated functions**
+**Related functions**
 
 ::: {.api}
 **modefreq**
@@ -427,7 +428,7 @@ $$
 ```
 :::
 
-**Associated functions**
+**Related functions**
 
 ::: {.api}
 **assembly**
@@ -532,7 +533,7 @@ Finite element models are available for the 1D continuous systems defined in @se
 ```
 :::
 
-**Associated functions**
+**Related functions**
 
 ::: {.api}
 **assemby**
@@ -648,7 +649,7 @@ where:
 
 - $\mathbf{B}_c$: Input matrix
 
-### Continuous model
+### Continuous-time models
 
 For a mechanical system, whose equation of motion is:
 $$
@@ -695,14 +696,196 @@ where $\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_N^2)$ and $\mat
 
 #### API
 
+**Data type**
+
+::: {.api}
+**ContinuousStateSpace**
+
+---
+```{julia}
+@doc ContinuousStateSpace
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**ss_model**
+
+---
+```{julia}
+#| echo: false
+@doc ss_model
+```
+:::
+
+::: {.api}
+**ss_modal_model**
+
+---
+```{julia}
+#| echo: false
+@doc ss_modal_model
+```
+:::
+
+::: {.api}
+**eigenmode**
+
+---
+```{julia}
+#| echo: false
+@doc eigenmode(Ac::Matrix{Float64}, Nₘ::Int = 0)
+```
+:::
+
+::: {.api}
+**modal_parameters**
+
+---
+```{julia}
+#| echo: false
+@doc modal_parameters
+```
+:::
+
+::: {.api}
+**c2r_modeshape**
+
+---
+```{julia}
+#| echo: false
+@doc c2r_modeshape
+```
+:::
 
 #### Example
 
+```julia
+# System matrices
+m_ss = Diagonal([2., 1.])
+k_ss = [6. -2.; -2. 4.]
+c_ss = [0.67 -0.11; -0.11 0.39]
 
-### Discrete models
 
+# Continuous-time state space from system matrices
+css = ss_model(k_ss, m_ss, c_ss)
+λ, Ψ = eigenmode(css.Ac)
+ω, ξ = modal_parameters(λss)
+Ψr = c2r_modeshape(Ψ)
+
+
+# Continuous-time state space from modal information
+ωₙ, ϕₙ = eigenmode(k_ss, m_ss)
+css_modal = ss_modal_model(ωₙ, 0.01, ϕₙ)
+```
+
+### Discrete-time models
+
+Discrete-time models can be either be obtained using sampled strategies from direct-time integration methods (e.g. Newmark's scheme). However, both approaches lead to a discrete-time state equation of the form:
+$$
+	\mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{z}_k + \mathbf{B}_f\, \mathbf{u}_k + \mathbf{B}_g\, \mathbf{u}_{k+1},
+$$
+
+The previous formulation is rather non-standard, since the state vector at frequency step $k + 1$ requires the knowledge of the input vector at time steps $k$ and $k + 1$. To reduce the state-space representation to its standard form, a reduced state $\mathbf{\overline{z}}_{k+1}$ is introduced:
+$$
+	\mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{x}_k + \mathbf{B}_f\, \mathbf{u}_k,
+$$
+
+In doing so, the discretized state equation becomes:
+$$
+	\mathbf{\overline{z}}_{k+1} = \mathbf{A}\, \mathbf{\overline{z}}_k + \mathbf{B}\, \mathbf{u}_k
+$$
+where $\mathbf{B} = \mathbf{B}_f + \mathbf{A\, B}_g$.
+
+#### Sampling methods
+
+Sampling methods are based on the discretization of the solution of the continuous-time state equation. Once discretized, the state equation can be written as:
+$$
+\mathbf{z}_{k+1} = \mathbf{A} \, \mathbf{z}_k + \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,\mathbf{u}(\tau + kh)\, d\tau,
+$$
+where $\mathbf{A} = e^{\mathbf{A_c} h}$ is the the discretized system matrix and $h$ is the discretization timestep.
+
+To cover a wide range of situations, the input vector is assumed to be parameterized as follows:
+$$
+\mathbf{u}(\tau + kh) = f(\tau)\, \mathbf{u}_k + g(\tau)\, \mathbf{u}_{k+1},
+$$
+where the basis function $f(\tau)$ and $g(\tau)$ control the evolution of the input vector between two time steps.
+
+Introducing the parameterization of the input vector into the convolution integral, one obtains the following state equation:
+$$
+	\mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{z}_k + \mathbf{B}_f\, \mathbf{u}_k + \mathbf{B}_g\, \mathbf{u}_{k+1},
+$$
+where $\mathbf{B}_f$ and $\mathbf{B}_g$ are the discretized input matrices defined such that:
+$$
+	\mathbf{B}_f = \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,f(\tau)\, d\tau \; \text{ and } \; \mathbf{B}_g = \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,g(\tau)\, d\tau.
+$$
+
+In the literature, the most commonly used sampling methods are the following[^1]:
+
+[^1]: D. Bernal. "Optimal discrete to continuous transfer for band limited inputs", *Journal of Engineering Mechanics*, vol. 133 (12), pp. 1370-1377, 2007.
+
+-  The Zero-Order Hold (ZOH) strategy, which assumes that the input vector is constant between two samples. This assumption is satisfied for $f(\tau) = 1$ and $g(\tau) = 0$ and leads to:
+$$
+		\mathbf{B} = \mathbf{B}_f = (\mathbf{A} - \mathbf{I})\, \mathbf{A}_\mathbf{c}^{-1}\, \mathbf{B_c}.
+$$
+
+- The First-Order Hold (FOH) sampling method, which assumes that the input vector varies linearly between two samples. This assumption is satisfied for $f(\tau) = 1 - \tau/h$ and $g(\tau) = \tau/h$ and leads to:
+$$
+		\begin{split}
+			&\mathbf{B}_f + \mathbf{B}_g = (\mathbf{A} - \mathbf{I})\, \mathbf{A}_\mathbf{c}^{-1}\, \mathbf{B_c}, \\
+			&\mathbf{B}_g = (\mathbf{A} - \mathbf{A_c}h - \mathbf{I})\mathbf{A}_\mathbf{c}^{-2}\, \mathbf{B_c}/h.
+		\end{split}
+$$
+
+- The Band-Limited Hold (BLH) sampling method, which assumes that the input signal can be approximated as a band-limited signal (i.e. the energy of the signal is concentrated in a defined frequency range). This assumption is satisfied for $f(\tau) = h\, \delta(\tau)$ and $g(\tau) = 0$, where $\delta(\tau)$ is the Dirac delta function and leads to:
+$$
+		\mathbf{B} = \mathbf{B}_f = \mathbf{A}\, \mathbf{B_c}\, h.
+$$
+
+#### Direct-time integration based methods
+
+Despite several methods can be found in the literature, such as the Newmark's family schemes, this package only provides the Runge-Kutta approach, because it is an explicit method (i.e. does not require any matrix inversion). After some calculation not detailed here[^2], the discrete system and input matrices are expressed as:
+$$
+	\begin{split}
+	&\mathbf{A} = \frac{1}{24}\left[24\,(\mathbf{I} + \mathbf{A_c}\, h) + 12\, \mathbf{A}_\mathbf{c}^2\, h^2 + 4\, \mathbf{A}_\mathbf{c}^3\, h^3 + \mathbf{A}_\mathbf{c}^4\, h^4\right], \\
+	&\mathbf{B}_f = \frac{h}{24}\left[12\, \mathbf{I} + 8\, \mathbf{A_c}\, h + 3 \mathbf{A}_\mathbf{c}^2\, h^2 + \mathbf{A}_\mathbf{c}^3\, h^3\right]\mathbf{B_c}, \\
+	&\mathbf{B}_g = \frac{h}{24}\left[12\, \mathbf{I} + 4\, \mathbf{A_c}\, h + \mathbf{A}_\mathbf{c}^2\, h^2\right]\mathbf{B_c}.
+	\end{split}
+$$
+
+[^2]: For further details, see: J. Ghibaudo. "Inverse estimation of sparse mechanical excitation sources by Bayesian filtering", *PhD thesis*, Conservatoire national des arts et métiers, 2024.
 
 #### API
 
+**Data type**
+
+::: {.api}
+**DiscreteStateSpace**
+
+---
+```{julia}
+#| echo: false
+
+@doc DiscreteStateSpace
+```
+:::
+
+**Related function**
+
+::: {.api}
+**c2d**
+
+---
+```{julia}
+#| echo: false
+
+@doc c2d
+```
+:::
 
 #### Example
+
+```julia
+dss = c2d(css, 0.01, :zoh)
+```

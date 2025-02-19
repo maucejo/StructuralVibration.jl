@@ -42,7 +42,7 @@ export modefreq, modeshape, eigenmode, modal_matrices, modal_effective_mass,
 
 export agwn, acn, mult_noise, mixed_noise, varest, estimated_SNR, denoising
 
-export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshapes
+export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
 
 export freq_extraction, modeshape_extraction
 
@@ -98,5 +98,5 @@ include("models/noise.jl")
 include("utils/visualization.jl")
 
 # Include files - Precompilation
-include("precompilation/precompilation.jl")
+# include("precompilation/precompilation.jl")
 end

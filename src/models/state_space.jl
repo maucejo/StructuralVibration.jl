@@ -3,7 +3,7 @@
 
 Continuous-time state-space model
 
-# Fields
+**Fields**
 * `Ac`: Continuous-time state matrix A
 * `Bc`: Continuous-time input matrix B
 """
@@ -17,7 +17,7 @@ end
 
 Discrete-time state-space model
 
-# Fields
+**Fields**
 * `Ad`: Discrete-time state matrix A
 * `Bd`: Discrete-time input matrix B
 * `Bdp`: Discrete-time input matrix Bp (only for `:foh` method)
@@ -44,6 +44,7 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
     * `:zoh`: Zero-order Hold method
     * `:foh`: First-order Hold method
     * `:blh`: Band-limited Hold method
+    * `:rk4`: 4th order Runge-Kutta method
 
 **Output**
 * `DiscreteStateSpace`: Discrete-time state-space model
@@ -127,7 +128,9 @@ Computes the eigenmodes of a continuous-time state-space model
 
 **Inputs**
 * `Ac`: Continuous-time state-space matrix
-* `Nₘ`: Number of eigenmodes to keep in the modal basis (default: empty)
+* `Nₘ`: Number of eigenmodes to keep in the modal basis (default: 0)
+
+*Note: `Nₘ` is the number of mode pairs to keep in the basis*
 
 **Outputs**
 * `λ`: Eigenvalues
@@ -150,7 +153,7 @@ end
 
 Computes the natural angular frequencies and damping ratios from the complex eigenvalues
 
-# Input
+**Input**
 * `λ`: Complex eigenvalues
 
 **Outputs**
@@ -167,17 +170,17 @@ function modal_parameters(λ)
 end
 
 """
-    c2r_modeshapes(Ψ)
+    c2r_modeshape(Ψ)
 
 Converts the complex modes to real modes
 
-# Input
+**Input**
 * `Ψ`: Complex modes
 
 **Output**
 * `ϕₙ`: Real modes
 """
-function c2r_modeshapes(Ψ)
+function c2r_modeshape(Ψ)
 
     M, Nmodes = size(Ψ)
     Ψₙ = Ψ[1:2:M, :]
@@ -191,7 +194,7 @@ function c2r_modeshapes(Ψ)
         p = polyfit(x, y, 1)
 
         # Angle of maximum correlation line
-        θ = atan.(p[1])
+        θ = atan(p[1])
 
         ϕₙ[:, i] = real(Ψᵢ*exp(-1im*θ))
     end

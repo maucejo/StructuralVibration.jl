@@ -1,7 +1,7 @@
 # Excitation
 rectangle = Rectangle(F₀, tstart, duration)
 triangle = Triangle(F₀, tstart, duration)
-hammer = Hammer(F₀, tstart, 9.7, 6e-4)
+hammer = Hammer(F₀, tstart, 8.7, 6e-4)
 smoothrect = SmoothRect(F₀, tstart, duration, 5Δt)
 sinewave = SineWave(F₀, tstart, duration, 10.)
 halfsine = HalfSine(F₀, tstart, duration)

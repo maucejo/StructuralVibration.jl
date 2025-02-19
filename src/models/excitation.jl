@@ -40,13 +40,13 @@ Struct to define a hammer impact excitation signal
 **Fields**
 * `F₀`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
-* `k`: Shape parameter
+* `p`: Shape parameter
 * `θ`: Intensity parameter [s]
 """
 @with_kw struct Hammer <: ArbitraryExc
     F₀::Float64
     tstart::Float64
-    k::Float64
+    p::Float64
     θ::Float64
 end
 
@@ -60,6 +60,8 @@ Struct to define a smooth rectangular excitation signal
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 * `trise`: Rise time from 0 to F₀ [s]
+
+*Note: `SmoothRect` is actually a custom Tukey window for which the coefficient α is computed to satisfy the `trise` given by the user*
 """
 @with_kw struct SmoothRect <: ArbitraryExc
     F₀::Float64
@@ -241,12 +243,10 @@ function excitation(type::Rectangle, t)
     (; F₀, tstart, duration) = type
     Ft = zeros(length(t))
 
-    pos_start = argmin(@. (t - tstart)^2.)
-    pos_end = argmin(@. (t - tstart - duration)^2.)
+    tb = tstart
+    te = tstart + duration
 
-    pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
-
-    Ft[pos_exc_t] .= F₀
+    Ft[@. tb ≤ t ≤ te] .= F₀
 
     return Ft
 end
@@ -258,13 +258,15 @@ function excitation(type::Triangle, t)
 
     Ft = zeros(length(t))
 
+    # trise = (tbegin + tend)/2
     trise = (2tstart + duration)/2.
+
     pos_start = argmin(@. (t .- tstart)^2.)
     pos_middle = argmin(@. (t - trise)^2.)
     pos_end = argmin(@. (t - tstart - duration)^2.)
     amp = 2F₀/duration
 
-    @. Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] - type.tstart)
+    @. Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] - tstart)
     @. Ft[pos_middle + 1:pos_end] = F₀ - amp*(t[pos_middle + 1:pos_end] - trise)
 
     return Ft
@@ -273,7 +275,7 @@ end
 # Hammer excitation
 function excitation(type::Hammer, t)
 
-    (; F₀, tstart, k, θ) = type
+    (; F₀, tstart, p, θ) = type
 
     Ft = zeros(length(t))
 
@@ -284,7 +286,7 @@ function excitation(type::Hammer, t)
 
     t_hammer = @. t[pos_start:end] - tstart
 
-    @. Ft[pos_start:end] = F₀*t_hammer^(k - 1.)*exp(-t_hammer/θ)/((k - 1.)*θ)^(k - 1.)/exp(1. - k)
+    @. Ft[pos_start:end] = F₀*(t_hammer/p/θ)^p*exp(-t_hammer/θ + p)
 
     return Ft
 end
@@ -463,7 +465,7 @@ function excitation(type::GaussianPulse, t)
     tpulse = t[pos_start:end] .- tstart .- duration/2
 
     # The precision parameter calibrates the standard deviation of the pulse, so that the duration = n*σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n*σ , the amplitude of F₀*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
-    n = 2sqrt(precision*2log(10) + 2log(F₀))
+    n = 2sqrt(2(precision*log(10) + log(F₀)))
     σ = duration/n
 
     @. Ft[pos_start:end] = F₀*exp(-0.5*(tpulse/σ)^2)*cos(2π*fc*tpulse)
@@ -488,7 +490,7 @@ function excitation(type::ColoredNoise, t)
         white_fft = rfft(randn(N))
         freq = rfftfreq(N, fs)
 
-        scale = ones(length(freq))
+        scale = zeros(length(freq))
         if color == :pink
             @. scale[2:end] = 1/sqrt(freq[2:end])
         elseif color == :blue
