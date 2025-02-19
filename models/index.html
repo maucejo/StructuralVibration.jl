@@ -105,7 +105,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -221,6 +224,12 @@ window.Quarto = {
  <span class="menu-text">Excitation models</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/noise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Noise models</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -244,8 +253,8 @@ window.Quarto = {
   </ul></li>
   <li><a href="#state-space-representation" id="toc-state-space-representation" class="nav-link" data-scroll-target="#state-space-representation"><span class="header-section-number">3</span> State space representation</a>
   <ul class="collapse">
-  <li><a href="#continuous-model" id="toc-continuous-model" class="nav-link" data-scroll-target="#continuous-model"><span class="header-section-number">3.1</span> Continuous model</a></li>
-  <li><a href="#discrete-models-1" id="toc-discrete-models-1" class="nav-link" data-scroll-target="#discrete-models-1"><span class="header-section-number">3.2</span> Discrete models</a></li>
+  <li><a href="#continuous-time-models" id="toc-continuous-time-models" class="nav-link" data-scroll-target="#continuous-time-models"><span class="header-section-number">3.1</span> Continuous-time models</a></li>
+  <li><a href="#discrete-time-models" id="toc-discrete-time-models" class="nav-link" data-scroll-target="#discrete-time-models"><span class="header-section-number">3.2</span> Discrete-time models</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -276,8 +285,8 @@ window.Quarto = {
 <h2 data-number="1" class="anchored" data-anchor-id="continuous-models"><span class="header-section-number">1</span> Continuous models</h2>
 <section id="sec-1d-models" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="sec-1d-models"><span class="header-section-number">1.1</span> 1D models</h3>
-<section id="bar-rod-and-strings" class="level4" data-number="1.1.1">
-<h4 data-number="1.1.1" class="anchored" data-anchor-id="bar-rod-and-strings"><span class="header-section-number">1.1.1</span> Bar, Rod and strings</h4>
+<section id="bars-rods-and-strings" class="level4" data-number="1.1.1">
+<h4 data-number="1.1.1" class="anchored" data-anchor-id="bars-rods-and-strings"><span class="header-section-number">1.1.1</span> Bars, Rods and strings</h4>
 <p>Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form: <span class="math display">\[
 m \ddot y(x, t) - D \frac{\partial^2 y(x,t)}{\partial x^2} = p(x, t),
 \]</span> where:</p>
@@ -327,8 +336,8 @@ m \ddot y(x, t) - D \frac{\partial^2 y(x,t)}{\partial x^2} = p(x, t),
 <li><p><span class="math inline">\(D\)</span>: Tension force [N]</p></li>
 </ul>
 </section>
-<section id="beam" class="level4" data-number="1.1.2">
-<h4 data-number="1.1.2" class="anchored" data-anchor-id="beam"><span class="header-section-number">1.1.2</span> Beam</h4>
+<section id="euler-bernoulli-beams" class="level4" data-number="1.1.2">
+<h4 data-number="1.1.2" class="anchored" data-anchor-id="euler-bernoulli-beams"><span class="header-section-number">1.1.2</span> Euler-Bernoulli beams</h4>
 <p>Euler-Bernoulli beams are governed by the following equation of motion: <span class="math display">\[
 m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 \]</span> where:</p>
@@ -482,7 +491,7 @@ m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 </div>
 </div>
 </div>
-<p><strong>Associated functions</strong></p>
+<p><strong>Related functions</strong></p>
 <div class="api">
 <p><strong>modefreq</strong></p>
 <hr>
@@ -644,9 +653,9 @@ m \ddot w(x, y ,t) + D\Delta w(x, y, t) = p(x, y, t),
 <li><p><span class="math inline">\(\Delta = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}\)</span>: Laplacian operator</p></li>
 </ul>
 </section>
-<section id="rectangular-plate" class="level4" data-number="1.2.2">
-<h4 data-number="1.2.2" class="anchored" data-anchor-id="rectangular-plate"><span class="header-section-number">1.2.2</span> Rectangular plate</h4>
-<p>Rectangular plates are governed by the following equation of motion: <span class="math display">\[
+<section id="rectangular-kirchhoff-love-plates" class="level4" data-number="1.2.2">
+<h4 data-number="1.2.2" class="anchored" data-anchor-id="rectangular-kirchhoff-love-plates"><span class="header-section-number">1.2.2</span> Rectangular Kirchhoff-Love plates</h4>
+<p>Rectangular Kirchhoff-Love plates are governed by the following equation of motion: <span class="math display">\[
 m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 \]</span> where:</p>
 <ul>
@@ -665,7 +674,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <section id="api-1" class="level4" data-number="1.2.3">
 <h4 data-number="1.2.3" class="anchored" data-anchor-id="api-1"><span class="header-section-number">1.2.3</span> API</h4>
 <p><strong>Data type</strong></p>
-<p>All the following data types are a subtype of the super type <code>TwoDtype</code>.</p>
+<p>All the following data types are a subtype of the super type <code>TwoDStructure</code>.</p>
 <div class="api">
 <p><strong>Membrane</strong></p>
 <hr>
@@ -727,7 +736,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 </div>
 </div>
 </div>
-<p><strong>Associated functions</strong></p>
+<p><strong>Related functions</strong></p>
 <div class="api">
 <p><strong>modefreq</strong></p>
 <hr>
@@ -1000,7 +1009,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 </div>
 </div>
-<p><strong>Associated functions</strong></p>
+<p><strong>Related functions</strong></p>
 <div class="api">
 <p><strong>assembly</strong></p>
 <hr>
@@ -1234,7 +1243,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </div>
 </div>
 </div>
-<p><strong>Associated functions</strong></p>
+<p><strong>Related functions</strong></p>
 <div class="api">
 <p><strong>assemby</strong></p>
 <hr>
@@ -1434,8 +1443,8 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <li><p><span class="math inline">\(\mathbf{A}_c\)</span>: System matrix</p></li>
 <li><p><span class="math inline">\(\mathbf{B}_c\)</span>: Input matrix</p></li>
 </ul>
-<section id="continuous-model" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="continuous-model"><span class="header-section-number">3.1</span> Continuous model</h3>
+<section id="continuous-time-models" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="continuous-time-models"><span class="header-section-number">3.1</span> Continuous-time models</h3>
 <p>For a mechanical system, whose equation of motion is: <span class="math display">\[
 \mathbf{M}\ddot{\mathbf{x}}(t) + \mathbf{C}\dot{\mathbf{x}}(t) + \mathbf{K x}(t) = \mathbf{u}(t),
 \]</span> the corresponding continuous-time state equation is given by: <span class="math display">\[
@@ -1472,25 +1481,312 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 \]</span> where <span class="math inline">\(\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_N^2)\)</span> and <span class="math inline">\(\mathbf{\Xi} = \text{diag}(2\xi_1\omega_1, \dots, 2\xi_N\omega_N)\)</span>.</p>
 <section id="api-4" class="level4" data-number="3.1.1">
 <h4 data-number="3.1.1" class="anchored" data-anchor-id="api-4"><span class="header-section-number">3.1.1</span> API</h4>
+<p><strong>Data type</strong></p>
+<div class="api">
+<p><strong>ContinuousStateSpace</strong></p>
+<hr>
+<div id="50" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@doc</span> ContinuousStateSpace</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>ContinuousStateSpace(Ac::Matrix{Float64}, Bc::Matrix{Float64})</code></pre>
+<p>Continuous-time state-space model</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>Ac</code>: Continuous-time state matrix A</p>
+</li>
+<li><p><code>Bc</code>: Continuous-time input matrix B</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related functions</strong></p>
+<div class="api">
+<p><strong>ss_model</strong></p>
+<hr>
+<div id="52" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>ss_model(K, M, C)</code></pre>
+<p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>K</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>C</code>: Damping matrix</p>
+</li>
+</ul>
+<p><strong>Output</strong> <code>css</code>: ContinuousStateSpace</p>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>ss_modal_model</strong></p>
+<hr>
+<div id="54" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>ss_modal_model(ωₙ , ξₙ, ϕₙ)</code></pre>
+<p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>ωₙ</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ξₙ</code>: Damping ratios</p>
+</li>
+<li><p><code>ϕₙ</code>: Mass-normalized mode shapes</p>
+</li>
+</ul>
+<p><strong>Output</strong> <code>css</code>: ContinuousStateSpace</p>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>eigenmode</strong></p>
+<hr>
+<div id="56" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>eigenmode(K, M, Nₘ = size(K, 1))</code></pre>
+<p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>K</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>Nₘ</code>: Number of modes to be keep in the modal basis</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>ωₘ</code>: Vector of natural frequencies</p>
+</li>
+<li><p><code>Φₘ</code>: Mass-normalized mode shapes</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modal_parameters</strong></p>
+<hr>
+<div id="58" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modal_parameters(λ)</code></pre>
+<p>Computes the natural angular frequencies and damping ratios from the complex eigenvalues</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>λ</code>: Complex eigenvalues</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>ωₙ</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ξₙ</code>: Damping ratios</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>c2r_modeshape</strong></p>
+<hr>
+<div id="60" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>c2r_modeshape(Ψ)</code></pre>
+<p>Converts the complex modes to real modes</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>Ψ</code>: Complex modes</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>ϕₙ</code>: Real modes</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="example-5" class="level4" data-number="3.1.2">
 <h4 data-number="3.1.2" class="anchored" data-anchor-id="example-5"><span class="header-section-number">3.1.2</span> Example</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System matrices</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>m_ss <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>k_ss <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>c_ss <span class="op">=</span> [<span class="fl">0.67</span> <span class="op">-</span><span class="fl">0.11</span>; <span class="op">-</span><span class="fl">0.11</span> <span class="fl">0.39</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from system matrices</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>ωₙ, ϕₙ <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωₙ, <span class="fl">0.01</span>, ϕₙ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="discrete-models-1" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="discrete-models-1"><span class="header-section-number">3.2</span> Discrete models</h3>
-<section id="api-5" class="level4" data-number="3.2.1">
-<h4 data-number="3.2.1" class="anchored" data-anchor-id="api-5"><span class="header-section-number">3.2.1</span> API</h4>
+<section id="discrete-time-models" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="discrete-time-models"><span class="header-section-number">3.2</span> Discrete-time models</h3>
+<p>Discrete-time models can be either be obtained using sampled strategies from direct-time integration methods (e.g.&nbsp;Newmark’s scheme). However, both approaches lead to a discrete-time state equation of the form: <span class="math display">\[
+    \mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{z}_k + \mathbf{B}_f\, \mathbf{u}_k + \mathbf{B}_g\, \mathbf{u}_{k+1},
+\]</span></p>
+<p>The previous formulation is rather non-standard, since the state vector at frequency step <span class="math inline">\(k + 1\)</span> requires the knowledge of the input vector at time steps <span class="math inline">\(k\)</span> and <span class="math inline">\(k + 1\)</span>. To reduce the state-space representation to its standard form, a reduced state <span class="math inline">\(\mathbf{\overline{z}}_{k+1}\)</span> is introduced: <span class="math display">\[
+    \mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{x}_k + \mathbf{B}_f\, \mathbf{u}_k,
+\]</span></p>
+<p>In doing so, the discretized state equation becomes: <span class="math display">\[
+    \mathbf{\overline{z}}_{k+1} = \mathbf{A}\, \mathbf{\overline{z}}_k + \mathbf{B}\, \mathbf{u}_k
+\]</span> where <span class="math inline">\(\mathbf{B} = \mathbf{B}_f + \mathbf{A\, B}_g\)</span>.</p>
+<section id="sampling-methods" class="level4" data-number="3.2.1">
+<h4 data-number="3.2.1" class="anchored" data-anchor-id="sampling-methods"><span class="header-section-number">3.2.1</span> Sampling methods</h4>
+<p>Sampling methods are based on the discretization of the solution of the continuous-time state equation. Once discretized, the state equation can be written as: <span class="math display">\[
+\mathbf{z}_{k+1} = \mathbf{A} \, \mathbf{z}_k + \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,\mathbf{u}(\tau + kh)\, d\tau,
+\]</span> where <span class="math inline">\(\mathbf{A} = e^{\mathbf{A_c} h}\)</span> is the the discretized system matrix and <span class="math inline">\(h\)</span> is the discretization timestep.</p>
+<p>To cover a wide range of situations, the input vector is assumed to be parameterized as follows: <span class="math display">\[
+\mathbf{u}(\tau + kh) = f(\tau)\, \mathbf{u}_k + g(\tau)\, \mathbf{u}_{k+1},
+\]</span> where the basis function <span class="math inline">\(f(\tau)\)</span> and <span class="math inline">\(g(\tau)\)</span> control the evolution of the input vector between two time steps.</p>
+<p>Introducing the parameterization of the input vector into the convolution integral, one obtains the following state equation: <span class="math display">\[
+    \mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{z}_k + \mathbf{B}_f\, \mathbf{u}_k + \mathbf{B}_g\, \mathbf{u}_{k+1},
+\]</span> where <span class="math inline">\(\mathbf{B}_f\)</span> and <span class="math inline">\(\mathbf{B}_g\)</span> are the discretized input matrices defined such that: <span class="math display">\[
+    \mathbf{B}_f = \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,f(\tau)\, d\tau \; \text{ and } \; \mathbf{B}_g = \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,g(\tau)\, d\tau.
+\]</span></p>
+<p>In the literature, the most commonly used sampling methods are the following<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
+<ul>
+<li><p>The Zero-Order Hold (ZOH) strategy, which assumes that the input vector is constant between two samples. This assumption is satisfied for <span class="math inline">\(f(\tau) = 1\)</span> and <span class="math inline">\(g(\tau) = 0\)</span> and leads to: <span class="math display">\[
+     \mathbf{B} = \mathbf{B}_f = (\mathbf{A} - \mathbf{I})\, \mathbf{A}_\mathbf{c}^{-1}\, \mathbf{B_c}.
+\]</span></p></li>
+<li><p>The First-Order Hold (FOH) sampling method, which assumes that the input vector varies linearly between two samples. This assumption is satisfied for <span class="math inline">\(f(\tau) = 1 - \tau/h\)</span> and <span class="math inline">\(g(\tau) = \tau/h\)</span> and leads to: <span class="math display">\[
+      \begin{split}
+          &amp;\mathbf{B}_f + \mathbf{B}_g = (\mathbf{A} - \mathbf{I})\, \mathbf{A}_\mathbf{c}^{-1}\, \mathbf{B_c}, \\
+          &amp;\mathbf{B}_g = (\mathbf{A} - \mathbf{A_c}h - \mathbf{I})\mathbf{A}_\mathbf{c}^{-2}\, \mathbf{B_c}/h.
+      \end{split}
+\]</span></p></li>
+<li><p>The Band-Limited Hold (BLH) sampling method, which assumes that the input signal can be approximated as a band-limited signal (i.e.&nbsp;the energy of the signal is concentrated in a defined frequency range). This assumption is satisfied for <span class="math inline">\(f(\tau) = h\, \delta(\tau)\)</span> and <span class="math inline">\(g(\tau) = 0\)</span>, where <span class="math inline">\(\delta(\tau)\)</span> is the Dirac delta function and leads to: <span class="math display">\[
+      \mathbf{B} = \mathbf{B}_f = \mathbf{A}\, \mathbf{B_c}\, h.
+\]</span></p></li>
+</ul>
 </section>
-<section id="example-6" class="level4" data-number="3.2.2">
-<h4 data-number="3.2.2" class="anchored" data-anchor-id="example-6"><span class="header-section-number">3.2.2</span> Example</h4>
+<section id="direct-time-integration-based-methods" class="level4" data-number="3.2.2">
+<h4 data-number="3.2.2" class="anchored" data-anchor-id="direct-time-integration-based-methods"><span class="header-section-number">3.2.2</span> Direct-time integration based methods</h4>
+<p>Despite several methods can be found in the literature, such as the Newmark’s family schemes, this package only provides the Runge-Kutta approach, because it is an explicit method (i.e.&nbsp;does not require any matrix inversion). After some calculation not detailed here<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, the discrete system and input matrices are expressed as: <span class="math display">\[
+    \begin{split}
+    &amp;\mathbf{A} = \frac{1}{24}\left[24\,(\mathbf{I} + \mathbf{A_c}\, h) + 12\, \mathbf{A}_\mathbf{c}^2\, h^2 + 4\, \mathbf{A}_\mathbf{c}^3\, h^3 + \mathbf{A}_\mathbf{c}^4\, h^4\right], \\
+    &amp;\mathbf{B}_f = \frac{h}{24}\left[12\, \mathbf{I} + 8\, \mathbf{A_c}\, h + 3 \mathbf{A}_\mathbf{c}^2\, h^2 + \mathbf{A}_\mathbf{c}^3\, h^3\right]\mathbf{B_c}, \\
+    &amp;\mathbf{B}_g = \frac{h}{24}\left[12\, \mathbf{I} + 4\, \mathbf{A_c}\, h + \mathbf{A}_\mathbf{c}^2\, h^2\right]\mathbf{B_c}.
+    \end{split}
+\]</span></p>
+</section>
+<section id="api-5" class="level4" data-number="3.2.3">
+<h4 data-number="3.2.3" class="anchored" data-anchor-id="api-5"><span class="header-section-number">3.2.3</span> API</h4>
+<p><strong>Data type</strong></p>
+<div class="api">
+<p><strong>DiscreteStateSpace</strong></p>
+<hr>
+<div id="62" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>DiscreteStateSpace(Ad::Matrix{Float64}, Bd::Matrix{Float64}, Bdp::Matrix{Float64})</code></pre>
+<p>Discrete-time state-space model</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>Ad</code>: Discrete-time state matrix A</p>
+</li>
+<li><p><code>Bd</code>: Discrete-time input matrix B</p>
+</li>
+<li><p><code>Bdp</code>: Discrete-time input matrix Bp (only for <code>:foh</code> method)</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>c2d</strong></p>
+<hr>
+<div id="64" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>c2d(css::ContinuouStateSpace, h::Float64, method::Symbol)</code></pre>
+<p>Converts a continuous-time state-space model to a discrete-time state-space model.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>css</code>: Continuous-time state-space model</p>
+</li>
+<li><p><code>h</code>: Sampling time.</p>
+</li>
+<li><p><code>method::Symbol</code>: Discretization method</p>
+<ul>
+<li><p><code>:zoh</code>: Zero-order Hold method</p>
+</li>
+<li><p><code>:foh</code>: First-order Hold method</p>
+</li>
+<li><p><code>:blh</code>: Band-limited Hold method</p>
+</li>
+<li><p><code>:rk4</code>: 4th order Runge-Kutta method</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>DiscreteStateSpace</code>: Discrete-time state-space model</p>
+<ul>
+<li><p><code>Ad</code>: Discrete-time state-space matrix A</p>
+</li>
+<li><p><code>Bd</code>: Discrete-time state-space matrix B</p>
+</li>
+<li><p><code>Bdp</code>: Discrete-time state-space matrix Bp (only for <code>:foh</code> method)</p>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-6" class="level4" data-number="3.2.4">
+<h4 data-number="3.2.4" class="anchored" data-anchor-id="example-6"><span class="header-section-number">3.2.4</span> Example</h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dss <span class="op">=</span> <span class="fu">c2d</span>(css, <span class="fl">0.01</span>, <span class="op">:</span>zoh)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
 </section>
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>D. Bernal. “Optimal discrete to continuous transfer for band limited inputs”, <em>Journal of Engineering Mechanics</em>, vol.&nbsp;133 (12), pp.&nbsp;1370-1377, 2007.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>For further details, see: J. Ghibaudo. “Inverse estimation of sparse mechanical excitation sources by Bayesian filtering”, <em>PhD thesis</em>, Conservatoire national des arts et métiers, 2024.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
