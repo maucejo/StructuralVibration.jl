@@ -581,7 +581,7 @@ lines!(ax, t, F)
 display(fig);
 ```
 
-### Colored noise
+### Colored noise {#sec-colored-noise}
 
 Colored noise is a random signal that has a power spectral density that is not (necessarily) flat over a given frequency range. In practice, colored noise is also refered to as "power-law noise" since its power spectral density is proportional to $f^{-\alpha}$ ($f$: frequency) and its spectrum is proportional to $f^{-\alpha/2}$.
 

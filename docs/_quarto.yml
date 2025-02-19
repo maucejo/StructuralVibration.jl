@@ -33,11 +33,7 @@ website:
       contents:
         - models/index.qmd
         - models/excitation.qmd
-        # - models/noise.qmd
-      # Discrete models
-      # Continuous models
-      # Excitation models
-      # Noise models
+        - models/noise.qmd
 
     - title: "Solvers"
       contents:

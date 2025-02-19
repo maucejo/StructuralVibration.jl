@@ -1,15 +1,15 @@
 """
     agwn(x, snr_dB; rst = true)
 
-Adds a Gaussian White Noise (AWGN) to a signal `x` with a given SNR.
+Adds a Gaussian White Noise (AGWN) to a signal `x` with a given SNR.
 
-# Inputs
-* `x`: signal
+**Inputs**
+* `x`: Signal
 * `snr_dB`: signal to noise ratio [dB]
-* `rst`: reset the random number generator - Bool
+* `rst`: Reset the random number generator - Bool
 
-# Output
-* `y`: noisy signal - Matrix{ComplexF64}
+**Output**
+* `y`: Noisy signal
 """
 function agwn(x, snr_dB; rst = true)
 
@@ -33,7 +33,7 @@ end
 
 Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
 
-# Inputs
+**Inputs**
 * `x`: Signal
 * `snr_dB`: Signal to noise ratio [dB]
 * `freq`: Frequency range of interest
@@ -44,10 +44,10 @@ Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
     * `:brown`
     * `:purple`
 * `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
-* `rst`: reset the random number generator
+* `rst`: Reset the random number generator
 
-# Output
-* `y`: noisy signal
+**Output**
+* `y`: Noisy signal
 """
 function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color = :pink; rst = true)
 
@@ -85,11 +85,11 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color =
 end
 
 """
-    acn(x, snr_dB, color = :pink; band_freq = Float64[], rst = true)
+    acn(x, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
 
 Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
 
-# Inputs
+**Inputs**
 * `x`: Signal
 * `snr_dB`: Signal to noise ratio [dB]
 * `fs`: Sampling frequency [Hz]
@@ -100,10 +100,10 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
     * `:brown`
     * `:purple`
 * `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
-* `rst`: reset the random number generator
+* `rst`: Reset the random number generator
 
-# Output
-* `y`: noisy signal
+**Output**
+* `y`: Noisy signal
 """
 function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
 
@@ -178,19 +178,19 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float6
 end
 
 """
-    mult_noise(x, snr_dB; rst = true)
+    mgwn(x, snr_dB; rst = true)
 
-Adds a multiplicative Gaussian White Noise (AWGN) to a signal `x` with a given SNR
+Adds a multiplicative Gaussian White Noise (MGWN) to a signal `x` with a given SNR
 
-# Inputs
+**Inputs**
 * `x`: Signal
 * `snr_dB`: Signal to noise ratio [dB]
-* `rst`: reset the random number generator
+* `rst`: Reset the random number generator
 
-# Output
-* `y`: noisy signal
+**Output**
+* `y`: Noisy signal
 """
-function mult_noise(x, snr_dB; rst = true)
+function mgwn(x, snr_dB; rst = true)
 
     # Reset the RNG if required
     if rst
@@ -208,13 +208,13 @@ end
 
 Adds both additive and multiplicative Gaussian White Noise to a signal `x` with a given SNR
 
-# Inputs
+**Inputs**
 * `x`: Signal
 * `snr_dB`: Signal to noise ratio [dB]
-* `rst`: reset the random number generator
+* `rst`: Reset the random number generator
 
-# Output
-* `y`: noisy signal
+**Output**
+* `y`: Noisy signal
 """
 function mixed_noise(x, snr_dB; rst = true)
 

@@ -44,7 +44,7 @@ end
 
 Plot a 2D plot.
 
-# Inputs
+**Inputs**
 * `x`: x-axis values
 * `y`: y-axis values
 * `lw`: linewidth
@@ -58,9 +58,9 @@ Plot a 2D plot.
     * active : Bool
     * position : Symbol
     * entry : String
-* `fonts`: Fonts of the figure
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
-# Output
+**Output**
 * `fig`: Figure
 """
 function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
@@ -133,11 +133,15 @@ end
 
 
 """
-    bode_plot(freq, y; lw = 1., xlab = "Frequency (Hz)", ylab = "Magnitude (dB)", xscale = identity, axis_tight = true, isdeg = false, layout = :vertical, ref_dB = 1., legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
+    bode_plot(freq, y; lw = 1., xlab = "Frequency (Hz)",
+              ylab = "Magnitude (dB)", xscale = identity,
+              axis_tight = true, isdeg = false, layout = :vertical,
+              ref_dB = 1., legend = (active = false, position = :rt, entry = " "),
+              fonts = DEFAULT_MAKIE_FONTS)
 
 Plot Bode diagram of a frequency response or a FRF.
 
-# Inputs
+**Inputs**
 * `freq`: Frequency range of interest
 * `y`: Frequency response or FRF
 * `lw`: Line width
@@ -149,9 +153,9 @@ Plot Bode diagram of a frequency response or a FRF.
 * `layout`: Layout of the plot (default: :vertical)
 * `ref_dB`: Reference value for magnitude (default: 1.)
 * `legend`: Legend parameters (default: (active = false, position = :rt, entry = " "))
-* `fonts`: Fonts of the figure
+* `fonts`: Fonts of the figure (default: `DEFAULT\\_MAKIE\\_FONTS`)
 
-# Output
+**Output**
 * `fig`: Figure
 """
 function bode_plot(freq, y; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
@@ -253,16 +257,16 @@ function bode_plot(freq, y; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", 
 end
 
 """
-    nyquist_plot(y, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
+    nyquist_plot(y; theme = :makie fonts = DEFAULT_MAKIE_FONTS)
 
 Plot Nyquist diagram
 
-# Inputs
+**Inputs**
 * `y`: Complex vector
 * `theme`: Theme (default: :makie)
-* `fonts`: Fonts of the figure
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
-# Output
+**Output**
 * `fig`: Figure
 """
 function nyquist_plot(y::Vector{ComplexF64}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
@@ -277,56 +281,74 @@ function nyquist_plot(y::Vector{ComplexF64}, theme = :makie; fonts = DEFAULT_MAK
 end
 
 """
-    nyquist_plot(freq, y, xlab = "Frequency (Hz)"; fonts = DEFAULT_MAKIE_FONTS)
+    nyquist_plot(freq, y, xlab = "Frequency (Hz)"; theme = :makie,
+                 projection = false, fonts = DEFAULT_MAKIE_FONTS)
 
 Plot Nyquist diagram in 3D
 
-# Inputs
+**Inputs**
 * `freq`: Frequency range
 * `y`: Complex vector
 * `ylabel`: y-axis label
 * `theme`: Theme (default: :makie)
-* `projection`: Projection of the curve on the xy, yz, and xz planes
-* `fonts`: Fonts of the figure
+* `projection`: Projection of the curve on the xy, yz, and xz planes (default: false)
+    * on the xy plane: (freq, real(y))
+    * on the yz plane: (imag(y), freq)
+    * on the xz plane: (real(y), imag(y))
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
-# Output
+**Output**
 * `fig`: Figure
 """
 function nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS)
 
     set_theme!(theme_choice(theme))
     fig = Figure(fonts = fonts)
-    ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part")
+    ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part", aspect = (1, 2, 1))
 
     yr = real.(y)
     yi = imag.(y)
     lines!(ax, yr, freq, yi)
 
-    minyr, maxyr = extrema(yr)
-    minf, maxf = extrema(freq)
-    minyi, maxyi = extrema(yi)
-
     # Some checks
-    minyr == 0. ? minyr = -abs(maxyr) : nothing
-    maxyr == 0. ? maxyr = abs(minyr) : nothing
-    minyi == 0. ? minyi = -abs(maxyi) : nothing
-    maxyi == 0. ? maxyi = abs(minyi) : nothing
-    minf == 0. ? minf = -1. : nothing
+    minyr, maxyr = extrema(yr)
+    if minyr*maxyr > 0.
+        if maxyr > 0.
+            minyr -= 0.1maxyr
+        else
+            maxyr -= 0.1minyr
+        end
+    end
 
-    maxyrr = maximum(abs.(yr))
-    maxyii = maximum(abs.(yi))
+    minyi, maxyi = extrema(yi)
+    if minyi*maxyi > 0.
+        if maxyi > 0.
+            minyi -= 0.1maxyi
+        else
+            maxyi -= 0.1minyi
+        end
+    end
+
+    minf, maxf = extrema(freq)
+    if minf == 0.
+        minf = -0.1
+        α = 0.9
+    else
+        minf -= 0.1
+        α = 1.1
+    end
 
     ax.yreversed = true
 
     if projection
-        lines!(ax, yr, yi, color = :black, linewidth = 0.5, transformation = (:xz, minf))
+        lines!(ax, yr, yi, color = :black, linewidth = 0.5, transformation = (:xz, α*minf))
         lines!(ax, freq, yi, color = :black, linewidth = 0.5, transformation = (:yz, 1.09maxyr))
         lines!(ax, yr, freq, color = :black, linewidth = 0.5, transformation = (:yx, 1.09minyi))
     end
 
-    xlims!(ax, -1.1maxyrr, 1.1maxyrr)
+    xlims!(ax, 1.1minyr, 1.1maxyr)
     ylims!(ax, maxf, minf)
-    zlims!(ax, -1.1maxyii, 1.1maxyii)
+    zlims!(ax, 1.1minyi, 1.1maxyi)
 
     ax.zticklabelpad = 5.
 
@@ -334,11 +356,16 @@ function nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", th
 end
 
 """
-    waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)], fonts = DEFAULT_MAKIE_FONTS)
+    waterfall_plot(x, y, z; zmin = minimum(z), lw = 1.,
+                   colorline = :auto, colmap = :viridis, colorband = (:white, 1.),
+                   xlabel = "x", ylabel = "y", zlabel = "z", edge = true,
+                   axis_tight = false, xlim = [minimum(x), maximum(x)],
+                   ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)],
+                   fonts = DEFAULT_MAKIE_FONTS)
 
 Plot a waterfall plot.
 
-# Inputs
+**Inputs**
 * `x::Vector`: x-axis values
 * `y::Vector`: y-axis values
 * `z::Matrix`: z-axis values
@@ -357,9 +384,9 @@ Plot a waterfall plot.
 * `xlim`: x-axis limits
 * `ylim`: y-axis limits
 * `zlim`: z-axis limits
-* `fonts`: Fonts of the figure
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
-# Output
+**Output**
 * `fig`: Figure
 """
 function waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)], fonts = DEFAULT_MAKIE_FONTS)

@@ -13,7 +13,7 @@ Structure containing the data of a time problem for a sdof system
     * :force: External force (default)
     * :base: Base motion
 """
-struct SdofFreeTimeProblem
+@with_kw struct SdofFreeTimeProblem
     sdof :: Sdof
     u0 :: Vector{Float64}
     t
@@ -51,7 +51,7 @@ Structure containing the data of a time problem for a sdof system subject to a h
     * :force: External force (default)
     * :base: Base motion
 """
-struct SdofHarmonicTimeProblem
+@with_kw struct SdofHarmonicTimeProblem
     sdof :: Sdof
     u0 :: Vector{Float64}
     t
@@ -78,7 +78,7 @@ Structure containing the data of a time problem for a sdof system subject to an 
     * :force: External force (default)
     * :base: Base motion
 """
-struct SdofForcedTimeProblem
+@with_kw struct SdofForcedTimeProblem
     sdof :: Sdof
     u0 :: Vector{Float64}
     t
@@ -132,7 +132,7 @@ Structure containing the data for computing the FRF a sdof system
     * :vel: Velocity spectrum or Mobility
     * :acc: Acceleration spectrum or Accelerance
 """
-struct SdofFRFProblem
+@with_kw struct SdofFRFProblem
     sdof :: Sdof
     freq
     type_exc :: Symbol
@@ -158,7 +158,7 @@ Structure containing the data for computing the frequency response of a sdof sys
     - :vel: Velocity spectrum or Mobility
     - :acc: Acceleration spectrum or Accelerance
 """
-struct SdofFrequencyProblem
+@with_kw struct SdofFrequencyProblem
     sdof :: Sdof
     freq
     F :: Vector{Float64}
