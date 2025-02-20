@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Noise estimation methods – StructuralVibration.jl</title>
+<title>Modal time solvers – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,6 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../solvers/frequency_solvers.html" rel="next">
+<link href="../solvers/direct_time_solvers.html" rel="prev">
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -101,11 +103,11 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Models</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../solvers/index.html"> 
+    <a class="nav-link active" href="../solvers/index.html" aria-current="page"> 
 <span class="menu-text">Solvers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../signal_processing/index.html" aria-current="page"> 
+    <a class="nav-link" href="../signal_processing/index.html"> 
 <span class="menu-text">Signal processing</span></a>
   </li>  
   <li class="nav-item">
@@ -130,7 +132,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../signal_processing/index.html">Noise estimation methods</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../solvers/modal_time_solvers.html">Modal time solvers</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -144,8 +146,32 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../signal_processing/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Noise estimation methods</span></a>
+  <a href="../solvers/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sdof solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/direct_time_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Direct-time integration solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/modal_time_solvers.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Modal time solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/frequency_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Frequency-domain solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/state_space_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">State-space solvers</span></a>
   </div>
 </li>
     </ul>
@@ -161,7 +187,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Noise estimation methods</h1>
+<h1 class="title">Modal time solvers</h1>
 </div>
 
 
@@ -599,6 +625,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../solvers/direct_time_solvers.html" class="pagination-link" aria-label="Direct-time integration solvers">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Direct-time integration solvers</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../solvers/frequency_solvers.html" class="pagination-link" aria-label="Frequency-domain solvers">
+        <span class="nav-page-text">Frequency-domain solvers</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

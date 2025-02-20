@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Visualization extension – StructuralVibration.jl</title>
+<title>Visualization extensions – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -170,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../visualization/index.html">Visualization extension</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../visualization/index.html">Visualization extensions</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -185,7 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../visualization/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Visualization extension</span></a>
+ <span class="menu-text">Visualization extensions</span></a>
   </div>
 </li>
     </ul>
@@ -205,6 +205,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#d-plot-1" id="toc-d-plot-1" class="nav-link" data-scroll-target="#d-plot-1"><span class="header-section-number">2.2</span> 3D plot</a></li>
   </ul></li>
   <li><a href="#waterfall-plot" id="toc-waterfall-plot" class="nav-link" data-scroll-target="#waterfall-plot"><span class="header-section-number">3</span> Waterfall plot</a></li>
+  <li><a href="#sv-plot" id="toc-sv-plot" class="nav-link" data-scroll-target="#sv-plot"><span class="header-section-number">4</span> SV plot</a></li>
   </ul>
 </nav>
     </div>
@@ -213,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Visualization extension</h1>
+<h1 class="title">Visualization extensions</h1>
 </div>
 
 
@@ -275,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
 <li><p><code>legend</code>: Legend parameters (default: (active = false, position = :rt, entry = " "))</p>
 </li>
-<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT<em>MAKIE</em>FONTS)</p>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)</p>
 </li>
 </ul>
 <p><strong>Output</strong></p>
@@ -328,11 +329,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Plot Nyquist diagram</p>
 <p><strong>Inputs</strong></p>
 <ul>
-<li><p><code>y</code>: Complex vector</p>
+<li><p><code>y</code>: Complex data vector</p>
 </li>
 <li><p><code>theme</code>: Theme (default: :makie)</p>
 </li>
-<li><p><code>fonts</code>: Fonts of the figure</p>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)</p>
 </li>
 </ul>
 <p><strong>Output</strong></p>
@@ -387,7 +388,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
 </ul>
 </li>
-<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT<em>MAKIE</em>FONTS)</p>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)</p>
 </li>
 </ul>
 <p><strong>Output</strong></p>
@@ -415,6 +416,154 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="waterfall-plot" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="waterfall-plot"><span class="header-section-number">3</span> Waterfall plot</h2>
+<p>A waterfall plot is a 3D plot with a partial curtain along the y-axis.</p>
+<div class="api">
+<p><strong>waterfall_plot</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>waterfall_plot(x, y, z; zmin = minimum(z), lw = 1.,
+               colorline = :auto, colmap = :viridis, colorband = (:white, 1.),
+               xlabel = "x", ylabel = "y", zlabel = "z", edge = true,
+               axis_tight = false, xlim = [minimum(x), maximum(x)],
+               ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)],
+               fonts = DEFAULT_MAKIE_FONTS)</code></pre>
+<p>Plot a waterfall plot.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>x</code>: x-axis values</p>
+</li>
+<li><p><code>y</code>: y-axis values</p>
+</li>
+<li><p><code>z</code>: z-axis values</p>
+</li>
+<li><p><code>zmin</code>: minimum value of z-axis</p>
+</li>
+<li><p><code>lw::Real</code>: linewidth</p>
+</li>
+<li><p><code>colorline</code>: color of the lines</p>
+</li>
+<li><p><code>colmap</code>: Name of the colormap</p>
+</li>
+<li><p><code>colorband</code>: Tuple defining the color of the band</p>
+<ul>
+<li><p>color : Color</p>
+</li>
+<li><p>alpha : Alpha value for transparency</p>
+</li>
+</ul>
+</li>
+<li><p><code>xlabel</code>: x-axis label</p>
+</li>
+<li><p><code>ylabel</code>: y-axis label</p>
+</li>
+<li><p><code>zlabel</code>: z-axis label</p>
+</li>
+<li><p><code>edge</code>: Display edges (default: true)</p>
+</li>
+<li><p><code>axis_tight</code>: Tight axis (default: false)</p>
+</li>
+<li><p><code>xlim</code>: x-axis limits</p>
+</li>
+<li><p><code>ylim</code>: y-axis limits</p>
+</li>
+<li><p><code>zlim</code>: z-axis limits</p>
+</li>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>fig</code>: Figure</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0</span>., <span class="fl">2</span>π, <span class="fl">100</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0</span>., <span class="fl">1</span>., <span class="fl">5</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>nx <span class="op">=</span> <span class="fu">length</span>(x)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ny <span class="op">=</span> <span class="fu">length</span>(y)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">zeros</span>(ny, nx)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(y)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    z[i, <span class="op">:</span>] <span class="op">=</span> <span class="fu">sin</span>.(i<span class="op">*</span>x<span class="op">/</span><span class="fl">2</span>.)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">waterfall_plot</span>(x, y, z, xlim <span class="op">=</span> [<span class="op">-</span><span class="fl">0.1</span>, <span class="fl">2</span>π <span class="op">+</span> <span class="fl">0.1</span>], ylim <span class="op">=</span> [<span class="op">-</span><span class="fl">0.1</span>, <span class="fl">1.1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="../assets/images/waterfall.png" class="img-fluid" style="width:85.0%"></p>
+</section>
+<section id="sv-plot" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sv-plot"><span class="header-section-number">4</span> SV plot</h2>
+<p>The SV plot (for <em>StructuralVibration plot</em>) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.</p>
+<div class="api">
+<p><strong>sv_plot</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity,
+axis_tight = true, xlabel = "x", ylabel = "y",
+legend = (active = false, position = :rt, orientation = :vertical, entry = " "),
+fonts = DEFAULT_MAKIE_FONTS)</code></pre>
+<p>Plot a 2D plot.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>x</code>: x-axis values</p>
+</li>
+<li><p><code>y</code>: y-axis values</p>
+</li>
+<li><p><code>lw</code>: linewidth</p>
+</li>
+<li><p><code>theme</code>: Theme (default: :makie)</p>
+</li>
+<li><p><code>xscale</code>: x-axis scale (default: identity)</p>
+</li>
+<li><p><code>yscale</code>: y-axis scale (default: identity)</p>
+</li>
+<li><p><code>axis_tight</code>: Tight axis (default: true)</p>
+</li>
+<li><p><code>xlabel</code>: x-axis label</p>
+</li>
+<li><p><code>ylabel</code>: y-axis label</p>
+</li>
+<li><p><code>legend</code>: Legend parameters</p>
+<ul>
+<li><p>active : Bool</p>
+</li>
+<li><p>position : Symbol</p>
+</li>
+<li><p>entry : String</p>
+</li>
+</ul>
+</li>
+<li><p><code>fonts</code>: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>fig</code>: Figure</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="22" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sv_plot</span>(x, z, lw <span class="op">=</span> <span class="fl">2</span>., legend <span class="op">=</span> (active <span class="op">=</span> <span class="cn">true</span>,))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-12-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>

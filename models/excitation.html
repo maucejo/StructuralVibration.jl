@@ -405,8 +405,11 @@ F_0 - \frac{2F_0}{T}(t - t_m) &amp; \text{if } t \in [t_m, t_\text{start} + T] \
 <section id="hammer-impact" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="hammer-impact"><span class="header-section-number">1.3</span> Hammer impact</h3>
 <p>The hammer impact signal is supposed to have the shape of a Gamma distribution <span class="math display">\[
-F(t) = F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\right),
-\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_h = t_\text{start}\)</span> is the time since the impact, <span class="math inline">\(p\)</span> is the shape parameter, and <span class="math inline">\(\theta\)</span> is the scale parameter.</p>
+F(t) = \begin{}
+F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\right), &amp; \text{if } t \geq t_\text{start} \\
+0, &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_h = t - t_\text{start}\)</span> is the time since the impact, <span class="math inline">\(p\)</span> is the shape parameter, and <span class="math inline">\(\theta\)</span> is the scale parameter.</p>
 <div class="api">
 <p><strong>Hammer</strong></p>
 <hr>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction – StructuralVibration.jl</title>
+<title>Sdof solvers – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,16 +20,51 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../solvers/direct_time_solvers.html" rel="next">
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -68,7 +103,39 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -130,7 +197,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../solvers/index.html">Introduction</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../solvers/index.html">Sdof solvers</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -145,7 +212,31 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../solvers/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Introduction</span></a>
+ <span class="menu-text">Sdof solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/direct_time_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Direct-time integration solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/modal_time_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modal time solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/frequency_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Frequency-domain solvers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../solvers/state_space_solvers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">State-space solvers</span></a>
   </div>
 </li>
     </ul>
@@ -153,15 +244,24 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#time-domain-solvers" id="toc-time-domain-solvers" class="nav-link active" data-scroll-target="#time-domain-solvers"><span class="header-section-number">1</span> Time domain solvers</a>
+  <ul class="collapse">
+  <li><a href="#free-response" id="toc-free-response" class="nav-link" data-scroll-target="#free-response"><span class="header-section-number">1.1</span> Free response</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Introduction</h1>
+<h1 class="title">Sdof solvers</h1>
 </div>
 
 
@@ -178,8 +278,139 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="time-domain-solvers" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="time-domain-solvers"><span class="header-section-number">1</span> Time domain solvers</h2>
+<p>The package provides a set of solvers to compute the time response of a single-degree-of-freedom system.</p>
+<section id="free-response" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="free-response"><span class="header-section-number">1.1</span> Free response</h3>
+<p>The free response of a single-degree-of-freedom system is the response of the system when it is subjected to initial conditions only. This means that the displacement of the mass is solution of the following ordinary differential equation: <span class="math display">\[
+\begin{cases}
+  \ddot x(t) + 2 \xi\omega_0\dot x(t) + \omega_0^2 x(t) = 0 \\
+  x(0) = x_0 \\
+  \dot x(0) = v_0
+\end{cases}.
+\]</span></p>
+<p>Depending on the value of the damping ratio <span class="math inline">\(\xi\)</span> and <span class="math inline">\(\omega_0 &gt; 0\)</span>, the system can have 4 different types of free response:</p>
+<ul>
+<li><p>an undamped motion when <span class="math inline">\(\xi = 0\)</span>. In this case, the free response is: <span class="math display">\[
+x(t) = x_0\cos\omega_0 t + \frac{v_0}{\omega_0}\sin\omega_0 t
+\]</span></p></li>
+<li><p>an underdamped motion when <span class="math inline">\(0 &lt; \xi &lt; 1\)</span>. In this case, the free response is: <span class="math display">\[
+x(t) = \left[x_0\cos\Omega_0 t + \frac{v_0 + \xi\Omega_0 x_0}{\Omega_0}\sin\Omega_0 t\right]e^{-\xi\omega_0 t}
+\]</span> where <span class="math inline">\(\Omega_0 = \omega_0\sqrt{1 - \xi^2}\)</span>.</p></li>
+<li><p>a critically damped motion when <span class="math inline">\(\xi = 1\)</span>. In this case, the free response is: <span class="math display">\[
+x(t) = \left[x_0 + (v_0 + \omega_0 x_0)t\right]e^{-\omega_0 t}
+\]</span></p></li>
+<li><p>an overdamped motion when <span class="math inline">\(\xi &gt; 1\)</span>. In this case, the free response is: <span class="math display">\[
+x(t) = \left[x_0\text{cosh}(\beta t) + \frac{v_0 + \xi\omega_0 x_0}{\beta}\text{sinh}\beta t\right]e^{-\xi\omega_0 t},
+\]</span> where <span class="math inline">\(\beta = \omega_0\sqrt{\xi^2 - 1}\)</span>.</p></li>
+</ul>
+<p>Finally, if <span class="math inline">\(\omega = 0\)</span>, the mass is free from constraints and the free response is: <span class="math display">\[
+x(t) = x_0 + v_0 t.
+\]</span></p>
+<section id="api" class="level4" data-number="1.1.1">
+<h4 data-number="1.1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">1.1.1</span> API</h4>
+<p><strong>Data type</strong></p>
+<div class="api">
+<p><strong>SdofFreeTimeProblem</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>SdofFreeTimeProblem(sdof, u0, t)</code></pre>
+<p>Structure containing the data of a time problem for a sdof system</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>sdof</code>: Sdof structure</p>
+</li>
+<li><p><code>u0</code>: Initial conditions</p>
+<ul>
+<li><p><code>x₀</code>: Initial displacement [m]</p>
+</li>
+<li><p><code>v₀</code>: Initial velocity [m/s]</p>
+</li>
+</ul>
+</li>
+<li><p><code>t</code>: Time points at which to evaluate the response</p>
+</li>
+</ul>
 
 
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="6" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::SdofFreeTimeProblem)</code></pre>
+<p>Compute the free response of a single degree of freedom (Sdof) system.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the parameters of the Sdof problem</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>sol</code>: The response of the system at the given time points   <code>u</code>: Displacement solution   <code>du</code>: Velocity solution   <code>ddu</code>: Acceleration solution</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example" class="level4" data-number="1.1.2">
+<h4 data-number="1.1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.1.2</span> Example</h4>
+<div id="8" class="cell" data-ouput="false" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f₀ <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Time vector</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial conditions</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>u₀ <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.2</span>]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Undamped system</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sdof_nd <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">0</span>.)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>prob_nd <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_nd, u₀, t)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>x_nd <span class="op">=</span> <span class="fu">solve</span>(prob_nd).u</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Underdamped system</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>sdof_ud <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">0.1</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>prob_ud <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_ud, u₀, t)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>x_ud <span class="op">=</span> <span class="fu">solve</span>(prob_ud).u</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Critically damped system</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>sdof_cd <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">1</span>.)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>prob_cd <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_cd, u₀, t)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>x_cd <span class="op">=</span> <span class="fu">solve</span>(prob_cd).u</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Overdamped system</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>sdof_od <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">2</span>.)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>prob_od <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_od, u₀, t)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>x_od <span class="op">=</span> <span class="fu">solve</span>(prob_od).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -599,6 +830,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../solvers/direct_time_solvers.html" class="pagination-link" aria-label="Direct-time integration solvers">
+        <span class="nav-page-text">Direct-time integration solvers</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
