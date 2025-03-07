@@ -1,5 +1,5 @@
 ---
-title: Noise estimation methods
+title: Function estimation
 format:
   html:
     toc: true

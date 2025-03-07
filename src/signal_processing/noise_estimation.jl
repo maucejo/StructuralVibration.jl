@@ -230,10 +230,10 @@ function bayesfun!(L, z, s², prior)
 
         J = α*sum(log, fₖ) + (α*n - 2)*log(vₖ)
     elseif prior == :invgamma
-        γₐ = 1e-3
-        γₛ = 1e-3
-        βₐ = 1e-3
-        βₛ = 1e-3
+        γₐ = 1.
+        γₛ = 1.
+        βₐ = 1e-10
+        βₛ = 1e-10
         M = 2. + γₛ + γₐ +  α*n
         vₖ = (α*sum(@. abs2(z)/fₖ) + βₐ .+ βₛ ./(10. .^L))/M
 
@@ -406,7 +406,7 @@ function varest_derrico(x)
         noisedata = undefs(nd, ntrim)
         p = undefs(ntrim)
         for (j, xj) in enumerate(eachrow(x))
-            noisedata[j, :] .= conv(xj, fdai)[posnd]
+            noisedata[j, :] .= DSP.conv(xj, fdai)[posnd]
         end
 
         if ntrim ≥ 2

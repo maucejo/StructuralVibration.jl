@@ -378,7 +378,7 @@ function anti_aliasing_filter(signal, fs)
     order = 200        # Filter order
     fb = 0.05*fn       # Filter bandwith = 2*fb
     freq_filt = [(0., fn - fb) => 1]
-    filt_coeff = remez(order, freq_filt, Hz = fs, maxiter = 50)
+    filt_coeff = DSP.remez(order, freq_filt, Hz = fs, maxiter = 50)
 
-    return filtfilt(filt_coeff, signal)
+    return DSP.filtfilt(filt_coeff, signal)
 end

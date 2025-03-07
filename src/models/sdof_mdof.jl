@@ -1,24 +1,24 @@
 """
-    Sdof(m, ω₀, ξ)
+    Sdof(m, ω0, ξ)
 
 Structure containing the data of a sdof system
 
 **Constructor**
 * `m`: Mass [kg]
-* `f₀`: Natural frequency [Hz]
+* `f0`: Natural frequency [Hz]
 * `ξ`: Damping ratio
 
 **Fields**
 * `m`: Mass [kg]
-* `ω₀`: Natural frequency [rad/s]
+* `ω0`: Natural frequency [rad/s]
 * `ξ`: Damping ratio
 """
 @with_kw struct Sdof
     m :: Float64
-    ω₀ ::Float64
+    ω0 ::Float64
     ξ :: Float64
 
-    Sdof(m, f₀, ξ) = new(m, 2π*f₀, ξ)
+    Sdof(m, f0, ξ) = new(m, 2π*f0, ξ)
 end
 
 """

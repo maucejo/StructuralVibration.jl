@@ -1,5 +1,5 @@
 ---
-title: Noise estimation methods
+title: Modal time solvers
 format:
   html:
     toc: true

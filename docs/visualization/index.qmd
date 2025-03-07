@@ -1,5 +1,5 @@
 ---
-title: Visualization extension
+title: Visualization extensions
 format:
   html:
     toc: true
@@ -94,4 +94,69 @@ nyquist_plot(H)
 
 ```{julia}
 nyquist_plot(freq, H, projection = true)
+```
+
+## Waterfall plot
+
+A waterfall plot is a 3D plot with a partial curtain along the y-axis.
+
+::: {.api}
+**waterfall_plot**
+
+---
+```{julia}
+#| echo: false
+@doc waterfall_plot
+```
+:::
+
+```julia
+x = range(0., 2π, 100)
+y = range(0., 1., 5)
+
+nx = length(x)
+ny = length(y)
+z = zeros(ny, nx)
+
+for i in eachindex(y)
+    z[i, :] = sin.(i*x/2.)
+end
+
+waterfall_plot(x, y, z, xlim = [-0.1, 2π + 0.1], ylim = [-0.1, 1.1])
+```
+
+![](../assets/images/waterfall.png){width=85%}
+
+## SV plot
+
+The SV plot (for _StructuralVibration plot_) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.
+
+::: {.api}
+**sv_plot**
+
+---
+```{julia}
+#| echo: false
+@doc sv_plot
+```
+:::
+
+```{julia}
+#| echo: false
+#| output: false
+
+x = range(0., 2π, 100)
+y = range(0., 1., 5)
+
+nx = length(x)
+ny = length(y)
+z = zeros(ny, nx)
+
+for i in eachindex(y)
+    z[i, :] = sin.(i*x/2.)
+end
+```
+
+```{julia}
+sv_plot(x, z, lw = 2., legend = (active = true,))
 ```

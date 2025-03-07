@@ -1,5 +1,5 @@
 ---
-title: Noise estimation methods
+title: Signal denoising & detrending
 format:
   html:
     toc: true

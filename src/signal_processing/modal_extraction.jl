@@ -1,6 +1,6 @@
 abstract type ModalExtraction end
-struct BodeExtract <: ModalExtraction end
-struct NyquistExtract <: ModalExtraction end
+struct PeakPicking <: ModalExtraction end
+struct CircleFit <: ModalExtraction end
 
 """
     freq_extraction(freq, H, method::ModalExtraction; type = :dis)
@@ -11,8 +11,8 @@ Extract natural frequencies and damping ratios from the Bode diagram fitting met
 * `freq`: Frequency vector
 * `H`: Frequency response function
 * `method`: Method to extract the natural frequencies and damping ratios
-    * `BodeExtract`: Bode diagram (default)
-    * `NyquistExtract`: Nyquist diagram
+    * `PeakPickingExtract`: Peak picking method (default)
+    * `CircleFitExtract`: Circle fitting method
 * `type`: Type of response to extract the natural frequencies and damping ratios
     * `:dis`: Displacement (default)
     * `:vel`: Velocity
@@ -22,15 +22,15 @@ Extract natural frequencies and damping ratios from the Bode diagram fitting met
 * `fₙ`: Natural frequencies
 * `ξₙ`: Damping ratios
 """
-function freq_extraction(freq, H, method::ModalExtraction = BodeExtract(); type = :dis)
-    if method isa BodeExtract
-        return freq_bode_extract(freq, H, type = type)
-    elseif method isa NyquistExtract
-        return freq_nyquist_extract(freq, H, type = type)
+function freq_extraction(freq, H, method::ModalExtraction = PeakPicking(); type = :dis)
+    if method isa PeakPicking
+        return freq_ppm_extract(freq, H, type = type)
+    elseif method isa CircleFit
+        return freq_cfm_extract(freq, H, type = type)
     end
 end
 
-function freq_bode_extract(freq, H; type = :dis)
+function freq_ppm_extract(freq, H; type = :dis)
     ω = 2π*freq
 
     Habs = abs.(H)
@@ -79,7 +79,7 @@ function freq_bode_extract(freq, H; type = :dis)
     return fₙ, ξₙ
 end
 
-function freq_nyquist_extract(freq, H; type = :dis)
+function freq_cfm_extract(freq, H; type = :dis)
     ω = 2π*freq
 
     pks = findmaxima(abs.(H)) |> peakproms! |> peakwidths!
@@ -160,15 +160,15 @@ Extract mode shapes from the Bode's diagram of Nyquiste's circle fitting method
 # Output
 * `ϕₙ`: Mode shapes
 """
-function modeshape_extraction(freq, H, fₙ, ξₙ, id_exc, method::ModalExtraction = BodeExtract(); type = :dis)
-    if method isa BodeExtract
-        return modeshape_bode_extract(freq, H, fₙ, ξₙ, id_exc; type = type)
-    elseif method isa NyquistExtract
+function modeshape_extraction(freq, H, fₙ, ξₙ, id_exc, method::ModalExtraction = PeakPicking(); type = :dis)
+    if method isa PeakPicking
+        return modeshape_ppm_extract(freq, H, fₙ, ξₙ, id_exc; type = type)
+    elseif method isa CircleFit
         return modeshape_nyquist_extract(freq, H, fₙ, ξₙ, id_exc; type = type)
     end
 end
 
-function modeshape_bode_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
+function modeshape_ppm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
     ω = 2π*freq
     ωₙ = 2π*fₙ
 
@@ -219,7 +219,7 @@ function modeshape_bode_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
     return ϕₙ
 end
 
-function modeshape_nyquist_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
+function modeshape_cfm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
 
     ω = 2π*freq
     ωₙ = 2π*fₙ

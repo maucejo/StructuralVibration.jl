@@ -38,15 +38,19 @@ website:
     - title: "Solvers"
       contents:
         - solvers/index.qmd
-      # Time solvers (modal + direct)
-      # Frequency solvers (modal + direct)
+        - solvers/direct_time_solvers.qmd
+        - solvers/modal_time_solvers.qmd
+        - solvers/frequency_solvers.qmd
+        - solvers/state_space_solvers.qmd
+
+    - title: "Signal processing"
+      contents:
+      - signal_processing/index.qmd
+
 
     - title: "Visualization"
       contents:
         - visualization/index.qmd
-      # Mode shapes
-      # Frequency response
-      # Time response
 
   page-footer:
     center: "2025 Mathieu Aucejo &#8729; Powered by [![](/assets/logo/quarto.png){width=4mm}](https://quarto.org) and [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org)"

@@ -1,5 +1,5 @@
 ---
-title: Noise estimation methods
+title: Frequency-domain solvers
 format:
   html:
     toc: true

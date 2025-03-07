@@ -1,0 +1,134 @@
+{
+  "cells": [
+    {
+      "cell_type": "raw",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: Sdof solvers\n",
+        "format:\n",
+        "  html:\n",
+        "    toc: true\n",
+        "    number-sections: true\n",
+        "---\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "## Time domain solvers\n",
+        "\n",
+        "The package provides a set of solvers to compute the time response of a single-degree-of-freedom system.\n",
+        "\n",
+        "### Free response\n",
+        "\n",
+        "The free response of a single-degree-of-freedom system is the response of the system when it is subjected to initial conditions only. This means that the displacement of the mass is solution of the following ordinary differential equation:\n",
+        "$$\n",
+        "\\begin{cases}\n",
+        "  \\ddot x(t) + 2 \\xi\\omega_0\\dot x(t) + \\omega_0^2 x(t) = 0 \\\\\n",
+        "  x(0) = x_0 \\\\\n",
+        "  \\dot x(0) = v_0\n",
+        "\\end{cases}.\n",
+        "$$\n",
+        "\n",
+        "Depending on the value of the damping ratio $\\xi$ and $\\omega_0 > 0$, the system can have 4 different types of free response:\n",
+        "\n",
+        "- an undamped motion when $\\xi = 0$. In this case, the free response is:\n",
+        "$$\n",
+        "x(t) = x_0\\cos\\omega_0 t + \\frac{v_0}{\\omega_0}\\sin\\omega_0 t\n",
+        "$$\n",
+        "\n",
+        "- an underdamped motion when $0 < \\xi < 1$. In this case, the free response is:\n",
+        "$$\n",
+        "x(t) = \\left[x_0\\cos\\Omega_0 t + \\frac{v_0 + \\xi\\Omega_0 x_0}{\\Omega_0}\\sin\\Omega_0 t\\right]e^{-\\xi\\omega_0 t}\n",
+        "$$\n",
+        "where $\\Omega_0 = \\omega_0\\sqrt{1 - \\xi^2}$.\n",
+        "\n",
+        "- a critically damped motion when $\\xi = 1$. In this case, the free response is:\n",
+        "$$\n",
+        "x(t) = \\left[x_0 + (v_0 + \\omega_0 x_0)t\\right]e^{-\\omega_0 t}\n",
+        "$$\n",
+        "\n",
+        "- an overdamped motion when $\\xi > 1$. In this case, the free response is:\n",
+        "$$\n",
+        "x(t) = \\left[x_0\\text{cosh}(\\beta t) + \\frac{v_0 + \\xi\\omega_0 x_0}{\\beta}\\text{sinh}\\beta t\\right]e^{-\\xi\\omega_0 t},\n",
+        "$$\n",
+        "where $\\beta = \\omega_0\\sqrt{\\xi^2 - 1}$.\n",
+        "\n",
+        "Finally, if $\\omega = 0$, the mass is free from constraints and the free response is:\n",
+        "$$\n",
+        "x(t) = x_0 + v_0 t.\n",
+        "$$\n",
+        "\n",
+        "#### API\n",
+        "\n",
+        "**Data type**\n",
+        "\n",
+        "::: {.api}\n",
+        "**SdofFreeTimeProblem**\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "---"
+      ],
+      "id": "4c5f5e75"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc SdofFreeTimeProblem"
+      ],
+      "id": "85943f7d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "**Related function**\n",
+        "\n",
+        "::: {.api}\n",
+        "**solve**\n",
+        "\n",
+        "---"
+      ],
+      "id": "20ac35e6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc solve(prob::SdofFreeTimeProblem)"
+      ],
+      "id": "d252d2d4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "#### Example"
+      ],
+      "id": "761fa83f"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-1.11",
+      "language": "julia",
+      "display_name": "Julia 1.11.1",
+      "path": "C:\\Users\\maucejo\\AppData\\Roaming\\jupyter\\kernels\\julia-1.11"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

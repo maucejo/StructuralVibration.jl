@@ -1,6 +1,8 @@
 module StructuralVibration
 
-using DSP, FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Parameters, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
+using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Parameters, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
+
+import DSP
 
 # Structs - Models
 export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
@@ -60,6 +62,12 @@ export undefs
 # Include files - Utils
 include("utils/undefs.jl")
 
+# Include files - Excitation models
+include("models/excitation.jl")
+
+# Include files - Noise models
+include("models/noise.jl")
+
 # Include files - Estimation
 include("signal_processing/gradient.jl")
 include("signal_processing/detrend.jl")
@@ -87,12 +95,6 @@ include("solvers/modal_time_solvers.jl")
 # Include files - State space
 include("models/state_space.jl")
 include("solvers/state_space_solvers.jl")
-
-# Include files - Excitation models
-include("models/excitation.jl")
-
-# Include files - Noise models
-include("models/noise.jl")
 
 # Include files - Visualization
 include("utils/visualization.jl")

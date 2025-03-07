@@ -1,5 +1,5 @@
 ---
-title: Noise estimation methods
+title: Direct-time integration solvers
 format:
   html:
     toc: true

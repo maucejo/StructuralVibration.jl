@@ -369,7 +369,7 @@ Compute the forced response of a multi-degrees of freedom (Mdof) system due to a
 # Output
 * `sol`: ModalTimeSolution structure containing the response of the system at the given time points
 """
-function solve(prob::ForcedModalTimeProblem, method = :interp)
+function solve(prob::ForcedModalTimeProblem; method = :interp)
     (; K, M, ξₙ, u0, t, F, Nₘ, ismodal) = prob
     x₀, v₀ = u0
     nt = length(t)
@@ -408,37 +408,71 @@ function solve(prob::ForcedModalTimeProblem, method = :interp)
 
     # Modal coordinate calculation
     q = undefs(nt, Nₘ)
-    qh =undefs(nt)
-    h = undefs(nt)
+    qh = undefs(nt)
+    if method == :interp || method == :conv
+        h = undefs(nt)
+    else
+        num = undefs(3)
+        denom = undefs(3)
+    end
+
     for (m, (ωₘ, ξₘ, qxₘ, qvₘ)) in enumerate(zip(ωₙ, ξₙ, qₓ, qᵥ))
         if ωₘ == 0.
             @. qh = qxₘ + qvₘ*t
-            @. h = t
+            if method == :interp || method == :conv
+                h = @. t
+            else
+                num .= [0., Δt, 0.]
+                denom .= [1., -2., 1.]
+            end
         elseif ξₘ < 1.
             Ωₘ = ωₘ*sqrt(1 - ξₘ^2)
             Ξₘ = ξₘ*ωₘ
             Aₘ = qxₘ
             Bₘ = (qvₘ + Ξₘ*qxₘ)/Ωₘ
             @. qh = (Aₘ*cos(Ωₘ*t) + Bₘ*sin(Ωₘ*t))*exp(-Ξₘ*t)
-            @. h = exp(-Ξₘ*t)*sin(Ωₘ*t)/Ωₘ
+            if method == :interp || method == :conv
+                @. h = exp(-Ξₘ*t)*sin(Ωₘ*t)/Ωₘ
+            else
+                α = exp(-Ξₘ*Δt)
+                β = Ωₘ*Δt
+                # Transfer function in the z-domain
+                num .= [0., α*sin(β)/Ωₘ, 0.]
+                denom .= [1., -2*α*cos(β), α^2]
+            end
         elseif ξₘ == 1.
             Aₘ = qxₘ
             Bₘ = qvₘ + ωₘ*qxₘ
             @. qh = (Aₘ + Bₘ*t)*exp(-ωₘ*t)
-            @. h = t*exp(-ωₘ*t)
+            if method == :interp || method == :conv
+                @. h = t*exp(-ωₘ*t)
+            else
+                α = exp(-ωₘ*Δt)
+                num = [0., α*Δt, 0.]
+                denom = [1., -2*α, α^2]
+            end
         else
             βₘ = ωₘ*sqrt(ξₘ^2 - 1)
             Ξₘ = ξₘ*ωₘ
             Aₘ = qxₘ
             Bₘ = (qvₘ + Ξₘ*qxₘ)/βₘ
             @. qh = (Aₘ*cosh(βₘ*t) + Bₘ*sinh(βₘ*t))*exp(-Ξₘ*t)
-            @. h = exp(-Ξₘ*t)*sinh(βₘ*t)/βₘ
+            if method == :interp || method == :conv
+                @. h = exp(-Ξₘ*t)*sinh(βₘ*t)/βₘ
+            else
+                α = exp(-ξ*ω0*Δt)
+                γ = β*Δt
+                num .= [0., α*sinh(γ)/m/β, 0.]
+                denom .= [1., -2*α*cosh(γ), α^2]
+            end
         end
 
         if method == :interp
             q[:, m] .= qh .+ duhamel_integral(Lₙ[m, :], h, t)
+        elseif method == :conv
+            q[:, m] .= qh .+ Δt*DSP.conv(Lₙ[m, :], h)[1:nt]
         else
-            q[:, m] .= qh .+ Δt*conv(Lₙ[m, :], h)[1:nt]
+            q[:, m] .= qh .+ Δt*DSP.filter(num, denom, Lₙ[m, :])
         end
     end
 

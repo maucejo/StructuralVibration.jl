@@ -1,5 +1,5 @@
 ---
-title: Noise estimation methods
+title: State-space solvers
 format:
   html:
     toc: true

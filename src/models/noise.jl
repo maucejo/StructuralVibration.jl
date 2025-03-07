@@ -4,7 +4,7 @@
 Adds a Gaussian White Noise (AGWN) to a signal `x` with a given SNR.
 
 **Inputs**
-* `x`: Signal
+* `x`: Signal (Real or Complex)
 * `snr_dB`: signal to noise ratio [dB]
 * `rst`: Reset the random number generator - Bool
 
@@ -56,14 +56,15 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color =
         rng = MersenneTwister(1000)
     end
 
+    ndx = ndims(x)
     SNR = 10^(snr_dB/10.)                     # SNR in linear scale
-    En = vec(mean(abs2, x, dims = ndims(x)))  # Signal energy
+    En = vec(mean(abs2, x, dims = ndx))  # Signal energy
     V = En/SNR                                # Noise variance
 
     σ = sqrt.(V)                              # Standard deviation
 
     white_noise = randn(rng, eltype(x), size(x))
-    scale = ones(size(x, ndims(x)))
+    scale = ones(size(x, ndx))
     if color == :pink
         @. scale[2:end] = 1/sqrt(freq[2:end])
     elseif color == :blue
@@ -76,10 +77,10 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color =
 
     # Energy preservation of the white noise
     scale ./= sqrt(mean(scale.^2))
-    colored_noise = white_noise.*scale
+    colored_noise = white_noise.*scale'
 
     # Colored noise with scaled variance
-    colored_noise .*= σ/std(colored_noise)
+    colored_noise .*= σ/std(colored_noise, dims = ndx)
 
     return x .+ colored_noise
 end
@@ -144,7 +145,7 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float6
 
     # Colored noise with scaled variance
     colored_noise = irfft(colored_fft, L, ndx)
-    colored_noise .*= σ/std(colored_noise)
+    @. colored_noise *= σ/std(colored_noise, dims = ndx)
 
     if length(band_freq) > 0
         flag = true

@@ -32,7 +32,18 @@ function theme_choice(name::Symbol)
             ylabelsize = labelsize,
             ylabelfont = :bold,
             xticklabelsize = ticklabelsize,
-            yticklabelsize = ticklabelsize
+            yticklabelsize = ticklabelsize,
+        ),
+        Axis3 = (
+            xlabelsize = labelsize,
+            xlabelfont = :bold,
+            ylabelsize = labelsize,
+            ylabelfont = :bold,
+            zlabelsize = labelsize,
+            zlabelfont = :bold,
+            xticklabelsize = ticklabelsize,
+            yticklabelsize = ticklabelsize,
+            zticklabelsize = ticklabelsize,
         )
     )
 
@@ -40,7 +51,10 @@ function theme_choice(name::Symbol)
 end
 
 """
-    sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
+    sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity,
+    axis_tight = true, xlabel = "x", ylabel = "y",
+    legend = (active = false, position = :rt, orientation = :vertical, entry = " "),
+    fonts = DEFAULT_MAKIE_FONTS)
 
 Plot a 2D plot.
 
@@ -63,7 +77,7 @@ Plot a 2D plot.
 **Output**
 * `fig`: Figure
 """
-function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
+function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, orientation = :vertical, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
 
     set_theme!(theme_choice(theme))
 
@@ -82,6 +96,12 @@ function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = iden
             legend_position = legend.position
         end
 
+        if !hasfield(t, :orientation)
+            legend_orientation = :vertical
+        else
+            legend_orientation = legend.orientation
+        end
+
         if !hasfield(t, :entry)
             if isa(y, Vector)
                 legend_entry = ["Data 1"]
@@ -97,7 +117,7 @@ function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = iden
             legend_entry = legend.entry
         end
 
-        leg = (active = legend.active, position = legend_position, entry = legend_entry)
+        leg = (active = legend.active, position = legend_position, entry = legend_entry, orientation = legend_orientation)
     else
         if isa(y, Vector)
             legend_entry = [" "]
@@ -121,7 +141,7 @@ function sv_plot(x, y; lw = 1., theme = :makie, xscale = identity, yscale = iden
     end
 
     if leg.active
-        axislegend(ax, position = leg.position, backgroundcolor = (:white, 0.5))
+        axislegend(ax, position = leg.position, backgroundcolor = (:white, 0.5), orientation = leg.orientation)
     end
 
     if axis_tight
@@ -153,7 +173,7 @@ Plot Bode diagram of a frequency response or a FRF.
 * `layout`: Layout of the plot (default: :vertical)
 * `ref_dB`: Reference value for magnitude (default: 1.)
 * `legend`: Legend parameters (default: (active = false, position = :rt, entry = " "))
-* `fonts`: Fonts of the figure (default: `DEFAULT\\_MAKIE\\_FONTS`)
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
 **Output**
 * `fig`: Figure
@@ -262,7 +282,7 @@ end
 Plot Nyquist diagram
 
 **Inputs**
-* `y`: Complex vector
+* `y`: Complex data vector
 * `theme`: Theme (default: :makie)
 * `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
@@ -303,6 +323,7 @@ Plot Nyquist diagram in 3D
 function nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS)
 
     set_theme!(theme_choice(theme))
+
     fig = Figure(fonts = fonts)
     ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part", aspect = (1, 2, 1))
 
@@ -366,13 +387,13 @@ end
 Plot a waterfall plot.
 
 **Inputs**
-* `x::Vector`: x-axis values
-* `y::Vector`: y-axis values
-* `z::Matrix`: z-axis values
-* `zmin::Real`: minimum value of z-axis
+* `x`: x-axis values
+* `y`: y-axis values
+* `z`: z-axis values
+* `zmin`: minimum value of z-axis
 * `lw::Real`: linewidth
-* `colorline::Symbol`: color of the lines
-* `colmap::Symbol`: Name of the colormap
+* `colorline`: color of the lines
+* `colmap`: Name of the colormap
 * `colorband`: Tuple defining the color of the band
     * color : Color
     * alpha : Alpha value for transparency
@@ -391,7 +412,9 @@ Plot a waterfall plot.
 """
 function waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)], fonts = DEFAULT_MAKIE_FONTS)
 
-    # Initialisation
+    set_theme!(theme_choice(:makie))
+
+    # Initialization
     ny = length(y)
     I₂ = ones(2)
 

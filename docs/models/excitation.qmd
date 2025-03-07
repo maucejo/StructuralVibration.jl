@@ -142,9 +142,12 @@ display(fig);
 
 The hammer impact signal is supposed to have the shape of a Gamma distribution
 $$
-F(t) = F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\right),
+F(t) = \begin{cases}
+F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\right), & \text{if } t \geq t_\text{start} \\
+0, & \text{otherwise}
+\end{cases},
 $$
-where $F_0$ is the amplitude of the signal, $t_h = t_\text{start}$ is the time since the impact, $p$ is the shape parameter, and $\theta$ is the scale parameter.
+where $F_0$ is the amplitude of the signal, $t_h = t - t_\text{start}$ is the time since the impact, $p$ is the shape parameter, and $\theta$ is the scale parameter.
 
 ::: {.api}
 **Hammer**
