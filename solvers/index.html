@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.40">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -71,7 +71,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23de9a1c3ba6cf3e248e28706c3df3a2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-4d04b275c36bd460889107e331013233.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-585a77d67552b4a34eb0de6c9603dd02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -105,7 +105,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -252,7 +255,10 @@ window.Quarto = {
   <li><a href="#time-domain-solvers" id="toc-time-domain-solvers" class="nav-link active" data-scroll-target="#time-domain-solvers"><span class="header-section-number">1</span> Time domain solvers</a>
   <ul class="collapse">
   <li><a href="#free-response" id="toc-free-response" class="nav-link" data-scroll-target="#free-response"><span class="header-section-number">1.1</span> Free response</a></li>
+  <li><a href="#forced-response" id="toc-forced-response" class="nav-link" data-scroll-target="#forced-response"><span class="header-section-number">1.2</span> Forced response</a></li>
+  <li><a href="#additional-functions" id="toc-additional-functions" class="nav-link" data-scroll-target="#additional-functions"><span class="header-section-number">1.3</span> Additional functions</a></li>
   </ul></li>
+  <li><a href="#frequency-domain-solvers" id="toc-frequency-domain-solvers" class="nav-link" data-scroll-target="#frequency-domain-solvers"><span class="header-section-number">2</span> Frequency domain solvers</a></li>
   </ul>
 </nav>
     </div>
@@ -324,9 +330,9 @@ x(t) = x_0 + v_0 t.
 </li>
 <li><p><code>u0</code>: Initial conditions</p>
 <ul>
-<li><p><code>x₀</code>: Initial displacement [m]</p>
+<li><p><code>x0</code>: Initial displacement [m]</p>
 </li>
-<li><p><code>v₀</code>: Initial velocity [m/s]</p>
+<li><p><code>v0</code>: Initial velocity [m/s]</p>
 </li>
 </ul>
 </li>
@@ -369,32 +375,32 @@ x(t) = x_0 + v_0 t.
 <div id="8" class="cell" data-ouput="false" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f₀ <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Time vector</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial conditions</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>u₀ <span class="op">=</span> [<span class="fl">0.1</span>, <span class="op">-</span><span class="fl">2</span>]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> [<span class="fl">1</span>, <span class="op">-</span><span class="fl">2</span>]</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Undamped system</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sdof_nd <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">0</span>.)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>prob_nd <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_nd, u₀, t)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sdof_nd <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, <span class="fl">0</span>.)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>prob_nd <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_nd, u0, t)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>x_nd <span class="op">=</span> <span class="fu">solve</span>(prob_nd).u</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Underdamped system</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>sdof_ud <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">0.1</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>prob_ud <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_ud, u₀, t)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>sdof_ud <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, <span class="fl">0.1</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>prob_ud <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_ud, u0, t)</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>x_ud <span class="op">=</span> <span class="fu">solve</span>(prob_ud).u</span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Critically damped system</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>sdof_cd <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">1</span>.)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>prob_cd <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_cd, u₀, t)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>sdof_cd <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, <span class="fl">1</span>.)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>prob_cd <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_cd, u0, t)</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>x_cd <span class="op">=</span> <span class="fu">solve</span>(prob_cd).u</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Overdamped system</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>sdof_od <span class="op">=</span> <span class="fu">Sdof</span>(m, f₀, <span class="fl">1.2</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>prob_od <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_od, u₀, t)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>sdof_od <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, <span class="fl">1.2</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>prob_od <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_od, u0, t)</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>x_od <span class="op">=</span> <span class="fu">solve</span>(prob_od).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="10" class="cell" data-execution_count="1">
@@ -406,10 +412,480 @@ x(t) = x_0 + v_0 t.
 </div>
 </div>
 </div>
-
-
 </section>
 </section>
+<section id="forced-response" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="forced-response"><span class="header-section-number">1.2</span> Forced response</h3>
+<p>The forced response of a single-degree-of-freedom system is the response of the system is the solution of the following ordinary differential equation: <span class="math display">\[
+\begin{cases}
+  \ddot x(t) + 2 \xi\omega_0\dot x(t) + \omega_0^2 x(t) = \frac{\text{rhs}(t)}{m} \\
+  x(0) = x_0 \\
+  \dot x(0) = v_0
+\end{cases},
+\]</span> where <span class="math inline">\(\text{rhs}(t)\)</span> is the right-hand side of the equation and its expression depends on the type of excitation: <span class="math display">\[
+\text{rhs}(t) = \begin{cases}
+f(t) &amp; \text{for an external force excitation} \\
+m\omega_0^2 x_b(t) + 2\xi\omega_0m\dot x_b(t) &amp; \text{for a base excitation}
+\end{cases}.
+\]</span></p>
+<p>Finally, the solution of the forced response is expressed as the sum of two terms, since: <span class="math display">\[
+x(t) = x_h(t) + x_p(t),
+\]</span> where <span class="math inline">\(x_h(t)\)</span> is the homogeneous solution of the equation and <span class="math inline">\(x_p(t)\)</span> is the particular solution of the equation.</p>
+<section id="harmonic-excitation-due-to-a-harmonic-excitation" class="level4" data-number="1.2.1">
+<h4 data-number="1.2.1" class="anchored" data-anchor-id="harmonic-excitation-due-to-a-harmonic-excitation"><span class="header-section-number">1.2.1</span> Harmonic excitation due to a harmonic excitation</h4>
+<p>When the excitation is harmonic, the resolution process is the following:</p>
+<ol type="1">
+<li><p>Compute the particular solution of the equation. The particular solution is a harmonic function of the same frequency as the excitation.</p></li>
+<li><p>Express the general solution of the homogeneous equation.</p></li>
+<li><p>Compute the remaining constants using the initial conditions. These constants depends on <span class="math inline">\(x_p(0)\)</span> and <span class="math inline">\(\dot x_p(0)\)</span>.</p></li>
+</ol>
+<section id="api-1" class="level5" data-number="1.2.1.1">
+<h5 data-number="1.2.1.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">1.2.1.1</span> API</h5>
+<p><strong>Data type</strong></p>
+<div class="api">
+<p><strong>SdofHarmonicTimeProblem</strong></p>
+<hr>
+<div id="12" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>SdofHarmonicTimeProblem(sdof, u0, t, F, ω, type_exc)</code></pre>
+<p>Structure containing the data of a time problem for a sdof system subject to a harmonic excitation</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>sdof</code>: Sdof structure</p>
+</li>
+<li><p><code>u0</code>: Initial conditions</p>
+<ul>
+<li><p><code>x0</code>: Initial displacement [m]</p>
+</li>
+<li><p><code>v0</code>: Initial velocity [m/s]</p>
+</li>
+</ul>
+</li>
+<li><p><code>t</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>F</code>: Amplitude of the force excitation [N] or base motion [m]</p>
+</li>
+<li><p><code>f</code>: Frequency of the excitation [Hz]</p>
+</li>
+<li><p><code>type_exc</code>: Type of excitation</p>
+<ul>
+<li><p>:force: External force (default)</p>
+</li>
+<li><p>:base: Base motion</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>sdof</code>: Sdof structure</p>
+</li>
+<li><p><code>u0</code>: Initial conditions</p>
+<ul>
+<li><p><code>x0</code>: Initial displacement [m]</p>
+</li>
+<li><p><code>v0</code>: Initial velocity [m/s]</p>
+</li>
+</ul>
+</li>
+<li><p><code>t</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>F</code>: Amplitude of the force excitation [N] or base motion [m]</p>
+</li>
+<li><p><code>ω</code>: Frequency of the excitation [rad/s]</p>
+</li>
+<li><p><code>type_exc</code>: Type of excitation</p>
+<ul>
+<li><p>:force: External force (default)</p>
+</li>
+<li><p>:base: Base motion</p>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::SdofHarmonicTimeProblem)</code></pre>
+<p>Computes the forced response of a single degree of freedom (Sdof) system due to an harmonic external force or base motion</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the parameters of the Sdof harmonic problem</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>sol</code>: The response of the system at the given time points</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level5" data-number="1.2.1.2">
+<h5 data-number="1.2.1.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">1.2.1.2</span> Example</h5>
+<div id="16" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiation of the Sdof object</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Harmonic excitation - Force amplitude + excitation frequency</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fl">2</span>.</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiation of the problem</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> [<span class="fl">1</span>, <span class="op">-</span><span class="fl">2</span>]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofHarmonicTimeProblem</span>(sdof, u0, t, F0, f, <span class="op">:</span>force)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the problem</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>x_harmo <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="arbitrary-excitation" class="level4" data-number="1.2.2">
+<h4 data-number="1.2.2" class="anchored" data-anchor-id="arbitrary-excitation"><span class="header-section-number">1.2.2</span> Arbitrary excitation</h4>
+<p>For an arbitrary excitation, the solution is given by: <span class="math display">\[
+x(t) = x_\text{free}(t) + \int_0^t rhs(t - τ)h(τ)dτ,
+\]</span> where <span class="math inline">\(x_\text{free}(t)\)</span> is the free response of the system and <span class="math inline">\(h(t)\)</span> is the impulse response of the system.</p>
+<section id="api-2" class="level5" data-number="1.2.2.1">
+<h5 data-number="1.2.2.1" class="anchored" data-anchor-id="api-2"><span class="header-section-number">1.2.2.1</span> API</h5>
+<p><strong>Data type</strong></p>
+<div class="api">
+<p><strong>SdofForcedTimeProblem</strong></p>
+<hr>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>SdofForcedTimeProblem(sdof, u0, t, F, ω, type_exc)</code></pre>
+<p>Structure containing the data of a time problem for a sdof system subject to an arbitrary excitation</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>sdof</code>: Sdof structure</p>
+</li>
+<li><p><code>u0</code>: Initial conditions</p>
+<ul>
+<li><p><code>x0</code>: Initial displacement [m]</p>
+</li>
+<li><p><code>v0</code>: Initial velocity [m/s]</p>
+</li>
+</ul>
+</li>
+<li><p><code>t</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>F</code>: Amplitude of the force excitation [N] or base motion [m]</p>
+</li>
+<li><p><code>type_exc</code>: Type of excitation</p>
+<ul>
+<li><p>:force: External force (default)</p>
+</li>
+<li><p>:base: Base motion</p>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::SdofForcedTimeProblem)</code></pre>
+<p>Computes the forced response of a single degree of freedom (Sdof) system due to an arbitrary external force or base motion</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the parameters of the Sdof forced problem</p>
+</li>
+<li><p><code>method</code>: Method to compute the Duhamel's integral</p>
+<ul>
+<li><p>:filt: Filtering using the Z-transform of the impulse response (default)</p>
+</li>
+<li><p>:interp: Interpolation + Gaussian quadrature</p>
+</li>
+<li><p>:conv: Convolution product</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>sol</code>: The response of the system at the given time points</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-2" class="level5" data-number="1.2.2.2">
+<h5 data-number="1.2.2.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">1.2.2.2</span> Example</h5>
+<div id="24" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiation of the Sdof object</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Harmonic excitation - Hammer impact</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">2</span>.</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>haversine <span class="op">=</span> <span class="fu">HaverSine</span>(F0, tstart, duration)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(haversine, t)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiation of the problem</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> [<span class="fl">1</span>, <span class="op">-</span><span class="fl">2</span>]</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, u0, t, F, <span class="op">:</span>force)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the problem</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>x_arb_filt <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>filt).u</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>x_arb_interp <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>interp).u</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>x_arb_conv <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>conv).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="26" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="additional-functions" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="additional-functions"><span class="header-section-number">1.3</span> Additional functions</h3>
+<section id="impulse-response" class="level4" data-number="1.3.1">
+<h4 data-number="1.3.1" class="anchored" data-anchor-id="impulse-response"><span class="header-section-number">1.3.1</span> Impulse response</h4>
+<p>The impulse response of a single-degree-of-freedom system is the response of the system when it is subjected to an impulse excitation. The impulse response is the solution of the following ordinary differential equation: <span class="math display">\[
+\overset{..}{h}(t) + 2\xi\omega_0\overset{.}{h}(t) + \omega_0^2 h(t) = \frac{\delta(t)}{m}.
+\]</span></p>
+<p>It can be shown that the impulse response can be computed by solving the following problem: <span class="math display">\[
+\begin{cases}
+\overset{..}{h}(t) + 2\xi\omega_0\overset{.}{h}(t) + \omega_0^2 h(t) = 0 &amp; \forall t &gt; 0 \\
+h(t) = 0 &amp; \text{at } t = 0 \\
+\overset{.}{h}(t) = \frac{1}{m} &amp; \text{at } t = 0
+\end{cases}.
+\]</span></p>
+<div class="api">
+<p><strong>impulse_response</strong></p>
+<hr>
+<div id="28" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>impulse_response(sdof, t)</code></pre>
+<p>Compute the impulse response of a single degree of freedom (Sdof) system</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>sdof</code>: Sdof structure</p>
+</li>
+<li><p><code>t</code>: Time points at which to evaluate the response</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>h</code>: Impulse response</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="30" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiation of the Sdof object</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(sdof, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="32" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-17-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="shock-response-spectrum" class="level4" data-number="1.3.2">
+<h4 data-number="1.3.2" class="anchored" data-anchor-id="shock-response-spectrum"><span class="header-section-number">1.3.2</span> Shock response spectrum</h4>
+<p>The shock response spectrum (SRS) is a graph of the peak acceleration response of a single-degree-of-freedom system subjected to a base acceleration with respect to the frequency. The SRS is computed by solving the following problem: <span class="math display">\[
+\ddot z(t) + 2\xi\omega_0\dot z(t) + \omega_0^2 z(t) = -\ddot x_b(t),
+\]</span> where <span class="math inline">\(z(t) = x(t) - x_b(t)\)</span> is the relative displacement of the system with respect to the base.</p>
+<p>To compute the SRS, the following steps are performed at a given frequency <span class="math inline">\(f\)</span>:</p>
+<ol type="1">
+<li><p>Instantiate a Sdof type</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(<span class="fl">1</span>., f, ξ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Compute the time response of the relative displacement <span class="math inline">\(z(t)\)</span> due to a base acceleration for <span class="math inline">\(z(0) = 0\)</span> and <span class="math inline">\(\dot z(0) = 0\)</span>.</p></li>
+<li><p>Compute the acceleration <span class="math inline">\(\ddot x(t)\)</span> of the system: <span class="math display">\[
+x(t) = -2\xi\omega_0\dot z(t) - \omega_0^2 z(t)
+\]</span></p></li>
+<li><p>Extract the primary or secondary part of the acceleration (i.e.&nbsp;until or after the end of the excitation signal).</p></li>
+<li><p>Compute either:</p>
+<ul>
+<li><p>The peak acceleration of the system such that: <span class="math display">\[
+SRS(f) = \max\left(|\ddot x(t)|\right)
+\]</span></p></li>
+<li><p>The maximum positive acceleration of the system such that: <span class="math display">\[
+SRS(f) = \max\left(\max(\ddot x(t), 0)\right)
+\]</span></p></li>
+<li><p>The maximum negative acceleration of the system such that: <span class="math display">\[
+SRS(f) = \max\left(\max(-\ddot x(t), 0)\right)
+\]</span></p></li>
+</ul></li>
+</ol>
+<p>Several algorithms are available to compute the SRS:</p>
+<ul>
+<li><code>:Basic</code>: the SRS is computed by following the steps mentioned above. It is not the most efficient algorithm but it is the most versatile.</li>
+<li><code>:RecursiveInt</code>: the SRS is computed using a recursive integration algorithm.</li>
+<li><code>:RecursiveFilt</code>: the SRS is computed using a recursive filtering algorithm.</li>
+<li><code>:Smallwood</code>: the SRS is computed using the Smallwood algorithm.</li>
+</ul>
+<p>For the last three algorithms, more details and references can be found <a href="https://fr.mathworks.com/help/signal/ug/practical-introduction-to-shock-waveform-and-shock-response-spectrum.html">Mathworks - Introduction to SRS</a></p>
+<div class="api">
+<p><strong>srs</strong></p>
+<hr>
+<div id="34" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>srs(base_acc::ArbitraryExc, freq, t, ξ = 0.05,
+    type = (instance = :primary, amplitude = :abs), alg = :Smallwood)</code></pre>
+<p>Compute the Shock Response Spectrum (SRS)</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>base_acc</code>: Base acceleration type - see <code>excitation</code> function for detatils</p>
+</li>
+<li><p><code>freq</code>: Vector of frequencies [Hz]</p>
+</li>
+<li><p><code>t</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>ξ</code>: Damping ratio (default = 0.05)</p>
+</li>
+<li><p><code>type</code>: Type of SRS</p>
+<ul>
+<li><p><code>instance</code>: Instance of the SRS</p>
+<ul>
+<li><p><code>:primary</code>: Primary instance (default)</p>
+</li>
+<li><p><code>:secondary</code>: Secondary instance</p>
+</li>
+</ul>
+</li>
+<li><p><code>amplitude</code>: Amplitude used of the computing SRS</p>
+<ul>
+<li><p><code>:abs</code>: Maximum absolute amplitude (default)</p>
+</li>
+<li><p><code>:pos</code>: Maximum positive amplitude</p>
+</li>
+<li><p><code>:neg</code>: Maximum negative amplitude</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>alg</code>: Algorithm to compute the SRS</p>
+<ul>
+<li><p><code>:Basic</code>: Basic algorithm</p>
+</li>
+<li><p><code>:RecursiveInt</code>: Recursive integration algorithm</p>
+</li>
+<li><p><code>:RecursiveFilt</code>: Recursive filtering algorithm</p>
+</li>
+<li><p><code>:Smallwood</code>: Smallwood algorithm (default)</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>srs</code>: Vector of the SRS values</p>
+</li>
+</ul>
+<p><em>Note</em></p>
+<ul>
+<li><p>Primary instance - response of the system during the application of the base acceleration</p>
+</li>
+<li><p>Secondary instance - response of the system after the application of the base acceleration</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="36" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the base acceleration</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">1e-5</span><span class="op">:</span><span class="fl">0.5</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>base_acc <span class="op">=</span> <span class="fu">HalfSine</span>(<span class="fl">10</span>., <span class="fl">0</span>, <span class="fl">1e-3</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the SRS</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fl">50</span>.<span class="op">:</span><span class="fl">25</span><span class="op">:</span><span class="fl">1e3</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>srs_basic <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>srs_rec_int <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>RecursiveInt)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>srs_rec_filt <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>RecursiveFilt)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>srs_smallwood <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>Smallwood)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="38" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="frequency-domain-solvers" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="frequency-domain-solvers"><span class="header-section-number">2</span> Frequency domain solvers</h2>
+
+
 </section>
 
 </main> <!-- /main -->
