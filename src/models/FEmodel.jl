@@ -106,7 +106,7 @@ Compute the global stiffness and mass matrices for a 1D structure with a given m
 """
 function assembly(model::OneDStructure, mesh::OneDMesh)
     # Compute elemental matrices
-    kₑ, mₑ = element_matrix(model, mesh.elem_size)
+    ke, me = element_matrix(model, mesh.elem_size)
 
     (; Elt, Ndof_per_node) = mesh
     Nelt = size(Elt, 1)
@@ -120,8 +120,8 @@ function assembly(model::OneDStructure, mesh::OneDMesh)
     @inbounds @views for i = 1:Nelt
         ind .= (Ndof_per_node*Elt[i, 2:end]' .+ repeat((0:Ndof_per_node-1), 1, Ndof_per_node) .- Ndof_per_node .+ 1)[:];
 
-        K[ind, ind] += kₑ
-        M[ind, ind] += mₑ
+        K[ind, ind] += ke
+        M[ind, ind] += me
     end
 
     return K, M
@@ -138,8 +138,8 @@ Compute the elemental stiffness and mass matrices for a beam with a element size
 * `h`: element size
 
 **Outputs**
-* `kₑ`: elemental stiffness matrix
-* `mₑ`: elemental mass matrix
+* `ke`: elemental stiffness matrix
+* `me`: elemental mass matrix
 """
 function element_matrix(beam::Beam, h)
     # Constants
@@ -147,18 +147,18 @@ function element_matrix(beam::Beam, h)
     mc = beam.m*h/420.
 
     # Elemental stiffness matrix
-    kₑ = kc.*[12. 6h -12. 6h;
+    ke = kc.*[12. 6h -12. 6h;
               6h 4h^2 -6h 2h^2;
               -12. -6h 12. -6h;
               6h 2h^2 -6h 4h^2]
 
     # Elemental mass matrix
-    mₑ = mc.*[156. 22h 54. -13h;
+    me = mc.*[156. 22h 54. -13h;
               22h 4h^2 13h -3h^2;
               54. 13h 156. -22h;
               -13h -3h^2 -22h 4h^2]
 
-    return kₑ, mₑ
+    return ke, me
 end
 
 function element_matrix(we::WaveEquation, h)
@@ -167,14 +167,14 @@ function element_matrix(we::WaveEquation, h)
     mc = we.m*h/6.
 
     # Elemental stiffness matrix
-    kₑ = kc.*[1. -1.;
+    ke = kc.*[1. -1.;
               -1. 1.]
 
     # Elemental mass matrix
-    mₑ = mc.*[2. 1.;
+    me = mc.*[2. 1.;
               1. 2.]
 
-    return kₑ, mₑ
+    return ke, me
 end
 
 """
@@ -224,32 +224,30 @@ function apply_bc(A, mesh)
 end
 
 """
-    eigenmode(K, M, Nₘ = size(K, 1))
+    eigenmode(K, M, n = size(K, 1))
 
 Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 
 **Inputs**
 * `K`: Stiffness matrix
 * `M`: Mass matrix
-* `Nₘ`: Number of modes to be keep in the modal basis
+* `n`: Number of modes to be keep in the modal basis
 
 **Outputs**
-* `ωₘ`: Vector of natural frequencies
-* `Φₘ`: Mass-normalized mode shapes
+* `ω`: Vector of natural frequencies
+* `Φ`: Mass-normalized mode shapes
 """
-function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, Nₘ = size(K, 1))
+function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, n = size(K, 1))
 
     λ, Φ = eigen(K, M)
+    ω = @. √abs(λ[1:n])
 
-    ωₘ = @. √abs(λ[1:Nₘ])
-    Φₘ = Φ[:, 1:Nₘ]
-
-    return ωₘ, Φₘ
+    return ωₘ, Φ[:, 1:n]
 end
 
 """
     rayleigh_damping_matrix(K, M, α, β)
-    rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)
+    rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)
 
 Compute the Rayleigh damping matrix for a given stiffness and mass matrices
 
@@ -261,10 +259,10 @@ Compute the Rayleigh damping matrix for a given stiffness and mass matrices
         * `α`: Mass proportional damping coefficient
         * `β`: Stiffness proportional damping coefficient
     * Method 2
-        * `ω₁`: First natural frequency
-        * `ω₂`: Second natural frequency
-        * `ξ₁`: Damping ratio for the first natural frequency
-        * `ξ₂`: Damping ratio for the second natural frequency
+        * `ω1`: First natural frequency
+        * `ω2`: Second natural frequency
+        * `ξ1`: Damping ratio for the first natural frequency
+        * `ξ2`: Damping ratio for the second natural frequency
 
 **Output**
 * `C`: Rayleigh damping matrix
@@ -273,28 +271,28 @@ function rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
     return α*M + β*K
 end
 
-function rayleigh_damping_matrix(K, M, ω₁::Float64, ω₂::Float64, ξ₁::Float64, ξ₂::Float64)
-    β = 2(ξ₂*ω₂ - ξ₁*ω₁)/(ω₂^2 - ω₁^2)
-    α = 2ξ₁*ω₁ - ω₁^2*β
+function rayleigh_damping_matrix(K, M, ω1::Float64, ω2::Float64, ξ1::Float64, ξ2::Float64)
+    β = 2(ξ2*ω2 - ξ1*ω1)/(ω2^2 - ω1^2)
+    α = 2ξ1*ω1 - ω1^2*β
     return α*M + β*K
 end
 
 """
-    modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)
+    modal_damping_matrix(M, ωn, ξn, Φn)
 
 Compute the damping matrix C from modal parameters
 
 **Inputs**
 * `M`: Mass matrix
-* `ωₙ`: Natural angular frequencies
-* `ξₙ`: Damping ratios
-* `Φₙ`: Mass-normalized mode shapes
+* `ωn`: Natural angular frequencies
+* `ξn`: Damping ratios
+* `Φn`: Mass-normalized mode shapes
 
 **Output**
 * `C`: Damping matrix
 """
-function modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)
-    Cₙ = Diagonal(2ξₙ.*ωₙ)
+function modal_damping_matrix(M, ωn, ξn, Φn)
+    Cn = Diagonal(2ξn.*ωn)
 
-    return Φₙ*M*Cₙ*M*Φₙ'
+    return Φn*M*Cn*M*Φn'
 end

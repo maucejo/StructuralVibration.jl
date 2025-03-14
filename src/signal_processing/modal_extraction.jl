@@ -19,8 +19,8 @@ Extract natural frequencies and damping ratios from the Bode diagram fitting met
     * `:acc`: Acceleration
 
 # Outputs
-* `fₙ`: Natural frequencies
-* `ξₙ`: Damping ratios
+* `fn`: Natural frequencies
+* `ξn`: Damping ratios
 """
 function freq_extraction(freq, H, method::ModalExtraction = PeakPicking(); type = :dis)
     if method isa PeakPicking
@@ -37,10 +37,10 @@ function freq_ppm_extract(freq, H; type = :dis)
     pks = findmaxima(Habs) |> peakproms! |> peakwidths!
 
     # Natural frequencies
-    fₙ = freq[pks.indices]
+    fn = freq[pks.indices]
 
-    nfreq = length(fₙ)
-    ξₙ = undefs(nfreq)
+    nfreq = length(fn)
+    ξn = undefs(nfreq)
 
     # Convert to displacement
     if type == :vel
@@ -55,7 +55,7 @@ function freq_ppm_extract(freq, H; type = :dis)
     freq_right = undefs(nlocal)
     Hleft = undefs(nlocal)
     Hright = undefs(nlocal)
-    for (n, (f, idmax, Hmax, edg)) in enumerate(zip(fₙ, pks.indices, pks.heights, pks.edges))
+    for (n, (f, idmax, Hmax, edg)) in enumerate(zip(fn, pks.indices, pks.heights, pks.edges))
         edge1, edge2 = round.(Int, edg) .+ [-5, 5]
 
         # Left side of the peak
@@ -73,10 +73,10 @@ function freq_ppm_extract(freq, H; type = :dis)
         fmax = freq_right[posright]
 
         # A structural damping is supposed η = 2ξ. So ξ = η/2
-        ξₙ[n] = (fmax^2 - fmin^2)/4f^2
+        ξn[n] = (fmax^2 - fmin^2)/4f^2
     end
 
-    return fₙ, ξₙ
+    return fn, ξn
 end
 
 function freq_cfm_extract(freq, H; type = :dis)
@@ -92,8 +92,8 @@ function freq_cfm_extract(freq, H; type = :dis)
         H ./= ω.^2
     end
 
-    fₙ = undefs(nfreq)
-    ξₙ = undefs(length(nfreq))
+    fn = undefs(nfreq)
+    ξn = undefs(length(nfreq))
 
     nfreq_itp = 500
     ReH_itp = undefs(nfreq_itp)
@@ -135,42 +135,42 @@ function freq_cfm_extract(freq, H; type = :dis)
         θ₂ = θ[pos2]
 
         # Calculation of the natural frequency and damping ratio
-        fₙ[n] = √((f₁^2*tan(θ₂/2) - f₂^2*tan(θ₁/2))/(tan(θ₂/2) - tan(θ₁/2)))
-        ξₙ[n] = (f₂^2 - f₁^2)/(2fₙ[n]^2*(tan(θ₁/2) - tan(θ₂/2)))
+        fn[n] = √((f₁^2*tan(θ₂/2) - f₂^2*tan(θ₁/2))/(tan(θ₂/2) - tan(θ₁/2)))
+        ξn[n] = (f₂^2 - f₁^2)/(2fn[n]^2*(tan(θ₁/2) - tan(θ₂/2)))
     end
 
-    return fₙ, ξₙ
+    return fn, ξn
 end
 
 """
-    modeshape_extraction(freq, H, fₙ, ξₙ, id_exc, method::ModalExtraction; type = :dis)
+    modeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction; type = :dis)
 
 Extract mode shapes from the Bode's diagram of Nyquiste's circle fitting method
 
 # Inputs
 * `freq`: Frequency vector
 * `H`: Frequency response function
-* `fₙ`: Natural frequencies
-* `ξₙ`: Damping ratios
+* `fn`: Natural frequencies
+* `ξn`: Damping ratios
 * `id_exc`: Identifier of the excited nodes
 * `method`: Method to extract the mode shapes
     * `BodeExtract`: Bode diagram (default)
     * `NyquistExtract`: Nyquist diagram
 
 # Output
-* `ϕₙ`: Mode shapes
+* `ϕn`: Mode shapes
 """
-function modeshape_extraction(freq, H, fₙ, ξₙ, id_exc, method::ModalExtraction = PeakPicking(); type = :dis)
+function modeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction = PeakPicking(); type = :dis)
     if method isa PeakPicking
-        return modeshape_ppm_extract(freq, H, fₙ, ξₙ, id_exc; type = type)
+        return modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = type)
     elseif method isa CircleFit
-        return modeshape_nyquist_extract(freq, H, fₙ, ξₙ, id_exc; type = type)
+        return modeshape_nyquist_extract(freq, H, fn, ξn, id_exc; type = type)
     end
 end
 
-function modeshape_ppm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
+function modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = :dis)
     ω = 2π*freq
-    ωₙ = 2π*fₙ
+    ωn = 2π*fn
 
     ndim = ndims(H)
     if ndim == 1
@@ -188,13 +188,13 @@ function modeshape_ppm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
 
     #Initialization
     nx = size(H, 1)
-    nfreq = length(fₙ)
-    ϕₙ = undefs(nx, nfreq)
+    nfreq = length(fn)
+    ϕn = undefs(nx, nfreq)
 
     # Unexcited nodes
     pos_nexc = findall(x -> x ∉ id_exc, 1:nx)
 
-    for (n, (ω₀, ξ)) in enumerate(zip(ωₙ, ξₙ))
+    for (n, (ω₀, ξ)) in enumerate(zip(ωn, ξn))
         # Trick for estimating the mode shape when ξ = 0
         η = 2ξ
         if η == 0.
@@ -206,23 +206,23 @@ function modeshape_ppm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
         # Mode shape estimation at driving point
         Hmax = H[id_exc, pos_max]
         signH = sign(angle(Hmax))
-        ϕₙ[id_exc, n] = signH*√(η*ω₀^2*abs(Hmax))
+        ϕn[id_exc, n] = signH*√(η*ω₀^2*abs(Hmax))
 
         # Mode shape estimation at other nodes
         for pos in pos_nexc
             Hmax = H[pos, pos_max]
             signH = sign(angle(Hmax))
-            ϕₙ[pos, n] = signH*η*ω₀^2*abs(Hmax)/abs(ϕₙ[id_exc, n])
+            ϕn[pos, n] = signH*η*ω₀^2*abs(Hmax)/abs(ϕn[id_exc, n])
         end
     end
 
-    return ϕₙ
+    return ϕn
 end
 
-function modeshape_cfm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
+function modeshape_cfm_extract(freq, H, fn, ξn, id_exc; type = :dis)
 
     ω = 2π*freq
-    ωₙ = 2π*fₙ
+    ωn = 2π*fn
 
     ndim = ndims(H)
     if ndim == 1
@@ -242,13 +242,13 @@ function modeshape_cfm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
 
     #Initialization
     nx = size(H, 1)
-    nfreq = length(fₙ)
-    ϕₙ = undefs(nx, nfreq)
+    nfreq = length(fn)
+    ϕn = undefs(nx, nfreq)
 
     # Unexcited nodes
     pos_nexc = findall(x -> x ∉ id_exc, 1:nx)
 
-    for (n, (ω₀, ξ, edg)) in enumerate(zip(ωₙ, ξₙ, pks.edges))
+    for (n, (ω₀, ξ, edg)) in enumerate(zip(ωn, ξn, pks.edges))
         η = 2ξ
         edges = round.(Int, edg) .+ [-5, 5]
         freqs = freq[edges[1]:edges[2]]
@@ -266,7 +266,7 @@ function modeshape_cfm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
         pos_max = argmin(abs.(ω - ω₀))
         Hmax = Hd[pos_max]
         signH = sign(angle(Hmax))
-        ϕₙ[id_exc, n] = signH*√(An)
+        ϕn[id_exc, n] = signH*√(An)
 
         # Mode shape estimation at other nodes
         for pos in pos_nexc
@@ -279,11 +279,11 @@ function modeshape_cfm_extract(freq, H, fₙ, ξₙ, id_exc; type = :dis)
 
             Hmax = Hd[pos_max]
             signH = sign(angle(Hmax))
-            ϕₙ[pos, n] = signH*An/abs(ϕₙ[id_exc, n])
+            ϕn[pos, n] = signH*An/abs(ϕn[id_exc, n])
         end
     end
 
-    return ϕₙ
+    return ϕn
 end
 
 """

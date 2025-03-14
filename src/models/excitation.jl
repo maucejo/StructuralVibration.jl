@@ -1,144 +1,144 @@
 abstract type ArbitraryExc end
 
 """
-    Rectangle(F₀, tstart, duration)
+    Rectangle(F, tstart, duration)
 
 Struct to define a rectangular excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 """
 @with_kw struct Rectangle <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
 end
 
 """
-    Triangle(F₀, tstart, duration)
+    Triangle(F, tstart, duration)
 
 Struct to define a triangular excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 """
 @with_kw struct Triangle <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
 end
 
 """
-    Hammer(F₀, tstart, k, θ)
+    Hammer(F, tstart, k, θ)
 
 Struct to define a hammer impact excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `p`: Shape parameter
 * `θ`: Intensity parameter [s]
 """
 @with_kw struct Hammer <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     p::Float64
     θ::Float64
 end
 
 """
-    SmoothRect(F₀, tstart, tr, duration)
+    SmoothRect(F, tstart, tr, duration)
 
 Struct to define a smooth rectangular excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
-* `trise`: Rise time from 0 to F₀ [s]
+* `trise`: Rise time from 0 to F [s]
 
 *Note: `SmoothRect` is actually a custom Tukey window for which the coefficient α is computed to satisfy the `trise` given by the user*
 """
 @with_kw struct SmoothRect <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
     trise::Float64
 end
 
 """
-    SineWave(F₀, tstart, duration, freq; zero_end = true)
+    SineWave(F, tstart, duration, freq; zero_end = true)
 
 Struct to define a sine wave excitation signal
 
 **Constructor parameters**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 * `freq`: Frequency of the excitation [Hz]
 * `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 * `ω`: Frequency of the excitation [Hz]
 * `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
 @with_kw struct SineWave <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
     ω::Float64
     ϕ::Float64
     zero_end::Bool
 
-    SineWave(F₀, tstart, duration, freq, ϕ = 0.; zero_end = true) = new(F₀, tstart, duration, 2π*freq, ϕ, zero_end)
+    SineWave(F, tstart, duration, freq, ϕ = 0.; zero_end = true) = new(F, tstart, duration, 2π*freq, ϕ, zero_end)
 end
 
 """
-    HalfSine(F₀, tstart, duration)
+    HalfSine(F, tstart, duration)
 
 Struct to define a half sine excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 """
 @with_kw struct HalfSine <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
 end
 
 """
-    HaverSine(F₀, tstart, duration)
+    HaverSine(F, tstart, duration)
 
 Struct to define a Haversine (or versed sine) excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 """
 @with_kw struct HaverSine <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
 end
 
 """
-    SweptSine(F₀, tstart, duration, fstart, fend, type)
+    SweptSine(F, tstart, duration, fstart, fend, type)
 
 Struct to define a swept sine excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 * `fstart`: Starting frequency [Hz]
@@ -150,7 +150,7 @@ Struct to define a swept sine excitation signal
 * `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
 @with_kw struct SweptSine <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
     fstart::Float64
@@ -158,16 +158,16 @@ Struct to define a swept sine excitation signal
     type_swept::Symbol
     zero_end::Bool
 
-    SweptSine(F₀, tstart, duration, fstart, fend, type_swept = :lin; zero_end = true) = new(F₀, tstart, duration, fstart, fend, type_swept, zero_end)
+    SweptSine(F, tstart, duration, fstart, fend, type_swept = :lin; zero_end = true) = new(F, tstart, duration, fstart, fend, type_swept, zero_end)
 end
 
 """
-    GaussianPulse(F₀, tstart, duration, fc)
+    GaussianPulse(F, tstart, duration, fc)
 
 Struct to define a Gaussian pulse excitation signal
 
 **Fields**
-* `F₀`: Amplitude of the force [N]
+* `F`: Amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 * `fc`: Center frequency of the pulse [Hz]
@@ -175,25 +175,25 @@ Struct to define a Gaussian pulse excitation signal
 
 *Note on the parameter `precision`*
 
-The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F₀*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
+The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
 """
 @with_kw struct GaussianPulse <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
     fc::Float64
     precision::Float64
 
-    GaussianPulse(F₀, tstart, duration, fc; precision = 4) = new(F₀, tstart, duration, fc, precision)
+    GaussianPulse(F, tstart, duration, fc; precision = 4) = new(F, tstart, duration, fc, precision)
 end
 
 """
-    ColoredNoise(F₀, color)
+    ColoredNoise(F, color)
 
 Struct to define a colored noise excitation signal
 
 **Fields**
-* `F₀`: Mean amplitude of the force [N]
+* `F`: Mean amplitude of the force [N]
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 * `σ`: Target standard deviation of the colored noise
@@ -206,14 +206,14 @@ Struct to define a colored noise excitation signal
 * `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
 """
 @with_kw struct ColoredNoise <: ArbitraryExc
-    F₀::Float64
+    F::Float64
     tstart::Float64
     duration::Float64
     σ::Float64
     color::Symbol
     band_freq::Vector{Float64}
 
-    ColoredNoise(F₀, tstart, duration, σ = 1.; color = :white, band_freq = Float64[]) = new(F₀, tstart, duration, σ, color, band_freq)
+    ColoredNoise(F, tstart, duration, σ = 1.; color = :white, band_freq = Float64[]) = new(F, tstart, duration, σ, color, band_freq)
 end
 
 """
@@ -240,13 +240,13 @@ Computes different types of excitation signals
 """
 function excitation(type::Rectangle, t)
 
-    (; F₀, tstart, duration) = type
+    (; F, tstart, duration) = type
     Ft = zeros(length(t))
 
     tb = tstart
     te = tstart + duration
 
-    Ft[@. tb ≤ t ≤ te] .= F₀
+    Ft[@. tb ≤ t ≤ te] .= F
 
     return Ft
 end
@@ -254,7 +254,7 @@ end
 # Triangle excitation
 function excitation(type::Triangle, t)
 
-    (; F₀, tstart, duration) = type
+    (; F, tstart, duration) = type
 
     Ft = zeros(length(t))
 
@@ -264,10 +264,10 @@ function excitation(type::Triangle, t)
     pos_start = argmin(@. (t .- tstart)^2.)
     pos_middle = argmin(@. (t - trise)^2.)
     pos_end = argmin(@. (t - tstart - duration)^2.)
-    amp = 2F₀/duration
+    amp = 2F/duration
 
     @. Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] - tstart)
-    @. Ft[pos_middle + 1:pos_end] = F₀ - amp*(t[pos_middle + 1:pos_end] - trise)
+    @. Ft[pos_middle + 1:pos_end] = F - amp*(t[pos_middle + 1:pos_end] - trise)
 
     return Ft
 end
@@ -275,7 +275,7 @@ end
 # Hammer excitation
 function excitation(type::Hammer, t)
 
-    (; F₀, tstart, p, θ) = type
+    (; F, tstart, p, θ) = type
 
     Ft = zeros(length(t))
 
@@ -286,7 +286,7 @@ function excitation(type::Hammer, t)
 
     t_hammer = @. t[pos_start:end] - tstart
 
-    @. Ft[pos_start:end] = F₀*(t_hammer/p/θ)^p*exp(-t_hammer/θ + p)
+    @. Ft[pos_start:end] = F*(t_hammer/p/θ)^p*exp(-t_hammer/θ + p)
 
     return Ft
 end
@@ -294,7 +294,7 @@ end
 # Smooth rectangular excitation
 function excitation(type::SmoothRect, t)
 
-    (; F₀, tstart, trise, duration) = type
+    (; F, tstart, trise, duration) = type
 
     Ft = zeros(length(t))
 
@@ -311,13 +311,13 @@ function excitation(type::SmoothRect, t)
     α = 2trise/duration
 
     t_rise = t[pos_start:pos_rect_start] .- tstart
-    Frise = @. 0.5*F₀*(1. - cos(2π*t_rise/α/duration))
+    Frise = @. 0.5*F*(1. - cos(2π*t_rise/α/duration))
 
     t_desc = @. t[pos_rect_end:pos_end] - tstart - duration
-    Fdesc = @. 0.5*F₀*(1. - cos(2π*t_desc/α/duration))
+    Fdesc = @. 0.5*F*(1. - cos(2π*t_desc/α/duration))
 
     Ft[pos_start:pos_rect_start] .= Frise
-    Ft[pos_rect_start:pos_rect_end] .= F₀
+    Ft[pos_rect_start:pos_rect_end] .= F
     Ft[pos_rect_end:pos_end] .= Fdesc
 
     return Ft
@@ -326,7 +326,7 @@ end
 # Sine wave excitation
 function excitation(type::SineWave, t)
 
-    (; F₀, tstart, duration, ω, ϕ, zero_end) = type
+    (; F, tstart, duration, ω, ϕ, zero_end) = type
 
     nt = length(t)
     Ft = zeros(nt)
@@ -352,7 +352,7 @@ function excitation(type::SineWave, t)
 
     pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
-    @. Ft[pos_exc_t] = F₀*sin(ω*(t[pos_exc_t] - tstart) + ϕ)
+    @. Ft[pos_exc_t] = F*sin(ω*(t[pos_exc_t] - tstart) + ϕ)
 
     return Ft
 end
@@ -360,7 +360,7 @@ end
 # Half sine excitation
 function excitation(type::HalfSine, t)
 
-    (; F₀, tstart, duration) = type
+    (; F, tstart, duration) = type
 
     Ft = zeros(length(t))
 
@@ -368,7 +368,7 @@ function excitation(type::HalfSine, t)
     pos_end = argmin(@. (t - tstart - duration)^2.)
     pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
-    @. Ft[pos_exc_t] = F₀*sin(π*(t[pos_exc_t] - tstart)/duration)
+    @. Ft[pos_exc_t] = F*sin(π*(t[pos_exc_t] - tstart)/duration)
 
     return Ft
 end
@@ -376,7 +376,7 @@ end
 # Haversine excitation
 function excitation(type::HaverSine, t)
 
-    (; F₀, tstart, duration) = type
+    (; F, tstart, duration) = type
 
     Ft = zeros(length(t))
 
@@ -384,7 +384,7 @@ function excitation(type::HaverSine, t)
     pos_end = argmin(@. (t - tstart - duration)^2.)
     pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
 
-    @. Ft[pos_exc_t] = F₀*(1. - cos(2π*(t[pos_exc_t] - tstart)/duration))/2
+    @. Ft[pos_exc_t] = F*(1. - cos(2π*(t[pos_exc_t] - tstart)/duration))/2
 
     return Ft
 end
@@ -392,7 +392,7 @@ end
 # Swept sine excitation
 function excitation(type::SweptSine, t)
 
-    (; F₀, tstart, duration, fstart, fend, type_swept, zero_end) = type
+    (; F, tstart, duration, fstart, fend, type_swept, zero_end) = type
 
     Ft = zeros(length(t))
 
@@ -450,25 +450,25 @@ function excitation(type::SweptSine, t)
         end
     end
 
-    @. Ft[pos_exc_t] = F₀*sin(ϕ)
+    @. Ft[pos_exc_t] = F*sin(ϕ)
 
     return Ft
 end
 
 # Gaussian pulse excitation
 function excitation(type::GaussianPulse, t)
-    (; F₀, tstart, duration, fc, precision) = type
+    (; F, tstart, duration, fc, precision) = type
 
     Ft = zeros(length(t))
 
     pos_start = argmin((t .- tstart).^2.)
     tpulse = t[pos_start:end] .- tstart .- duration/2
 
-    # The precision parameter calibrates the standard deviation of the pulse, so that the duration = n*σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n*σ , the amplitude of F₀*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
-    n = 2sqrt(2(precision*log(10) + log(F₀)))
+    # The precision parameter calibrates the standard deviation of the pulse, so that the duration = n*σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n*σ , the amplitude of F*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
+    n = 2sqrt(2(precision*log(10) + log(F)))
     σ = duration/n
 
-    @. Ft[pos_start:end] = F₀*exp(-0.5*(tpulse/σ)^2)*cos(2π*fc*tpulse)
+    @. Ft[pos_start:end] = F*exp(-0.5*(tpulse/σ)^2)*cos(2π*fc*tpulse)
 
     return Ft
 end
@@ -476,7 +476,7 @@ end
 # Colored noise excitation
 function excitation(type::ColoredNoise, t)
 
-    (; F₀, tstart, duration, σ, color, band_freq) = type
+    (; F, tstart, duration, σ, color, band_freq) = type
     N = length(t)
     Ft = zeros(N)
 
@@ -485,7 +485,7 @@ function excitation(type::ColoredNoise, t)
 
     # Generate the fft of a white noise
     if color == :white
-        Ft .= F₀ .+ σ*randn(N)
+        Ft .= F .+ σ*randn(N)
     else
         white_fft = rfft(randn(N))
         freq = rfftfreq(N, fs)
@@ -510,7 +510,7 @@ function excitation(type::ColoredNoise, t)
         colored_noise =  irfft(colored_noise_fft, N)
         colored_noise .*= σ/std(colored_noise)
 
-        @. Ft = F₀ + colored_noise
+        @. Ft = F + colored_noise
     end
 
     if length(band_freq) > 0

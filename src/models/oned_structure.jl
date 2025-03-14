@@ -121,8 +121,8 @@ Computes the natural frequencies of a longitudinal or torsional bar up to fmax
         * `:SF`: Simply Supported - Free
 
 **Outputs**
-* `ωₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
-* `kₙ`: Vector of modal wavenumbers
+* `ωn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* `kn`: Vector of modal wavenumbers
 """
 function modefreq(model::WaveEquation, fmax, bc = :CC)
     (; L, m, D) = model
@@ -130,46 +130,46 @@ function modefreq(model::WaveEquation, fmax, bc = :CC)
     c = sqrt(D/m)
     ωmax = 2π*fmax
 
-    ωₙ = Float64[]
-    kₙ = Float64[]
+    ωn = Float64[]
+    kn = Float64[]
     if bc == :CC
         n = 1
-        kᵢ = n*π/L
-        ωᵢ = c*kᵢ
-        while ωᵢ ≤ ωmax
-            push!(ωₙ, ωᵢ)
-            push!(kₙ, kᵢ)
+        ki = n*π/L
+        ωi = c*ki
+        while ωi ≤ ωmax
+            push!(ωn, ωi)
+            push!(kn, ki)
             n += 1
-            kᵢ = n*π/L
-            ωᵢ = c*kᵢ
+            ki = n*π/L
+            ωi = c*ki
         end
     elseif bc === :CF
         n = 1
-        kᵢ = (2n - 1)π/L
-        ωᵢ = c*kᵢ
-        while ωᵢ ≤ ωmax
-            push!(ωₙ, ωᵢ)
-            push!(kₙ, kᵢ)
+        ki = (2n - 1)π/L
+        ωi = c*ki
+        while ωi ≤ ωmax
+            push!(ωn, ωi)
+            push!(kn, ki)
             n += 1
-            kᵢ = (2n - 1)π/L
-            ωᵢ = c*kᵢ
+            ki = (2n - 1)π/L
+            ωi = c*ki
         end
     elseif bc == :FF
         n = 0
-        kᵢ = 0.
-        ωᵢ = 0.
-        while ωᵢ ≤ ωmax
-            push!(ωₙ, ωᵢ)
-            push!(kₙ, kᵢ)
+        ki = 0.
+        ωi = 0.
+        while ωi ≤ ωmax
+            push!(ωn, ωi)
+            push!(kn, ki)
             n += 1
-            kᵢ = n*π/L
-            ωᵢ = c*kᵢ
+            ki = n*π/L
+            ωi = c*ki
         end
     else
         error("Boundary conditions not implemented")
     end
 
-    return ωₙ, kₙ
+    return ωn, kn
 end
 
 function modefreq(model::Beam, fmax, bc = :SS)
@@ -178,107 +178,107 @@ function modefreq(model::Beam, fmax, bc = :SS)
     c = sqrt(D/m)
     ωmax = 2π*fmax
 
-    ωₙ = Float64[]
-    kₙ = Float64[]
+    ωn = Float64[]
+    kn = Float64[]
     if bc == :SS
         n = 1
-        kᵢ = n*π/L
-        ωᵢ = c*kᵢ^2
-        while ωᵢ ≤ ωmax
-            push!(kₙ, kᵢ)
-            push!(ωₙ, ωᵢ)
+        ki = n*π/L
+        ωi = c*ki^2
+        while ωi ≤ ωmax
+            push!(kn, ki)
+            push!(ωn, ωi)
             n += 1
-            kᵢ = n*π/L
-            ωᵢ = c*kᵢ^2
+            ki = n*π/L
+            ωi = c*ki^2
         end
     elseif bc == :CC
-        append!(kₙ, [4.73, 7.85, 11]./L)
-        append!(ωₙ, c.*kₙ.^2)
+        append!(kn, [4.73, 7.85, 11]./L)
+        append!(ωn, c.*kn.^2)
 
         n = 4
-        kᵢ = (2n + 1)π/2L
-        ωᵢ = c*kᵢ^2
-        while ωᵢ ≤ ωmax
-            push!(kₙ, kᵢ)
-            push!(ωₙ, ωᵢ)
+        ki = (2n + 1)π/2L
+        ωi = c*ki^2
+        while ωi ≤ ωmax
+            push!(kn, ki)
+            push!(ωn, ωi)
             n += 1
-            kᵢ = (2n + 1)π/2L
-            ωᵢ = c*kᵢ.^2
+            ki = (2n + 1)π/2L
+            ωi = c*ki.^2
         end
     elseif bc == :CS
-        append!(kₙ, [3.92, 7.07, 10.2]./L)
-        append!(ωₙ, c.*kₙ.^2)
+        append!(kn, [3.92, 7.07, 10.2]./L)
+        append!(ωn, c.*kn.^2)
 
         n = 4
-        kᵢ = (4n + 1)π/4L
-        ωᵢ = c*kᵢ^2
-        while ωᵢ ≤ ωmax
-            push!(kₙ, kᵢ)
-            push!(ωₙ, ωᵢ)
+        ki = (4n + 1)π/4L
+        ωi = c*ki^2
+        while ωi ≤ ωmax
+            push!(kn, ki)
+            push!(ωn, ωi)
             n += 1
-            kᵢ = (4n + 1)π/4L
-            ωᵢ = c*kᵢ^2
+            ki = (4n + 1)π/4L
+            ωi = c*ki^2
         end
     elseif bc == :CF
-        append!(kₙ, [1.87,  4.73, 7.85, 11]./L)
-        append!(ωₙ, c.*kₙ.^2)
+        append!(kn, [1.87,  4.73, 7.85, 11]./L)
+        append!(ωn, c.*kn.^2)
 
         n = 5
-        kᵢ = (2n + 1)π/2L
-        ωᵢ = c*kᵢ^2
-        while ωᵢ ≤ ωmax
-            push!(kₙ, kᵢ)
-            push!(ωₙ, ωᵢ)
+        ki = (2n + 1)π/2L
+        ωi = c*ki^2
+        while ωi ≤ ωmax
+            push!(kn, ki)
+            push!(ωn, ωi)
             n += 1
-            kᵢ = (2n + 1)π/2L
-            ωᵢ = c*kᵢ^2
+            ki = (2n + 1)π/2L
+            ωi = c*ki^2
         end
     elseif bc == :SF
-        append!(kₙ, [3.92, 7.07, 10.2]./L)
-        append!(ωₙ, c.*kₙ.^2)
+        append!(kn, [3.92, 7.07, 10.2]./L)
+        append!(ωn, c.*kn.^2)
 
         n = 4
-        kᵢ = (4n + 1)π/4L
-        ωᵢ = c*kᵢ^2
-        while ωᵢ ≤ ωmax
-            push!(kₙ,kᵢ)
-            push!(ωₙ, ωᵢ)
+        ki = (4n + 1)π/4L
+        ωi = c*ki^2
+        while ωi ≤ ωmax
+            push!(kn,ki)
+            push!(ωn, ωi)
             n += 1
-            kᵢ = (4n + 1)π/4L
-            ωᵢ = c*kᵢ^2
+            ki = (4n + 1)π/4L
+            ωi = c*ki^2
         end
     elseif bc == :FF
-        append!(kₙ, [0., 0., 4.73, 7.85, 11]./L)
-        append!(ωₙ, c.*kₙ.^2)
+        append!(kn, [0., 0., 4.73, 7.85, 11]./L)
+        append!(ωn, c.*kn.^2)
 
         n = 4
-        kᵢ = (2n + 1)π/2L
-        ωᵢ = c*kᵢ^2
-        while ωᵢ ≤ ωmax
-            push!(kₙ, kᵢ)
-            push!(ωₙ, ωᵢ)
+        ki = (2n + 1)π/2L
+        ωi = c*ki^2
+        while ωi ≤ ωmax
+            push!(kn, ki)
+            push!(ωn, ωi)
             n += 1
-            kᵢ = (2n + 1)π/2L
-            ωᵢ = c*kᵢ^2
+            ki = (2n + 1)π/2L
+            ωi = c*ki^2
         end
     else
         error("Boundary conditions not implemented")
     end
 
-    return ωₙ, kₙ
+    return ωn, kn
 end
 
 """
-    modeshape(model::Bar, kₙ, x, bc = :CC)
-    modeshape(model::Rod, kₙ, x, bc = :CC)
-    modeshape(model::Strings, kₙ, x, bc = :CC)
-    modeshape(model::Beam, kₙ, x, bc = :SS)
+    modeshape(model::Bar, kn, x, bc = :CC)
+    modeshape(model::Rod, kn, x, bc = :CC)
+    modeshape(model::Strings, kn, x, bc = :CC)
+    modeshape(model::Beam, kn, x, bc = :SS)
 
 Computes the mass-normalized mode shapes of a longitudinal or torsional bar
 
 **Inputs**
 * `model`: Structure containing the bar data
-* `kₙ`: Array of modal wavenumbers
+* `kn`: Array of modal wavenumbers
 * `x`: Coordinates of calculation points of the mode shapes
 * `bc`: Boundary conditions
     * For all OneDStructure
@@ -293,7 +293,7 @@ Computes the mass-normalized mode shapes of a longitudinal or torsional bar
 **Output**
 * `ϕ`: Mass-normalized mode shapes
 """
-function modeshape(model::WaveEquation, kₙ, x, bc = :CC)
+function modeshape(model::WaveEquation, kn, x, bc = :CC)
 
     (; L, m) = model
 
@@ -307,25 +307,25 @@ function modeshape(model::WaveEquation, kₙ, x, bc = :CC)
         # Modal mass
         M = m*L/2
 
-        return sin.(x*kₙ')./sqrt(M)
+        return sin.(x*kn')./sqrt(M)
     elseif bc == :CF
         # Modal mass
         M = m*L/2
 
-        return sin.(x*kₙ')./sqrt(M)
+        return sin.(x*kn')./sqrt(M)
     elseif bc == :FF
         # Modal mass
-        n = length(kₙ)
-        Mₙ = m*L.*ones(length(n))./2
-        Mₙ[1] *= 2.
+        n = length(kn)
+        Mn = m*L.*ones(length(n))./2
+        Mn[1] *= 2.
 
-        return cos.(x*kₙ')./sqrt.(Mₙ')
+        return cos.(x*kn')./sqrt.(Mn')
     else
         error("Boundary conditions not implemented")
     end
 end
 
-function modeshape(model::Beam, kₙ, x, bc = :SS)
+function modeshape(model::Beam, kn, x, bc = :SS)
 
     (; L, m) = model
 
@@ -339,70 +339,70 @@ function modeshape(model::Beam, kₙ, x, bc = :SS)
         # Modal mass
         M = m*L/2.
 
-        return sin.(x*kₙ')./sqrt(M)
+        return sin.(x*kn')./sqrt(M)
     elseif bc == :CC
-        Mₙ = @. m*(
-                -kₙ*L*cos(2kₙ*L)
-                + kₙ*L*cosh(2kₙ*L)
-                + cosh(kₙ*L)^2*sin(2kₙ*L)
-                + 2cos(kₙ*L)*sinh(kₙ*L)
-                - 2sin(kₙ*L)*(cosh(kₙ*L) + 2kₙ*L*sinh(kₙ*L))
-                - cos(kₙ*L)^2*sinh(2kₙ*L)
-                )/(2kₙ*(cos(kₙ*L) - cosh(kₙ*L))^2*(sin(kₙ*L) - sinh(kₙ*L))^2)
+        Mn = @. m*(
+                -kn*L*cos(2kn*L)
+                + kn*L*cosh(2kn*L)
+                + cosh(kn*L)^2*sin(2kn*L)
+                + 2cos(kn*L)*sinh(kn*L)
+                - 2sin(kn*L)*(cosh(kn*L) + 2kn*L*sinh(kn*L))
+                - cos(kn*L)^2*sinh(2kn*L)
+                )/(2kn*(cos(kn*L) - cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L))^2)
 
-        return @. ((cosh(x*kₙ') - cos(x*kₙ'))/(cosh(kₙ'*L) - cos(kₙ'*L)) - (sinh(x*kₙ') - sin(x*kₙ'))/(sinh(kₙ'*L) - sin(kₙ'*L)))/sqrt(Mₙ')
+        return @. ((cosh(x*kn') - cos(x*kn'))/(cosh(kn'*L) - cos(kn'*L)) - (sinh(x*kn') - sin(x*kn'))/(sinh(kn'*L) - sin(kn'*L)))/sqrt(Mn')
     elseif bc == :CS
-        Mₙ = @. m*(
-                -kₙ*L*cos(2kₙ*L)
-                + kₙ*L*cosh(2kₙ*L)
-                + cosh(kₙ*L)^2*sin(2kₙ*L)
-                + 2cos(kₙ*L)*sinh(kₙ*L)
-                - 2sin(kₙ*L)*(cosh(kₙ*L) + 2kₙ*L*sinh(kₙ*L))
-                - cos(kₙ*L)^2*sinh(2kₙ*L)
-                )/(2kₙ*(cos(kₙ*L) - cosh(kₙ*L))^2*(sin(kₙ*L) - sinh(kₙ*L))^2)
+        Mn = @. m*(
+                -kn*L*cos(2kn*L)
+                + kn*L*cosh(2kn*L)
+                + cosh(kn*L)^2*sin(2kn*L)
+                + 2cos(kn*L)*sinh(kn*L)
+                - 2sin(kn*L)*(cosh(kn*L) + 2kn*L*sinh(kn*L))
+                - cos(kn*L)^2*sinh(2kn*L)
+                )/(2kn*(cos(kn*L) - cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L))^2)
 
-        return @. ((cosh(x*kₙ') - cos(x*kₙ'))/(cosh(kₙ'*L) - cos(kₙ'*L)) - (sinh(x*kₙ') - sin(x*kₙ'))/(sinh(kₙ'*L) - sin(kₙ'*L)))/sqrt(Mₙ')
+        return @. ((cosh(x*kn') - cos(x*kn'))/(cosh(kn'*L) - cos(kn'*L)) - (sinh(x*kn') - sin(x*kn'))/(sinh(kn'*L) - sin(kn'*L)))/sqrt(Mn')
 
     elseif bc == :CF
-        Mₙ = @. m*(
-                -2kₙ*L*cos(2kₙ*L)
-                - 7sin(2kₙ*L)
-                + cosh(2kₙ*L)*(2kₙ*L + 3sin(2kₙ*L))
-                - 2cosh(kₙ*L)*(3sin(kₙ*L) + sin(3kₙ*L))
-                - sin(4kₙ*L)
-                + (6cos(kₙ*L) + 6cos(3kₙ*L) - 8kₙ*L*sin(kₙ*L))*sinh(kₙ*L)
-                + 6cos(kₙ*L)^2*sinh(2kₙ*L)
-                )/(4kₙ*(cos(kₙ*L) + cosh(kₙ*L))^2*(sin(kₙ*L) - sinh(kₙ*L)).^2)
+        Mn = @. m*(
+                -2kn*L*cos(2kn*L)
+                - 7sin(2kn*L)
+                + cosh(2kn*L)*(2kn*L + 3sin(2kn*L))
+                - 2cosh(kn*L)*(3sin(kn*L) + sin(3kn*L))
+                - sin(4kn*L)
+                + (6cos(kn*L) + 6cos(3kn*L) - 8kn*L*sin(kn*L))*sinh(kn*L)
+                + 6cos(kn*L)^2*sinh(2kn*L)
+                )/(4kn*(cos(kn*L) + cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L)).^2)
 
-        return @. ((cosh(x*kₙ') - cos(x*kₙ'))/(cosh(kₙ'*L) + cos(kₙ'*L)) - (sinh(x*kₙ') - sin(x*kₙ'))/(sinh(kₙ'*L) + sin(kₙ'*L)))/sqrt(Mₙ')
+        return @. ((cosh(x*kn') - cos(x*kn'))/(cosh(kn'*L) + cos(kn'*L)) - (sinh(x*kn') - sin(x*kn'))/(sinh(kn'*L) + sin(kn'*L)))/sqrt(Mn')
 
     elseif bc == :SF
-        Mₙ = @. m*(
-            -3/tan(kₙ*L)
-            + 3/tanh(kₙ*L)
-            + kₙ*L/sin(kₙ*L)^2
-            - kₙ*L/sinh(kₙ*L)^2)/2kₙ
+        Mn = @. m*(
+            -3/tan(kn*L)
+            + 3/tanh(kn*L)
+            + kn*L/sin(kn*L)^2
+            - kn*L/sinh(kn*L)^2)/2kn
 
-        return @. (sin(x*kₙ')/sin(kₙ'*L) + sinh(x*kₙ')/sinh(kₙ'*L))/sqrt(Mₙ')
+        return @. (sin(x*kn')/sin(kn'*L) + sinh(x*kn')/sinh(kn'*L))/sqrt(Mn')
 
     elseif bc == :FF
-        Mₙ = @. m*(
-                -kₙ*L*cos(2kₙ*L)
-                + kₙ*L*cosh(2kₙ*L)
-                + 6cosh(kₙ*L)*sin(kₙ*L)
-                - 3cosh(kₙ*L)^2*sin(2kₙ*L)
-                - (6cos(kₙ*L) + 4kₙ*L*sin(kₙ*L))*sinh(kₙ*L)
-                + 3cos(kₙ*L)^2*sinh(2kₙ*L)
-            )/(2kₙ*(cos(kₙ*L) - cosh(kₙ*L))^2*(sin(kₙ*L) - sinh(kₙ*L))^2)
+        Mn = @. m*(
+                -kn*L*cos(2kn*L)
+                + kn*L*cosh(2kn*L)
+                + 6cosh(kn*L)*sin(kn*L)
+                - 3cosh(kn*L)^2*sin(2kn*L)
+                - (6cos(kn*L) + 4kn*L*sin(kn*L))*sinh(kn*L)
+                + 3cos(kn*L)^2*sinh(2kn*L)
+            )/(2kn*(cos(kn*L) - cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L))^2)
 
-        Mₙ[1:2] .= m*L
+        Mn[1:2] .= m*L
 
-        ϕₙ = @. ((cosh(x*kₙ') + cos(x*kₙ'))/(cosh(kₙ'*L) - cos(kₙ'*L))) - ((sinh(x*kₙ') + sin(x*kₙ'))/(sinh(kₙ'*L) - sin(kₙ'*L)))
+        ϕn = @. ((cosh(x*kn') + cos(x*kn'))/(cosh(kn'*L) - cos(kn'*L))) - ((sinh(x*kn') + sin(x*kn'))/(sinh(kn'*L) - sin(kn'*L)))
 
-        ϕₙ[:, 1] .= 1.
-        ϕₙ[:, 2] = x .- L/2
+        ϕn[:, 1] .= 1.
+        ϕn[:, 2] = x .- L/2
 
-        return @. ϕₙ/sqrt(Mₙ')
+        return @. ϕn/sqrt(Mn')
     else
         error("Boundary conditions not implemented")
     end

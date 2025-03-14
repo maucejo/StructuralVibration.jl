@@ -100,49 +100,49 @@ function ss_model(K, M, C)
 end
 
 """
-    ss_modal_model(ωₙ , ξₙ, ϕₙ)
+    ss_modal_model(ωn , ξn, ϕn)
 
 Generates a continuous-time state-space model from the mass, damping, and stiffness matrices
 
 **Inputs**
-* `ωₙ`: Natural angular frequencies
-* `ξₙ`: Damping ratios
-* `ϕₙ`: Mass-normalized mode shapes
+* `ωn`: Natural angular frequencies
+* `ξn`: Damping ratios
+* `ϕn`: Mass-normalized mode shapes
 
 **Output**
 `css`: ContinuousStateSpace
 """
-function ss_modal_model(ωₙ , ξₙ, ϕₙ)
+function ss_modal_model(ωn, ξn, ϕn)
 
-    m, n = size(ϕₙ)
-    Ac = [zeros(n, n) I; -Diagonal(ωₙ.^2) -Diagonal(2ξₙ.*ωₙ)]
-    Bc = [zeros(n, m); ϕₙ']
+    m, n = size(ϕn)
+    Ac = [zeros(n, n) I; -Diagonal(ωn.^2) -Diagonal(2ξn.*ωn)]
+    Bc = [zeros(n, m); ϕn']
 
     return ContinuousStateSpace(Ac, Bc)
 end
 
 """
-    eigenmode(Ac, Nₘ)
+    eigenmode(Ac, n)
 
-Computes the eigenmodes of a continuous-time state-space model
+Computes the eigen of a continuous-time state-space model
 
 **Inputs**
 * `Ac`: Continuous-time state-space matrix
-* `Nₘ`: Number of eigenmodes to keep in the modal basis (default: 0)
+* `n`: Number of eigen to keep in the modal basis (default: 0)
 
-*Note: `Nₘ` is the number of mode pairs to keep in the basis*
+*Note: `n` is the number of mode pairs to keep in the basis*
 
 **Outputs**
 * `λ`: Eigenvalues
 * `Ψ`: Eigenvectors
 """
 
-function eigenmode(Ac::Matrix{Float64}, Nₘ::Int = 0)
+function eigenmode(Ac::Matrix{Float64}, n::Int = 0)
 
     λ, Ψ = eigen(Ac)
 
-    if Nₘ > 0
-        return λ[1:2Nₘ], Ψ[:, 1:2Nₘ]
+    if n > 0
+        return λ[1:2n], Ψ[:, 1:2n]
     end
 
     return λ, Ψ
@@ -157,16 +157,16 @@ Computes the natural angular frequencies and damping ratios from the complex eig
 * `λ`: Complex eigenvalues
 
 **Outputs**
-* `ωₙ`: Natural angular frequencies
-* `ξₙ`: Damping ratios
+* `ωn`: Natural angular frequencies
+* `ξn`: Damping ratios
 """
 function modal_parameters(λ)
 
-    λₙ = λ[1:2:end]
-    ωₙ = abs.(λₙ)
-    ξₙ = -real(λₙ)./ωₙ
+    λn = λ[1:2:end]
+    ωn = abs.(λn)
+    ξn = -real(λn)./ωn
 
-    return ωₙ, ξₙ
+    return ωn, ξn
 end
 
 """
@@ -178,17 +178,17 @@ Converts the complex modes to real modes
 * `Ψ`: Complex modes
 
 **Output**
-* `ϕₙ`: Real modes
+* `ϕn`: Real modes
 """
 function c2r_modeshape(Ψ)
 
-    M, Nmodes = size(Ψ)
-    Ψₙ = Ψ[1:2:M, :]
-    ϕₙ = zeros(Int(M/2), Nmodes)
+    m, n = size(Ψ)
+    Ψn = Ψ[1:2:m, :]
+    ϕ = zeros(Int(m/2), n)
 
-    for (i, Ψᵢ) in enumerate(eachcol(Ψₙ))
-        x = real(Ψᵢ)
-        y = imag(Ψᵢ)
+    for (i, Ψi) in enumerate(eachcol(Ψn))
+        x = real(Ψi)
+        y = imag(Ψi)
 
         # Fit a first order line to the data
         p = polyfit(x, y, 1)
@@ -196,8 +196,8 @@ function c2r_modeshape(Ψ)
         # Angle of maximum correlation line
         θ = atan(p[1])
 
-        ϕₙ[:, i] = real(Ψᵢ*exp(-1im*θ))
+        ϕ[:, i] = real(Ψi*exp(-1im*θ))
     end
 
-    return ϕₙ
+    return ϕ
 end

@@ -63,7 +63,7 @@ Structure containing the data feeding the direct solver for calculating an FRF
 end
 
 """
-    StateSpacemodalFRFProblem(css::ContinuousStateSpace, freq, type, So, Se, Nm)
+    StateSpacemodalFRFProblem(css::ContinuousStateSpace, freq, type, So, Se, n)
 
 Structure containing the data feeding the direct solver for calculating an FRF
 
@@ -72,7 +72,7 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * `freq`: Frequencies of interest
 * `So`: Selection matrix for observation points
 * `Se`: Selection matrix for excitation points
-* `Nm`: Number of modes to keep in the modal basis
+* `n`: Number of modes to keep in the modal basis
 
 # Note: It is assumed that the output equation is of the form y = So*x
 """
@@ -81,9 +81,9 @@ Structure containing the data feeding the direct solver for calculating an FRF
     freq
     So
     Se
-    Nm
+    n
 
-    StateSpaceModalFRFProblem(css, freq, So = I(Int(size(css.Ac, 1)/2)), Se = I(size(css.Bc, 2)), Nm = 0) = new(css, freq, So, Se, Nm)
+    StateSpaceModalFRFProblem(css, freq, So = I(Int(size(css.Ac, 1)/2)), Se = I(size(css.Bc, 2)), n = 0) = new(css, freq, So, Se, n)
 end
 
 """
@@ -119,7 +119,7 @@ Structure containing the data feeding the modal solver for calculating the frequ
 end
 
 """
-    StateSpaceModalFreqProblem(css::ContinuousStateSpace, freq, F, So, Nm)
+    StateSpaceModalFreqProblem(css::ContinuousStateSpace, freq, F, So, n)
 
 Structure containing the data feeding the modal solver for calculating the frequency reponse
 
@@ -128,16 +128,16 @@ Structure containing the data feeding the modal solver for calculating the frequ
 * `freq`: Frequencies of interest
 * `F`: External force matrix
 * `So`: Selection matrix for observation points
-* `Nm`: Number of modes to keep in the modal basis
+* `n`: Number of modes to keep in the modal basis
 """
 @with_kw struct StateSpaceModalFreqProblem
     css :: ContinuousStateSpace
     freq
     F
     So
-    Nm
+    n
 
-    StateSpaceModalFreqProblem(css, freq, F, So = I(Int(size(css.Ac, 1)/2)), Nm = 0) = new(css, freq, F, So, Nm)
+    StateSpaceModalFreqProblem(css, freq, F, So = I(Int(size(css.Ac, 1)/2)), n = 0) = new(css, freq, F, So, n)
 end
 
 
@@ -334,7 +334,7 @@ Computes the FRF matrix by modal method
 function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
 
     # Initialisation
-    (; css, freq, So, Se, Nm) = m
+    (; css, freq, So, Se, n) = m
     Nₒ = size(So, 1)
     Nₑ = size(Se, 1)
     Nstate = size(css.Ac, 1)
@@ -342,7 +342,7 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
     Nf = length(freq)
 
     # Compute modal information
-    λ, Ψ = eigenmode(css.Ac, Nm)
+    λ, Ψ = eigenode(css.Ac, n)
     B = Ψ\css.Bc
 
     if type == :dis
@@ -354,10 +354,10 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
         D = So*Bc[Ns+1:end, :]*Se'
     end
     Bₑ = B*Se'
-    Nm = length(λ)
+    n = length(λ)
 
     FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
-    M = Diagonal(undefs(ComplexF64, Nm))
+    M = Diagonal(undefs(ComplexF64, n))
     indm = diagind(M)
 
     ωf = 2π*freq
@@ -440,7 +440,7 @@ Computes the frequency response by modal method
 
 # Inputs
 * `m`: Structure containing the problem data
-* `Nm`: Number of eigenmodes to keep in the modal basis
+* `n`: Number of eigenodes to keep in the modal basis
 * `type::Symbol`: Type of FRF to compute
     * `:dis`: Displacement
     * `:vel`: Velocity
@@ -452,14 +452,14 @@ Computes the frequency response by modal method
 """
 function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
     # Initialisation
-    (; css, freq, F, So, Nm) = m
+    (; css, freq, F, So, n) = m
     Nₒ = size(So, 1)
     Nstate = size(css.Ac, 1)
     Ns = Int(Nstate/2)
     Nf = length(freq)
 
     # Compute modal information
-    λ, Ψ = eigenmode(css.Ac, Nm)
+    λ, Ψ = eigenode(css.Ac, n)
     Bc = Ψ\css.Bc
 
     if type == :dis || type == :acc
@@ -468,10 +468,10 @@ function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
         Ψₒ = So*Ψ[Ns+1:end, :]
     end
     u = Bc*F
-    Nm = length(λ)
+    n = length(λ)
 
     y = undefs(ComplexF64, Nₒ, Nf)
-    M = Diagonal(undefs(ComplexF64, Nm))
+    M = Diagonal(undefs(ComplexF64, n))
     indm = diagind(M)
 
     ωf = 2π*freq

@@ -32,8 +32,8 @@ Structure containing the data of a time problem for a sdof system subject to a h
 * `F`: Amplitude of the force excitation [N] or base motion [m]
 * `f`: Frequency of the excitation [Hz]
 * `type_exc`: Type of excitation
-    * :force: External force (default)
-    * :base: Base motion
+    * `:force`: External force (default)
+    * `:base`: Base motion
 
 **Fields**
 * `sdof`: Sdof structure
@@ -44,8 +44,8 @@ Structure containing the data of a time problem for a sdof system subject to a h
 * `F`: Amplitude of the force excitation [N] or base motion [m]
 * `ω`: Frequency of the excitation [rad/s]
 * `type_exc`: Type of excitation
-    * :force: External force (default)
-    * :base: Base motion
+    * `:force`: External force (default)
+    * `:base`: Base motion
 """
 @with_kw struct SdofHarmonicTimeProblem
     sdof :: Sdof
@@ -71,8 +71,8 @@ Structure containing the data of a time problem for a sdof system subject to an 
 * `t`: Time points at which to evaluate the response
 * `F`: Amplitude of the force excitation [N] or base motion [m]
 * `type_exc`: Type of excitation
-    * :force: External force (default)
-    * :base: Base motion
+    * `:force`: External force (default)
+    * `:base`: Base motion
 """
 @with_kw struct SdofForcedTimeProblem
     sdof :: Sdof
@@ -109,12 +109,12 @@ Structure containing the data for computing the FRF a sdof system
 * `sdof`: Sdof structure
 * `freq``: Vector of frequencies [Hz]
 * `type_exc`: Type of excitation
-    * :force: External force (default)
-    * :base: Base motion
+    * `:force`: External force (default)
+    * `:base`: Base motion
 * `type_resp`: Type of response
-    * :dis: Displacement spectrum or Admittance (default)
-    * :vel: Velocity spectrum or Mobility
-    * :acc: Acceleration spectrum or Accelerance
+    * `:dis`: Displacement spectrum or Admittance (default)
+    * `:vel`: Velocity spectrum or Mobility
+    * `:acc`: Acceleration spectrum or Accelerance
 """
 @with_kw struct SdofFRFProblem
     sdof :: Sdof
@@ -135,12 +135,12 @@ Structure containing the data for computing the frequency response of a sdof sys
 * `freq``: Vector of frequencies [Hz]
 * `F`: Vector of the force excitation [N] or base motion [m]
 * `type_exc`: Type of excitation
-    - :force: External force (default)
-    - :base: Base motion
+    - `:force`: External force (default)
+    - `:base`: Base motion
 * `type_resp`: Type of response
-    - :dis: Displacement spectrum or Admittance (default)
-    - :vel: Velocity spectrum or Mobility
-    - :acc: Acceleration spectrum or Accelerance
+    - `:dis`: Displacement spectrum or Admittance (default)
+    - `:vel`: Velocity spectrum or Mobility
+    - `:acc`: Acceleration spectrum or Accelerance
 """
 @with_kw struct SdofFrequencyProblem
     sdof :: Sdof

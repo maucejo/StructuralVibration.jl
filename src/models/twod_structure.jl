@@ -62,8 +62,8 @@ Computes the natural frequencies of a simply supported rectangular plate or a cl
 * `fmax`: Maximum frequency for calculating the modal shapes [Hz]
 
 **Outputs**
-* `ωₘₙ`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
-* `kₘₙ`: Matrix of modal wave numbers
+* `ωmn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* `kmn`: Matrix of modal wave numbers
 """
 function modefreq(model::TwoDStructure, fmax)
    (; L, b, m, D) = model
@@ -73,55 +73,55 @@ function modefreq(model::TwoDStructure, fmax)
 
     m = 1
     n = 1
-    kₘ = m*π/L
-    kₙ = n*π/b
-    ωᵢ = c*(kₘ^2 + kₙ^2)
+    km = m*π/L
+    kn = n*π/b
+    ωi = c*(km^2 + kn^2)
 
-    ωₘₙ = Float64[]
-    kₘₙ = Float64[]
+    ωmn = Float64[]
+    kmn = Float64[]
     ind = Int64[]
     # Boucle sur m
-    while ωᵢ ≤ ωmax
+    while ωi ≤ ωmax
         # Boucle sur n
-        while ωᵢ ≤ ωmax
-            push!(ωₘₙ,  ωᵢ)
-            append!(kₘₙ, [kₘ, kₙ])
+        while ωi ≤ ωmax
+            push!(ωmn,  ωi)
+            append!(kmn, [km, kn])
             append!(ind, [m, n])
             n += 1
-            kₘ = m*π/L
-            kₙ = n*π/b
-            ωᵢ = c*(kₘ^2 + kₙ^2)
+            km = m*π/L
+            kn = n*π/b
+            ωi = c*(km^2 + kn^2)
         end
 
         m += 1
         n = 1
-        kₘ = m*π/L
-        kₙ = n*π/b
-        ωᵢ = c*(kₘ^2 + kₙ^2)
+        km = m*π/L
+        kn = n*π/b
+        ωi = c*(km^2 + kn^2)
     end
 
-    kₘₙ = reshape(kₘₙ, (2, Int(length(kₘₙ)/2)))
+    kmn = reshape(kmn, (2, Int(length(kmn)/2)))
     ind = reshape(ind, (2, Int(length(ind)/2)))
-    pos = sortperm(ωₘₙ)
+    pos = sortperm(ωmn)
 
-    return ωₘₙ[pos], kₘₙ[:, pos], ind[:, pos]
+    return ωmn[pos], kmn[:, pos], ind[:, pos]
 end
 
 """
-    modeshape(model::Plate, kₘₙ, x, y)
-    modeshape(model::Membrane, kₘₙ, x, y)
+    modeshape(model::Plate, kmn, x, y)
+    modeshape(model::Membrane, kmn, x, y)
 
 Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane
 
 **Inputs**
 * `model`: Structure containing the data related to the structure
-* `kₘₙ`: Matrix of modal wave numbers
+* `kmn`: Matrix of modal wave numbers
 * `(x, y)`: Coordinates of the points where the mode shapes are calculated
 
 **Output**
 * `ϕ`: Mass-normalized mode shapes
 """
-function modeshape(p::TwoDStructure, kₘₙ, x, y)
+function modeshape(p::TwoDStructure, kmn, x, y)
     (; L, b, m) = p
 
     if isa(x, Number)
@@ -136,7 +136,7 @@ function modeshape(p::TwoDStructure, kₘₙ, x, y)
         y = collect(y)
     end
 
-    Mₙ = m*L*b/4
+    Mn = m*L*b/4
 
-    return sin.(x*kₘₙ[1, :]').*sin.(y*kₘₙ[2, :]')./sqrt(Mₙ)
+    return sin.(x*kmn[1, :]').*sin.(y*kmn[2, :]')./sqrt(Mn)
 end
