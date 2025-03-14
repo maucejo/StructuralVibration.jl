@@ -281,12 +281,12 @@ function solve(m::StateSpaceFRFProblem, type::Symbol = :dis; ismat = false, prog
     (; css, freq, So, Se) = m
     (; Ac, Bc) = css
     Nₒ = size(So, 1)
-    Nₑ = size(Se, 1)
+    Ne = size(Se, 1)
     Nstate, Nu = size(Bc)
     Ns = Int(Nstate/2)
     Nf = length(freq)
 
-    FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
+    FRF = [undefs(ComplexF64, Nₒ, Ne) for _ in 1:Nf]
     M = undefs(ComplexF64, Nstate, Nu)
 
     if type == :acc
@@ -311,7 +311,7 @@ function solve(m::StateSpaceFRFProblem, type::Symbol = :dis; ismat = false, prog
     end
 
     if ismat
-        return reshape(reduce(hcat, FRF), Nₒ, Nₑ, :)
+        return reshape(reduce(hcat, FRF), Nₒ, Ne, :)
     end
 
     return StateSpaceFRFSolution(FRF)
@@ -336,7 +336,7 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
     # Initialisation
     (; css, freq, So, Se, n) = m
     Nₒ = size(So, 1)
-    Nₑ = size(Se, 1)
+    Ne = size(Se, 1)
     Nstate = size(css.Ac, 1)
     Ns = Int(Nstate/2)
     Nf = length(freq)
@@ -353,10 +353,10 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
         C = So*Ac[Ns+1:end, :]*Ψ
         D = So*Bc[Ns+1:end, :]*Se'
     end
-    Bₑ = B*Se'
+    Be = B*Se'
     n = length(λ)
 
-    FRF = [undefs(ComplexF64, Nₒ, Nₑ) for _ in 1:Nf]
+    FRF = [undefs(ComplexF64, Nₒ, Ne) for _ in 1:Nf]
     M = Diagonal(undefs(ComplexF64, n))
     indm = diagind(M)
 
@@ -368,14 +368,14 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
         @. M[indm] = 1/(1im*ω - λ)
 
         if type == :dis || type == :vel
-            FRF[f] .= Ψₒ*M*Bₑ
+            FRF[f] .= Ψₒ*M*Be
         elseif type == :acc
-            FRF[f] .*= C*M*Bₑ + D
+            FRF[f] .*= C*M*Be + D
         end
     end
 
     if ismat
-        return reshape(reduce(hcat, FRF), Nₒ, Nₑ, :)
+        return reshape(reduce(hcat, FRF), Nₒ, Ne, :)
     end
 
     return StateSpaceFRFSolution(FRF)
@@ -416,17 +416,17 @@ function solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "State Space Frequency Problem - Direct method...", showspeed = true)
-    for (f, (ω, Fₑ)) in enumerate(zip(ωf, eachcol(F)))
+    for (f, (ω, Fe)) in enumerate(zip(ωf, eachcol(F)))
         progress ? next!(p) : nothing
 
         M .= (1im*ω*I - Ac)\Bc
 
         if type == :dis
-            y[:, f] .= So*M[1:Ns, :]*Fₑ
+            y[:, f] .= So*M[1:Ns, :]*Fe
         elseif type == :vel
-            y[:, f] .= So*M[Ns+1:end, :]*Fₑ
+            y[:, f] .= So*M[Ns+1:end, :]*Fe
         elseif type == :acc
-            y[:, f] .= (C*M + D)*Fₑ
+            y[:, f] .= (C*M + D)*Fe
         end
     end
 
@@ -476,12 +476,12 @@ function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
 
     ωf = 2π*freq
     p = Progress(Nf, color = :black, desc = "State Space Frequency Problem - Modal approach...", showspeed = true)
-    for (f, (ω, uₑ)) in enumerate(zip(ωf, eachcol(u)))
+    for (f, (ω, ue)) in enumerate(zip(ωf, eachcol(u)))
         progress ? next!(p) : nothing
 
         @. M[indm] = 1/(1im*ω - λ)
 
-        y[:, f] .= Ψₒ*M*uₑ
+        y[:, f] .= Ψₒ*M*ue
         if type == :acc
             y[:, f] .*= -ω^2
         end
