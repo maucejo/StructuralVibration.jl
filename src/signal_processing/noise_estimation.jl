@@ -98,7 +98,7 @@ function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
         batches = [x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
         nb = length(batches)
 
-        noisevar = undefs(nr, nb)
+        noisevar = similar(x, nr, nb)
         @views for (b, batch) in enumerate(batches)
             if length(batch) < batch_size
                 continue
@@ -114,12 +114,16 @@ end
 varest(x) = varest(x, BayesianEst())
 
 """
-    varest_bayesian(x)
+    varest_bayesian(x, method::OptimFamily)
 
 Estimates the noise variance of a signal `x` using Bayesian denoising.
 
 # Inputs
 * `x`: Signal
+* `method`: Noise estimation method
+    * `BayesianEst`: Bayesian noise estimation
+    * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
+    * `LcurveEst`: L-curve noise estimation
 
 # Output
 * `noisevar`: Noise variance - Vector{Float64}
@@ -168,8 +172,8 @@ Note: This function is not intended to be used directly
 function varest_bayesian(x, prior = :invgamma)
     # Eigenvalues of the second difference matrix
     n = length(x)
-    s = undefs(n)
-    z = undefs(eltype(x), n)
+    s = similar(real(x))
+    z = similar(x)
 
     @. s = 2(1. - cos((0:n-1)π/n))
     @. s[s == 0.] = 1e-8
@@ -259,8 +263,8 @@ Estimates the noise variance of a signal `x` using the Generalized Cross-Validat
 """
 function varest_gcv(x)
     n = length(x)
-    s = undefs(n)
-    z = undefs(eltype(x), n)
+    s = similar(real(x))
+    z = similar(x)
 
     @. s = 2(1. - cos((0:n-1)π/n))
     @. s[s == 0.] = 1e-8
@@ -321,8 +325,8 @@ Estimates the noise variance of a signal `x` using the L-curve method as propose
 """
 function varest_lcurve(x)
     n = length(x)
-    s = undefs(n)
-    z = undefs(eltype(x), n)
+    s = similar(real(x))
+    z = similar(x)
 
     @. s = 2(cos((0:n-1)π/n) - 1.)
     @. s[s == 0.] = 1e-8
@@ -382,8 +386,7 @@ function varest_derrico(x)
     # iid, N(0,σ²), then we can try to back out the noise variance.
     nfda = 6
     np = 14
-    fda = undefs(Vector{Float64}, nfda)
-    perc = undefs(np)
+    fda = similar(x, nfda)
     # Normalization to unit norm
     fda[1] = [1., -1.]./√2.
     fda[2] = [1., -2., 1.]./√6.
@@ -394,12 +397,12 @@ function varest_derrico(x)
 
     # Compute an interquantile range, like the distance between the 25 and 75 points. This trims off the trash at each end, potentially corrupted if there are discontinuities in the curve. It also deals simply with a non-zero mean in this data. Actually do this for several different interquantile ranges, then take a median.
     # NOTE: While I could have used other methods for the final variance estimation, this method was chosen to avoid outlier issues when the curve may have isolated discontinuities in function value or a derivative. The following points correspond to the central 90, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, and 20 percent ranges.
-    perc .= [0.05; range(0.1, 0.4, step = 0.025)]
+    perc = [0.05; range(0.1, 0.4, step = 0.025)]
     z = @. √2*erfinv(1. - 2perc)
 
-    noisevar = undefs(nd)
-    σₑ = fill(NaN, nd, nfda)
-    Q = undefs(nd, np)
+    noisevar = similar(x, nd)
+    σe = fill(NaN, nd, nfda)
+    Q = similar(x, nd, np)
     @views for (i, fdai) in enumerate(fda)
         posnd = (i+1):ns
         ntrim = ns - i
@@ -423,15 +426,15 @@ function varest_derrico(x)
             notnan = findall(@. !isnan(Q[1, :]))
 
             # Our noise std estimate is given by the median of the interquantile range(s). This is an ad hoc, but hopefully effective, way of estimating the measurement noise present in the signal.
-            σₑ[:, i] .= median(Q[:, notnan], dims = 2)
+            σe[:, i] .= median(Q[:, notnan], dims = 2)
         end
     end
 
     # Drop those estimates which failed for lack of enough data
-    notnan = findall(@. !isnan(@view σₑ[1, :]))
+    notnan = findall(@. !isnan(@view σe[1, :]))
 
     # Use median of these estimates to get a noise estimate.
-    noisevar .= median(σₑ[:, notnan], dims = 2).^2.
+    noisevar .= median(σe[:, notnan], dims = 2).^2.
 
     # Use an adhoc correction to remove the bias in the noise estimate. This correction was determined by examination of a large number of random samples.
     noisevar ./= (1. + 15(ns + 1.225)^(-1.245))

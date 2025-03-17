@@ -1,5 +1,5 @@
 """
-    DirectTimeProblem(K, M, C, u0::Tuple{Vector{Float64}, Vector{Float64}}, t, F::Matrix{Float64})
+    DirectTimeProblem(K, M, C, u0::Tuple{Vector{T}, Vector{T}}, t, F::Matrix{T})
 
 Structure containing data for the time solver
 
@@ -21,15 +21,15 @@ Structure containing data for the time solver
 * h: Time step
 * F: External force matrix
 """
-@with_kw struct DirectTimeProblem
-    K
-    M
-    C
-    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
-    h
-    F
+@show_struct struct DirectTimeProblem{T <: AbstractMatrix, S <: AbstractMatrix, U <: AbstractMatrix, V <: Real}
+    K::T
+    M::S
+    C::U
+    u0::Tuple{Vector{V}, Vector{V}}
+    h::V
+    F::T
 
-    DirectTimeProblem(K, M, C, u0, t, F) = new(K, M, C, u0, t[2] - t[1], F)
+    DirectTimeProblem(K::T, M::S, C::U, u0::Tuple{Vector{V}, Vector{V}}, t::AbstractVector{V}, F::V) where {T, S, U, V} = new{T, S, U, V}(K, M, C, u0, t[2] - t[1], F)
 end
 
 """
@@ -42,10 +42,10 @@ Structure containing problem solutions
 * du: Velocity matrix or vector
 * ddu: Acceleration matrix or vector
 """
-@with_kw struct DirectTimeSolution
-    u
-    du
-    ddu
+@show_struct struct DirectTimeSolution{T <: Real}
+    u::Matrix{T}
+    du::Matrix{T}
+    ddu::Matrix{T}
 end
 
 # Solvers
@@ -71,14 +71,14 @@ abstract type NewmarkFamily end
 
 Fox-Goodwin time solver
 """
-struct FoxGoodwin <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct FoxGoodwin{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    FoxGoodwin() = new(0., 0., 0.5, 1/12, "Direct Time Problem - Fox-Goodwin...")
+    FoxGoodwin(αf::T = 0., αm::T = 0., γ0::T = 0.5, β0::T = 1/12) where T = new{T}(αf, αm, γ0, β0, "Direct Time Problem - Fox-Goodwin...")
 end
 
 """
@@ -86,100 +86,102 @@ end
 
 Linear acceleration time solver
 """
-struct LinearAcceleration <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct LinearAcceleration{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    LinearAcceleration() = new(0., 0., 0.5, 1/6, "Direct Time Problem - Linear acceleration...")
+    LinearAcceleration(αf::T = 0., αm::T = 0., γ0::T = 0.5, β0::T = 1/6) where T = new{T}(αf, αm, γ0, β0, "Direct Time Problem - Linear acceleration...")
+
+    # LinearAcceleration() = new(0., 0., 0.5, 1/6, "Direct Time Problem - Linear acceleration...")
 end
 
 """
-    Newmark(; γ₀ = 0.5, β₀ = 0.25)
+    Newmark(; γ0 = 0.5, β0 = 0.25)
 
 Newmark time solver
 """
-struct Newmark <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct Newmark{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    Newmark(; γ₀ = 0.5, β₀ = 0.25) = new(0., 0., γ₀, β₀, "Direct Time Problem - Newmark...")
+    Newmark(; γ0::T = 0.5, β0::T = 0.25) where T = new{T}(0., 0., γ0, β0, "Direct Time Problem - Newmark...")
 end
 
 """
-    HHT(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf)
+    HHT(; γ0 = 0.5, β0 = 0.25, ρ = 1., αf = Inf)
 
 Hilber-Hughes-Taylor time solver
 """
-struct HHT <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct HHT{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    function HHT(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf)
+    function HHT(; γ0::T = 0.5, β0::T = 0.25, ρ::T = 1., αf::T = Inf) where T
         if αf ≠ Inf
             (0. < αf < 1/3) ? error("αf must be in [0, 1/3[") : nothing
-            return new(αf, 0., γ₀, β₀, "Direct Time Problem - HHT...")
+            return new{T}(αf, 0., γ0, β0, "Direct Time Problem - HHT...")
         else
             ρ < 0.5 ? error("ρ must be in [0.5, 1]") : nothing
-            return new((1. - ρ)/(1. + ρ), 0., γ₀, β₀, "Direct Time Problem - HHT...")
+            return new{T}((1. - ρ)/(1. + ρ), 0., γ0, β0, "Direct Time Problem - HHT...")
         end
     end
 end
 
 """
-    WBZ(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αₘ = Inf)
+    WBZ(; γ0 = 0.5, β0 = 0.25, ρ = 1., αm = Inf)
 
 Wood-Bossak-Zienkiewicz time solver
 """
-struct WBZ <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct WBZ{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    function WBZ(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αₘ = Inf)
-        if αₘ ≠ Inf
-            (αₘ ≤ 0.5) ? error("αₘ must be ≤ 0.5") : nothing
-            return new(0., αₘ, γ₀, β₀, "Direct Time Problem - WBZ...")
+    function WBZ(; γ0::T = 0.5, β0::T = 0.25, ρ::T = 1., αm::T = Inf) where T
+        if αm ≠ Inf
+            (αm ≤ 0.5) ? error("αm must be ≤ 0.5") : nothing
+            return new{T}(0., αm, γ0, β0, "Direct Time Problem - WBZ...")
         else
             (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
-            return new(0., (ρ - 1.)/(ρ + 1.), γ₀, β₀, "Direct Time Problem - WBZ...")
+            return new{T}(0., (ρ - 1.)/(ρ + 1.), γ0, β0, "Direct Time Problem - WBZ...")
         end
     end
 end
 
 """
-    GeneralizedAlpha(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf, αₘ = Inf)
+    GeneralizedAlpha(; γ0 = 0.5, β0 = 0.25, ρ = 1., αf = Inf, αm = Inf)
 
 Generalized-α time solver
 """
-struct GeneralizedAlpha <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct GeneralizedAlpha{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    function GeneralizedAlpha(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf, αₘ = Inf)
-        if αf ≠ Inf && αₘ ≠ Inf
-            (αₘ ≤ αf ≤ 0.5) ? error("αₘ ≤ αf ≤ 0.5") : nothing
+    function GeneralizedAlpha(; γ0::T = 0.5, β0::T = 0.25, ρ::T = 1., αf::T = Inf, αm = Inf) where T
+        if αf ≠ Inf && αm ≠ Inf
+            (αm ≤ αf ≤ 0.5) ? error("αm ≤ αf ≤ 0.5") : nothing
         else
             (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
 
             αf = ρ/(ρ + 1.)
-            αₘ = 3αf - 1.
+            αm = 3αf - 1.
         end
 
-        return new(αf, αₘ, γ₀, β₀, "Direct Time Problem - Generalized-α...")
+        return new{T}(αf, αm, γ0, β0, "Direct Time Problem - Generalized-α...")
     end
 end
 
@@ -188,14 +190,14 @@ end
 
 Mid-point rule time solver
 """
-struct MidPoint <: NewmarkFamily
-    αf::Float64
-    αₘ::Float64
-    γ₀::Float64
-    β₀::Float64
+@show_struct struct MidPoint{T <: Real} <: NewmarkFamily
+    αf::T
+    αm::T
+    γ0::T
+    β0::T
     name::String
 
-    MidPoint() = new(0.5, 0.5, 0.5, 0.25, "Direct Time Problem - Mid-point rule...")
+    MidPoint(αf::T = 0.5, αm::T = 0.5, γ0::T = 0.5, β0::T = 0.25) where T = new{T}(αf, αm, γ0, β0, "Direct Time Problem - Mid-point rule...")
 end
 
 ## Algorithms
@@ -224,12 +226,12 @@ function solve(prob::DirectTimeProblem, alg::CentralDiff; progress = true)
 
     Nddl, nt = size(F)
     # Initialization of the result matrices
-    D = zeros(Nddl, nt)
-    V = zeros(Nddl, nt)
-    A = zeros(Nddl, nt)
+    D = similar(K, Nddl, nt)
+    V = similar(D)
+    A = similar(D)
 
     # Intermediate vectors
-    rhs = zeros(Nddl)
+    rhs = similar(F, Nddl)
 
     # Computation of the initial acceleration
     D[:, 1] .= u0[1]
@@ -266,18 +268,18 @@ function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
 
     Nddl, nt = size(F)
     # Initialization of the result matrices
-    D = zeros(Nddl, nt)
-    V = zeros(Nddl, nt)
-    A = zeros(Nddl, nt)
+    D = similar(K, Nddl, nt)
+    V = similar(D)
+    A = similar(D)
 
     # Initialization of the intermediate vectors
-    k₁ = zeros(Nddl)
-    k₂ = zeros(Nddl)
-    k₃ = zeros(Nddl)
-    k₄ = zeros(Nddl)
-    KD = zeros(Nddl)
-    CK = zeros(Nddl)
-    Fn_2 = zeros(Nddl)
+    k₁ = similar(F, Nddl)
+    k₂ = similar(k₁)
+    k₃ = similar(k₁)
+    k₄ = similar(k₁)
+    KD = similar(k₁)
+    CK = similar(k₁)
+    Fn_2 = similar(k₁)
 
     # Computation of the initial acceleration
     D[:, 1] .= u0[1]
@@ -311,16 +313,16 @@ end
 #Newmark family
 function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     (; K, M, C, u0, h, F) = prob
-    (; αf, αₘ, γ₀, β₀, name) = alg
+    (; αf, αm, γ0, β0, name) = alg
 
     Nddl, nt = size(F)
     # Initialization of the result matrices
-    D = zeros(Nddl, nt)
-    V = zeros(Nddl, nt)
-    A = zeros(Nddl, nt)
+    D = similar(K, Nddl, nt)
+    V = similar(D)
+    A = similar(D)
 
     # Intermediate vectors
-    rhs = zeros(Nddl)
+    rhs = similar(F, Nddl)
 
     # Computation of the initial acceleration
     D[:, 1] .= u0[1]
@@ -330,8 +332,8 @@ function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     A[:, 1] = M\rhs
 
     # Newmark scheme parameters
-    γ = γ₀*(1. + 2αf - 2αₘ)
-    β = β₀*(1. + αf - αₘ)^2
+    γ = γ0*(1. + 2αf - 2αm)
+    β = β0*(1. + αf - αm)^2
 
     a₁ = (1. - γ)*h
     a₂ = (0.5 - β)*h^2
@@ -344,8 +346,8 @@ function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     b₃ = b₈*a₃
     b₄ = b₈*a₄
     b₅ = b₈*h
-    b₆ = 1. - αₘ
-    b₇ = αₘ
+    b₆ = 1. - αm
+    b₇ = αm
     b₉ = αf
 
     # Computation of the effective stiffness matrix

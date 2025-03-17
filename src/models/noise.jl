@@ -49,7 +49,7 @@ Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
 **Output**
 * `y`: Noisy signal
 """
-function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color = :pink; rst = true)
+function acn(x::VecOrMat{T}, snr_dB, freq::AbstractArray, color = :pink; rst = true) where {T <: Complex}
 
     # Reset the RNG if required
     if rst
@@ -64,7 +64,7 @@ function acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color =
     σ = sqrt.(V)                              # Standard deviation
 
     white_noise = randn(rng, eltype(x), size(x))
-    scale = ones(size(x, ndx))
+    scale = ones(eltype(x), size(x, ndx))
     if color == :pink
         @. scale[2:end] = 1/sqrt(freq[2:end])
     elseif color == :blue
@@ -106,7 +106,7 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
 **Output**
 * `y`: Noisy signal
 """
-function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
+function acn(x::VecOrMat{T}, snr_dB, fs, color = :pink; band_freq = T[], rst = true) where {T <: Real}
 
     # Reset the RNG if required
     if rst
@@ -124,7 +124,7 @@ function acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float6
     white_fft = rfft(randn(rng, size(x)), ndx)
     freq = rfftfreq(L, fs)
 
-    scale = ones(length(freq))
+    scale = ones(eltype(x), length(freq))
     if color == :pink
         @. scale[2:end] = 1/sqrt(freq[2:end])
     elseif color == :blue

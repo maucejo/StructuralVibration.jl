@@ -10,12 +10,12 @@ Structure containing the data of a time problem for a sdof system
     * `v0`: Initial velocity [m/s]
 * `t`: Time points at which to evaluate the response
 """
-@with_kw struct SdofFreeTimeProblem
-    sdof :: Sdof
-    u0 :: Vector{Float64}
-    t
+@show_struct struct SdofFreeTimeProblem{T <: Real, S <: AbstractVector}
+    sdof::Sdof
+    u0::Vector{T}
+    t::S
 
-    SdofFreeTimeProblem(sdof, u0, t) = new(sdof, u0, t)
+    SdofFreeTimeProblem(sdof, u0::Vector{T}, t::S) where {T, S} = new{T, S}(sdof, u0, t)
 end
 
 """
@@ -47,15 +47,15 @@ Structure containing the data of a time problem for a sdof system subject to a h
     * `:force`: External force (default)
     * `:base`: Base motion
 """
-@with_kw struct SdofHarmonicTimeProblem
-    sdof :: Sdof
-    u0 :: Vector{Float64}
-    t
-    F :: Float64
-    ω :: Float64
-    type_exc :: Symbol
+@show_struct struct SdofHarmonicTimeProblem{T <: Real, S <: AbstractVector}
+    sdof::Sdof
+    u0::Vector{T}
+    t::S
+    F::T
+    ω::T
+    type_exc::Symbol
 
-    SdofHarmonicTimeProblem(sdof, u0, t, F, f, type_exc = :force) = new(sdof, u0, t, F, 2π*f, type_exc)
+    SdofHarmonicTimeProblem(sdof, u0::Vector{T}, t::S, F::T, f::T, type_exc = :force) where {T, S} = new{T, S}(sdof, u0, t, F, 2π*f, type_exc)
 end
 
 """
@@ -74,14 +74,14 @@ Structure containing the data of a time problem for a sdof system subject to an 
     * `:force`: External force (default)
     * `:base`: Base motion
 """
-@with_kw struct SdofForcedTimeProblem
-    sdof :: Sdof
-    u0 :: Vector{Float64}
-    t
-    F :: Vector{Float64}
-    type_exc :: Symbol
+@show_struct struct SdofForcedTimeProblem{T <: Real, S <: AbstractVector}
+    sdof::Sdof
+    u0::Vector{T}
+    t::S
+    F::Vector{T}
+    type_exc::Symbol
 
-    SdofForcedTimeProblem(sdof, u0, t, F, type_exc = :force) = new(sdof, u0, t, F, type_exc)
+    SdofForcedTimeProblem(sdof, u0::Vector{T}, t::S, F::Vector{T}, type_exc = :force) where {T, S} = new{T, S}(sdof, u0, t, F, type_exc)
 end
 
 """
@@ -94,10 +94,10 @@ Structure containing the data of the solution of the forced response of a sdof s
 * `du`: Velocity solution
 * `ddu`: Acceleration solution
 """
-@with_kw struct SdofTimeSolution
-    u :: Vector{Float64}
-    du :: Vector{Float64}
-    ddu :: Vector{Float64}
+@show_struct struct SdofTimeSolution{T <: Real}
+    u::Vector{T}
+    du::Vector{T}
+    ddu::Vector{T}
 end
 
 """
@@ -116,13 +116,13 @@ Structure containing the data for computing the FRF a sdof system
     * `:vel`: Velocity spectrum or Mobility
     * `:acc`: Acceleration spectrum or Accelerance
 """
-@with_kw struct SdofFRFProblem
-    sdof :: Sdof
-    freq
-    type_exc :: Symbol
-    type_resp :: Symbol
+@show_struct struct SdofFRFProblem{T <: AbstractVector}
+    sdof::Sdof
+    freq::T
+    type_exc::Symbol
+    type_resp::Symbol
 
-    SdofFRFProblem(sdof, freq; type_exc = :force, type_resp = :dis) = new(sdof, freq, type_exc, type_resp)
+    SdofFRFProblem(sdof, freq::T; type_exc = :force, type_resp = :dis) where T = new{T}(sdof, freq, type_exc, type_resp)
 end
 
 """
@@ -142,14 +142,14 @@ Structure containing the data for computing the frequency response of a sdof sys
     - `:vel`: Velocity spectrum or Mobility
     - `:acc`: Acceleration spectrum or Accelerance
 """
-@with_kw struct SdofFrequencyProblem
-    sdof :: Sdof
-    freq
-    F :: Vector{Float64}
-    type_exc :: Symbol
-    type_resp :: Symbol
+@show_struct struct SdofFrequencyProblem{T <: Real, S <: AbstractVector}
+    sdof::Sdof
+    freq::S
+    F::Vector{T}
+    type_exc::Symbol
+    type_resp::Symbol
 
-    SdofFrequencyProblem(sdof, freq, F; type_exc = :force, type_resp = :dis) = new(sdof, freq, F, type_exc, type_resp)
+    SdofFrequencyProblem(sdof, freq::S, F::Vector{T}; type_exc = :force, type_resp = :dis) where {T, S} = new{T, S}(sdof, freq, F, type_exc, type_resp)
 end
 
 """
@@ -162,8 +162,8 @@ Structure containing the data of the solution of a frequency problem for a sdof 
    * Response spectrum (displacement, velocity, acceleration) [m, m/s, m/s²]
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
-@with_kw struct SdofFrequencySolution
-    u :: Vector{Complex{Float64}}
+@show_struct struct SdofFrequencySolution{T <: Complex}
+    u::Vector{T}
 end
 
 """
@@ -187,8 +187,8 @@ function solve(prob::SdofFreeTimeProblem)
 
     if ω0 == 0.
         x = @. x0 + v0*t
-        v = @. v0*ones(length(t))
-        a = @. zeros(length(t))
+        v = @. v0*ones(eltype(u0), length(t))
+        a = @. zeros(eltype(u0), length(t))
     elseif ξ < 1.
         Ω0 = ω0*√(1 - ξ^2)
         A = x0
@@ -263,8 +263,8 @@ function solve(prob::SdofHarmonicTimeProblem)
         if ω0 == 0.
             B = v0 + ρ0*ω*sin(ϕ)
             xh = @. A + B*t
-            vh = @. B*ones(length(t))
-            ah = @. zeros(length(t))
+            vh = @. B*ones(eltype(u0), length(t))
+            ah = @. zeros(eltype(u0), length(t))
         elseif ξ < 1.
             Ω0 = ω0*√(1 - ξ^2)
             B = (v0 + ξ*ω0*A + ρ0*ω*sin(ϕ))/Ω0
@@ -487,7 +487,7 @@ Compute the impulse response of a single degree of freedom (Sdof) system
 **Output**
 * `h`: Impulse response
 """
-function impulse_response(sdof::Sdof, t)
+function impulse_response(sdof::Sdof, t::T) where {T <: AbstractVector}
     prob = SdofFreeTimeProblem(sdof, [0., 1/sdof.m], t)
 
     return solve(prob).u
@@ -529,7 +529,7 @@ Compute the Shock Response Spectrum (SRS)
 * Primary instance - response of the system during the application of the base acceleration
 * Secondary instance - response of the system after the application of the base acceleration
 """
-function srs(base_acc::ArbitraryExc, freqs, t, ξ = 0.05, type_srs = (instance = :primary, amplitude = :abs); alg = :Smallwood)
+function srs(base_acc::ArbitraryExc, freq::T, t::S, ξ = 0.05; type_srs = (instance = :primary, amplitude = :abs), alg = :Smallwood) where {T <: AbstractVector, S <: AbstractVector}
 
     # Some checks
     t_srs = typeof(type_srs)
@@ -563,9 +563,9 @@ function srs(base_acc::ArbitraryExc, freqs, t, ξ = 0.05, type_srs = (instance =
 
     acc = excitation(base_acc, t)
 
-    srs = undefs(length(freqs))
-    x = undefs(length(t))
-    for (f, f0) in enumerate(freqs)
+    srs = similar(freq)
+    x = similar(t)
+    for (f, f0) in enumerate(freq)
         if alg == :Basic
             x .= srs_basic(f0, ξ, acc, t)
         elseif alg == :RecursiveInt

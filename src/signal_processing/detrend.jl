@@ -3,7 +3,7 @@ detrend(t, y, order=1)
 
 Detrend a signal `y` with respect to time `t` using a polynomial of order `order`.
 """
-function detrend(t::AbstractArray, y::AbstractArray, order = 1, bp = Float64[])
+function detrend(t, y, order::Int = 1, bp::Vector{T} = T[]) where {T <: Real}
     if length(bp) == 0
         return y - polyval(polyfit(t, y, order[1]), t)
     else
@@ -18,8 +18,7 @@ function detrend(t::AbstractArray, y::AbstractArray, order = 1, bp = Float64[])
             order = order*ones(length(bpi) - 1)
         end
 
-        y_detrended = undefs(length(y))
-
+        y_detrended = similar(y)
         for (i, ordi) in enumerate(order)
             idx = findall(@. bpi[i] ≤ t ≤ bpi[i + 1])
 
@@ -43,7 +42,7 @@ Fit a polynomial of order `order` to the data `x` and `y`.
 # Output
 - `p`: Coefficients of the polynomial
 """
-function polyfit(x::AbstractArray, y::AbstractArray, order::Int = 1)
+function polyfit(x, y, order::Int = 1)
     if order == 0
         return mean(y)
     else
@@ -67,7 +66,7 @@ end
 - `y`: Value of the polynomial at `x`
 """
 function polyval(p, x)
-    y = zeros(length(x))
+    y = zeros(eltype(p), length(x))
     orders = 0:length(p) - 1
 
     for (ci, ordi) in zip(p, reverse(orders))

@@ -40,7 +40,7 @@ function freq_ppm_extract(freq, H; type = :dis)
     fn = freq[pks.indices]
 
     nfreq = length(fn)
-    ξn = undefs(nfreq)
+    ξn = similar(fn)
 
     # Convert to displacement
     if type == :vel
@@ -51,10 +51,10 @@ function freq_ppm_extract(freq, H; type = :dis)
 
     # Damping ratios estimation from the half-bandwidth method
     nlocal = 500
-    freq_left = undefs(nlocal)
-    freq_right = undefs(nlocal)
-    Hleft = undefs(nlocal)
-    Hright = undefs(nlocal)
+    freq_left = similar(fn, nlocal)
+    freq_right = similar(freq_left)
+    Hleft = similar(freq_left)
+    Hright = similar(freq_left)
     for (n, (f, idmax, Hmax, edg)) in enumerate(zip(fn, pks.indices, pks.heights, pks.edges))
         edge1, edge2 = round.(Int, edg) .+ [-5, 5]
 
@@ -83,7 +83,6 @@ function freq_cfm_extract(freq, H; type = :dis)
     ω = 2π*freq
 
     pks = findmaxima(abs.(H)) |> peakproms! |> peakwidths!
-    nfreq = length(pks.indices)
 
     # Convert to displacement
     if type == :vel
@@ -92,15 +91,15 @@ function freq_cfm_extract(freq, H; type = :dis)
         H ./= ω.^2
     end
 
-    fn = undefs(nfreq)
-    ξn = undefs(length(nfreq))
+    fn = similar(pks.indices)
+    ξn = similar(fn)
 
     nfreq_itp = 500
-    ReH_itp = undefs(nfreq_itp)
-    ImH_itp = undefs(nfreq_itp)
-    freq_itp = undefs(nfreq_itp)
-    α = undefs(nfreq_itp)
-    θ = undefs(nfreq_itp)
+    ReH_itp = similar(fn, nfreq_itp)
+    ImH_itp = similar(ReH_itp)
+    freq_itp = similar(ReH_itp)
+    α = similar(ReH_itp)
+    θ = similar(ReH_itp)
     for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
         edges = round.(Int, edg) .+ [-5, 5]
@@ -189,7 +188,7 @@ function modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = :dis)
     #Initialization
     nx = size(H, 1)
     nfreq = length(fn)
-    ϕn = undefs(nx, nfreq)
+    ϕn = similar(fn, nx, nfreq)
 
     # Unexcited nodes
     pos_nexc = findall(x -> x ∉ id_exc, 1:nx)
@@ -243,7 +242,7 @@ function modeshape_cfm_extract(freq, H, fn, ξn, id_exc; type = :dis)
     #Initialization
     nx = size(H, 1)
     nfreq = length(fn)
-    ϕn = undefs(nx, nfreq)
+    ϕn = similar(fn, nx, nfreq)
 
     # Unexcited nodes
     pos_nexc = findall(x -> x ∉ id_exc, 1:nx)
@@ -302,7 +301,7 @@ Fit a circle to a set of points (x, y) using the least squares method
 """
 function circfit(x, y)
     # System matrix
-    S = [x y ones(length(x))]
+    S = [x y ones(eltype(x), length(x))]
 
     # RHS
     b = @. -x^2 - y^2

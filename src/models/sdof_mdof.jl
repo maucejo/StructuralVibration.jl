@@ -13,12 +13,12 @@ Structure containing the data of a sdof system
 * `ω0`: Natural frequency [rad/s]
 * `ξ`: Damping ratio
 """
-@with_kw struct Sdof
-    m :: Float64
-    ω0 ::Float64
-    ξ :: Float64
+@show_struct struct Sdof{T <: Real}
+    m::T
+    ω0::T
+    ξ::T
 
-    Sdof(m, f0, ξ) = new(m, 2π*f0, ξ)
+    Sdof(m::T, f0::T, ξ::T) where T = new{T}(m, 2π*f0, ξ)
 end
 
 """
@@ -31,12 +31,26 @@ Structure containing the data for building a mdof system
 * `m`: Masses of the mdof system
 * `c`: Damping coefficients of the viscous dampers
 """
-@with_kw struct Mdof
-    k::Vector{Float64}
-    m::Vector{Float64}
-    c::Vector{Float64}
+@show_struct struct Mdof{T <: Real}
+    k::Vector{T}
+    m::Vector{T}
+    c::Vector{T}
 
-    Mdof(k, m, c = Float64[]) = new(k, m, c)
+    function Mdof(k::Vector{T}, m::Vector{T}, c::Vector{T} = T[]) where T
+        nk = length(k)
+        nm = length(m)
+        nc = length(c)
+
+        nk != nm - 1 ? throw(DimensionMismatch("The number of masses must be equal to the number of springs plus 1")) : nothing
+
+        if nc != 0
+            nc != nm - 1 ? throw(DimensionMismatch("The number of masses must be equal to the number of dampers plus 1")) : nothing
+
+            nk != nc ? throw(DimensionMismatch("The number of springs must be equal to the number of dampers")) : nothing
+        end
+
+        return new{T}(k, m, c)
+    end
 end
 
 """
@@ -56,25 +70,26 @@ Structure containing the data for building a mdof mesh
 * `constrained_dofs`: Constrained degrees of freedom
 * `free_dofs`: Free degrees of freedom
 """
-@with_kw struct MdofMesh
+@show_struct struct MdofMesh
     Elt::Matrix{Int}
     constrained_dofs::Vector{Int}
     free_dofs::Vector{Int}
 
     function MdofMesh(model::Mdof, bc = :CC)
-        Nelt = length(model.k)
-        Nnodes = length(model.m)
-        Elt = undefs(Nelt, 3)
+        nelt = length(model.k)
+        nnodes = length(model.m)
 
-        for i = 1:Nelt
+        dofs = 1:nnodes
+        Elt = similar(dofs, nelt, 3)
+
+        for i = 1:nelt
             Elt[i, 1] = i
             Elt[i, 2] = i
             Elt[i, 3] = i + 1
         end
 
-        dofs = 1:Nnodes
         if bc == :CC
-            constrained_dofs = [1, Nnodes]
+            constrained_dofs = [1, nnodes]
         elseif bc == :CF
             constrained_dofs = [1]
         elseif bc == :FF
@@ -103,25 +118,20 @@ Assembly of the mass, stiffness and damping matrices of a mdof system
 function assembly(model::Mdof)
     (; k, m, c) = model
 
-    Nm = length(m)
-    Nk = length(k)
-    Nc = length(c)
+    nm = length(m)
+    nk = length(k)
+    nc = length(c)
 
-    Nk != Nm - 1 ? error("The number of masses must be equal to the number of springs plus 1") : nothing
+    nk != nm - 1 ? error("The number of masses must be equal to the number of springs plus 1") : nothing
 
     M = Diagonal(m)
-    K = zeros(Nm, Nm)
+    K = zeros(eltype(k), nm, nm)
 
-    if Nc == 0
+    if nc == 0
         flag = false
     else
         flag = true
-
-        Nc != Nm - 1 ? error("The number of masses must be equal to the number of dampers plus 1") : nothing
-
-        Nk != Nc ? error("The number of springs must be equal to the number of dampers") : nothing
-
-        C = zeros(Nm, Nm)
+        C = zeros(eltype(k), nm, nm)
     end
 
     for (i, ki) in enumerate(k)
@@ -134,7 +144,7 @@ function assembly(model::Mdof)
 end
 
 """
-    element_matrix(coeff::Float64)
+    element_matrix(coeff)
 
 Elemental stiffness or damping matrix
 
@@ -142,6 +152,6 @@ Elemental stiffness or damping matrix
 * `coeff`: Stiffness or damping coefficient
 
 **Output**
-* `Kₑ`: Elemental stiffness or damping matrix
+* `Ke`: Elemental stiffness or damping matrix
 """
-element_matrix(coeff::Float64) = coeff.*[1. -1.; -1. 1.]
+element_matrix(coeff) = coeff.*[1. -1.; -1. 1.]

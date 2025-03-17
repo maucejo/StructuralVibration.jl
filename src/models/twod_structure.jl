@@ -18,18 +18,16 @@ Structure containing the data of a homogeneous and isotropic bending plate
 * `m`: Surface mass [kg/m²]
 * `D`: Bending stiffness [N.m]
 """
-@with_kw struct Plate <: TwoDStructure
-    L::Float64
-    b::Float64
-    m::Float64
-    D::Float64
+@show_struct struct Plate{T <: Real} <: TwoDStructure
+    L::T
+    b::T
+    m::T
+    D::T
 
-    function Plate(L::Float64, b::Float64, h::Float64, E::Float64, ρ::Float64, ν::Float64)
-
+    function Plate(L::T, b::T, h::T, E::T, ρ::T, ν::T) where T
         m = ρ*h
         D = E*h^3/12/(1. - ν^2.)
-
-        return new(L, b, m, D)
+        return new{T}(L, b, m, D)
     end
 end
 
@@ -44,7 +42,7 @@ Structure containing the data of a homogeneous and isotropic rectangular membran
 * `m`: Surface mass [kg/m²]
 * `D`: Tension per unit length [N/m]
 """
-@with_kw struct Membrane <: TwoDStructure
+@show_struct struct Membrane <: TwoDStructure
     L::Float64
     b::Float64
     m::Float64

@@ -17,12 +17,12 @@ Structure containing the data of a homogeneous and isotropic longitudinal bar
 * `m`: Line mass [kg/m]
 * `D`: Stiffness coefficient [Pa]
 """
-@with_kw struct Bar <: WaveEquation
-    L::Float64
-    m::Float64
-    D::Float64
+@show_struct struct Bar{T <: Real} <: WaveEquation
+    L::T
+    m::T
+    D::T
 
-    Bar(L::Float64, S::Float64, E::Float64, ρ::Float64) = new(L, ρ*S, E*S)
+    Bar(L::T, S::T, E::T, ρ::T) where T = new{T}(L, ρ*S, E*S)
 end
 
 """
@@ -42,12 +42,12 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 * `m`: Line mass [kg/m]
 * `D`: Stiffness coefficient [Pa]
 """
-@with_kw struct Rod <: WaveEquation
-    L::Float64
-    m::Float64
-    D::Float64
+@show_struct struct Rod{T <:Real} <: WaveEquation
+    L::T
+    m::T
+    D::T
 
-    Rod(L::Float64, I::Float64, J::Float64, G::Float64, ρ::Float64) = new(L, ρ*I, G*J)
+    Rod(L::T, I::T, J::T, G::T, ρ::T) where T = new{T}(L, ρ*I, G*J)
 end
 
 """
@@ -66,12 +66,12 @@ Structure containing the data of a homogeneous and isotropic string
 * `m`: Linear mass density [kg/m]
 * `D`: Tension [N]
 """
-@with_kw struct Strings <: WaveEquation
-    L :: Float64
-    m :: Float64
-    D :: Float64
+@show_struct struct Strings{T <: Real} <: WaveEquation
+    L::T
+    m::T
+    D::T
 
-    Strings(L::Float64, S::Float64, D::Float64, ρ::Float64) = new(L, ρ*S, D)
+    Strings(L::T, S::T, D::T, ρ::T) where T = new{T}(L, ρ*S, D)
 end
 
 """
@@ -91,12 +91,12 @@ Structure containing the data of a homogeneous and isotropic bending beam
 * `M`: Linear mass density [kg/m]
 * `D`: Bending stiffness [N.m²]
 """
-@with_kw struct Beam <: OneDStructure
-    L :: Float64
-    m :: Float64
-    D :: Float64
+@show_struct struct Beam{T <: Real} <: OneDStructure
+    L::T
+    m::T
+    D::T
 
-    Beam(L::Float64, S::Float64, I::Float64, E::Float64, ρ::Float64) = new(L, ρ*S, E*I)
+    Beam(L::T, S::T, I::T, E::T, ρ::T) where T = new{T}(L, ρ*S, E*I)
 end
 
 """

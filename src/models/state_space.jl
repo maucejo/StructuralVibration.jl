@@ -1,5 +1,5 @@
 """
-    ContinuousStateSpace(Ac::Matrix{Float64}, Bc::Matrix{Float64})
+    ContinuousStateSpace(Ac, Bc)
 
 Continuous-time state-space model
 
@@ -7,13 +7,13 @@ Continuous-time state-space model
 * `Ac`: Continuous-time state matrix A
 * `Bc`: Continuous-time input matrix B
 """
-@with_kw struct ContinuousStateSpace
-    Ac::Matrix{Float64}
-    Bc::Matrix{Float64}
+@show_struct struct ContinuousStateSpace{T <: Real}
+    Ac::Matrix{T}
+    Bc::Matrix{T}
 end
 
 """
-    DiscreteStateSpace(Ad::Matrix{Float64}, Bd::Matrix{Float64}, Bdp::Matrix{Float64})
+    DiscreteStateSpace(Ad, Bd, Bdp)
 
 Discrete-time state-space model
 
@@ -22,14 +22,12 @@ Discrete-time state-space model
 * `Bd`: Discrete-time input matrix B
 * `Bdp`: Discrete-time input matrix Bp (only for `:foh` method)
 """
-@with_kw struct DiscreteStateSpace
-    Ad::Matrix{Float64}
-    Bd::Matrix{Float64}
-    Bdp::Matrix{Float64}
+@show_struct struct DiscreteStateSpace{T <: Real}
+    Ad::Matrix{T}
+    Bd::Matrix{T}
+    Bdp::Matrix{T}
 
-    function DiscreteStateSpace(Ad, Bd, Bdp = undefs(size(Bd)))
-        return new(Ad, Bd, Bdp)
-    end
+    DiscreteStateSpace(Ad::Matrix{T}, Bd::Matrix{T}, Bdp::Matrix{T} = similar(Bd)) where T = new{T}(Ad, Bd, Bdp)
 end
 
 """
@@ -137,7 +135,7 @@ Computes the eigen of a continuous-time state-space model
 * `Ψ`: Eigenvectors
 """
 
-function eigenmode(Ac::Matrix{Float64}, n::Int = 0)
+function eigenmode(Ac::Matrix{T}, n::Int = 0) where {T <: Real}
 
     λ, Ψ = eigen(Ac)
 

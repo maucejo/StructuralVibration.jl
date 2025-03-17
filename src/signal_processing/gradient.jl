@@ -1,36 +1,36 @@
 """
-    gradient(f::Vector{Float64}, t)
+    gradient(f::Vector{T}, t) where {T <: Real}
 
 Compute the gradient of a function `f` at points `t`.
 
 # Inputs
-- `f::Vector{Float64}`: Function values
+- `f`: Function values
 - `t`: Points at which to evaluate the gradient
 
 # Output
 - `df`: Gradient of the vector `f` at points `t`
 """
-function gradient(f::Vector{Float64}, t)
+function gradient(f::Vector{T}, t) where {T <: Real}
 
-    itp = linear_interpolation(t, f)
+    itp = cubic_spline_interpolation(t, f)
 
     return only.(Interpolations.gradient.(Ref(itp), t))
 end
 
 """
-    gradient(f::Matrix{Float64}, t)
+    gradient(f::Matrix{T}, t) where {T <: Real}
 
 Compute the gradient of a function `f` at points `t`.
 
 # Inputs
-- `f::Matrix{Float64}`: Function values
+- `f`: Function values
 - `t`: Points at which to evaluate the gradient
 
 # Output
 
 - `df`: Gradient of the each row of the matrix `f` at points `t`
 """
-function gradient(f::Matrix{Float64}, t)
+function gradient(f::Matrix{T}, t) where {T <: Real}
     nx, nt = size(f)
     df = zeros(nx, nt)
     for i in 1:nx
@@ -40,7 +40,21 @@ function gradient(f::Matrix{Float64}, t)
     return df
 end
 
-function curvature(x::Vector{Float64}, y::Vector{Float64}, p)
+
+"""
+    curvature(x::Vector{T}, y::Vector{T}, p) where {T <: Real}
+
+Compute the curvature of a parametric curve `(x(t), y(t))` at points `t`.
+
+# Inputs
+- `x`: x-coordinates of the curve
+- `y`: y-coordinates of the curve
+- `p`: Points at which to evaluate the curvature
+
+# Output
+- `curvature`: Curvature of the curve at points `p`
+"""
+function curvature(x::Vector{T}, y::Vector{T}, p) where {T <: Real}
     dx = gradient(x, p)
     ddx = gradient(dx, p)
 

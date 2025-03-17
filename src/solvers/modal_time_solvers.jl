@@ -10,23 +10,23 @@ Structure containing data for the modal time solver
 * `n`: Number of modes to retain inf the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-struct FreeModalTimeProblem
-    K :: VecOrMat{Float64}
-    M :: Matrix{Float64}
-    ξn :: Vector{Float64}
-    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
-    t
-    n :: Int
-    ismodal :: Bool
+@show_struct struct FreeModalTimeProblem{T <: Real, S <: AbstractMatrix, U <: AbstractVector}
+    K::VecOrMat{T}
+    M::S
+    ξn::Vector{T}
+    u0::Tuple{Vector{T}, Vector{T}}
+    t::V
+    n::Int
+    ismodal::Bool
 
-    function FreeModalTimeProblem(K, M, ξn, u0, t, n = size(K, 1), ismodal = false)
+    function FreeModalTimeProblem(K::VecOrMat{T}, M::S, ξn::Vector{T}, u0::Tuple{Vector{T}, Vector{T}}, t::U, n = size(K, 1), ismodal = false) where {T, S, U}
         if !isa(ξn, Array)
             ξn = fill(ξn, n)
         elseif length(ξn) != n
             error("The number of damping ratios must be equal to n")
         end
 
-        new(K, M, ξn, u0, t, n, ismodal)
+        new{T, S, U}(K, M, ξn, u0, t, n, ismodal)
     end
 end
 
@@ -40,8 +40,8 @@ Structure containing data for the modal time solver for computing the forced res
 * `M`: Mass matrix (or mass-normalized mode shapes)
 * `ξn`: Damping ratios
 * `u0`: Initial conditions
-    * `x₀`: Initial displacement (or modal displacement)
-    * `v₀`: Initial velocity (or modal velocity)
+    * `x0`: Initial displacement (or modal displacement)
+    * `v0`: Initial velocity (or modal velocity)
 * `t`: Time points at which to evaluate the response
 * `F`: Amplitude vector (or modal force amplitude vector)
 * `freq`: Excitation frequency
@@ -53,33 +53,33 @@ Structure containing data for the modal time solver for computing the forced res
 * `M`: Mass matrix (or mass-normalized mode shapes)
 * `ξn`: Damping ratios
 * `u0`: Initial conditions
-    * `x₀`: Initial displacement (or modal displacement)
-    * `v₀`: Initial velocity (or modal velocity)
+    * `x0`: Initial displacement (or modal displacement)
+    * `v0`: Initial velocity (or modal velocity)
 * `t`: Time points at which to evaluate the response
 * `F`: Amplitude vector (or modal force amplitude vector)
 * `ω`: Excitation angular frequency
 * `n`: Number of modes to retain in the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-struct HarmonicModalTimeProblem
-    K :: Matrix{Float64}
-    M :: Matrix{Float64}
-    ξn :: Vector{Float64}
-    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
-    t
-    F :: Vector{Float64}
-    ω :: Float64
-    n :: Int
-    ismodal :: Bool
+@show_struc struct HarmonicModalTimeProblem{T <: Real, S <: AbstractMatrix, U <: AbstractVector}
+    K::Matrix{T}
+    M::S
+    ξn::Vector{T}
+    u0::Tuple{Vector{T}, Vector{T}}
+    t::U
+    F::Vector{T}
+    ω::T
+    n::Int
+    ismodal::Bool
 
-    function HarmonicModalTimeProblem(K, M, ξn, u0, t, F, freq, n = size(K, 1); ismodal = false)
+    function HarmonicModalTimeProblem(K::Matrix{T}, M::S, ξn::Vector{T}, u0::Tuple{Vector{T}, Vector{T}}, t::U, F::Vector{T}, freq::T, n = size(K, 1); ismodal = false) where {T, S, U}
         if !isa(ξn, Array)
             ξn = fill(ξn, n)
         elseif length(ξn) != n
             error("The number of damping ratios must be equal to n")
         end
 
-        new(K, M, ξn, u0, t, F, 2π*freq, n, ismodal)
+        new{T, S, U}(K, M, ξn, u0, t, F, 2π*freq, n, ismodal)
     end
 end
 
@@ -100,24 +100,24 @@ Structure containing data for modal time solver for computing the forced respons
 * `n`: Number of modes to retain in the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-struct ForcedModalTimeProblem
-    K
-    M
-    ξn :: Vector{Float64}
-    u0 :: Tuple{Vector{Float64}, Vector{Float64}}
-    t
-    F
-    n :: Int
-    ismodal :: Bool
+@show_struct struct ForcedModalTimeProblem{T <: Real, S <: AbstractMatrix, U <: AbstractVector}
+    K::VecOrMat{T}
+    M::S
+    ξn::Vector{T}
+    u0::Tuple{Vector{T}, Vector{T}}
+    t::U
+    F::Matrix{T}
+    n::Int
+    ismodal::Bool
 
-    function ForcedModalTimeProblem(K, M, ξn, u0, t, F, n = size(K, 1); ismodal = false)
+    function ForcedModalTimeProblem(K::VecOrMat{T}, M::S, ξn::Vector{T}, u0::Tuple{Vector{T}, Vector{T}}, t::U, F::Matrix{T}, n = size(K, 1); ismodal = false) where {T, S, U}
         if !isa(ξn, Array)
             ξn = fill(ξn, n)
         elseif length(ξn) != n
             error("The number of damping ratios must be equal to n")
         end
 
-        new(K, M, ξn, u0, t, F, n, ismodal)
+        new{T, S, U}(K, M, ξn, u0, t, F, n, ismodal)
     end
 end
 
@@ -131,10 +131,10 @@ Structure containing problem solutions
 * `du`: Velocity matrix or vector
 * `ddu`: Acceleration matrix or vector
 """
-struct ModalTimeSolution
-    u
-    du
-    ddu
+@show_struct struct ModalTimeSolution{T <: Real}
+    u::Matrix{T}
+    du::Matrix{T}
+    ddu::Matrix{T}
 end
 
 """
@@ -145,8 +145,8 @@ Structure containing the impulse response of a modal system
 # Field
 * `u`: Impulse response of a Mdof system
 """
-struct ModalImpulseSolution
-    u :: Union{Matrix{Float64}, Vector{Matrix{Float64}}}
+@show_struct struct ModalImpulseSolution{T <: Real}
+    u::Union{Matrix{T}, Vector{Matrix{T}}}
 end
 
 
@@ -163,7 +163,7 @@ Compute the free response of a multi-degrees of freedom (Mdof) system using the 
 """
 function solve(prob::FreeModalTimeProblem)
     (; K, M, ξn, u0, t, n, ismodal) = prob
-    x₀, v₀ = u0
+    x0, v0 = u0
     nt = length(t)
 
     # Modal analysis
@@ -175,8 +175,8 @@ function solve(prob::FreeModalTimeProblem)
         # Note: The mode shapes are mass-normalized, so Mn = I
 
         # Modal initial conditions
-        qₓ = Φm'*M*x₀
-        qᵥ = Φm'*M*v₀
+        qx = Φm'*M*x0
+        qv = Φm'*M*v0
     else
         Φm = M[:, 1:n]
         if K isa Vector
@@ -184,15 +184,15 @@ function solve(prob::FreeModalTimeProblem)
         else
             ωn = .√diag(K)[1:n]
         end
-        qₓ = x₀[1:n]
-        qᵥ = v₀[1:n]
+        qx = x0[1:n]
+        qv = v0[1:n]
     end
 
     # Modal coordinate calculation
-    q = undefs(nt, n)
-    dq = undefs(nt, n)
-    ddq = undefs(nt, n)
-    for (m, (ωm, ξm, Am, qm))  in enumerate(zip(ωn, ξn, qₓ, qᵥ))
+    q = similar(x0, nt, n)
+    dq = similar(q)
+    ddq = similar(q)
+    for (m, (ωm, ξm, Am, qm))  in enumerate(zip(ωn, ξn, qx, qv))
         if ωm == 0.
             @. q[:, m] = Am + qm*t
             @. dq[:, m] = qm
@@ -252,7 +252,7 @@ Compute the forced response of a multi-degrees of freedom (Mdof) system due to a
 """
 function solve(prob::HarmonicModalTimeProblem)
     (; K, M, ξn, u0, t, F, ω, n, ismodal) = prob
-    x₀, v₀ = u0
+    x0, v0 = u0
     nt = length(t)
 
     if size(F, 2) ≠ 1
@@ -268,8 +268,8 @@ function solve(prob::HarmonicModalTimeProblem)
         # Note: The mode shapes are mass-normalized, so Mn = I
 
         # Modal initial conditions
-        qₓ = Φm'*M*x₀
-        qᵥ = Φm'*M*v₀
+        qx = Φm'*M*x0
+        qv = Φm'*M*v0
     else
         Φm = M[:, 1:n]
         if K isa Vector
@@ -277,8 +277,8 @@ function solve(prob::HarmonicModalTimeProblem)
         else
             ωn = .√diag(K)[1:n]
         end
-        qₓ = x₀[1:n]
-        qᵥ = v₀[1:n]
+        qx = x0[1:n]
+        qv = v0[1:n]
     end
 
     # Modal viscous Damping vector
@@ -288,23 +288,23 @@ function solve(prob::HarmonicModalTimeProblem)
     Ln = Φm'*F
 
     # Particular solution
-    Qₚ = @. Ln/(ωn^2 - ω^2 + 2im*Ξ*ω)
-    ρ = abs.(Qₚ)
-    ϕ = angle.(Qₚ)
+    Qp = @. Ln/(ωn^2 - ω^2 + 2im*Ξ*ω)
+    ρ = abs.(Qp)
+    ϕ = angle.(Qp)
 
-    A = @. qₓ - ρ*cos(ϕ)
+    A = @. qx - ρ*cos(ϕ)
 
     # Modal coordinate calculation
-    q = undefs(nt, n)
-    dq = undefs(nt, n)
-    ddq = undefs(nt, n)
-    qh = undefs(nt)
-    dqh = undefs(nt)
-    ddqh = undefs(nt)
+    q = similar(x0, nt, n)
+    dq = similar(q)
+    ddq = similar(q)
+    qh = similar(t)
+    dqh = similar(t)
+    ddqh = similar(t)
 
-    for (m, (ωm, ξm, Am, qm, ρm, ϕm))  in enumerate(zip(ωn, ξn, A, qᵥ, ρ, ϕ))
+    for (m, (ωm, ξm, Am, qm, ρm, ϕm))  in enumerate(zip(ωn, ξn, A, qv, ρ, ϕ))
         if ξm == 0. && ωm == ω
-            Am = qₓ[m]
+            Am = qx[m]
             Bm = qm/ω
             ρm = Ln[m]/2ω
 
@@ -372,7 +372,7 @@ Compute the forced response of a multi-degrees of freedom (Mdof) system due to a
 """
 function solve(prob::ForcedModalTimeProblem; method = :interp)
     (; K, M, ξn, u0, t, F, n, ismodal) = prob
-    x₀, v₀ = u0
+    x0, v0 = u0
     nt = length(t)
     Δt = t[2] - t[1]
 
@@ -385,8 +385,8 @@ function solve(prob::ForcedModalTimeProblem; method = :interp)
         # Note: The mode shapes are mass-normalized, so Mn = I
 
         # Modal initial conditions
-        qₓ = Φm'*M*x₀
-        qᵥ = Φm'*M*v₀
+        qx = Φm'*M*x0
+        qv = Φm'*M*v0
 
         # Modal participation factor
         Ln = Φm'*F
@@ -400,24 +400,24 @@ function solve(prob::ForcedModalTimeProblem; method = :interp)
         end
 
         # Modal initial condition
-        qₓ = x₀[1:n]
-        qᵥ = v₀[1:n]
+        qx = x0[1:n]
+        qv = v0[1:n]
 
          # Modal participation factor
-        Ln = F[1:n]
+        Ln = F[1:n, :]
     end
 
     # Modal coordinate calculation
-    q = undefs(nt, n)
-    qh = undefs(nt)
+    q = similar(u0, nt, n)
+    qh = similar(t)
     if method == :interp || method == :conv
-        h = undefs(nt)
+        h = similar(t)
     else
         num = undefs(3)
         denom = undefs(3)
     end
 
-    for (m, (ωm, ξm, qxm, qvm)) in enumerate(zip(ωn, ξn, qₓ, qᵥ))
+    for (m, (ωm, ξm, qxm, qvm)) in enumerate(zip(ωn, ξn, qx, qv))
         if ωm == 0.
             @. qh = qxm + qvm*t
             if method == :interp || method == :conv
@@ -500,7 +500,7 @@ Compute the impulse response of a multi-degrees of freedom (Mdof) system using t
 # Output
 * `sol`: ModalImpulseSolution
 """
-function impulse_response(K::Matrix{Float64}, M::AbstractMatrix{Float64}, ξn, t, n = size(K, 1); ismat = false)
+function impulse_response(K::Matrix{T}, M::AbstractMatrix{T}, ξn, t::AbstractVector, n = size(K, 1); ismat = false) where {T <: Real}
     λ, Φ = eigen(K, M)
     fn = .√λ[1:n]/2π
     Φn = Φ[:, 1:n]
@@ -513,10 +513,10 @@ function impulse_response(K::Matrix{Float64}, M::AbstractMatrix{Float64}, ξn, t
         error("The number of damping ratios must be equal to n")
     end
 
-    h = [zeros(ndofs, ndofs) for _ in 1:nt]
-    hsdof = undefs(nt)
+    h = [similar(K) for _ in 1:nt]
+    hsdof = similar(t)
 
-    for (m, (fm, ξm, Φm)) in enumerate(zip(fn, ξn, eachcol(Φn)))
+    for (fm, ξm, Φm) in zip(fn, ξn, eachcol(Φn))
         # The modes are mass-normalized
         sdof = Sdof(1., fm, ξm)
         prob = SdofFreeTimeProblem(sdof, [0., 1.], t)

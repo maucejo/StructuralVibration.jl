@@ -44,15 +44,14 @@ Denoises a signal `y`
 # Output
 * `x`: Denoised signal
 """
-function denoising(y::AbstractArray, alg::RegDenoising)
+function denoising(y::T, alg::RegDenoising) where {T <: AbstractArray}
    ndim = ndims(y)
-   sy = size(y)
-   n = sy[ndim]
+   n = size(y, ndim)
 
    # Initialization
-   s = undefs(n)
-   z = undefs(eltype(y), sy)
-   U = undefs(n, n)
+   s = similar(real(y), n)
+   z = similar(y)
+   U = similar(y, n, n)
 
    # Eigenvalues of the second difference matrix
    @. s = 2(1. - cos((0:n-1)π/n))
@@ -60,7 +59,7 @@ function denoising(y::AbstractArray, alg::RegDenoising)
    s² = s.^2
 
    # Corresponding eigenvectors
-   scale = undefs(n)
+   scale = similar(s)
    scale[1] = sqrt(1/n)
    scale[2:end] .= sqrt(2/n)
    U = [cos((k - 1)*(2j - 1)π/2n) for j = 1:n, k = 1:n].*scale'
@@ -68,7 +67,7 @@ function denoising(y::AbstractArray, alg::RegDenoising)
    # Calulation of DCT-2
    z .= dct(y, ndim)
 
-   x = undefs(sy)
+   x = similar(y)
 
     if ndim == 1
         x .= reg_denoise(z, s², U, alg.prior)
@@ -92,7 +91,7 @@ function reg_denoise(z, s², U, prior)
     return U*(z./(1 .+ λ*s²))
 end
 
-function denoising(y::AbstractArray, alg::KalmanDenoising)
+function denoising(y::T, alg::KalmanDenoising) where {T <: AbstractArray}
 
     # Conversion
     y isa Vector ? y = transpose(y) : nothing
@@ -116,18 +115,18 @@ function kalman_denoise(y, Q, R, alg)
 
     # Initialization
     nx, nt = size(y)
-    xest = undefs(eltype(y), nx, nt)
-    Pest = [undefs(eltype(y), nx, nx) for _ in 1:nt]
+    xest = similar(y)
+    Ppred = similar(y, nx, nx)
+    Pest = [similar(Ppred) for _ in 1:nt]
 
     xest[:, 1] .= y[:, 1]
     Pest[1] .= R
 
     # Other initializations
-    xpred = undefs(eltype(y), nx)
-    Ppred = undefs(eltype(y), nx, nx)
-    ik = undefs(eltype(y), nx)
-    Kk = undefs(eltype(y), nx, nx)
-    Sk = undefs(eltype(y), nx, nx)
+    xpred = similar(y, nx)
+    ik = similar(xpred)
+    Kk = similar(Ppred)
+    Sk = similar(Ppred)
 
     for k = 2:nt
         # Prediction
@@ -144,8 +143,8 @@ function kalman_denoise(y, Q, R, alg)
 
     if alg.rts
         # RTS pass
-        x = undefs(eltype(y), nx, nt)
-        P = undefs(eltype(y), nx, nx)
+        x = similar(y)
+        P = similar(Ppred)
 
         x[:, end] .= xest[:, end]
         P .= Pest[end]
@@ -169,14 +168,14 @@ function kf_objfun!(λ, y, R)
     nx, nt = size(y)
     x = y[:, 1]
 
-    P = undefs(eltype(y), nx, nx)
+    P = similar(y, nx, nx)
     P .= R
 
-    xpred = undefs(eltype(y), nx)
-    Ppred = undefs(eltype(y), nx, nx)
-    ik = undefs(eltype(y), nx)
-    Sk = undefs(eltype(y), nx, nx)
-    Kk = undefs(eltype(y), nx, nx)
+    xpred = similar(y, nx)
+    Ppred = similar(P)
+    ik = similar(xpred)
+    Sk = similar(P)
+    Kk = similar(P)
 
     # Application of the initial conditions
     Q = (10 .^λ).*I(nx)

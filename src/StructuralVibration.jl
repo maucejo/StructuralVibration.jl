@@ -60,7 +60,8 @@ export sv_plot, bode_plot, nyquist_plot, waterfall_plot
 export undefs
 
 # Include files - Utils
-include("utils/undefs.jl")
+include("utils/macro_utils.jl")
+# include("utils/undefs.jl")
 
 # Include files - Excitation models
 include("models/excitation.jl")

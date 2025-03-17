@@ -27,7 +27,7 @@ Create a force window
 * `w`: Force window
 """
 function force(N, width = 0.1)
-    w = zeros(N)
+    w = zeros(typeof(width), N)
     w[1:round(Int, width*N)] .= 1
 
     return w
@@ -112,7 +112,7 @@ function parzen(N)
     L = N + 1
     n = round.(Int, (0:N-1) .- N/2)
 
-    w = undefs(N)
+    w = similar(n, Float64)
     pos1 = @. 0 ≤ abs(n) ≤ L/4
     pos2 = @. L/4 < abs(n) ≤ L/2
     @. w[pos1] = 1 - 6*(2n[pos1]/L)^2*(1 - 2abs(n[pos1])/L)
@@ -134,9 +134,9 @@ Create a Planck-taper window
 * `w`: Planck-taper window
 """
 function planck(N, ϵ = 0.25)
-    w = undefs(N)
     n = 0:(N-1)
     δ = ϵ*N
+    w = similar(n, typeof(δ))
 
     pos1 = @. 1 ≤ n < δ
     pos2 = @. δ ≤ n < Int(N/2)

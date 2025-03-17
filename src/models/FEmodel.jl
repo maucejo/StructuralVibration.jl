@@ -237,7 +237,7 @@ Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 * `ω`: Vector of natural frequencies
 * `Φ`: Mass-normalized mode shapes
 """
-function eigenmode(K::Matrix{Float64}, M::AbstractMatrix{Float64}, n = size(K, 1))
+function eigenmode(K, M, n = size(K, 1))
 
     λ, Φ = eigen(K, M)
     ω = @. √abs(λ[1:n])
@@ -267,11 +267,11 @@ Compute the Rayleigh damping matrix for a given stiffness and mass matrices
 **Output**
 * `C`: Rayleigh damping matrix
 """
-function rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+function rayleigh_damping_matrix(K, M, α, β)
     return α*M + β*K
 end
 
-function rayleigh_damping_matrix(K, M, ω1::Float64, ω2::Float64, ξ1::Float64, ξ2::Float64)
+function rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)
     β = 2(ξ2*ω2 - ξ1*ω1)/(ω2^2 - ω1^2)
     α = 2ξ1*ω1 - ω1^2*β
     return α*M + β*K
