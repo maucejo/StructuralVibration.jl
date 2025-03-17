@@ -15,7 +15,7 @@ Structure containing data for the modal time solver
     M::S
     ξn::Vector{T}
     u0::Tuple{Vector{T}, Vector{T}}
-    t::V
+    t::U
     n::Int
     ismodal::Bool
 
@@ -61,7 +61,7 @@ Structure containing data for the modal time solver for computing the forced res
 * `n`: Number of modes to retain in the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
 """
-@show_struc struct HarmonicModalTimeProblem{T <: Real, S <: AbstractMatrix, U <: AbstractVector}
+@show_struct struct HarmonicModalTimeProblem{T <: Real, S <: AbstractMatrix, U <: AbstractVector}
     K::Matrix{T}
     M::S
     ξn::Vector{T}

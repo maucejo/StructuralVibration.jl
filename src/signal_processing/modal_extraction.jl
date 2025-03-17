@@ -38,8 +38,6 @@ function freq_ppm_extract(freq, H; type = :dis)
 
     # Natural frequencies
     fn = freq[pks.indices]
-
-    nfreq = length(fn)
     ξn = similar(fn)
 
     # Convert to displacement

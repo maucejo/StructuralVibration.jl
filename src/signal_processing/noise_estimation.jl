@@ -11,7 +11,7 @@ Bayesian noise estimation
     * `:invgamma`: Inverse gamma distribution (default)
     * `:uniform`: Uniform distribution
 """
-struct BayesianEst <: OptimFamily
+@show_struct struct BayesianEst <: OptimFamily
     prior :: Symbol
 
     BayesianEst(prior = :invgamma) = new(prior)
@@ -30,7 +30,7 @@ This method has been proposed by Garcia in [1]
 # Reference
 [1] Garcia, D. (2010). Robust smoothing of gridded data in one and higher dimensions with missing values. Computational Statistics and Data Analysis, 54(5), 1167-1178
 """
-struct GCVEst <: OptimFamily end
+@show_struct struct GCVEst <: OptimFamily end
 
 """
     LcurveEst
@@ -46,7 +46,7 @@ This method is based on the method proposed by Hansen in [1]
 [1] Hansen, P. C. (1999). The L-curve and its use in the numerical treatment of inverse problems. Computational Inverse Problems in Electrocardiology, 119-142
 
 """
-struct LcurveEst <: OptimFamily end
+@show_struct struct LcurveEst <: OptimFamily end
 
 """
     DerricoEst
@@ -61,7 +61,7 @@ This method has been proposed by John D'Errico in [1]
 # Reference
 [1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023
 """
-struct DerricoEst <: NoiseEstimation end
+@show_struct struct DerricoEst <: NoiseEstimation end
 
 """
     varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)

@@ -10,7 +10,7 @@ Bayesian Regularization denoising method
     * `:invgamma`: Inverse Gamma distribution
     * `:uniform`: Uniform distribution
 """
-struct RegDenoising <: DenoisingMethod
+@show_struct struct RegDenoising <: DenoisingMethod
     prior::Symbol
 
     RegDenoising(prior = :invgamma) = new(prior)
@@ -24,7 +24,7 @@ Kalman filter denoising method
 # Fields
 * `rts`: Flag to enable the Rauch-Tung-Striebel smoother
 """
-struct KalmanDenoising <: DenoisingMethod
+@show_struct struct KalmanDenoising <: DenoisingMethod
     rts::Bool
 
     KalmanDenoising(; rts = false) = new(rts)

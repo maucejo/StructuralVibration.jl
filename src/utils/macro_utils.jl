@@ -21,23 +21,6 @@ its name, type, and value.
     displays the first 5 elements followed by "..."
   - Always includes an array summary (dimensions and type)
 - For other types: displays the type and standard representation
-
-# Example
-```julia
-@show_struct struct Person
-    name::String
-    age::Int
-    scores::Vector{Float64}
-end
-
-p = Person("John", 30, [15.5, 17.0, 16.5])
-println(p)
-# Output:
-#   Person
-#     name: String John
-#     age: Int64 30
-#     scores: Vector{Float64} [15.5, 17.0, 16.5]
-```
 """
 macro show_struct(expr)
     if expr.head != :struct
@@ -97,7 +80,7 @@ macro show_struct(expr)
                     end
                     println(io, "  "^(2) * "$field: $(summary(value)) $val_str")
                 elseif isstructtype(value_type)
-                    # Pour les structures, afficher uniquement le type, pas la valeur
+                    # For structures, display only the type, not the value
                     println(io, "  "^(2) * "$field: $value_type")
                 else
                     println(io, "  "^(2) * "$field: $value_type $value")
@@ -108,6 +91,7 @@ macro show_struct(expr)
 
     # Combine the structure definition and the show method
     return quote
+        $(esc(:($Base.@__doc__ $expr)))
         $result
         $show_def
     end

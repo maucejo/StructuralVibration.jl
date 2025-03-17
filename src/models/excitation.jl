@@ -110,7 +110,7 @@ Struct to define a half sine excitation signal
 * `tstart`: Starting time of the excitation [s]
 * `duration`: Duration of the excitation [s]
 """
-@show_struct struct HalfSine <: ArbitraryExc
+@show_struct struct HalfSine{T <: Real} <: ArbitraryExc
     F::T
     tstart::T
     duration::T

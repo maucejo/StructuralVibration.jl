@@ -106,7 +106,7 @@ Structure containing the data feeding the direct solver for calculating the moda
     freq::V
     So::W
 
-    DirectFreqProblem(K::T, M::S, C::U, F::T, freq::V, So::W = I(size(K, 1))) = new{T, S, U, V, W}(K, M, C, F, freq, So)
+    DirectFreqProblem(K::T, M::S, C::U, F::T, freq::V, So::W = I(size(K, 1))) where {T, S, U ,V, W} = new{T, S, U, V, W}(K, M, C, F, freq, So)
 end
 
 """
