@@ -286,7 +286,7 @@ window.Quarto = {
 </header>
 
 
-<p>The aim of this section is to describe the modal time solvers available in the <code>StructuralVibration.jl</code> package for solving Multi-degrees of freedom (Mdof) systems. To explain, the theoretical foundations of the proposed solvers, let’s consider a Mdof system with <span class="math inline">\(N\)</span> degrees of freedom. The equation of motion of the system is given by: <span class="math display">\[
+<p>The aim of this section is to describe the modal time solvers available for solving Multi-degrees of freedom (Mdof) systems. To explain, the theoretical foundations of the proposed solvers, let’s consider a Mdof system with <span class="math inline">\(N\)</span> degrees of freedom. The equation of motion of the system is given by: <span class="math display">\[
 \mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{C} \dot{\mathbf{x}}(t) + \mathbf{K} \mathbf{x}(t) = \mathbf{F}(t)
 \]</span> where <span class="math inline">\(\mathbf{M}\)</span> is the mass matrix, <span class="math inline">\(\mathbf{C}\)</span> is the damping matrix, <span class="math inline">\(\mathbf{K}\)</span> is the stiffness matrix, <span class="math inline">\(\mathbf{x}(t)\)</span> is the displacement vector, and <span class="math inline">\(\mathbf{F}(t)\)</span> is the vector of external forces.</p>
 <p>To solve the previous in the modal space, the solution <span class="math inline">\(\mathbf{x}(t)\)</span> is expressed as: <span class="math display">\[
@@ -333,7 +333,7 @@ Note
 <ul>
 <li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies ωn^2</p>
+<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -477,7 +477,7 @@ Note
 <ul>
 <li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies ωn^2</p>
+<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -630,7 +630,7 @@ Note
 <ul>
 <li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies ωn^2</p>
+<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -746,9 +746,6 @@ Note
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>CairoMakie.Screen{PDF}</code></pre>
-</div>
 </div>
 </section>
 </section>
@@ -778,7 +775,7 @@ h_1(t) &amp; &amp; &amp; &amp; \\
 <ul>
 <li><p>If <code>ismodal = false</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code>: Squared natural angular frequencies ωn^2</p>
+<li><p>If <code>ismodal = true</code>: Squared natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -813,44 +810,16 @@ h_1(t) &amp; &amp; &amp; &amp; \\
 </div>
 </div>
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Time vector</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">1e-2</span><span class="op">:</span><span class="fl">30</span>.</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Impulse response matrix</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(K, M, ξ, t, ismat <span class="op">=</span> <span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>2×2×3001 Array{Float64, 3}:
-[:, :, 1] =
-  0.0  -0.0
- -0.0   0.0
-
-[:, :, 2] =
-  0.00166467  -0.00332933
- -0.00332933   0.00665866
-
-[:, :, 3] =
-  0.00332478  -0.00664956
- -0.00664956   0.0132991
-
-;;; … 
-
-[:, :, 2999] =
- -0.00217048   0.00434096
-  0.00434096  -0.00868191
-
-[:, :, 3000] =
- -0.00219998   0.00439997
-  0.00439997  -0.00879993
-
-[:, :, 3001] =
- -0.00222832   0.00445665
-  0.00445665  -0.00891329</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Time vector</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">1e-2</span><span class="op">:</span><span class="fl">30</span>.</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Impulse response matrix</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(K, M, ξ, t, ismat <span class="op">=</span> <span class="cn">true</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
