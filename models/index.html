@@ -303,9 +303,10 @@ m \ddot y(x, t) - D \frac{\partial^2 y(x,t)}{\partial x^2} = p(x, t),
 <li><span class="math inline">\(u(x, t)\)</span>: Longitudinal displacement [m]</li>
 </ul></li>
 <li><p><span class="math inline">\(p(x, t)\)</span>: Distributed longitudinal force [N/m]</p></li>
-<li><p><span class="math inline">\(m = \rho S\)</span>: Linear mass density [Kg/m<sup>2</sup>]</p>
+<li><p><span class="math inline">\(m = \rho S\)</span>: Linear mass density [kg/m<sup>2</sup>]</p>
 <ul>
-<li><span class="math inline">\(\rho\)</span>: Mass density [kg/m<sup>3</sup>] and <span class="math inline">\(S\)</span>: Cross-section area [m<sup>2</sup>]</li>
+<li><span class="math inline">\(\rho\)</span>: Mass density [kg/m<sup>3</sup>]</li>
+<li><span class="math inline">\(S\)</span>: Cross-section area [m<sup>2</sup>]</li>
 </ul></li>
 <li><p><span class="math inline">\(D = E S\)</span>: Longitudinal stiffness [N]</p>
 <ul>
@@ -535,9 +536,9 @@ modefreq(model::Beam, fmax, bc = :SS)</code></pre>
 </ul>
 <p><strong>Outputs</strong></p>
 <ul>
-<li><p><code>ωₙ</code>: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]</p>
+<li><p><code>ωn</code>: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]</p>
 </li>
-<li><p><code>kₙ</code>: Vector of modal wavenumbers</p>
+<li><p><code>kn</code>: Vector of modal wavenumbers</p>
 </li>
 </ul>
 
@@ -551,16 +552,16 @@ modefreq(model::Beam, fmax, bc = :SS)</code></pre>
 <hr>
 <div id="14" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modeshape(model::Bar, kₙ, x, bc = :CC)
-modeshape(model::Rod, kₙ, x, bc = :CC)
-modeshape(model::Strings, kₙ, x, bc = :CC)
-modeshape(model::Beam, kₙ, x, bc = :SS)</code></pre>
+<div class="markdown"><pre><code>modeshape(model::Bar, kn, x, bc = :CC)
+modeshape(model::Rod, kn, x, bc = :CC)
+modeshape(model::Strings, kn, x, bc = :CC)
+modeshape(model::Beam, kn, x, bc = :SS)</code></pre>
 <p>Computes the mass-normalized mode shapes of a longitudinal or torsional bar</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>model</code>: Structure containing the bar data</p>
 </li>
-<li><p><code>kₙ</code>: Array of modal wavenumbers</p>
+<li><p><code>kn</code>: Array of modal wavenumbers</p>
 </li>
 <li><p><code>x</code>: Coordinates of calculation points of the mode shapes</p>
 </li>
@@ -754,9 +755,9 @@ modefreq(model::Membrane, fmax)</code></pre>
 </ul>
 <p><strong>Outputs</strong></p>
 <ul>
-<li><p><code>ωₘₙ</code>: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]</p>
+<li><p><code>ωmn</code>: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]</p>
 </li>
-<li><p><code>kₘₙ</code>: Matrix of modal wave numbers</p>
+<li><p><code>kmn</code>: Matrix of modal wave numbers</p>
 </li>
 </ul>
 
@@ -770,14 +771,14 @@ modefreq(model::Membrane, fmax)</code></pre>
 <hr>
 <div id="22" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modeshape(model::Plate, kₘₙ, x, y)
-modeshape(model::Membrane, kₘₙ, x, y)</code></pre>
+<div class="markdown"><pre><code>modeshape(model::Plate, kmn, x, y)
+modeshape(model::Membrane, kmn, x, y)</code></pre>
 <p>Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>model</code>: Structure containing the data related to the structure</p>
 </li>
-<li><p><code>kₘₙ</code>: Matrix of modal wave numbers</p>
+<li><p><code>kmn</code>: Matrix of modal wave numbers</p>
 </li>
 <li><p><code>(x, y)</code>: Coordinates of the points where the mode shapes are calculated</p>
 </li>
@@ -853,13 +854,13 @@ Figure&nbsp;1: Classical representation of an Sdof system
 <hr>
 <div id="24" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Sdof(m, ω₀, ξ)</code></pre>
+<div class="markdown"><pre><code>Sdof(m, ω0, ξ)</code></pre>
 <p>Structure containing the data of a sdof system</p>
 <p><strong>Constructor</strong></p>
 <ul>
 <li><p><code>m</code>: Mass [kg]</p>
 </li>
-<li><p><code>f₀</code>: Natural frequency [Hz]</p>
+<li><p><code>f0</code>: Natural frequency [Hz]</p>
 </li>
 <li><p><code>ξ</code>: Damping ratio</p>
 </li>
@@ -868,7 +869,7 @@ Figure&nbsp;1: Classical representation of an Sdof system
 <ul>
 <li><p><code>m</code>: Mass [kg]</p>
 </li>
-<li><p><code>ω₀</code>: Natural frequency [rad/s]</p>
+<li><p><code>ω0</code>: Natural frequency [rad/s]</p>
 </li>
 <li><p><code>ξ</code>: Damping ratio</p>
 </li>
@@ -1067,7 +1068,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="34" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>eigenmode(K, M, Nₘ = size(K, 1))</code></pre>
+<div class="markdown"><pre><code>eigenmode(K, M, n = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1075,14 +1076,14 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </li>
 <li><p><code>M</code>: Mass matrix</p>
 </li>
-<li><p><code>Nₘ</code>: Number of modes to be keep in the modal basis</p>
+<li><p><code>n</code>: Number of modes to be keep in the modal basis</p>
 </li>
 </ul>
 <p><strong>Outputs</strong></p>
 <ul>
-<li><p><code>ωₘ</code>: Vector of natural frequencies</p>
+<li><p><code>ω</code>: Vector of natural frequencies</p>
 </li>
-<li><p><code>Φₘ</code>: Mass-normalized mode shapes</p>
+<li><p><code>Φ</code>: Mass-normalized mode shapes</p>
 </li>
 </ul>
 
@@ -1096,22 +1097,22 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="36" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_matrices(ωₙ, ξₙ)</code></pre>
+<div class="markdown"><pre><code>modal_matrices(ωn, ξn)</code></pre>
 <p>Computes the modal mass, stiffness, and damping matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
-<li><p><code>ωₙ</code>: Vector of natural frequencies</p>
+<li><p><code>ωn</code>: Vector of natural frequencies</p>
 </li>
-<li><p><code>ξₙ</code>: Modal damping</p>
+<li><p><code>ξn</code>: Modal damping</p>
 </li>
 </ul>
 <p><strong>Outputs</strong></p>
 <ul>
-<li><p><code>Kₙ</code>: Generalized stiffness matrix</p>
+<li><p><code>Kn</code>: Generalized stiffness matrix</p>
 </li>
-<li><p><code>Mₙ</code>: Generalized mass matrix (identity matrix, due to mass normalization)</p>
+<li><p><code>Mn</code>: Generalized mass matrix (identity matrix, due to mass normalization)</p>
 </li>
-<li><p><code>Cₙ</code>: Generalized damping matrix</p>
+<li><p><code>Cn</code>: Generalized damping matrix</p>
 </li>
 </ul>
 
@@ -1125,13 +1126,13 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="38" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_effective_mass(M, ϕₙ, r)</code></pre>
+<div class="markdown"><pre><code>modal_effective_mass(M, ϕn, r)</code></pre>
 <p>Computes the effective mass of a mode</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>M</code>: Mass matrix</p>
 </li>
-<li><p><code>ϕₙ</code>: Mode shape</p>
+<li><p><code>ϕn</code>: Mode shape</p>
 </li>
 <li><p><code>r</code>: Influence vector (rigid body mode)</p>
 </li>
@@ -1283,7 +1284,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>rayleigh_damping_matrix(K, M, α, β)
-rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
+rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1303,13 +1304,13 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 </li>
 <li><p>Method 2</p>
 <ul>
-<li><p><code>ω₁</code>: First natural frequency</p>
+<li><p><code>ω1</code>: First natural frequency</p>
 </li>
-<li><p><code>ω₂</code>: Second natural frequency</p>
+<li><p><code>ω2</code>: Second natural frequency</p>
 </li>
-<li><p><code>ξ₁</code>: Damping ratio for the first natural frequency</p>
+<li><p><code>ξ1</code>: Damping ratio for the first natural frequency</p>
 </li>
-<li><p><code>ξ₂</code>: Damping ratio for the second natural frequency</p>
+<li><p><code>ξ2</code>: Damping ratio for the second natural frequency</p>
 </li>
 </ul>
 </li>
@@ -1332,17 +1333,17 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <hr>
 <div id="46" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_damping_matrix(M, ωₙ, ξₙ, Φₙ)</code></pre>
+<div class="markdown"><pre><code>modal_damping_matrix(M, ωn, ξn, Φn)</code></pre>
 <p>Compute the damping matrix C from modal parameters</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>M</code>: Mass matrix</p>
 </li>
-<li><p><code>ωₙ</code>: Natural angular frequencies</p>
+<li><p><code>ωn</code>: Natural angular frequencies</p>
 </li>
-<li><p><code>ξₙ</code>: Damping ratios</p>
+<li><p><code>ξn</code>: Damping ratios</p>
 </li>
-<li><p><code>Φₙ</code>: Mass-normalized mode shapes</p>
+<li><p><code>Φn</code>: Mass-normalized mode shapes</p>
 </li>
 </ul>
 <p><strong>Output</strong></p>
@@ -1488,7 +1489,7 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <div id="50" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@doc</span> ContinuousStateSpace</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>ContinuousStateSpace(Ac::Matrix{Float64}, Bc::Matrix{Float64})</code></pre>
+<div class="markdown"><pre><code>ContinuousStateSpace(Ac, Bc)</code></pre>
 <p>Continuous-time state-space model</p>
 <p><strong>Fields</strong></p>
 <ul>
@@ -1532,15 +1533,15 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <hr>
 <div id="54" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>ss_modal_model(ωₙ , ξₙ, ϕₙ)</code></pre>
+<div class="markdown"><pre><code>ss_modal_model(ωn , ξn, ϕn)</code></pre>
 <p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
-<li><p><code>ωₙ</code>: Natural angular frequencies</p>
+<li><p><code>ωn</code>: Natural angular frequencies</p>
 </li>
-<li><p><code>ξₙ</code>: Damping ratios</p>
+<li><p><code>ξn</code>: Damping ratios</p>
 </li>
-<li><p><code>ϕₙ</code>: Mass-normalized mode shapes</p>
+<li><p><code>ϕn</code>: Mass-normalized mode shapes</p>
 </li>
 </ul>
 <p><strong>Output</strong> <code>css</code>: ContinuousStateSpace</p>
@@ -1555,7 +1556,7 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <hr>
 <div id="56" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>eigenmode(K, M, Nₘ = size(K, 1))</code></pre>
+<div class="markdown"><pre><code>eigenmode(K, M, n = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1563,14 +1564,14 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 </li>
 <li><p><code>M</code>: Mass matrix</p>
 </li>
-<li><p><code>Nₘ</code>: Number of modes to be keep in the modal basis</p>
+<li><p><code>n</code>: Number of modes to be keep in the modal basis</p>
 </li>
 </ul>
 <p><strong>Outputs</strong></p>
 <ul>
-<li><p><code>ωₘ</code>: Vector of natural frequencies</p>
+<li><p><code>ω</code>: Vector of natural frequencies</p>
 </li>
-<li><p><code>Φₘ</code>: Mass-normalized mode shapes</p>
+<li><p><code>Φ</code>: Mass-normalized mode shapes</p>
 </li>
 </ul>
 
@@ -1593,9 +1594,9 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 </ul>
 <p><strong>Outputs</strong></p>
 <ul>
-<li><p><code>ωₙ</code>: Natural angular frequencies</p>
+<li><p><code>ωn</code>: Natural angular frequencies</p>
 </li>
-<li><p><code>ξₙ</code>: Damping ratios</p>
+<li><p><code>ξn</code>: Damping ratios</p>
 </li>
 </ul>
 
@@ -1618,7 +1619,7 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li><p><code>ϕₙ</code>: Real modes</p>
+<li><p><code>ϕn</code>: Real modes</p>
 </li>
 </ul>
 
@@ -1706,7 +1707,7 @@ rayleigh_damping_matrix(K, M, ω₁, ω₂, ξ₁, ξ₂)</code></pre>
 <hr>
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>DiscreteStateSpace(Ad::Matrix{Float64}, Bd::Matrix{Float64}, Bdp::Matrix{Float64})</code></pre>
+<div class="markdown"><pre><code>DiscreteStateSpace(Ad, Bd, Bdp)</code></pre>
 <p>Discrete-time state-space model</p>
 <p><strong>Fields</strong></p>
 <ul>

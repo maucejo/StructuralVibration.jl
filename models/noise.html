@@ -284,7 +284,7 @@ window.Quarto = {
 <p>Adds a Gaussian White Noise (AGWN) to a signal <code>x</code> with a given SNR.</p>
 <p><strong>Inputs</strong></p>
 <ul>
-<li><p><code>x</code>: Signal</p>
+<li><p><code>x</code>: Signal (Real or Complex)</p>
 </li>
 <li><p><code>snr_dB</code>: signal to noise ratio [dB]</p>
 </li>
@@ -383,11 +383,45 @@ window.Quarto = {
 <p>Adds a complex Random Colored Noise (ACN) to a signal <code>x</code> with a given SNR</p>
 <p><strong>Inputs</strong></p>
 <ul>
+<li><p><code>x::VecOrMat{Real}</code>: Signal</p>
+</li>
+<li><p><code>snr_dB</code>: Signal to noise ratio [dB]</p>
+</li>
+<li><p><code>freq::AbstractVector</code>: Frequency range of interest</p>
+</li>
+<li><p><code>color</code>: Color of the noise</p>
+<ul>
+<li><p><code>:white</code></p>
+</li>
+<li><p><code>:pink</code> (default)</p>
+</li>
+<li><p><code>:blue</code></p>
+</li>
+<li><p><code>:brown</code></p>
+</li>
+<li><p><code>:purple</code></p>
+</li>
+</ul>
+</li>
+<li><p><code>rst::Bool</code>: Reset the random number generator</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>y</code>: Noisy signal</p>
+</li>
+</ul>
+
+
+<pre><code>acn(x, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)</code></pre>
+<p>Adds a complex Colored Noise (ACN) to a signal <code>x</code> with a given SNR</p>
+<p><strong>Inputs</strong></p>
+<ul>
 <li><p><code>x</code>: Signal</p>
 </li>
 <li><p><code>snr_dB</code>: Signal to noise ratio [dB]</p>
 </li>
-<li><p><code>freq</code>: Frequency range of interest</p>
+<li><p><code>fs</code>: Sampling frequency [Hz]</p>
 </li>
 <li><p><code>color</code>: Color of the noise</p>
 <ul>
