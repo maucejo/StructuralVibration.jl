@@ -337,7 +337,7 @@ Note
 <ul>
 <li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies</p>
+<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -437,11 +437,11 @@ Note
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">FreeModalTimeProblem</span>(K, M, ξ, u0, t)</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - case 2 - Provide the squared natural frequencies and mode shapes</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>λ, Φ <span class="op">=</span> <span class="fu">eigen</span>(K, M)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>x0m <span class="op">=</span> Φ<span class="ch">'*M*x0</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>v0m <span class="op">=</span> Φ<span class="ch">'*M*v0</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ωm, Φm <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>x0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>x0</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>v0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>v0</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (x0m, v0m)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>prob_modal <span class="op">=</span> <span class="fu">FreeModalTimeProblem</span>(λ, Φ, ξ, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>prob_modal <span class="op">=</span> <span class="fu">FreeModalTimeProblem</span>(ωm, Φm, ξ, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>x_free <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
@@ -482,7 +482,7 @@ Note
 <ul>
 <li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies</p>
+<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -525,9 +525,9 @@ Note
 </li>
 <li><p><code>u0</code>: Initial conditions</p>
 <ul>
-<li><p><code>x0</code>: Initial displacement (or modal displacement)</p>
+<li><p><code>u0[1]</code>: Initial displacement (or modal displacement)</p>
 </li>
-<li><p><code>v0</code>: Initial velocity (or modal velocity)</p>
+<li><p><code>u0[2]</code>: Initial velocity (or modal velocity)</p>
 </li>
 </ul>
 </li>
@@ -595,25 +595,26 @@ Note
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial conditions</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> [<span class="fl">0.2</span>, <span class="fl">0.1</span>]</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>v0 <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">2</span>.]</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">1</span>.</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - case 1 - Provide the stiffness and mass matrices</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>prob_harmo <span class="op">=</span> <span class="fu">HarmonicModalTimeProblem</span>(K, M, ξ, F, <span class="fl">2</span>π<span class="op">*</span>freq, u0, t)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - case 2 - Provide the squared natural frequencies and mode shapes</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>λ, Φ <span class="op">=</span> <span class="fu">eigen</span>(K, M)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>x0m <span class="op">=</span> Φ<span class="ch">'*M*x0</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>v0m <span class="op">=</span> Φ<span class="ch">'*M*v0</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (x0m, v0m)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>Lm <span class="op">=</span> Φ<span class="ch">'*F</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>prob_harmo_modal <span class="op">=</span> <span class="fu">HarmonicModalTimeProblem</span>(λ, Φ, ξ, Lm, <span class="fl">2</span>π<span class="op">*</span>freq, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>x_harmo <span class="op">=</span> <span class="fu">solve</span>(prob_harmo).u</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>x_harmo_modal <span class="op">=</span> <span class="fu">solve</span>(prob_harmo_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> (x0, v0)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">2</span>.]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - case 1 - Provide the stiffness and mass matrices</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>prob_harmo <span class="op">=</span> <span class="fu">HarmonicModalTimeProblem</span>(K, M, ξ, F, <span class="fl">2</span>π<span class="op">*</span>freq, u0, t)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - case 2 - Provide the squared natural frequencies and mode shapes</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ωm, Φm <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>x0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>x0</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>v0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>v0</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (x0m, v0m)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>Lm <span class="op">=</span> Φm<span class="op">'*</span>F</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>prob_harmo_modal <span class="op">=</span> <span class="fu">HarmonicModalTimeProblem</span>(ωm, Φm, ξ, Lm, <span class="fl">2</span>π<span class="op">*</span>freq, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>x_harmo <span class="op">=</span> <span class="fu">solve</span>(prob_harmo).u</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>x_harmo_modal <span class="op">=</span> <span class="fu">solve</span>(prob_harmo_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="18" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -644,7 +645,7 @@ Note
 <ul>
 <li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Squared natural angular frequencies</p>
+<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Natural angular frequencies</p>
 </li>
 </ul>
 </li>
@@ -658,6 +659,8 @@ Note
 </li>
 <li><p><code>ξn</code>: Damping ratios</p>
 </li>
+<li><p><code>F::Matrix{Real}</code>: External force matrix (or modal force matrix)</p>
+</li>
 <li><p><code>u0::Tuple</code>: Initial conditions</p>
 <ul>
 <li><p><code>u0[1]</code>: Initial displacement (or modal displacement)</p>
@@ -667,8 +670,6 @@ Note
 </ul>
 </li>
 <li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
-</li>
-<li><p><code>F::Matrix{Real}</code>: External force matrix (or modal force matrix)</p>
 </li>
 <li><p><code>n::Int</code>: Number of modes to retain in the modal basis</p>
 </li>
@@ -743,10 +744,10 @@ Note
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>prob_forced <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(K, M, ξ, F, u0, t)</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - case 2 - Provide the squared natural frequencies and mode shapes</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>λ, Φ <span class="op">=</span> <span class="fu">eigen</span>(K, M)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>ωm, Φm <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (<span class="fu">zeros</span>(<span class="fl">2</span>), <span class="fu">zeros</span>(<span class="fl">2</span>))</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>Lm <span class="op">=</span> Φ<span class="ch">'*F</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(λ, Φ, ξ, Lm, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>Lm <span class="op">=</span> Φm<span class="op">'*</span>F</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(ωm, Φm, ξ, Lm, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>x_forced <span class="op">=</span> <span class="fu">solve</span>(prob_forced).u</span>

@@ -1438,8 +1438,9 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <h2 data-number="3" class="anchored" data-anchor-id="state-space-representation"><span class="header-section-number">3</span> State space representation</h2>
 <p>The state space representation of a mechanical system is expressed as: <span class="math display">\[
 \dot{\mathbf{z}}(t) = \mathbf{A}_c \mathbf{z}(t) + \mathbf{B}_c \mathbf{u}(t),
-\]</span> where: - <span class="math inline">\(\mathbf{z}(t)\)</span>: State vector</p>
+\]</span> where:</p>
 <ul>
+<li><p><span class="math inline">\(\mathbf{z}(t)\)</span>: State vector</p></li>
 <li><p><span class="math inline">\(\mathbf{u}(t)\)</span>: Input vector</p></li>
 <li><p><span class="math inline">\(\mathbf{A}_c\)</span>: System matrix</p></li>
 <li><p><span class="math inline">\(\mathbf{B}_c\)</span>: Input matrix</p></li>
@@ -1487,7 +1488,6 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <p><strong>ContinuousStateSpace</strong></p>
 <hr>
 <div id="50" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@doc</span> ContinuousStateSpace</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>ContinuousStateSpace(Ac, Bc)</code></pre>
 <p>Continuous-time state-space model</p>
@@ -1521,7 +1521,11 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <li><p><code>C</code>: Damping matrix</p>
 </li>
 </ul>
-<p><strong>Output</strong> <code>css</code>: ContinuousStateSpace</p>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>css</code>: ContinuousStateSpace</p>
+</li>
+</ul>
 
 
 </div>
@@ -1533,7 +1537,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="54" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>ss_modal_model(ωn , ξn, ϕn)</code></pre>
+<div class="markdown"><pre><code>ss_modal_model(ωn, ξn, ϕn)</code></pre>
 <p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1544,7 +1548,11 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <li><p><code>ϕn</code>: Mass-normalized mode shapes</p>
 </li>
 </ul>
-<p><strong>Output</strong> <code>css</code>: ContinuousStateSpace</p>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>css</code>: ContinuousStateSpace</p>
+</li>
+</ul>
 
 
 </div>
@@ -1631,22 +1639,22 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 </section>
 <section id="example-5" class="level4" data-number="3.1.2">
 <h4 data-number="3.1.2" class="anchored" data-anchor-id="example-5"><span class="header-section-number">3.1.2</span> Example</h4>
-<div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System matrices</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>m_ss <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>k_ss <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>c_ss <span class="op">=</span> [<span class="fl">0.67</span> <span class="op">-</span><span class="fl">0.11</span>; <span class="op">-</span><span class="fl">0.11</span> <span class="fl">0.39</span>]</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from system matrices</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>ωₙ, ϕₙ <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωₙ, <span class="fl">0.01</span>, ϕₙ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System matrices</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>m_ss <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>k_ss <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>c_ss <span class="op">=</span> [<span class="fl">0.67</span> <span class="op">-</span><span class="fl">0.11</span>; <span class="op">-</span><span class="fl">0.11</span> <span class="fl">0.39</span>]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from system matrices</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>ωₙ, ϕₙ <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωₙ, <span class="fl">0.01</span>, ϕₙ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="discrete-time-models" class="level3" data-number="3.2">
@@ -1738,7 +1746,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 </li>
 <li><p><code>h</code>: Sampling time.</p>
 </li>
-<li><p><code>method::Symbol</code>: Discretization method</p>
+<li><p><code>method</code>: Discretization method</p>
 <ul>
 <li><p><code>:zoh</code>: Zero-order Hold method</p>
 </li>
@@ -1759,7 +1767,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 </li>
 <li><p><code>Bd</code>: Discrete-time state-space matrix B</p>
 </li>
-<li><p><code>Bdp</code>: Discrete-time state-space matrix Bp (only for <code>:foh</code> method)</p>
+<li><p><code>Bdp</code>: Discrete-time state-space matrix Bp (only for <code>:foh</code> and <code>:rk4</code> methods)</p>
 </li>
 </ul>
 </li>
@@ -1773,7 +1781,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 </section>
 <section id="example-6" class="level4" data-number="3.2.4">
 <h4 data-number="3.2.4" class="anchored" data-anchor-id="example-6"><span class="header-section-number">3.2.4</span> Example</h4>
-<div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dss <span class="op">=</span> <span class="fu">c2d</span>(css, <span class="fl">0.01</span>, <span class="op">:</span>zoh)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dss <span class="op">=</span> <span class="fu">c2d</span>(css, <span class="fl">0.01</span>, <span class="op">:</span>zoh)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
