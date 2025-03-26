@@ -323,6 +323,7 @@ Note
 <p>The solution of the previous equation can be found in <a href="https://maucejo.github.io/StructuralVibration.jl/solvers/#free-response">Sdof solvers - Section 1.1</a>.</p>
 <section id="api" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">1.1</span> API</h3>
+<p><strong>Data type</strong></p>
 <div class="api">
 <p><strong>FreeModalTimeProblem</strong></p>
 <hr>
@@ -467,6 +468,7 @@ Note
 <h3 data-number="2.1" class="anchored" data-anchor-id="harmonic-excitation"><span class="header-section-number">2.1</span> Harmonic excitation</h3>
 <section id="api-1" class="level4" data-number="2.1.1">
 <h4 data-number="2.1.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.1.1</span> API</h4>
+<p><strong>Data type</strong></p>
 <div class="api">
 <p><strong>HarmonicModalTimeProblem</strong></p>
 <hr>
@@ -561,7 +563,15 @@ Note
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li><p><code>sol</code>: ModalTimeSolution structure containing the response of the system at the given time points</p>
+<li><p><code>sol</code>: Solution structure containing the response of the system at the given time points</p>
+<ul>
+<li><p><code>u</code>: Displacement</p>
+</li>
+<li><p><code>du</code>: Velocity</p>
+</li>
+<li><p><code>ddu</code>: Acceleration</p>
+</li>
+</ul>
 </li>
 </ul>
 
@@ -620,6 +630,7 @@ Note
 <h3 data-number="2.2" class="anchored" data-anchor-id="arbitrary-excitation"><span class="header-section-number">2.2</span> Arbitrary excitation</h3>
 <section id="api-2" class="level4" data-number="2.2.1">
 <h4 data-number="2.2.1" class="anchored" data-anchor-id="api-2"><span class="header-section-number">2.2.1</span> API</h4>
+<p><strong>Data type</strong></p>
 <div class="api">
 <p><strong>ForcedModalTimeProblem</strong></p>
 <hr>
