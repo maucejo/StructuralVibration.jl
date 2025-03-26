@@ -4,27 +4,31 @@
 Structure to store the time and frequency parameters for the FFT analysis
 
 # Constructor parameters
-* `fs`: Sampling rate of the signal
-* `bs`: Block size of the signal
-* `pow2`: Flag for finding the next power of 2
+* `fs::Real`: Sampling rate of the signal
+* `bs::Real`: Block size of the signal
+* `pow2::Bool`: Flag for finding the next power of 2
 
-# Inputs
-* `t`: Time vector
+# Fields
+* `t::Vector{Real}`: Time vector
 * `dt`: Time step
-* `freq`: Frequency vector
-* `df`: Frequency resolution
+* `tspan::Tuple{Real, Real}`: Time span
+* `freq::Vector{Real}`: Frequency vector
+* `df::Real`: Frequency resolution
+* `freq_span::Tuple{Real, Real}`: Frequency span
+* `fs::Real`: Sampling rate
+* `bs::Real`: Block size
 """
-@show_struct struct FFTParameters{T <: Real}
-    t::AbstractVector{T}
-    dt::T
-    tspan::Tuple{T, T}
-    freq::AbstractVector{T}
-    df::T
-    freq_span::Tuple{T, T}
-    fs::T
-    bs::T
+@show_data struct FFTParameters{Tf <: Real, Tb <: Real}
+    t::Vector{Tf}
+    dt::Tf
+    tspan::Tuple{Tf, Tf}
+    freq::Vector{Tf}
+    df::Tf
+    freq_span::Tuple{Tf, Tf}
+    fs::Tf
+    bs::Tb
 
-    function FFTParameters(fs::T, bs::T; pow2 = true) where T
+    function FFTParameters(fs::Tf, bs::Tb; pow2 = true) where {Tf, Tb}
         # Sample rate & block size
         if pow2
             fs = nextpow(2, fs)
@@ -45,32 +49,32 @@ Structure to store the time and frequency parameters for the FFT analysis
         freq = 0.:df:(fmax - df)
         freq_span = (0., fmax)
 
-        return new{T}(t, dt, tspan, freq, df, freq_span, fs, bs)
+        return new{Tf, Tb}(t, dt, tspan, freq, df, freq_span, fs, bs)
     end
 end
 
 """
-    tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, fft_params::FFTParameters, window_input = hanning(fft_params.bs), window_output = window_input; overlap = 0., type = :h1) where {T <: Real}
+    tfestimate(input_signal, output_signal, fft_params, window_input = hanning(fft_params.bs), window_output = window_input; overlap = 0., type = :h1) where {T <: Real}
 
 Estimation of the one-sided transfer function between two signals
 
 # Inputs
-* `input_signal`: Input signal
-* `output_signal`: Output signal
-* `bs`: Size of a block
+* `input_signal::Vector{Real}`: Input signal
+* `output_signal::Vector{Real}`: Output signal
+* `fft_params::FFTParameters`: FFT parameters
 * `window_input`: Window function for the input signal
 * `window_output`: Window function for the output signal
-* `fs`: Sampling rate of the signal
-* `overlap`: Overlap ratio between the segments
-* `type`: Type of transfer function to estimate
+* `fs::Real`: Sampling rate of the signal
+* `overlap::Real`: Overlap ratio between the segments
+* `type::Symbol`: Type of transfer function to estimate
     * :h1 (default)
     * :h2
     * :h3 - h3 = (h1 + h2)/2
     * :hv - hv = sqrt(h1*h2)
 
 # Outputs
-* `H`: Transfer function
-* `coh`: Coherence
+* `H::Vector{Complex}`: Transfer function
+* `coh::Vector{Real}`: Coherence
 
 # Available window functions
 
@@ -174,17 +178,16 @@ function tfestimation(input_signal::Vector{T}, output_signal::Vector{T}, bs, win
 end
 
 """
-    welch(input_signal::Vector{T}, fft_params::FFTParameters, window = hanning(fft_params.bs); overlap = 0.5, scale = :psd) where {T <: Real}
+    welch(input_signal, fft_params, window = hanning(fft_params.bs); overlap = 0.5, scale = :psd) where {T <: Real}
 
 Estimation of the one-sided Power Spectral Density (PSD) of a signal using the Welch method
 
 # Inputs
-* `input_signal`: Input signal
-* `bs`: Size of a block
+* `input_signal::Vector{Real}`: Input signal
+* `fft_params::FFTParameters`: FFT parameters
 * `window`: Window function
-* `fs`: Sampling rate of the signal
-* `overlap`: Overlap ratio between the segments
-* `scaling`: Scale of the PSD - see https://community.sw.siemens.com/s/article/the-autopower-function-demystified for more information
+* `overlap::Real`: Overlap ratio between the segments
+* `scaling::Symbol`: Scale of the PSD - see https://community.sw.siemens.com/s/article/the-autopower-function-demystified for more information
     * :psd (default) - Autopower Power Spectral Density
     * :esd - Autopower Energy Spectral Density
     * :spectrum - Autopower spectrum
@@ -275,16 +278,15 @@ function welch(input_signal::Vector{T}, bs, window = hanning(bs); fs = 1, overla
 end
 
 """
-    spectrum(input_signal::Vector{Float64}, fft_params::FFTParameters, window = hanning(fft_params.bs); overlap = 0.5)
+    spectrum(input_signal, fft_params::FFTParameters, window = hanning(fft_params.bs); overlap = 0.5)
 
 Estimation of the spectrum of a signal
 
 # Inputs
-* `input_signal`: Input signal
-* `bs`: Size of a block
+* `input_signal::Vector{Real}`: Input signal
+* `fft_params::FFTParameters`: FFT parameters
 * `window`: Window function
-* `fs`: Sampling rate of the signal
-* `overlap`: Overlap ratio between the segments
+* `overlap::Real`: Overlap ratio between the segments
 
 # Output
 * `y`: Spectrum
@@ -356,14 +358,14 @@ end
 Segmentation of a signal into blocks
 
 # Inputs
-* `signal`: Signal to be segmented
-* `bs`: Size of a block
+* `signal::Vector{Real}`: Signal to be segmented
+* `bs::Real`: Size of a block
 * `window`: Window function
-* `overlap`: Overlap ratio between the segments
+* `overlap::Real`: Overlap ratio between the segments
 
 # Output
-* `segments`: Segmented signal
-* `n_segments`: number of segments
+* `segments::Vector{Real}`: Segmented signal
+* `n_segments::Int`: number of segments
 """
 function signal_segmentation(signal, bs, window, overlap)
     # Signal length
@@ -387,7 +389,7 @@ function anti_aliasing_filter(signal, fs)
     order = 200        # Filter order
     fb = 0.05*fn       # Filter bandwith = 2*fb
     freq_filt = [(0., fn - fb) => 1]
-    filt_coeff = DSP.remez(order, freq_filt, Hz = fs, maxiter = 50)
+    filt_coeff = remez(order, freq_filt, Hz = fs, maxiter = 50)
 
-    return DSP.filtfilt(filt_coeff, signal)
+    return filtfilt(filt_coeff, signal)
 end

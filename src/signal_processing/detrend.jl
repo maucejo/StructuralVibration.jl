@@ -1,7 +1,13 @@
 """
-detrend(t, y, order=1)
+    detrend(t, y, order = 1, bp = [])
 
 Detrend a signal `y` with respect to time `t` using a polynomial of order `order`.
+
+# Inputs
+- `t::AbstractVector`: Time vector
+- `y::AbstractVector`: Signal to be detrended
+- `order::Real`: Order of the polynomial (default is 1)
+- `bp::Vector{Real}`: Breakpoints for the polynomial (default is empty)
 """
 function detrend(t, y, order::Int = 1, bp::Vector{T} = T[]) where {T <: Real}
     if length(bp) == 0
@@ -35,9 +41,9 @@ end
 Fit a polynomial of order `order` to the data `x` and `y`.
 
 # Inputs
-- `x`: Independent variable
-- `y`: Dependent variable
-- `order`: Order of the polynomial (default is 1)
+- `x::AbstractVector`: Independent variable
+- `y::AbstractVector`: Dependent variable
+- `order::Real`: Order of the polynomial (default is 1)
 
 # Output
 - `p`: Coefficients of the polynomial
@@ -59,7 +65,7 @@ end
     Evaluate a polynomial of coefficients `p` at `x`
 
 # Inputs
-- `p`: Coefficients of the polynomial
+- `p::Vector{Real}`: Coefficients of the polynomial
 - `x`: Value at which the polynomial is evaluated
 
 # Output

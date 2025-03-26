@@ -6,22 +6,26 @@ Structure containing data for the state-space model
 # Constructor
 * `css`: Continuous-time state space model
 * `u0`: Initial conditions
-* `t`: Time vector
 * `F`: External force matrix
+* `t`: Time vector
 
-# Fields
-* css: ContinuousStateSpace
-* u0: Initial conditions
-* h: Time step
-* F: External force matrix
+**Fields**
+* `css`: ContinuousStateSpace
+* `F`: External force matrix
+* `u0`: Initial conditions
+* `h`: Time step
 """
-@show_struct struct StateSpaceTimeProblem{T <: Real}
+@show_data struct StateSpaceTimeProblem{Tf <: AbstractMatrix, Tu <: AbstractVector, T <: Real}
     css::ContinuousStateSpace
-    u0::Vector{T}
+    F::Tf
+    u0::Tu
     h::T
-    F::Matrix{T}
 
-    StateSpaceTimeProblem(css, u0::Vector{T}, t::AbstractVector, F::Matrix{T}) where T = new{T}(css, u0, t[2] - t[1], F)
+    function StateSpaceTimeProblem(css, F::Tf, u0::Tu, t::AbstractRange) where {Tf, Tu}
+
+        h = step(t)
+        return new{Tf, Tu, typeof(h)}(css, F, u0, h)
+    end
 end
 
 """
@@ -29,12 +33,12 @@ end
 
 Structure containing the solution of the state-space model
 
-# Fields
+**Fields**
 * `u`: Displacement matrix or vector
 * `du`: Velocity matrix or vector
 * `ddu`: Acceleration matrix or vector
 """
-@show_struct struct StateSpaceTimeSolution{T <: Real}
+@show_data struct StateSpaceTimeSolution{T <: Real}
     u::Matrix{T}
     du::Matrix{T}
     ddu::Matrix{T}
@@ -45,7 +49,7 @@ end
 
 Structure containing the data feeding the direct solver for calculating an FRF
 
-# Fields
+**Fields**
 * `css`: Continuous-time state space model
 * `freq`: Frequencies of interest
 * `So`: Selection matrix for observation points
@@ -53,13 +57,13 @@ Structure containing the data feeding the direct solver for calculating an FRF
 
 # note: It is assumed that the output equation is of the form y = So*x
 """
-@show_struct struct StateSpaceFRFProblem{T <: AbstractVector, S <: AbstractMatrix}
+@show_data struct StateSpaceFRFProblem{Tf <: AbstractVector, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
-    freq::T
-    So::S
-    Se::S
+    freq::Tf
+    So::Ts
+    Se::Ts
 
-    StateSpaceFRFProblem(css, freq::T, So::S = I(Int(size(css.Ac, 1)/2)), Se::S = I(size(css.Bc, 2))) where {T, S} = new{T, S}(css, freq, So, Se)
+    StateSpaceFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2))) where {Tf, Ts} = new{Tf, Ts}(css, freq, So, Se)
 end
 
 """
@@ -67,7 +71,7 @@ end
 
 Structure containing the data feeding the direct solver for calculating an FRF
 
-# Fields
+**Fields**
 * `css`: Continuous-time state space model
 * `freq`: Frequencies of interest
 * `So`: Selection matrix for observation points
@@ -76,14 +80,14 @@ Structure containing the data feeding the direct solver for calculating an FRF
 
 # note: It is assumed that the output equation is of the form y = So*x
 """
-@show_struct struct StateSpaceModalFRFProblem{T <: AbstractVector, S <: AbstractMatrix}
+@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractVector, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
-    freq::T
-    So::S
-    Se::S
+    freq::Tf
+    So::Ts
+    Se::Ts
     n::Int
 
-    StateSpaceModalFRFProblem(css, freq::T, So::S = I(Int(size(css.Ac, 1)/2)), Se::S = I(size(css.Bc, 2)), n = 0) where {T, S} = new{T, S}(css, freq, So, Se, n)
+    StateSpaceModalFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2)), n = 0) where {Tf, Ts} = new{Tf, Ts}(css, freq, So, Se, n)
 end
 
 """
@@ -91,65 +95,64 @@ end
 
 Structure containing the solution of the state-space model
 
-# Field
+**Field**
 * `u`: FRF matrix
 """
-@show_struct struct StateSpaceFRFSolution{T <: Complex}
-    u::Union{Matrix{T}, Vector{Matrix{T}}}
+@show_data struct StateSpaceFRFSolution{T <: Complex}
+    u::Union{AbstractArray{T}, Vector{Matrix{T}}}
 end
 
 """
-    StateSpaceFreqProblem(css::ContinuousStateSpace, freq, F, So)
+    StateSpaceFreqProblem(css::ContinuousStateSpace, F, freq, So)
 
-Structure containing the data feeding the modal solver for calculating the frequency reponse
+Structure containing the data feeding the modal solver for calculating the frequency response
 
-# Fields
+**Fields**
 * `css`: Continuous-time state space model
-* `freq`: Frequencies of interest
 * `F`: External force matrix
+* `freq`: Frequencies of interest
 * `So`: Selection matrix for observation points
 """
-@show_struct struct StateSpaceFreqProblem{T <: AbstractVector, S <: AbstractMatrix, U <: AbstractMatrix}
+@show_data struct StateSpaceFreqProblem{TF <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
-    freq::T
-    F::S
-    So::U
+    F::TF
+    freq::Tf
+    So::Ts
 
-    StateSpaceFreqProblem(css, freq::T, F::S, So::U = I(Int(size(css.Ac, 1)/2))) where {T, S, U} = new{T, S, U}(css, freq, F, So)
+    StateSpaceFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2))) where {TF, Tf, Ts} = new{TF, Tf, Ts}(css, F, freq, So)
 end
 
 """
-    StateSpaceModalFreqProblem(css::ContinuousStateSpace, freq, F, So, n)
+    StateSpaceModalFreqProblem(css::ContinuousStateSpace, F, freq, So, n)
 
-Structure containing the data feeding the modal solver for calculating the frequency reponse
+Structure containing the data feeding the modal solver for calculating the frequency response
 
-# Fields
+**Fields**
 * `css`: Continuous-time state space model
-* `freq`: Frequencies of interest
 * `F`: External force matrix
+* `freq`: Frequencies of interest
 * `So`: Selection matrix for observation points
 * `n`: Number of modes to keep in the modal basis
 """
-@show_struct struct StateSpaceModalFreqProblem{T <: AbstractVector, S <: AbstractMatrix, U <: AbstractMatrix}
+@show_data struct StateSpaceModalFreqProblem{TF <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
-    freq::T
-    F::S
-    So::U
+    F::TF
+    freq::Tf
+    So::Ts
     n::Int
 
-    StateSpaceModalFreqProblem(css, freq::T, F::S, So::U = I(Int(size(css.Ac, 1)/2)), n = 0) where {T, S, U} = new{T, S, U}(css, freq, F, So, n)
+    StateSpaceModalFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), n = 0) where {TF, Tf, Ts} = new{TF, Tf, Ts}(css, F, freq, So, n)
 end
-
 
 """
     StateSpaceFreqSolution(u)
 
 Structure containing the solution of the state-space model
 
-# Field
+**Field**
 * `u`: Frequency response matrix
 """
-@show_struct struct StateSpaceFreqSolution{T <: Complex}
+@show_data struct StateSpaceFreqSolution{T <: Complex}
     u::Matrix{T}
 end
 
@@ -158,21 +161,21 @@ end
 
 Solves a discrete-time problem using the state-space model
 
-# Inputs
+**Inputs**
 * `prob`: Discrete-time problem
-* `method::Symbol`: Discretization method
+* `method`: Discretization method
     * `:zoh`: Zero-order Hold method
     * `:foh`: First-order Hold method
     * `:blh`: Band-limited Hold method
     * `:rk4`: Runge-Kutta 4th order method
 * `progress`: Show progress bar (default = true)
 
-# Output
+**Output**
 * `StateSpaceSolution`: Solution of the state-space model
 """
-function solve(prob::StateSpaceTimeProblem, method::Symbol = :zoh; progress = true)
+function solve(prob::StateSpaceTimeProblem, method = :zoh; progress = true)
 
-    (; css, u0, h, F) = prob
+    (; css, F, u0, h) = prob
     dss = c2d(css, h, method)
 
     nx = size(css.Ac, 1)
@@ -194,7 +197,7 @@ function solve(prob::StateSpaceTimeProblem, method::Symbol = :zoh; progress = tr
         name = "Time problem - RK4..."
     end
 
-    p = Progress(nt, color = :black, desc = name, showspeed = true)
+    p = Progress(nt, desc = name, showspeed = true)
     @views @inbounds for k in 1:nt-1
         progress ? next!(p) : nothing
 
@@ -216,16 +219,16 @@ end
 
 Solves a continuous-time problem using the state-space model
 
-# Inputs
+**Inputs**
 * `prob`: Continuous-time problem
 * `alg`: Time integration algorithm
 * `progress`: Show progress bar (default = true)
 
-# Output
+**Output**
 * `StateSpaceSolution`: Solution of the state-space model
 """
 function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
-    (; css, u0, h, F) = prob
+    (; css, u0, F, h) = prob
     (; Ac, Bc) = css
 
     nx = size(css.Ac, 1)
@@ -243,7 +246,7 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
 
     x[:, 1] .= u0[:]
 
-    p = Progress(nt, color = :black, desc = "State Space Time Problem - RK4...", showspeed = true)
+    p = Progress(nt, desc = "State Space Time Problem - RK4...", showspeed = true)
     @views @inbounds for k in 1:nt-1
         progress ? next!(p) : nothing
 
@@ -262,23 +265,23 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
 end
 
 """
-    solve(m::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
+    solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
 
 Computes the FRF matrix by direct method
 
-# Parameter
-* `m`: Structure containing the problem data
+**Inputs**
+* `prob`: Structure containing the problem data
 * `type`: Type of FRF to compute (:dis, :vel, :acc)
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
 * `progress`: Show progress bar (default = true)
 
-# Output
+**Output**
 * `sol`: FRFSolution structure
 """
-function solve(m::StateSpaceFRFProblem, type::Symbol = :dis; ismat = false, progress = true)
+function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
 
     # Initialisation
-    (; css, freq, So, Se) = m
+    (; css, freq, So, Se) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
     Ne = size(Se, 1)
@@ -295,7 +298,7 @@ function solve(m::StateSpaceFRFProblem, type::Symbol = :dis; ismat = false, prog
     end
 
     ωf = 2π*freq
-    p = Progress(nf, color = :black, desc = "State Space FRF Problem - Direct method...", showspeed = true)
+    p = Progress(nf, desc = "State Space FRF Problem - Direct method...", showspeed = true)
     for (f, ω) in enumerate(ωf)
         progress ? next!(p) : nothing
 
@@ -311,7 +314,7 @@ function solve(m::StateSpaceFRFProblem, type::Symbol = :dis; ismat = false, prog
     end
 
     if ismat
-        return reshape(reduce(hcat, FRF), no, Ne, :)
+        return StateSpaceFRFSolution(reshape(reduce(hcat, FRF), no, Ne, :))
     end
 
     return StateSpaceFRFSolution(FRF)
@@ -322,13 +325,13 @@ end
 
 Computes the FRF matrix by modal method
 
-# Parameter
+**Inputs**
 * `m`: Structure containing the problem data
 * `type`: Type of FRF to compute (:dis, :vel, :acc)
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
 * `progress`: Show progress bar
 
-# Output
+**Output**
 * `sol`: StateSpaceFRFSolution
 """
 function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
@@ -362,7 +365,7 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
     indm = diagind(M)
 
     ωf = 2π*freq
-    p = Progress(nf, color = :black, desc = "State Space FRF Problem - Modal approach...", showspeed = true)
+    p = Progress(nf, desc = "State Space FRF Problem - Modal approach...", showspeed = true)
     for (f, ω) in enumerate(ωf)
         progress ? next!(p) : nothing
 
@@ -376,7 +379,7 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
     end
 
     if ismat
-        return reshape(reduce(hcat, FRF), no, Ne, :)
+        return StateSpaceFRFSolution(reshape(reduce(hcat, FRF), no, Ne, :))
     end
 
     return StateSpaceFRFSolution(FRF)
@@ -387,7 +390,7 @@ end
 
 Computes the frequency response by direct method
 
-# Inputs
+**Inputs**
 * `m`: Structure containing the problem data
 * `type::Symbol`: Type of FRF to compute
     * `:dis`: Displacement
@@ -395,7 +398,7 @@ Computes the frequency response by direct method
     * `:acc`: Acceleration
 * `progress`: Show progress bar
 
-# Output
+**Output**
 `sol`: StateSpaceFreqSolution
 """
 function solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
@@ -416,7 +419,7 @@ function solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
     end
 
     ωf = 2π*freq
-    p = Progress(nf, color = :black, desc = "State Space Frequency Problem - Direct method...", showspeed = true)
+    p = Progress(nf, desc = "State Space Frequency Problem - Direct method...", showspeed = true)
     for (f, (ω, Fe)) in enumerate(zip(ωf, eachcol(F)))
         progress ? next!(p) : nothing
 
@@ -439,7 +442,7 @@ end
 
 Computes the frequency response by modal method
 
-# Inputs
+**Inputs**
 * `m`: Structure containing the problem data
 * `n`: Number of eigenodes to keep in the modal basis
 * `type::Symbol`: Type of FRF to compute
@@ -448,7 +451,7 @@ Computes the frequency response by modal method
     * `:acc`: Acceleration
 * `progress`: Show progress bar
 
-# Output
+**Output**
 `sol`: StateSpaceFreqSolution
 """
 function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
@@ -477,7 +480,7 @@ function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
     indm = diagind(M)
 
     ωf = 2π*freq
-    p = Progress(nf, color = :black, desc = "State Space Frequency Problem - Modal approach...", showspeed = true)
+    p = Progress(nf, desc = "State Space Frequency Problem - Modal approach...", showspeed = true)
     for (f, (ω, ue)) in enumerate(zip(ωf, eachcol(u)))
         progress ? next!(p) : nothing
 

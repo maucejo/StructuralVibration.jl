@@ -13,7 +13,7 @@ Structure containing the data of a sdof system
 * `ω0`: Natural frequency [rad/s]
 * `ξ`: Damping ratio
 """
-@show_struct struct Sdof{T <: Real}
+@show_data struct Sdof{T <: Real}
     m::T
     ω0::T
     ξ::T
@@ -31,7 +31,7 @@ Structure containing the data for building a mdof system
 * `m`: Masses of the mdof system
 * `c`: Damping coefficients of the viscous dampers
 """
-@show_struct struct Mdof{T <: Real}
+@show_data struct Mdof{T <: Real}
     k::Vector{T}
     m::Vector{T}
     c::Vector{T}
@@ -70,7 +70,7 @@ Structure containing the data for building a mdof mesh
 * `constrained_dofs`: Constrained degrees of freedom
 * `free_dofs`: Free degrees of freedom
 """
-@show_struct struct MdofMesh
+@show_data struct MdofMesh
     Elt::Matrix{Int}
     constrained_dofs::Vector{Int}
     free_dofs::Vector{Int}

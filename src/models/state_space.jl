@@ -7,7 +7,7 @@ Continuous-time state-space model
 * `Ac`: Continuous-time state matrix A
 * `Bc`: Continuous-time input matrix B
 """
-@show_struct struct ContinuousStateSpace{T <: Real}
+@show_data struct ContinuousStateSpace{T <: Real}
     Ac::Matrix{T}
     Bc::Matrix{T}
 end
@@ -22,7 +22,7 @@ Discrete-time state-space model
 * `Bd`: Discrete-time input matrix B
 * `Bdp`: Discrete-time input matrix Bp (only for `:foh` method)
 """
-@show_struct struct DiscreteStateSpace{T <: Real}
+@show_data struct DiscreteStateSpace{T <: Real}
     Ad::Matrix{T}
     Bd::Matrix{T}
     Bdp::Matrix{T}
@@ -48,7 +48,7 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
 * `DiscreteStateSpace`: Discrete-time state-space model
     * `Ad`: Discrete-time state-space matrix A
     * `Bd`: Discrete-time state-space matrix B
-    * `Bdp`: Discrete-time state-space matrix Bp (only for `:foh` method)
+    * `Bdp`: Discrete-time state-space matrix Bp (only for `:foh` and `:rk4` methods)
 """
 function c2d(css::ContinuousStateSpace, h, method = :zoh)
     (; Ac, Bc) = css
@@ -67,9 +67,9 @@ function c2d(css::ContinuousStateSpace, h, method = :zoh)
         Bd = Ad*Bc*h
         return DiscreteStateSpace(Ad, Bd)
     elseif method == :rk4
-        Ad = [24(I + Ac*h) + 12(Ac*h)^2 + 4(Ac*h)^3 + (Ac*h)^4]/24
-        Bf = h*[12I + 8Ac*h + 3(Ac*h)^2 + (Ac*h)^3]*Bc/24
-        Bg = h*[12I + 4Ac*h + (Ac*h)^2]*Bc/24
+        Ad = (24(I + Ac*h) + 12(Ac*h)^2 + 4(Ac*h)^3 + (Ac*h)^4)/24
+        Bf = h*(12I + 8Ac*h + 3(Ac*h)^2 + (Ac*h)^3)*Bc/24
+        Bg = h*(12I + 4Ac*h + (Ac*h)^2)*Bc/24
         return DiscreteStateSpace(Ad, Bf, Bg)
     end
 end
@@ -85,7 +85,7 @@ Generates a continuous-time state-space model from the mass, damping, and stiffn
 * `C`: Damping matrix
 
 **Output**
-`css`: ContinuousStateSpace
+* `css`: ContinuousStateSpace
 """
 function ss_model(K, M, C)
 
@@ -98,7 +98,7 @@ function ss_model(K, M, C)
 end
 
 """
-    ss_modal_model(ωn , ξn, ϕn)
+    ss_modal_model(ωn, ξn, ϕn)
 
 Generates a continuous-time state-space model from the mass, damping, and stiffness matrices
 
@@ -108,7 +108,7 @@ Generates a continuous-time state-space model from the mass, damping, and stiffn
 * `ϕn`: Mass-normalized mode shapes
 
 **Output**
-`css`: ContinuousStateSpace
+* `css`: ContinuousStateSpace
 """
 function ss_modal_model(ωn, ξn, ϕn)
 

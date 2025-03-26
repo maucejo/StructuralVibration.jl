@@ -19,11 +19,11 @@ using StructuralVibration, ShareAdd
 
 ## Time domain solvers
 
-The package provides a set of solvers to compute the time response of a single-degree-of-freedom system.
+The package provides a set of solvers to compute the time response of a single-degree-of-freedom (sdof) system.
 
 ### Free response
 
-The free response of a single-degree-of-freedom system is the response of the system when it is subjected to initial conditions only. This means that the displacement of the mass is solution of the following ordinary differential equation:
+The free response of a sdof system is the response of the system when it is subjected to initial conditions only. This means that the displacement of the mass is solution of the following ordinary differential equation:
 $$
 \begin{cases}
   \ddot x(t) + 2 \xi\omega_0\dot x(t) + \omega_0^2 x(t) = 0 \\
@@ -100,7 +100,7 @@ f0 = 1.
 t = 0.:0.01:10.
 
 # Initial conditions
-u0 = [1, -2]
+u0 = [1., -2.]
 
 # Undamped system
 sdof_nd = Sdof(m, f0, 0.)
@@ -131,22 +131,22 @@ xmin, xmax = extrema([x_nd; x_ud; x_cd; x_od])
 fig = Figure()
 ax = Axis(fig[1, 1], ylabel="Displacement (m)", title = "Undamped system")
 lines!(ax, t, x_nd)
-xlims!(ax, 0, 10)
+xlims!(ax, minimum(t), maximum(t))
 ylims!(ax, xmin, xmax)
 
 ax1 = Axis(fig[1, 2], title = "Underdamped system")
 lines!(ax1, t, x_ud)
-xlims!(ax1, 0, 10)
+xlims!(ax1, minimum(t), maximum(t))
 ylims!(ax1, xmin, xmax)
 
 ax2 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="Displacement (m)", title = "Critically damped system")
 lines!(ax2, t, x_cd)
-xlims!(ax2, 0, 10)
+xlims!(ax2, minimum(t), maximum(t))
 ylims!(ax2, xmin, xmax)
 
 ax3 = Axis(fig[2, 2], xlabel="Time (s)", title = "Overdamped system")
 lines!(ax3, t, x_od)
-xlims!(ax3, 0, 10)
+xlims!(ax3, minimum(t), maximum(t))
 ylims!(ax3, xmin, xmax)
 
 display(fig);
@@ -154,10 +154,10 @@ display(fig);
 
 ### Forced response
 
-The forced response of a single-degree-of-freedom system is the response of the system is the solution of the following ordinary differential equation:
+The forced response of a sdof system is the response of the system is the solution of the following ordinary differential equation:
 $$
 \begin{cases}
-  \ddot x(t) + 2 \xi\omega_0\dot x(t) + \omega_0^2 x(t) = \frac{\text{rhs}(t)}{m} \\
+  \ddot x(t) + 2 \xi\omega_0\dot x(t) + \omega_0^2 x(t) = \displaystyle\frac{\text{rhs}(t)}{m} \\
   x(0) = x_0 \\
   \dot x(0) = v_0
 \end{cases},
@@ -176,7 +176,7 @@ x(t) = x_h(t) + x_p(t),
 $$
 where $x_h(t)$ is the homogeneous solution of the equation and $x_p(t)$ is the particular solution of the equation.
 
-#### Harmonic excitation due to a harmonic excitation
+#### Harmonic excitation
 
 When the excitation is harmonic, the resolution process is the following:
 
@@ -231,8 +231,8 @@ f = 2.
 
 # Instantiation of the problem
 t = 0.:0.01:10.
-u0 = [1, -2]
-prob = SdofHarmonicTimeProblem(sdof, u0, t, F0, f, :force)
+u0 = [1., -2.]
+prob = SdofHarmonicTimeProblem(sdof, F0, f, u0, t, :force)
 
 # Solve the problem
 x_harmo = solve(prob).u
@@ -244,7 +244,7 @@ x_harmo = solve(prob).u
 fig = Figure()
 ax = Axis(fig[1, 1], xlabel="Time (s)", ylabel="Displacement (m)", title = "Harmonic excitation")
 lines!(ax, t, x_harmo)
-xlims!(ax, 0, 10)
+xlims!(ax, minimum(t), maximum(t))
 
 display(fig);
 ```
@@ -294,7 +294,7 @@ f0 = 1.
 # Instantiation of the Sdof object
 sdof = Sdof(m, f0, ξ)
 
-# Harmonic excitation - Hammer impact
+# Haversine excitation signal
 F0 = 10.
 tstart = 0.5
 duration = 2.
@@ -305,7 +305,7 @@ F = excitation(haversine, t)
 
 # Instantiation of the problem
 u0 = [1, -2]
-prob = SdofForcedTimeProblem(sdof, u0, t, F, :force)
+prob = SdofForcedTimeProblem(sdof, F, u0, t, :force)
 
 # Solve the problem
 x_arb_filt = solve(prob, method = :filt).u
@@ -323,7 +323,7 @@ lines!(ax, t, x_arb_interp, linestyle = :dash, label = "Interp. + Quad.")
 lines!(ax, t, x_arb_conv, linestyle = :dashdot , label = "Convolution")
 axislegend(ax, position = :rt,
            backgroundcolor = (:white, 0.5))
-xlims!(ax, 0, 10)
+xlims!(ax, minimum(t), maximum(t))
 
 display(fig);
 ```
@@ -332,7 +332,7 @@ display(fig);
 
 #### Impulse response
 
-The impulse response of a single-degree-of-freedom system is the response of the system when it is subjected to an impulse excitation. The impulse response is the solution of the following ordinary differential equation:
+The impulse response of a sdof system is the response of the system when it is subjected to an impulse excitation. The impulse response is the solution of the following ordinary differential equation:
 $$
 \overset{..}{h}(t) + 2\xi\omega_0\overset{.}{h}(t) + \omega_0^2 h(t) = \frac{\delta(t)}{m}.
 $$
@@ -342,7 +342,7 @@ $$
 \begin{cases}
 \overset{..}{h}(t) + 2\xi\omega_0\overset{.}{h}(t) + \omega_0^2 h(t) = 0 & \forall t > 0 \\
 h(t) = 0 & \text{at } t = 0 \\
-\overset{.}{h}(t) = \frac{1}{m} & \text{at } t = 0
+\overset{.}{h}(t) = \displaystyle\frac{1}{m} & \text{at } t = 0
 \end{cases}.
 $$
 
@@ -352,7 +352,7 @@ $$
 ---
 ```{julia}
 #| echo: false
-@doc impulse_response(sdof::Sdof, t)
+@doc impulse_response(sdof, t)
 ```
 :::
 
@@ -378,14 +378,14 @@ h = impulse_response(sdof, t)
 fig = Figure()
 ax = Axis(fig[1, 1], xlabel="Time (s)", ylabel="Impulse response", title = "Impulse response")
 lines!(ax, t, h)
-xlims!(ax, 0, 10)
+xlims!(ax, minimum(t), maximum(t))
 
 display(fig);
 ```
 
 #### Shock response spectrum
 
-The shock response spectrum (SRS) is a graph of the peak acceleration response of a single-degree-of-freedom system subjected to a base acceleration with respect to the frequency. The SRS is computed by solving the following problem:
+The shock response spectrum (SRS) is a graph of the peak acceleration response of a sdof system subjected to a base acceleration with respect to the frequency. The SRS is computed by solving the following problem:
 $$
 \ddot z(t) + 2\xi\omega_0\dot z(t) + \omega_0^2 z(t) = -\ddot x_b(t),
 $$
@@ -448,7 +448,7 @@ For the last three algorithms, more details and references can be found [Mathwor
 
 # Definition of the base acceleration
 t = 0.:1e-5:0.5
-base_acc = HalfSine(10., 0, 1e-3)
+base_acc = HalfSine(10., 0., 1e-3)
 
 # Compute the SRS
 f = 50.:25:1e3
@@ -468,9 +468,153 @@ lines!(ax, f, srs_rec_filt, label = "Recursive filtering")
 lines!(ax, f, srs_rec_int, label = "Recursive integration")
 lines!(ax, f, srs_smallwood, label = "Smallwood")
 axislegend(ax, position = :rb, backgroundcolor = (:white, 0.5),)
-xlims!(ax, 50, 1000)
+xlims!(ax, minimum(f), maximum(f))
 
 display(fig);
 ```
 
 ## Frequency domain solvers
+
+The package provides solvers for computing the Frequency Response Function (FRF) and the response spectrum of a sdof system.
+
+### Frequency Response Function
+
+The Frequency Response Function (FRF) of a sdof system is the ratio of the steady-state response $X(\omega)$ of the system to an external excitation $F(\omega)$ or an external base motion $X_b(\omega)$. The FRF is computed from the following equation:
+$$
+H(\omega) = \begin{cases}
+\displaystyle\frac{1}{m(\omega_0^2 - \omega^2 + 2j\xi\omega\omega_0)} & \text{for a force excitation} \\
+\displaystyle\frac{\omega_0^2 + 2j\xi\omega\omega_0}{\omega_0^2 - \omega^2 + 2j\xi\omega\omega_0} & \text{for a base excitation}
+\end{cases},
+$$
+where $j$ is the imaginary unit.
+
+#### API
+
+**Data type**
+
+::: {.api}
+**SdofFRFProblem**
+
+---
+```{julia}
+#| echo: false
+@doc SdofFRFProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::SdofFRFProblem)
+```
+:::
+
+#### Example
+
+```{julia}
+#| output: false
+
+# Structural parameters
+m = 1.
+f0 = 10.
+ξ = 0.01
+
+# Instantiation of the Sdof object
+sdof = Sdof(m, f0, ξ)
+
+# Definition of the frequency range
+f = 1.:0.1:30.
+
+# Instantiation of the problem - Force excitation
+prob = SdofFRFProblem(sdof, f)
+
+# Solve the problem
+H = solve(prob).u
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Frequency (Hz)", ylabel = "FRF (m/N)", title = "Frequency Response Function")
+lines!(ax, f, abs.(H))
+xlims!(ax, minimum(f), maximum(f))
+
+display(fig);
+```
+
+### Response spectrum
+
+The response spectrum of a sdof system is the frequency response of the system to an external force $F(\omega)$ or a base motion $X_b(\omega)$ with respect to the frequency. The response spectrum $Y(\omega)$ is computed from the following equation:
+$$
+Y(\omega) = \begin{cases}
+\displaystyle\frac{F(\omega)}{m(\omega_0^2 - \omega^2 + 2j\xi\omega\omega_0)} & \text{for a force excitation} \\
+\displaystyle\frac{(\omega_0^2 + 2j\xi\omega\omega_0) X_b(\omega)}{\omega_0^2 - \omega^2 + 2j\xi\omega\omega_0} & \text{for a base excitation}
+\end{cases}.
+$$
+
+#### API
+
+**Data type**
+
+::: {.api}
+**SdofFRFProblem**
+
+---
+```{julia}
+#| echo: false
+@doc SdofFrequencyProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::SdofFRFProblem)
+```
+:::
+
+#### Example
+
+```{julia}
+#| output: false
+
+# Structural parameters
+m = 1.
+f0 = 10.
+ξ = 0.01
+
+# Instantiation of the Sdof object
+sdof = Sdof(m, f0, ξ)
+
+# Definition of the frequency range
+f = 1.:0.1:30.
+
+# Instantiation of the problem - Force excitation
+F = fill(10., length(f))
+prob = SdofFrequencyProblem(sdof, f, F)
+
+# Solve the problem
+y = solve(prob).u
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Frequency (Hz)", ylabel = "Displacement (m)", title = "Response spectrum")
+lines!(ax, f, abs.(y))
+xlims!(ax, minimum(f), maximum(f))
+
+display(fig);
+```

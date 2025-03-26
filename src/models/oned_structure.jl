@@ -17,7 +17,7 @@ Structure containing the data of a homogeneous and isotropic longitudinal bar
 * `m`: Line mass [kg/m]
 * `D`: Stiffness coefficient [Pa]
 """
-@show_struct struct Bar{T <: Real} <: WaveEquation
+@show_data struct Bar{T <: Real} <: WaveEquation
     L::T
     m::T
     D::T
@@ -42,7 +42,7 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 * `m`: Line mass [kg/m]
 * `D`: Stiffness coefficient [Pa]
 """
-@show_struct struct Rod{T <:Real} <: WaveEquation
+@show_data struct Rod{T <:Real} <: WaveEquation
     L::T
     m::T
     D::T
@@ -66,7 +66,7 @@ Structure containing the data of a homogeneous and isotropic string
 * `m`: Linear mass density [kg/m]
 * `D`: Tension [N]
 """
-@show_struct struct Strings{T <: Real} <: WaveEquation
+@show_data struct Strings{T <: Real} <: WaveEquation
     L::T
     m::T
     D::T
@@ -91,7 +91,7 @@ Structure containing the data of a homogeneous and isotropic bending beam
 * `M`: Linear mass density [kg/m]
 * `D`: Bending stiffness [N.m²]
 """
-@show_struct struct Beam{T <: Real} <: OneDStructure
+@show_data struct Beam{T <: Real} <: OneDStructure
     L::T
     m::T
     D::T

@@ -6,14 +6,14 @@ abstract type ArbitraryExc end
 Struct to define a rectangular excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
 """
-@show_struct struct Rectangle{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
+@show_data struct Rectangle{Tf <: Real, Tt <: Real, Td <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
 end
 
 """
@@ -22,14 +22,14 @@ end
 Struct to define a triangular excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
 """
-@show_struct struct Triangle{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
+@show_data struct Triangle{Tf <: Real, Tt <: Real, Td <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
 end
 
 """
@@ -38,16 +38,16 @@ end
 Struct to define a hammer impact excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `p`: Shape parameter
-* `θ`: Intensity parameter [s]
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `p::Real`: Shape parameter
+* `θ::Real`: Intensity parameter [s]
 """
-@show_struct struct Hammer{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    p::T
-    θ::T
+@show_data struct Hammer{Tf <: Real, Tt <: Real, Tp <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    p::Tp
+    θ::Tp
 end
 
 """
@@ -56,18 +56,18 @@ end
 Struct to define a smooth rectangular excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
-* `trise`: Rise time from 0 to F [s]
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
+* `trise::Real`: Rise time from 0 to F [s]
 
 *Note: `SmoothRect` is actually a custom Tukey window for which the coefficient α is computed to satisfy the `trise` given by the user*
 """
-@show_struct struct SmoothRect{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
-    trise::T
+@show_data struct SmoothRect{Tf <: Real, Tt <: Real, Td <: Real, Tr <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
+    trise::Tr
 end
 
 """
@@ -76,28 +76,28 @@ end
 Struct to define a sine wave excitation signal
 
 **Constructor parameters**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
-* `freq`: Frequency of the excitation [Hz]
-* `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
+* `freq::Real`: Frequency of the excitation [Hz]
+* `zero_end::Bool`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
-* `ω`: Frequency of the excitation [Hz]
-* `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
+* `ω::Real`: Frequency of the excitation [Hz]
+* `zero_end::Bool`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
-@show_struct struct SineWave{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
-    ω::T
-    ϕ::T
+@show_data struct SineWave{Tf <: Real, Tt <: Real, Td <: Real, Tw <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
+    ω::Tw
+    ϕ::Tw
     zero_end::Bool
 
-    SineWave(F::T, tstart::T, duration::T, freq::T, ϕ::T = 0.; zero_end = true) where T = new{T}(F, tstart, duration, 2π*freq, ϕ, zero_end)
+    SineWave(F::Tf, tstart::Tt, duration::Td, freq::Tw, ϕ::Tw = 0.; zero_end = true) where {Tf, Tt, Td, Tw} = new{Tf, Tt, Td, Tw}(F, tstart, duration, 2π*freq, ϕ, zero_end)
 end
 
 """
@@ -106,14 +106,14 @@ end
 Struct to define a half sine excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
 """
-@show_struct struct HalfSine{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
+@show_data struct HalfSine{Tf <: Real, Tt <: Real, Td <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
 end
 
 """
@@ -122,14 +122,14 @@ end
 Struct to define a Haversine (or versed sine) excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
 """
-@show_struct struct HaverSine{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
+@show_data struct HaverSine{Tf <: Real, Tt <: Real, Td <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
 end
 
 """
@@ -138,27 +138,27 @@ end
 Struct to define a swept sine excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
-* `fstart`: Starting frequency [Hz]
-* `fend`: Ending frequency [Hz]
-* `type`: Type of sweep
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
+* `fstart::Real`: Starting frequency [Hz]
+* `fend::Real`: Ending frequency [Hz]
+* `type::Symbol`: Type of sweep
     * `:lin` - linear (default)
     * `:quad` - quadratic
     * `:log` - logarithmic
-* `zero_end`: Boolean to set the excitation to 0 at the end of the duration (default = true)
+* `zero_end::Bool`: Boolean to set the excitation to 0 at the end of the duration (default = true)
 """
-@show_struct struct SweptSine{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
-    fstart::T
-    fend::T
+@show_data struct SweptSine{Tf <: Real, Tt <: Real, Td <: Real, Tr <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
+    fstart::Tr
+    fend::Tr
     type_swept::Symbol
     zero_end::Bool
 
-    SweptSine(F::T, tstart::T, duration::T, fstart::T, fend::T, type_swept::Symbol = :lin; zero_end::Bool = true) where T = new{T}(F, tstart, duration, fstart, fend, type_swept, zero_end)
+    SweptSine(F::Tf, tstart::Tt, duration::Td, fstart::Tr, fend::Tr, type_swept::Symbol = :lin; zero_end::Bool = true) where {Tf, Tt, Td, Tr} = new{Tf, Tt, Td, Tr}(F, tstart, duration, fstart, fend, type_swept, zero_end)
 end
 
 """
@@ -167,24 +167,24 @@ end
 Struct to define a Gaussian pulse excitation signal
 
 **Fields**
-* `F`: Amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
-* `fc`: Center frequency of the pulse [Hz]
-* `precision`: Precision of the pulse (default = 4.)
+* `F::Real`: Amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
+* `fc::Real`: Center frequency of the pulse [Hz]
+* `precision::Real`: Precision of the pulse (default = 4.)
 
 *Note on the parameter `precision`*
 
 The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
 """
-@show_struct struct GaussianPulse{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
-    fc::T
-    precision::T
+@show_data struct GaussianPulse{Tf <: Real, Tt <: Real, Td <: Real, Tc <: Real, Tp <: Real} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
+    fc::Tc
+    precision::Tp
 
-    GaussianPulse(F::T, tstart::T, duration::T, fc::T; precision::T = 4.) where T = new{T}(F, tstart, duration, fc, precision)
+    GaussianPulse(F::Tf, tstart::Tt, duration::Td, fc::Tc; precision::Tp = 4.) where {Tf, Tt, Td, Tc, Tp} = new{Tf, Tt, Td, Tc, Tp}(F, tstart, duration, fc, precision)
 end
 
 """
@@ -193,27 +193,27 @@ end
 Struct to define a colored noise excitation signal
 
 **Fields**
-* `F`: Mean amplitude of the force [N]
-* `tstart`: Starting time of the excitation [s]
-* `duration`: Duration of the excitation [s]
-* `σ`: Target standard deviation of the colored noise
-* `color`: Color of the noise
+* `F::Real`: Mean amplitude of the force [N]
+* `tstart::Real`: Starting time of the excitation [s]
+* `duration::Real`: Duration of the excitation [s]
+* `σ::Real`: Target standard deviation of the colored noise
+* `color::Symbol`: Color of the noise
     * `:white` (default)
     * `:pink`
     * `:blue`
     * `:brown`
     * `:purple`
-* `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
+* `band_freq::AbstractVector`: Frequencies used to defined the bandpass filter applied to the colored noise
 """
-@show_struct struct ColoredNoise{T <: Real} <: ArbitraryExc
-    F::T
-    tstart::T
-    duration::T
-    σ::T
+@show_data struct ColoredNoise{Tf <: Real, Tt <: Real, Td <: Real, Ts <: Real, Tb <: AbstractVector} <: ArbitraryExc
+    F::Tf
+    tstart::Tt
+    duration::Td
+    σ::Ts
     color::Symbol
-    band_freq::Vector{T}
+    band_freq::Tb
 
-    ColoredNoise(F::T, tstart::T, duration::T, σ::T = 1.; color::Symbol = :white, band_freq::Vector{T} = T[]) where T = new{T}(F, tstart, duration, σ, color, band_freq)
+    ColoredNoise(F::Tf, tstart::Tt, duration::Td, σ::Ts = 1.; color::Symbol = :white, band_freq::Tb = Tf[]) where {Tf, Tt, Td, Ts, Tb} = new{Tf, Tt, Td, Ts, Tb}(F, tstart, duration, σ, color, band_freq)
 end
 
 """
@@ -516,19 +516,19 @@ function excitation(type::ColoredNoise, t)
     if length(band_freq) > 0
         if band_freq[1] > freq[1] && band_freq[2] < freq[end]
             # Band-pass filter
-            filter_type = Bandpass(band_freq[1], band_freq[2])
+            filter_type = DSP.Bandpass(band_freq[1], band_freq[2])
         elseif band_freq[1] < freq[1] && band_freq[2] < freq[end]
             # Low-pass filter
-            filter_type = Lowpass(band_freq[2])
+            filter_type = DSP.Lowpass(band_freq[2])
         elseif band_freq[1] > freq[1] && band_freq[2] > freq[end]
             # High-pass filter
-            filter_type = Highpass(band_freq[1])
+            filter_type = DSP.Highpass(band_freq[1])
         else
             return x .+ colored_noise
         end
 
-        df = digitalfilter(filter_type, Butterworth(4); fs)
-        Ft .= filtfilt(df, Ft)
+        df = DSP.digitalfilter(filter_type, DSP.Butterworth(4); fs)
+        Ft .= DSP.filtfilt(df, Ft)
     end
 
     pos_start = argmin(@. (t - tstart)^2.)

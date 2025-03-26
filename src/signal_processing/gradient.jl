@@ -1,10 +1,10 @@
 """
-    gradient(f::Vector{T}, t) where {T <: Real}
+    gradient(f, t)
 
 Compute the gradient of a function `f` at points `t`.
 
 # Inputs
-- `f`: Function values
+- `f::Vector{Real}`: Function values
 - `t`: Points at which to evaluate the gradient
 
 # Output
@@ -18,12 +18,12 @@ function gradient(f::Vector{T}, t) where {T <: Real}
 end
 
 """
-    gradient(f::Matrix{T}, t) where {T <: Real}
+    gradient(f, t) where {T <: Real}
 
 Compute the gradient of a function `f` at points `t`.
 
 # Inputs
-- `f`: Function values
+- `f::Matrix{Real}`: Function values
 - `t`: Points at which to evaluate the gradient
 
 # Output
@@ -42,7 +42,7 @@ end
 
 
 """
-    curvature(x::Vector{T}, y::Vector{T}, p) where {T <: Real}
+    curvature(x, y, p) where {T <: Real}
 
 Compute the curvature of a parametric curve `(x(t), y(t))` at points `t`.
 

@@ -18,7 +18,7 @@ Structure containing the data of a homogeneous and isotropic bending plate
 * `m`: Surface mass [kg/m²]
 * `D`: Bending stiffness [N.m]
 """
-@show_struct struct Plate{T <: Real} <: TwoDStructure
+@show_data struct Plate{T <: Real} <: TwoDStructure
     L::T
     b::T
     m::T
@@ -42,7 +42,7 @@ Structure containing the data of a homogeneous and isotropic rectangular membran
 * `m`: Surface mass [kg/m²]
 * `D`: Tension per unit length [N/m]
 """
-@show_struct struct Membrane <: TwoDStructure
+@show_data struct Membrane <: TwoDStructure
     L::Float64
     b::Float64
     m::Float64

@@ -6,11 +6,11 @@ abstract type DenoisingMethod end
 Bayesian Regularization denoising method
 
 # Fields
-* `prior`: Prior distribution over the hyperparameters used for computing the regularization parameter
+* `prior::Symbol`: Prior distribution over the hyperparameters used for computing the regularization parameter
     * `:invgamma`: Inverse Gamma distribution
     * `:uniform`: Uniform distribution
 """
-@show_struct struct RegDenoising <: DenoisingMethod
+@show_data struct RegDenoising <: DenoisingMethod
     prior::Symbol
 
     RegDenoising(prior = :invgamma) = new(prior)
@@ -24,7 +24,7 @@ Kalman filter denoising method
 # Fields
 * `rts`: Flag to enable the Rauch-Tung-Striebel smoother
 """
-@show_struct struct KalmanDenoising <: DenoisingMethod
+@show_data struct KalmanDenoising <: DenoisingMethod
     rts::Bool
 
     KalmanDenoising(; rts = false) = new(rts)

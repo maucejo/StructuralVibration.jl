@@ -641,6 +641,7 @@ $$
 \dot{\mathbf{z}}(t) = \mathbf{A}_c \mathbf{z}(t) + \mathbf{B}_c \mathbf{u}(t),
 $$
 where:
+
 - $\mathbf{z}(t)$: State vector
 
 - $\mathbf{u}(t)$: Input vector
@@ -703,6 +704,7 @@ where $\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_N^2)$ and $\mat
 
 ---
 ```{julia}
+#| echo: false
 @doc ContinuousStateSpace
 ```
 :::

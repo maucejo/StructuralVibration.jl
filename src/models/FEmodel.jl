@@ -25,17 +25,17 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 * `constrained_dofs`: Constrained degrees of freedom
 * `free_dofs`: Free degrees of freedom
 """
-@show_struct struct OneDMesh
-    xmin::Float64
-    L::Float64
-    Nodes::Matrix{Float64}
+@show_data struct OneDMesh{T <: Real}
+    xmin::T
+    L::T
+    Nodes::Matrix{T}
     Elt::Matrix{Int}
     Ndof_per_node::Int
-    elem_size::Float64
+    elem_size::T
     constrained_dofs::Vector{Int}
     free_dofs::Vector{Int}
 
-    function OneDMesh(model::OneDStructure, xmin, Nelt, bc = :CC)
+    function OneDMesh(model::OneDStructure, xmin::T, Nelt::Int, bc::Symbol = :CC) where T
         Nnodes = Nelt + 1
         Nodes = undefs(Nnodes, 2)
         Elt = undefs(Nelt, 3)
@@ -85,7 +85,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
         end
         free_dofs = setdiff(dofs, constrained_dofs)
 
-        new(xmin, model.L, Nodes, Elt, Ndof_per_node, elem_size, constrained_dofs, free_dofs)
+        new{T}(xmin, model.L, Nodes, Elt, Ndof_per_node, elem_size, constrained_dofs, free_dofs)
     end
 end
 
@@ -242,7 +242,7 @@ function eigenmode(K, M, n = size(K, 1))
     λ, Φ = eigen(K, M)
     ω = @. √abs(λ[1:n])
 
-    return ωₘ, Φ[:, 1:n]
+    return ω, Φ[:, 1:n]
 end
 
 """
@@ -294,5 +294,5 @@ Compute the damping matrix C from modal parameters
 function modal_damping_matrix(M, ωn, ξn, Φn)
     Cn = Diagonal(2ξn.*ωn)
 
-    return Φn*M*Cn*M*Φn'
+    return M*Φn*Cn*Φn'*M
 end

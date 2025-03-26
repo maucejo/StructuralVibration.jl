@@ -7,11 +7,11 @@ abstract type OptimFamily <: NoiseEstimation end
 Bayesian noise estimation
 
 # Fields
-* `prior`: Prior distribution of the noise parameters to estimate - Symbol
+* `prior::Symbol`: Prior distribution of the noise parameters to estimate - Symbol
     * `:invgamma`: Inverse gamma distribution (default)
     * `:uniform`: Uniform distribution
 """
-@show_struct struct BayesianEst <: OptimFamily
+@show_data struct BayesianEst <: OptimFamily
     prior :: Symbol
 
     BayesianEst(prior = :invgamma) = new(prior)
@@ -30,7 +30,7 @@ This method has been proposed by Garcia in [1]
 # Reference
 [1] Garcia, D. (2010). Robust smoothing of gridded data in one and higher dimensions with missing values. Computational Statistics and Data Analysis, 54(5), 1167-1178
 """
-@show_struct struct GCVEst <: OptimFamily end
+struct GCVEst <: OptimFamily end
 
 """
     LcurveEst
@@ -46,7 +46,7 @@ This method is based on the method proposed by Hansen in [1]
 [1] Hansen, P. C. (1999). The L-curve and its use in the numerical treatment of inverse problems. Computational Inverse Problems in Electrocardiology, 119-142
 
 """
-@show_struct struct LcurveEst <: OptimFamily end
+struct LcurveEst <: OptimFamily end
 
 """
     DerricoEst
@@ -61,7 +61,7 @@ This method has been proposed by John D'Errico in [1]
 # Reference
 [1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023
 """
-@show_struct struct DerricoEst <: NoiseEstimation end
+struct DerricoEst <: NoiseEstimation end
 
 """
     varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
@@ -162,7 +162,7 @@ Note: This function is not intended to be used directly
 
 # Input
 * `x`: Signal - Vector{Float64}
-* `prior`: Prior distribution of the noise parameters to estimate - Symbol
+* `prior::Symbol`: Prior distribution of the noise parameters to estimate - Symbol
     * `:invgamma`: Inverse gamma distribution (default)
     * `:uniform`: Uniform distribution
 
@@ -409,7 +409,7 @@ function varest_derrico(x)
         noisedata = undefs(nd, ntrim)
         p = undefs(ntrim)
         for (j, xj) in enumerate(eachrow(x))
-            noisedata[j, :] .= DSP.conv(xj, fdai)[posnd]
+            noisedata[j, :] .= conv(xj, fdai)[posnd]
         end
 
         if ntrim ≥ 2

@@ -84,7 +84,7 @@ end
     Ft = excitation(hammer, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
-    @test round(length(t)*sum(Ft)*Δt) == 314.
+    @test round(length(t)*sum(Ft)*Δt) == 331.
 end
 
 @testitem "Triangle shape force" begin
@@ -130,10 +130,10 @@ end
     plate = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
 
     fmax = 1e3
-    ωₙ, kₙ = modefreq(plate, fmax)
-    Nmodes = length(ωₙ)
+    ωn, kn = modefreq(plate, fmax)
+    Nmodes = length(ωn)
 
-    Kₙ, Mₙ, Cₙ = modal_matrices(ωₙ, 1e-2)
+    Kn, Mn, Cn = modal_matrices(ωn, 1e-2)
 
     Δt = 1e-6 # Pas de temps
     tf = 0.07 # instant final
@@ -142,57 +142,57 @@ end
 
     hammer = Hammer(1., 8e-3, 9.7, 6e-4)
     F = excitation(hammer, t)
-    ϕₑ = modeshape(plate, kₙ, loc[1], loc[2])
-    Fₙ = (F*ϕₑ)'
+    ϕe = modeshape(plate, kn, loc[1], loc[2])
+    Fn = (F*ϕe)'
 
-    ϕₒ = modeshape(plate, kₙ, loc[1], loc[2])
+    ϕo = modeshape(plate, kn, loc[1], loc[2])
 
-    prob = DirectTimeProblem(Kₙ, Mₙ, Cₙ, (zeros(Nmodes), zeros(Nmodes)), t, Fₙ)
+    prob = DirectTimeProblem(Kn, Mn, Cn, Fn, (zeros(Nmodes), zeros(Nmodes)), t)
 
     # Generalized-α
     solGα = solve(prob)
     (; ddu) = solGα
-    AccGα = ϕₒ*ddu
+    AccGα = ϕo*ddu
 
     # Central difference
     solCD = solve(prob, CentralDiff())
     (; ddu) = solCD
-    AccCD = ϕₒ*ddu
+    AccCD = ϕo*ddu
 
     # HHT
     solHHT = solve(prob, HHT())
     (; ddu) = solHHT
-    AccHHT = ϕₒ*ddu
+    AccHHT = ϕo*ddu
 
     # Fox-Goodwin
     solFG = solve(prob, FoxGoodwin())
     (; ddu) = solFG
-    AccFG = ϕₒ*ddu
+    AccFG = ϕo*ddu
 
     # Linear acceleration
     solLA = solve(prob, LinearAcceleration())
     (; ddu) = solLA
-    AccLA = ϕₒ*ddu
+    AccLA = ϕo*ddu
 
     # Newmark
     solNM = solve(prob, Newmark())
     (; ddu) = solNM
-    AccNM = ϕₒ*ddu
+    AccNM = ϕo*ddu
 
     # WBZ
     solWBZ = solve(prob, WBZ())
     (; ddu) = solWBZ
-    AccWBZ = ϕₒ*ddu
+    AccWBZ = ϕo*ddu
 
     # Mid-point
     solMP = solve(prob, MidPoint())
     (; ddu) = solMP
-    AccMP = ϕₒ*ddu
+    AccMP = ϕo*ddu
 
     # RK4
     solRK4 = solve(prob, RK4())
     (; ddu) = solRK4
-    AccRK4 = ϕₒ*ddu
+    AccRK4 = ϕo*ddu
 
     energyGα = sum(abs2, AccGα)
     energyCD = sum(abs2, AccCD)
@@ -204,7 +204,7 @@ end
     energyMP = sum(abs2, AccMP)
     energyRK4 = sum(abs2, AccRK4)
 
-    @test round(sum(abs2, AccGα), digits = 2) == 866.97
+    @test round(sum(abs2, AccGα), digits = 2) == 699.43
     @test (abs(energyCD - energyGα)/energyGα) ≤ 1e-2
     @test (abs(energyHHT - energyGα)/energyGα) ≤ 1e-2
     @test (abs(energyFG - energyGα)/energyGα) ≤ 1e-2

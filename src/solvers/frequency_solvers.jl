@@ -13,21 +13,21 @@ Structure containing the data feeding the modal solver for calculating an FRF
 # note
 The mode shapes must be mass-normalized
 """
-@show_struct struct ModalFRFProblem{T <: Real, S <: AbstractVector, U <: AbstractMatrix}
+@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractVector, Tp <: AbstractMatrix}
     ωn::Vector{T}
     ξn::Vector{T}
-    freq::S
-    ϕo::U
-    ϕe::U
+    freq::Tf
+    ϕo::Tp
+    ϕe::Tp
 
-    function ModalFRFProblem(ωn::Vector{T}, ξn::Vector{T}, freq::S, ϕo::U, ϕe::U) where {T, S, U}
+    function ModalFRFProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, freq::Tf, ϕo::Tp, ϕe::Tp) where {T, Tf, Tp}
         if !isa(ξn, Array)
             ξn = fill(ξn, length(ωn))
         elseif length(ξn) != length(ωn)
-            error("The number of damping ratios must be equal to the number of resonance frequencies")
+            throw(DimensionMismatch("The number of damping ratios must be equal to the number of resonance frequencies"))
         end
 
-        new{T, S, U}(ωn, ξn, freq, ϕo, ϕe)
+        new{T, Tf, Tp}(ωn, ξn, freq, ϕo, ϕe)
     end
 end
 
@@ -44,15 +44,15 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * So: Selection matrix for observation points
 * Se: Selection matrix for excitation points
 """
-@show_struct struct DirectFRFProblem{T <: AbstractMatrix, S <: AbstractMatrix, U <: AbstractMatrix, V <: AbstractVector, W <: AbstractMatrix}
-    K::T
-    M::S
-    C::U
-    freq::V
-    So::W
-    Se::W
+@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractVector, Ts <: AbstractMatrix}
+    K::Tk
+    M::Tm
+    C::Tc
+    freq::Tf
+    So::Ts
+    Se::Ts
 
-    DirectFRFProblem(K::T, M::S, C::U, freq::V, So::W = I(size(K, 1)), Se::W = I(size(K, 1))) where {T, S, U, V, W} = new{T, S, U, V, W}(K, M, C, freq, So, Se)
+    DirectFRFProblem(K::Tk, M::Tm, C::Tc, freq::Tf, So::Ts = I(size(K, 1)), Se::Ts = I(size(K, 1))) where {Tk, Tm, Tc, Tf, Ts} = new{Tk, Tm, Tc, Tf, Ts}(K, M, C, freq, So, Se)
 end
 
 """
@@ -67,21 +67,21 @@ Structure containing the data feeding the modal solver for calculating the frequ
 * freq: Frequencies of interest
 * ϕo: Mode shapes at observation points
 """
-@show_struct struct ModalFreqProblem{T <: Real, S <: AbstractVector}
+@show_data struct ModalFreqProblem{T <: Real, Tfn <: AbstractMatrix, Tf <: AbstractVector}
     ωn::Vector{T}
     ξn::Vector{T}
-    Fn::Matrix{T}
-    freq::S
+    Fn::Tfn
+    freq::Tf
     ϕo::Matrix{T}
 
-    function ModalFreqProblem(ωn::Vector{T}, ξn::Vector{T}, Fn::Matrix{T}, freq::S, ϕo::Matrix{T}) where {T, S}
+    function ModalFreqProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, Fn::Tfn, freq::Tf, ϕo::Matrix{T}) where {T, Tfn, Tf}
         if !isa(ξn, Array)
             ξn = fill(ξn, length(ωn))
         elseif length(ξn) != length(ωn)
-            error("The number of damping ratios must be equal to the number of resonance frequencies")
+            throw(DimensionMismatch("The number of damping ratios must be equal to the number of resonance frequencies"))
         end
 
-        new{T, S}(ωn, ξn, Fn, freq, ϕo)
+        new{T, Tfn, Tf}(ωn, ξn, Fn, freq, ϕo)
     end
 end
 
@@ -98,15 +98,15 @@ Structure containing the data feeding the direct solver for calculating the moda
 * freq: Frequencies of interest
 * So: Selection matrix for observation points
 """
-@show_struct struct DirectFreqProblem{T <: AbstractMatrix, S <: AbstractMatrix, U <: AbstractMatrix, V <: AbstractVector, W <: AbstractMatrix}
-    K::T
-    M::S
-    C::U
-    F::T
-    freq::V
-    So::W
+@show_data struct DirectFreqProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, TF <: AbstractMatrix, Tf <: AbstractVector, Ts <: AbstractMatrix}
+    K::Tk
+    M::Tm
+    C::Tc
+    F::TF
+    freq::Tf
+    So::Ts
 
-    DirectFreqProblem(K::T, M::S, C::U, F::T, freq::V, So::W = I(size(K, 1))) where {T, S, U ,V, W} = new{T, S, U, V, W}(K, M, C, F, freq, So)
+    DirectFreqProblem(K::Tk, M::Tm, C::Tc, F::TF, freq::Tf, So::Ts = I(size(K, 1))) where {Tk, Tm, Tc , TF, Tf, Ts} = new{Tk, Tm, Tc, TF, Tf, Ts}(K, M, C, F, freq, So)
 end
 
 """
@@ -117,7 +117,7 @@ Structure containing the solution of the frequency response problem
 # Fields
 * u: Transfer function matrix
 """
-@show_struct struct FRFSolution{T <: Complex}
+@show_data struct FRFSolution{T <: Complex}
     u::Union{Array{T, 3}, Vector{Matrix{T}}}
 end
 
@@ -129,7 +129,7 @@ Structure containing the solution of the frequency response problem
 # Fields
 * u: Frequency response matrix
 """
-@show_struct struct FrequencySolution{T <: Complex}
+@show_data struct FrequencySolution{T <: Complex}
     u::Matrix{T}
 end
 

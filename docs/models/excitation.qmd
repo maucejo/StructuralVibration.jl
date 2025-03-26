@@ -62,12 +62,12 @@ where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time o
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 
 # Initialize Rectangle type
-rect = Rectangle(F₀, tstart, duration)
+rect = Rectangle(F0, tstart, duration)
 
 # Compute the excitation
 F = excitation(rect, t)
@@ -115,12 +115,12 @@ where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time o
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 
 # Initialize Triangle type
-tri = Triangle(F₀, tstart, duration)
+tri = Triangle(F0, tstart, duration)
 
 # Compute the excitation
 F = excitation(tri, t)
@@ -167,13 +167,13 @@ where $F_0$ is the amplitude of the signal, $t_h = t - t_\text{start}$ is the ti
 t = 0.:Δt:0.05
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 0.01
 k = 9.7
 θ = 6e-4
 
 # Initialize Hammer type
-hammer = Hammer(F₀, tstart, k, θ)
+hammer = Hammer(F0, tstart, k, θ)
 
 # Compute the excitation
 F = excitation(hammer, t)
@@ -221,13 +221,13 @@ where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time o
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 trise = 1.
 
 # Initialize SmoothRect type
-srect = SmoothRect(F₀, tstart, duration, trise)
+srect = SmoothRect(F0, tstart, duration, trise)
 
 # Compute the excitation
 F = excitation(srect, t)
@@ -286,13 +286,13 @@ $$
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 f = 2.
 
 # Initialize HaverSine type
-sine = SineWave(F₀, tstart, duration, f, zero_end = true)
+sine = SineWave(F0, tstart, duration, f, zero_end = true)
 
 # Compute the excitation
 F = excitation(sine, t)
@@ -339,12 +339,12 @@ where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time o
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 
 # Initialize HalfSine type
-hsine = HalfSine(F₀, tstart, duration)
+hsine = HalfSine(F0, tstart, duration)
 
 # Compute the excitation
 F = excitation(hsine, t)
@@ -391,12 +391,12 @@ where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time o
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 
 # Initialize HaverSine type
-haversine = HaverSine(F₀, tstart, duration)
+haversine = HaverSine(F0, tstart, duration)
 
 # Compute the excitation
 F = excitation(haversine, t)
@@ -498,7 +498,7 @@ $$
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 fstart = 1.
@@ -506,7 +506,7 @@ fend = 6.
 type_swept = :lin
 
 # Initialize SweptSine type
-chirp = SweptSine(F₀, tstart, duration, fstart, fend, type_swept, zero_end = true)
+chirp = SweptSine(F0, tstart, duration, fstart, fend, type_swept, zero_end = true)
 
 # Compute the excitation
 F = excitation(chirp, t)
@@ -560,13 +560,13 @@ $$
 t = 0.:Δt:10.
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 2.5
 duration = 5.
 fc = 2.
 
 # Initialize GaussianPulse type
-gpulse = GaussianPulse(F₀, tstart, duration, fc)
+gpulse = GaussianPulse(F0, tstart, duration, fc)
 
 # Compute the excitation
 F = excitation(gpulse, t)
@@ -628,17 +628,17 @@ nt = length(t)
 fs = 1/Δt
 
 # Excitation parameters
-F₀ = 1.
+F0 = 1.
 tstart = 0.
 duration = 10.
 σ = 1.
 
 # Initialize ColoredNoise type
-exc_white = ColoredNoise(F₀, tstart, duration, σ, color = :white)
-exc_pink = ColoredNoise(F₀, tstart, duration, σ, color = :pink)
-exc_blue = ColoredNoise(F₀, tstart, duration, σ, color = :blue)
-exc_brown = ColoredNoise(F₀, tstart, duration, σ, color = :brown)
-exc_purple = ColoredNoise(F₀, tstart, duration, σ, color = :purple)
+exc_white = ColoredNoise(F0, tstart, duration, σ, color = :white)
+exc_pink = ColoredNoise(F0, tstart, duration, σ, color = :pink)
+exc_blue = ColoredNoise(F0, tstart, duration, σ, color = :blue)
+exc_brown = ColoredNoise(F0, tstart, duration, σ, color = :brown)
+exc_purple = ColoredNoise(F0, tstart, duration, σ, color = :purple)
 
 # Compute the spectrum of the colored noise
 freq = rfftfreq(nt, fs)

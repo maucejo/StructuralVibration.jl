@@ -4,18 +4,18 @@
 Structure containing the data of a time problem for a sdof system
 
 **Fields**
-* `sdof`: Sdof structure
-* `u0`: Initial conditions
+* `sdof::Sdof`: Sdof structure
+* `u0::AbstractVector`: Initial conditions
     * `x0`: Initial displacement [m]
     * `v0`: Initial velocity [m/s]
-* `t`: Time points at which to evaluate the response
+* `t::AbstractRange`: Time points at which to evaluate the response
 """
-@show_struct struct SdofFreeTimeProblem{T <: Real, S <: AbstractVector}
+@show_data struct SdofFreeTimeProblem{Tu <: AbstractVector, Tt <: AbstractRange}
     sdof::Sdof
-    u0::Vector{T}
-    t::S
+    u0::Tu
+    t::Tt
 
-    SdofFreeTimeProblem(sdof, u0::Vector{T}, t::S) where {T, S} = new{T, S}(sdof, u0, t)
+    SdofFreeTimeProblem(sdof, u0::Tu, t::Tt) where {Tu, Tt} = new{Tu, Tt}(sdof, u0, t)
 end
 
 """
@@ -24,38 +24,38 @@ end
 Structure containing the data of a time problem for a sdof system subject to a harmonic excitation
 
 **Constructor parameters**
-* `sdof`: Sdof structure
-* `u0`: Initial conditions
-    * `x0`: Initial displacement [m]
-    * `v0`: Initial velocity [m/s]
-* `t`: Time points at which to evaluate the response
+* `sdof::Sdof`: Sdof structure
 * `F`: Amplitude of the force excitation [N] or base motion [m]
 * `f`: Frequency of the excitation [Hz]
-* `type_exc`: Type of excitation
+* `u0::AbstractVector`: Initial conditions
+    * `x0`: Initial displacement [m]
+    * `v0`: Initial velocity [m/s]
+* `t::AbstractVector`: Time points at which to evaluate the response
+* `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
 
 **Fields**
-* `sdof`: Sdof structure
-* `u0`: Initial conditions
-    * `x0`: Initial displacement [m]
-    * `v0`: Initial velocity [m/s]
-* `t`: Time points at which to evaluate the response
+* `sdof::Sdof`: Sdof structure
 * `F`: Amplitude of the force excitation [N] or base motion [m]
 * `ω`: Frequency of the excitation [rad/s]
-* `type_exc`: Type of excitation
+* `u0::AbstractVector`: Initial conditions
+    * `x0`: Initial displacement [m]
+    * `v0`: Initial velocity [m/s]
+* `t::AbstractRange`: Time points at which to evaluate the response
+* `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
 """
-@show_struct struct SdofHarmonicTimeProblem{T <: Real, S <: AbstractVector}
+@show_data struct SdofHarmonicTimeProblem{T <: Real, Tu <: AbstractVector, Tt <: AbstractRange}
     sdof::Sdof
-    u0::Vector{T}
-    t::S
     F::T
     ω::T
+    u0::Tu
+    t::Tt
     type_exc::Symbol
 
-    SdofHarmonicTimeProblem(sdof, u0::Vector{T}, t::S, F::T, f::T, type_exc = :force) where {T, S} = new{T, S}(sdof, u0, t, F, 2π*f, type_exc)
+    SdofHarmonicTimeProblem(sdof, F::T, f::T, u0::Tu, t::Tt, type_exc = :force) where {T, Tu, Tt} = new{T, Tu, Tt}(sdof, F, 2π*f, u0, t, type_exc)
 end
 
 """
@@ -64,24 +64,24 @@ end
 Structure containing the data of a time problem for a sdof system subject to an arbitrary excitation
 
 **Fields**
-* `sdof`: Sdof structure
-* `u0`: Initial conditions
+* `sdof::Sdof`: Sdof structure
+* `F::AbstractVector`: Amplitude of the force excitation [N] or base motion [m]
+* `u0::AbstractVector`: Initial conditions
     * `x0`: Initial displacement [m]
     * `v0`: Initial velocity [m/s]
-* `t`: Time points at which to evaluate the response
-* `F`: Amplitude of the force excitation [N] or base motion [m]
-* `type_exc`: Type of excitation
+* `t::AbstractVector`: Time points at which to evaluate the response
+* `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
 """
-@show_struct struct SdofForcedTimeProblem{T <: Real, S <: AbstractVector}
+@show_data struct SdofForcedTimeProblem{Tf <: AbstractVector, Tu <: AbstractVector, Tt <: AbstractRange}
     sdof::Sdof
-    u0::Vector{T}
-    t::S
-    F::Vector{T}
+    F::Tf
+    u0::Tu
+    t::Tt
     type_exc::Symbol
 
-    SdofForcedTimeProblem(sdof, u0::Vector{T}, t::S, F::Vector{T}, type_exc = :force) where {T, S} = new{T, S}(sdof, u0, t, F, type_exc)
+    SdofForcedTimeProblem(sdof, F::Tf, u0::Tu, t::Tt, type_exc = :force) where {Tf, Tu, Tt} = new{Tf, Tu, Tt}(sdof, F, u0, t, type_exc)
 end
 
 """
@@ -90,39 +90,39 @@ end
 Structure containing the data of the solution of the forced response of a sdof system
 
 **Fields**
-* `u`: Displacement solution
-* `du`: Velocity solution
-* `ddu`: Acceleration solution
+* `u::Vector{Real}`: Displacement solution
+* `du::Vector{Real}`: Velocity solution
+* `ddu::Vector{Real}`: Acceleration solution
 """
-@show_struct struct SdofTimeSolution{T <: Real}
+@show_data struct SdofTimeSolution{T <: Real}
     u::Vector{T}
     du::Vector{T}
     ddu::Vector{T}
 end
 
 """
-    SdofFRFProblem(sdof, u0, t, F, type_exc, type_resp)
+    SdofFRFProblem(sdof, freq, type_exc, type_resp)
 
 Structure containing the data for computing the FRF a sdof system
 
 **Fields**
-* `sdof`: Sdof structure
-* `freq``: Vector of frequencies [Hz]
-* `type_exc`: Type of excitation
+* `sdof::Sdof`: Sdof structure
+* `freq::AbstractRange`: Vector of frequencies [Hz]
+* `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
-* `type_resp`: Type of response
+* `type_resp::Symbol`: Type of response
     * `:dis`: Displacement spectrum or Admittance (default)
     * `:vel`: Velocity spectrum or Mobility
     * `:acc`: Acceleration spectrum or Accelerance
 """
-@show_struct struct SdofFRFProblem{T <: AbstractVector}
+@show_data struct SdofFRFProblem{Tf <: AbstractRange}
     sdof::Sdof
-    freq::T
+    freq::Tf
     type_exc::Symbol
     type_resp::Symbol
 
-    SdofFRFProblem(sdof, freq::T; type_exc = :force, type_resp = :dis) where T = new{T}(sdof, freq, type_exc, type_resp)
+    SdofFRFProblem(sdof, freq::Tf; type_exc = :force, type_resp = :dis) where Tf = new{Tf}(sdof, freq, type_exc, type_resp)
 end
 
 """
@@ -131,25 +131,25 @@ end
 Structure containing the data for computing the frequency response of a sdof system
 
 **Fields**
-* `sdof`: Sdof structure
-* `freq``: Vector of frequencies [Hz]
-* `F`: Vector of the force excitation [N] or base motion [m]
-* `type_exc`: Type of excitation
-    - `:force`: External force (default)
-    - `:base`: Base motion
-* `type_resp`: Type of response
-    - `:dis`: Displacement spectrum or Admittance (default)
-    - `:vel`: Velocity spectrum or Mobility
-    - `:acc`: Acceleration spectrum or Accelerance
+* `sdof::Sdof`: Sdof structure
+* `freq::AbstractRange`: Vector of frequencies [Hz]
+* `F::AbstractVector`: Vector of the force excitation [N] or base motion [m]
+* `type_exc::Symbol`: Type of excitation
+    * `:force`: External force (default)
+    * `:base`: Base motion
+* `type_resp::Symbol`: Type of response
+    * `:dis`: Displacement spectrum or Admittance (default)
+    * `:vel`: Velocity spectrum or Mobility
+    * `:acc`: Acceleration spectrum or Accelerance
 """
-@show_struct struct SdofFrequencyProblem{T <: Real, S <: AbstractVector}
+@show_data struct SdofFrequencyProblem{Tf <: AbstractRange, TF <: AbstractVector}
     sdof::Sdof
-    freq::S
-    F::Vector{T}
+    freq::Tf
+    F::TF
     type_exc::Symbol
     type_resp::Symbol
 
-    SdofFrequencyProblem(sdof, freq::S, F::Vector{T}; type_exc = :force, type_resp = :dis) where {T, S} = new{T, S}(sdof, freq, F, type_exc, type_resp)
+    SdofFrequencyProblem(sdof, freq::Tf, F::TF; type_exc = :force, type_resp = :dis) where {Tf, TF} = new{Tf, TF}(sdof, freq, F, type_exc, type_resp)
 end
 
 """
@@ -158,11 +158,11 @@ end
 Structure containing the data of the solution of a frequency problem for a sdof system
 
 **Field**
-* `u`: Solution of the frequency problem
+* `u::Vector{Complex}`: Solution of the frequency problem
    * Response spectrum (displacement, velocity, acceleration) [m, m/s, m/s²]
    * Or Frequency response function (FRF) (Admittance, Mobility, Accelerance) [m/N, m.s/N, m.s²/N]
 """
-@show_struct struct SdofFrequencySolution{T <: Complex}
+@show_data struct SdofFrequencySolution{T <: Complex}
     u::Vector{T}
 end
 
@@ -176,46 +176,72 @@ Compute the free response of a single degree of freedom (Sdof) system.
 
 **Output**
 * `sol`: The response of the system at the given time points
-    `u`: Displacement solution
-    `du`: Velocity solution
-    `ddu`: Acceleration solution
+    * `u`: Displacement solution
+    * `du`: Velocity solution
+    * `ddu`: Acceleration solution
 """
 function solve(prob::SdofFreeTimeProblem)
     (; sdof, u0, t) = prob
     (; ω0, ξ) = sdof
     x0, v0 = u0
 
+    cache = (
+        xh = similar(t),
+        vh = similar(t),
+        ah = similar(t)
+    )
+
+    free_response_sdof!(cache, ω0, ξ, x0, v0, t)
+
+    return SdofTimeSolution(cache.xh, cache.vh, cache.ah)
+end
+
+"""
+    free_response_sdof!(cache, ω0, ξ, x0, v0, t)
+
+Compute the free response of a single degree of freedom (Sdof) system.
+
+**Inputs**
+* `cache`: Cache for the solution
+    * `xh`: Displacement
+    * `vh`: Velocity
+    * `ah`: Acceleration
+* `ω0`: Natural angular frequency [rad/s]
+* `ξ`: Damping ratio
+* `x0`: Initial displacement [m]
+* `v0`: Initial velocity [m/s]
+* `t`: Time vector
+"""
+function free_response_sdof!(cache, ω0, ξ, x0, v0, t)
     if ω0 == 0.
-        x = @. x0 + v0*t
-        v = @. v0*ones(eltype(u0), length(t))
-        a = @. zeros(eltype(u0), length(t))
+        @. cache.xh = x0 + v0*t
+        cache.vh .= v0*one(cache.x)
+        cache.ah .= zero(cache.x)
     elseif ξ < 1.
         Ω0 = ω0*√(1 - ξ^2)
         A = x0
         B = (v0 + ξ*ω0*x0)/Ω0
 
-        x = @. (A*cos(Ω0*t) + B*sin(Ω0*t))*exp(-ξ*ω0*t)
-        v = @. Ω0*(-A*sin(Ω0*t) + B*cos(Ω0*t))*exp(-ξ*ω0*t) - ξ*ω0*x
-        a = @. -2ξ*ω0*v - ω0^2*x
+        @. cache.xh = (A*cos(Ω0*t) + B*sin(Ω0*t))*exp(-ξ*ω0*t)
+        @. cache.vh = Ω0*(-A*sin(Ω0*t) + B*cos(Ω0*t))*exp(-ξ*ω0*t) - ξ*ω0*cache.xh
+        @. cache.ah = -2ξ*ω0*cache.vh - ω0^2*cache.xh
 
     elseif ξ == 1.
         A = x0
         B = v0 + ω0*x0
 
-        x = @. (A + B*t)*exp(-ω0*t)
-        v = @. B*exp(-ω0*t) - ω0*x
-        a = @. -2ω0*v - ω0^2*x
+        @. cache.xh = (A + B*t)*exp(-ω0*t)
+        @. cache.vh = B*exp(-ω0*t) - ω0*cache.xh
+        @. cache.ah = -2ω0*cache.vh - ω0^2*cache.xh
     else
         β = ω0*√(ξ^2 - 1)
         A = x0
         B = (v0 + ξ*ω0*x0)/β
 
-        x = @. exp(-ξ*ω0*t)*(A*cosh(β*t) + B*sinh(β*t))
-        v = @. β*(A*sinh(β*t) + B*cosh(β*t))*exp(-ξ*ω0*t) - ξ*ω0*x
-        a = @. -2ξ*ω0*v - ω0^2*x
+        @. cache.xh = exp(-ξ*ω0*t)*(A*cosh(β*t) + B*sinh(β*t))
+        @. cache.vh = β*(A*sinh(β*t) + B*cosh(β*t))*exp(-ξ*ω0*t) - ξ*ω0*cache.xh
+        @. cache.ah = -2ξ*ω0*cache.vh - ω0^2*cache.xh
     end
-
-    return SdofTimeSolution(x, v, a)
 end
 
 """
@@ -228,13 +254,55 @@ Computes the forced response of a single degree of freedom (Sdof) system due to 
 
 **Output**
 * `sol`: The response of the system at the given time points
+    * `u`: Displacement solution
+    * `du`: Velocity solution
+    * `ddu`: Acceleration solution
 """
 function solve(prob::SdofHarmonicTimeProblem)
-
-    (; sdof, u0, t, F, ω, type_exc) = prob
+    (; sdof, F, ω, u0, t, type_exc) = prob
     (; m, ω0, ξ) = sdof
     x0, v0 = u0
 
+    cache = (
+        x = similar(t),
+        v = similar(t),
+        a = similar(t),
+        xh = similar(t),
+        vh = similar(t),
+        ah = similar(t)
+    )
+
+    harmonic_response_sdof!(cache, F, ω, x0, v0, m, ω0, ξ, t, type_exc)
+
+    return SdofTimeSolution(cache.x, cache.v, cache.a)
+end
+
+"""
+    harmonic_response_sdof!(cache, xh, vh, ah, F, ω, x0, v0, m, ω0, ξ, t, type_exc)
+
+Compute the forced response of a single degree of freedom (Sdof) system due to an harmonic external force or base motion
+
+**Inputs**
+* `cache`: Cache for the solution
+    * `x`: Displacement
+    * `v`: Velocity
+    * `a`: Acceleration
+    * `xh`: Displacement - Homogeneous solution (cache)
+    * `vh`: Velocity - Homogeneous solution (cache)
+    * `ah`: Acceleration - Homogeneous solution (cache)
+* `F`: Amplitude of the force excitation [N] or base motion [m]
+* `ω`: Frequency of the excitation [rad/s]
+* `x0`: Initial displacement [m]
+* `v0`: Initial velocity [m/s]
+* `m`: Mass [kg]
+* `ω0`: Natural angular frequency [rad/s]
+* `ξ`: Damping ratio
+* `t::AbtractRange`: Time vector
+* `type_exc::Symbol`: Type of excitation
+    * `:force`: External force (default)
+    * `:base`: Base motion
+"""
+function harmonic_response_sdof!(cache, F, ω, x0, v0, m, ω0, ξ, t, type_exc)
     if ξ == 0. && ω0 == ω
         # Variation parameters
         if type_exc == :force
@@ -246,9 +314,9 @@ function solve(prob::SdofHarmonicTimeProblem)
         ρ0 = α*F/2ω
         A = x0
         B = v0/ω
-        x = @. A*cos(ω*t) + B*sin(ω*t) + ρ0*t*sin(ω*t)
-        v = @. -A*ω*sin(ω*t) + B*ω*cos(ω*t) + ρ0*(sin(ω*t) + ω*t*cos(ω*t))
-        a = @. -A*ω^2*cos(ω*t) - B*ω^2*sin(ω*t) + ρ0*(2ω*cos(ω*t) - ω^2*t*sin(ω*t))
+        @. cache.x = A*cos(ω*t) + B*sin(ω*t) + ρ0*t*sin(ω*t)
+        @. cache.v = -A*ω*sin(ω*t) + B*ω*cos(ω*t) + ρ0*(sin(ω*t) + ω*t*cos(ω*t))
+        @. cache.a = -A*ω^2*cos(ω*t) - B*ω^2*sin(ω*t) + ρ0*(2ω*cos(ω*t) - ω^2*t*sin(ω*t))
     else
         if type_exc == :force
             X = F/m/(ω0^2 - ω^2 + 2im*ξ*ω*ω0)
@@ -262,34 +330,32 @@ function solve(prob::SdofHarmonicTimeProblem)
         A = x0 - ρ0*cos(ϕ)
         if ω0 == 0.
             B = v0 + ρ0*ω*sin(ϕ)
-            xh = @. A + B*t
-            vh = @. B*ones(eltype(u0), length(t))
-            ah = @. zeros(eltype(u0), length(t))
+            @. cache.xh = A + B*t
+            @. cache.vh =  B*one(xh)
+            @. cache.ah = zero(xh)
         elseif ξ < 1.
             Ω0 = ω0*√(1 - ξ^2)
             B = (v0 + ξ*ω0*A + ρ0*ω*sin(ϕ))/Ω0
-            xh = @. (A*cos(Ω0*t) + B*sin(Ω0*t))*exp(-ξ*ω0*t)
-            vh = @. Ω0*(-A*sin(Ω0*t) + B*cos(Ω0*t))*exp(-ξ*ω0*t) - ξ*ω0*xh
-            ah = @. -2ξ*ω0*vh - ω0^2*xh
+            @. cache.xh = (A*cos(Ω0*t) + B*sin(Ω0*t))*exp(-ξ*ω0*t)
+            @. cache.vh = Ω0*(-A*sin(Ω0*t) + B*cos(Ω0*t))*exp(-ξ*ω0*t) - ξ*ω0*cache.xh
+            @. cache.ah = -2ξ*ω0*cache.vh - ω0^2*cache.xh
         elseif ξ == 1.
             B = v0 + ω0*A + ρ0*ω*sin(ϕ)
-            xh = @. (A + B*t)*exp(-ω0*t)
-            vh = @. B*exp(-ω0*t) - ω0*xh
-            ah = @. -2ω0*vh - ω0^2*xh
+            @. cache.xh = (A + B*t)*exp(-ω0*t)
+            @. cache.vh = B*exp(-ω0*t) - ω0*cache.xh
+            @. cache.ah = -2ω0*cache.vh - ω0^2*cache.xh
         else
             β = ω0*√(ξ^2 - 1)
             B = (v0 + ξ*ω0*A + ρ0*ω*sin(ϕ))/β
-            xh = @. (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω0*t)
-            vh = @. β*(A*sinh(β*t) + B*cosh(β*t))*exp(-ξ*ω0*t) - ξ*ω0*xh
-            ah = @. -2ξ*ω0*vh - ω0^2*xh
+            @. cache.xh = (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω0*t)
+            @. cache.vh = β*(A*sinh(β*t) + B*cosh(β*t))*exp(-ξ*ω0*t) - ξ*ω0*cache.xh
+            @. cache.ah = -2ξ*ω0*cache.vh - ω0^2*cache.xh
         end
 
-        x = @. xh + ρ0*cos(ω*t + ϕ)
-        v = @. vh - ρ0*ω*sin(ω*t + ϕ)
-        a = @. ah - ρ0*ω^2*cos(ω*t + ϕ)
+        @. cache.x = cache.xh + ρ0*cos(ω*t + ϕ)
+        @. cache.v = cache.vh - ρ0*ω*sin(ω*t + ϕ)
+        @. cache.a = cache.ah - ρ0*ω^2*cos(ω*t + ϕ)
     end
-
-    return SdofTimeSolution(x, v, a)
 end
 
 """
@@ -306,90 +372,146 @@ Computes the forced response of a single degree of freedom (Sdof) system due to 
 
 **Output**
 * `sol`: The response of the system at the given time points
+    * `u`: Displacement solution
+    * `du`: Velocity solution
+    * `ddu`: Acceleration solution
 """
 function solve(prob::SdofForcedTimeProblem; method = :filt)
 
-    (; sdof, u0, t, F, type_exc) = prob
+    (; sdof, F, u0, t, type_exc) = prob
     (; m, ω0, ξ) = sdof
     x0, v0 = u0
 
-    # Time step
-    Δt = t[2] - t[1]
+    # Cache for the free response
+    cache_h = (
+        xh = similar(t),
+        vh = similar(t),
+        ah = similar(t),
+    )
 
+    # Cache for the particular solution
+    cache_p = (
+        xp = similar(t),
+        vp = similar(t),
+        ap = similar(t),
+        h = similar(t),
+        num = similar(t, 3),
+        denom = similar(t, 3)
+    )
+
+    free_response_sdof!(cache_h, ω0, ξ, x0, v0, t)
+
+    forced_response_sdof!(cache_p, F, m, ω0, ξ, t, type_exc, method)
+
+    x = cache_h.xh .+ cache_p.xp
+    v = cache_h.vh .+ cache_p.ap
+    a = cache_h.ah .+ cache_p.ap
+
+    return SdofTimeSolution(x, v, a)
+end
+
+"""
+    forced_response_sdof!(cache, F, m, ω0, ξ, t, type_exc, method)
+
+Compute the forced response of a single degree of freedom (Sdof) system due to an arbitrary external force or base motion
+
+**Inputs**
+* `cache`: Cache for the solution
+    * `xp::AbstractVector`: Displacement
+    * `vp::AbstractVector`: Velocity
+    * `ap::AbstractVector`: Acceleration
+    * `h::AbstractVector`: Impulse response
+    * `num::AbstractVector`: Numerator of the transfer function in z-domain
+    * `denom::AbstractVector`: Denominator of the transfer function in z-domain
+* `F::AbstractVector`: Amplitude of the force excitation [N] or base motion [m]
+* `m`: Mass [kg]
+* `ω0`: Natural angular frequency [rad/s]
+* `ξ`: Damping ratio
+* `t`: Time vector
+* `type_exc`: Type of excitation
+    * `:force`: External force (default)
+    * `:base`: Base motion
+* `method`: Method to compute the Duhamel's integral
+    * `:filt`: Filtering using the Z-transform of the impulse response (default)
+    * `:interp`: Interpolation + Gaussian quadrature
+    * `:conv`: Convolution product
+"""
+function forced_response_sdof!(cache, F, m, ω0, ξ, t, type_exc, method)
     # Impulse response
-    A = x0
+    Δt = t[2] - t[1]
     if ω0 == 0.
-        B = v0
-        xh = @. A + B*t
         if method == :interp || method == :conv
-            h = @. t/m
+            @. cache.h = t/m
         else
-            num = [0., Δt/m, 0.]
-            denom = [1., -2., 1.]
+            cache.num .= [0., Δt/m, 0.]
+            cache.denom .= [1., -2., 1.]
         end
     elseif ξ < 1.
         Ω0 = ω0*√(1 - ξ^2)
-        B = (v0 + ξ*ω0*x0)/Ω0
-        xh = @. (A*cos(Ω0*t) + B*sin(Ω0*t))*exp(-ξ*ω0*t)
         if method == :interp || method == :conv
-            h = @. exp(-ξ*ω0*t)*sin(Ω0*t)/m/Ω0
+            @. cache.h = exp(-ξ*ω0*t)*sin(Ω0*t)/m/Ω0
         else
             α = exp(-ξ*ω0*Δt)
             β = Ω0*Δt
             # Transfer function in the z-domain
-            num = [0., α*sin(β)/m/Ω0, 0.]
-            denom = [1., -2*α*cos(β), α^2]
+            cache.num .= [0., α*sin(β)/m/Ω0, 0.]
+            cache.denom .= [1., -2*α*cos(β), α^2]
         end
     elseif ξ == 1.
-        B = v0 + ω0*x0
-        xh = @. (A + B*t)*exp(-ω0*t)
         if method == :interp || method == :conv
-            h = @. t*exp(-ω0*t)/m
+            @. cache.h = t*exp(-ω0*t)/m
         else
             α = exp(-ω0*Δt)
-            num = [0., α*Δt/m, 0.]
-            denom = [1., -2*α, α^2]
+            cache.num .= [0., α*Δt/m, 0.]
+            cache.denom .= [1., -2*α, α^2]
         end
     else
         β = ω0*√(ξ^2 - 1)
-        B = (v0 + ξ*ω0*x0)/β
-        xh = @. (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω0*t)
         if method == :interp || method == :conv
-            h = @. exp(-ξ*ω0*t)*sinh(β*t)/m/β
+            @. cache.h = exp(-ξ*ω0*t)*sinh(β*t)/m/β
         else
             α = exp(-ξ*ω0*Δt)
             γ = β*Δt
-            num = [0., α*sinh(γ)/m/β, 0.]
-            denom = [1., -2*α*cosh(γ), α^2]
+            cache.num .= [0., α*sinh(γ)/m/β, 0.]
+            cache.denom .= [1., -2*α*cosh(γ), α^2]
         end
     end
 
-    # Duhamel's integral
     if type_exc == :base
         k, c = ω0^2*m, 2ξ*ω0*m
         xb = F
         vb = gradient(xb, t)
 
-        F = k*xb .+ c*vb
+        F .= k*xb .+ c*vb
     end
 
     if method == :interp || method == :conv
         if method == :interp
-            xp = duhamel_integral(F, h, t)
+            cache.xp .= duhamel_integral(F, cache.h, t)
         else
-            xp = Δt*DSP.conv(F, h)[1:length(F)]
+            cache.xp .= Δt*conv(F, cache.h)[1:length(F)]
         end
     else
-        xp = Δt*DSP.filt(num, denom, F)
+        cache.xp .= Δt*filt(cache.num, cache.denom, F)
     end
 
-    x = xh .+ xp
-    v = gradient(x, t)
-    a = gradient(v, t)
-
-    return SdofTimeSolution(x, v, a)
+    cache.vp .= gradient(cache.xp, t)
+    cache.ap .= gradient(cache.vp, t)
 end
 
+"""
+    duhamel_integral(F, h, t)
+
+Compute the Duhamel's integral
+
+**Inputs**
+* `F`: Force excitation
+* `h`: Impulse response
+* `t`: Time vector
+
+**Output**
+* `x`: Solution of the Duhamel's integral
+"""
 function duhamel_integral(F, h, t)
     # Interpolation
     fc = cubic_spline_interpolation(t, F)
@@ -397,13 +519,11 @@ function duhamel_integral(F, h, t)
 
     # Gauss-Legendre quadrature
     nodes, weights = gausslegendre(500)
-    n = length(nodes)
-    nt = length(t)
 
     # Initialization
-    x = undefs(nt)
-    scaled_nodes = undefs(n)
-    scaled_weights = undefs(n)
+    x = similar(t)
+    scaled_nodes = similar(nodes)
+    scaled_weights = similar(nodes)
     for (i, ti) in enumerate(t)
         @. scaled_nodes = (nodes + 1)*ti/2
         @. scaled_weights = weights*ti/2
@@ -422,7 +542,7 @@ Compute the FRF of a single degree of freedom (Sdof) system
 * `prob`: Structure containing the parameters of the Sdof FRF problem
 
 **Output**
-* sol: Solution of the FRF problem
+* `sol`: Solution of the FRF problem
 """
 function solve(prob::SdofFRFProblem)
     (; sdof, freq, type_exc, type_resp) = prob
@@ -453,7 +573,7 @@ Compute the frequency response function of a single degree of freedom (Sdof) sys
 * `prob`: Structure containing the parameters of the Sdof frequency problem
 
 **Output**
-* sol: Solution of the frequency problem
+* `sol`: Solution of the frequency problem
 """
 function solve(prob::SdofFrequencyProblem)
     (; sdof, freq, F, type_exc, type_resp) = prob
@@ -487,10 +607,18 @@ Compute the impulse response of a single degree of freedom (Sdof) system
 **Output**
 * `h`: Impulse response
 """
-function impulse_response(sdof::Sdof, t::T) where {T <: AbstractVector}
-    prob = SdofFreeTimeProblem(sdof, [0., 1/sdof.m], t)
+function impulse_response(sdof, t)
+    (; m, ω0, ξ) = sdof
 
-    return solve(prob).u
+    cache = (
+        xh = similar(t),
+        vh = similar(t),
+        ah = similar(t)
+    )
+
+    free_response_sdof!(cache, ω0, ξ, zero(ξ), 1/m, t)
+
+    return cache.xh
 end
 
 abstract type SRSalg end
@@ -504,7 +632,7 @@ struct RecursiveInt <: SRSalg end
 Compute the Shock Response Spectrum (SRS)
 
 **Inputs**
-* `base_acc`: Base acceleration type - see `excitation` function for detatils
+* `base_acc::ArbitraryExc`: Base acceleration type - see `excitation` function for detatils
 * `freq`: Vector of frequencies [Hz]
 * `t`: Time points at which to evaluate the response
 * `ξ`: Damping ratio (default = 0.05)
@@ -529,7 +657,7 @@ Compute the Shock Response Spectrum (SRS)
 * Primary instance - response of the system during the application of the base acceleration
 * Secondary instance - response of the system after the application of the base acceleration
 """
-function srs(base_acc::ArbitraryExc, freq::T, t::S, ξ = 0.05; type_srs = (instance = :primary, amplitude = :abs), alg = :Smallwood) where {T <: AbstractVector, S <: AbstractVector}
+function srs(base_acc::ArbitraryExc, freq, t, ξ = 0.05; type_srs = (instance = :primary, amplitude = :abs), alg = :Smallwood)
 
     # Some checks
     t_srs = typeof(type_srs)
@@ -589,6 +717,7 @@ end
 function srs_basic(f0, ξ, acc, t)
     ω0 = 2π*f0
     sdof = Sdof(1., f0, ξ)
+
     prob = SdofForcedTimeProblem(sdof, [0., 0.], t, -acc, :conv)
     (; u, du) = solve(prob)
 
@@ -597,7 +726,7 @@ end
 
 function srs_recursive_int(f0, ξ, acc, t)
     # Time step
-    h = t[2] - t[1]
+    h = step(t)
     nt = length(t)
 
     if ξ ≥ 1.
@@ -627,7 +756,7 @@ function srs_recursive_int(f0, ξ, acc, t)
     c10 = ((1/ω0/h + 4ξ/ω0^2/h^2)*(1. - eCos) + ((2. - 4ξ^2)/ω0^2/h^2 - ξ/ω0/h)*eSin/√(1 - ξ^2) - 2/ω0/h)/2ω0^2
 
     # Acceleration response
-    x = undefs(nt)
+    x = similar(t)
 
     # Initial conditions - Relative displacement and velocity
     z = 0.
@@ -656,7 +785,7 @@ end
 
 function srs_recursive_filt(f0, ξ, acc, t)
     # Time step
-    h = t[2] - t[1]
+    h = step(t)
 
     if ξ ≥ 1.
         error("Damping ratio must be less than 1")
@@ -672,8 +801,8 @@ function srs_recursive_filt(f0, ξ, acc, t)
     eSin = eh*sin(Ω0*h)
 
     # filter coefficients
-    b = undefs(3)
-    a = undefs(3)
+    b = similar(t, 3)
+    a = similar(b)
 
     b[1] = 2ξ*ω0*h
     b[2] = ω0*h*(ω0*(1. -2ξ^2)*eSin/Ω0 - 2ξ*eCos)
@@ -683,12 +812,12 @@ function srs_recursive_filt(f0, ξ, acc, t)
     a[2] = -2eCos
     a[3] = exp(-2ξ*ω0*h)
 
-    return DSP.filt(b, a, acc)
+    return filt(b, a, acc)
 end
 
 function srs_smallwood(f0, ξ, acc, t)
     # Time step
-    h = t[2] - t[1]
+    h = step(t)
 
     if ξ ≥ 1.
         error("Damping ratio must be less than 1")
@@ -704,8 +833,8 @@ function srs_smallwood(f0, ξ, acc, t)
     eSin = eh*sin(Ω0*h)
 
     # filter coefficients
-    b = undefs(3)
-    a = undefs(3)
+    b = similar(t, 3)
+    a = similar(b)
 
     b[1] = 1 - eSin/Ω0/h
     b[2] = 2(eSin/Ω0/h - eCos)
@@ -715,5 +844,5 @@ function srs_smallwood(f0, ξ, acc, t)
     a[2] = -2eCos
     a[3] = exp(-2ξ*ω0*h)
 
-    return DSP.filt(b, a, acc)
+    return filt(b, a, acc)
 end

@@ -38,10 +38,10 @@ website:
     - title: "Solvers"
       contents:
         - solvers/index.qmd
-        - solvers/direct_time_solvers.qmd
         - solvers/modal_time_solvers.qmd
-        - solvers/frequency_solvers.qmd
+        - solvers/direct_time_solvers.qmd
         - solvers/state_space_solvers.qmd
+        - solvers/frequency_solvers.qmd
 
     - title: "Signal processing"
       contents:

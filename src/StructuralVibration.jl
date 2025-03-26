@@ -1,8 +1,8 @@
 module StructuralVibration
 
-using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Parameters, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
+using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
 
-import DSP
+using DSP: conv, filt, remez, filtfilt
 
 # Structs - Models
 export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
@@ -17,8 +17,7 @@ export Rectangle, Triangle, Hammer, SmoothRect, SineWave,
 
 # Structs - Problems
 export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
-       SdofFRFProblem, SdofFrequencyProblem, StateSpaceTimeProblem, StateSpaceFRFProblem, StateSpaceFreqProblem,
-       FreeModalTimeProblem, ForcedModalTimeProblem, ModalFRFProblem, DirectFRFProblem, ModalFreqProblem, DirectFreqProblem, DirectTimeProblem
+       SdofFRFProblem, SdofFrequencyProblem, StateSpaceTimeProblem, StateSpaceFRFProblem, StateSpaceModalFRFProblem, StateSpaceFreqProblem, StateSpaceModalFreqProblem, FreeModalTimeProblem,HarmonicModalTimeProblem, ForcedModalTimeProblem, ModalFRFProblem, DirectFRFProblem, ModalFreqProblem, DirectFreqProblem, DirectTimeProblem
 
 # Structs - Time solvers
 export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
@@ -56,12 +55,8 @@ export gradient, detrend
 # Functions for plotting
 export sv_plot, bode_plot, nyquist_plot, waterfall_plot
 
-# Utility functions
-export undefs
-
 # Include files - Utils
 include("utils/macro_utils.jl")
-# include("utils/undefs.jl")
 
 # Include files - Excitation models
 include("models/excitation.jl")

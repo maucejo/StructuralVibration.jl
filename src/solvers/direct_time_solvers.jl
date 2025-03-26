@@ -1,35 +1,40 @@
 """
-    DirectTimeProblem(K, M, C, u0::Tuple{Vector{T}, Vector{T}}, t, F::Matrix{T})
+    DirectTimeProblem(K, M, C, F, u0, t)
 
 Structure containing data for the time solver
 
-# Constructor
+**Constructor**
+* `K::AbstractMatrix`: Stiffness matrix
+* `M::AbstractMatrix`: Mass matrix
+* `C:AbstractMatrix`: Damping matrix
+* `F::AbstractMatrix`: External force matrix
+* `u0::Tuple`: Initial conditions
+    * `u0[1]`: Initial displacement (or modal displacement)
+    * `u0[2]`: Initial velocity (or modal velocity)
+* `t::AbstractRange`: Time points at which to evaluate the response
+
+**Fields**
 * `K`: Stiffness matrix
 * `M`: Mass matrix
 * `C`: Damping matrix
-* `u0`: Initial conditions
-* `t`: Time steps
 * `F`: External force matrix
-
-# Fields
-* K: Stiffness matrix
-* M: Mass matrix
-* C: Damping matrix
-* u0: Initial conditions
-    * u0[1]: Initial displacement
-    * u0[2]: Initial velocity
-* h: Time step
-* F: External force matrix
+* `u0`: Initial conditions
+    * `u0[1]`: Initial displacement
+    * `u0[2]`: Initial velocity
+* `h::Real`: Time step
 """
-@show_struct struct DirectTimeProblem{T <: AbstractMatrix, S <: AbstractMatrix, U <: AbstractMatrix, V <: Real}
-    K::T
-    M::S
-    C::U
-    u0::Tuple{Vector{V}, Vector{V}}
-    h::V
-    F::T
+@show_data struct DirectTimeProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractMatrix, Tu <: AbstractVector, Th <: Real}
+    K::Tk
+    M::Tm
+    C::Tc
+    F::Tf
+    u0::Tuple{Tu, Tu}
+    h::Th
 
-    DirectTimeProblem(K::T, M::S, C::U, u0::Tuple{Vector{V}, Vector{V}}, t::AbstractVector{V}, F::V) where {T, S, U, V} = new{T, S, U, V}(K, M, C, u0, t[2] - t[1], F)
+    function DirectTimeProblem(K::Tk, M::Tm, C::Tc, F::Tf, u0::Tuple{Tu, Tu}, t::AbstractRange) where {Tk, Tm, Tc, Tf, Tu}
+        h = step(t)
+        return new{Tk, Tm, Tc, Tf, Tu, typeof(h)}(K, M, C, F, u0, h)
+    end
 end
 
 """
@@ -37,12 +42,12 @@ end
 
 Structure containing problem solutions
 
-# Fields
-* u: Displacement matrix or vector
-* du: Velocity matrix or vector
-* ddu: Acceleration matrix or vector
+**Fields**
+* `u`: Displacement matrix or vector
+* `du`: Velocity matrix or vector
+* `ddu`: Acceleration matrix or vector
 """
-@show_struct struct DirectTimeSolution{T <: Real}
+@show_data struct DirectTimeSolution{T <: Real}
     u::Matrix{T}
     du::Matrix{T}
     ddu::Matrix{T}
@@ -71,7 +76,7 @@ abstract type NewmarkFamily end
 
 Fox-Goodwin time solver
 """
-@show_struct struct FoxGoodwin{T <: Real} <: NewmarkFamily
+@show_data struct FoxGoodwin{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -86,7 +91,7 @@ end
 
 Linear acceleration time solver
 """
-@show_struct struct LinearAcceleration{T <: Real} <: NewmarkFamily
+@show_data struct LinearAcceleration{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -94,8 +99,6 @@ Linear acceleration time solver
     name::String
 
     LinearAcceleration(αf::T = 0., αm::T = 0., γ0::T = 0.5, β0::T = 1/6) where T = new{T}(αf, αm, γ0, β0, "Direct Time Problem - Linear acceleration...")
-
-    # LinearAcceleration() = new(0., 0., 0.5, 1/6, "Direct Time Problem - Linear acceleration...")
 end
 
 """
@@ -103,7 +106,7 @@ end
 
 Newmark time solver
 """
-@show_struct struct Newmark{T <: Real} <: NewmarkFamily
+@show_data struct Newmark{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -118,7 +121,7 @@ end
 
 Hilber-Hughes-Taylor time solver
 """
-@show_struct struct HHT{T <: Real} <: NewmarkFamily
+@show_data struct HHT{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -141,7 +144,7 @@ end
 
 Wood-Bossak-Zienkiewicz time solver
 """
-@show_struct struct WBZ{T <: Real} <: NewmarkFamily
+@show_data struct WBZ{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -164,7 +167,7 @@ end
 
 Generalized-α time solver
 """
-@show_struct struct GeneralizedAlpha{T <: Real} <: NewmarkFamily
+@show_data struct GeneralizedAlpha{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -190,7 +193,7 @@ end
 
 Mid-point rule time solver
 """
-@show_struct struct MidPoint{T <: Real} <: NewmarkFamily
+@show_data struct MidPoint{T <: Real} <: NewmarkFamily
     αf::T
     αm::T
     γ0::T
@@ -206,23 +209,26 @@ end
 
 Direct time integration solver
 
-# Inputs
+**Inputs**
 * `prob`: DirectTimeProblem structure
 * `alg`: Numerical integration algorithm
-    * CentralDiff(): Central difference
-    * RK4(): Fourth-order Runge-Kutta
-    * Newmark(): Newmark
-    * HHT(): Hilber-Hughes-Taylor
-    * WBZ(): Wood-Bossak-Zienkiewicz
-    * GeneralizedAlpha(): Generalized-α
-    * MidPoint(): Mid-point rule
+    * `CentralDiff()`: Central difference
+    * `RK4()`: Fourth-order Runge-Kutta
+    * `Newmark()`: Newmark
+    * `HHT()`: Hilber-Hughes-Taylor
+    * `WBZ()`: Wood-Bossak-Zienkiewicz
+    * `GeneralizedAlpha()`: Generalized-α (default)
+    * `MidPoint()`: Mid-point rule
 * `progress`: Show progress bar
 
-# Output
-* `sol`: DirectTimeSolution structure
+**Output**
+* `sol`: Solution structure containing the response of the system at the given time points
+    * `u`: Displacement
+    * `du`: Velocity
+    * `ddu`: Acceleration
 """
 function solve(prob::DirectTimeProblem, alg::CentralDiff; progress = true)
-    (; K, M, C, u0, h, F) = prob
+    (; K, M, C, F, u0, h) = prob
 
     Nddl, nt = size(F)
     # Initialization of the result matrices
@@ -243,7 +249,7 @@ function solve(prob::DirectTimeProblem, alg::CentralDiff; progress = true)
 
     D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
 
-    p = Progress(nt - 1, desc = "Direct Time Problem - Central difference...", color = :black, showspeed = true)
+    p = Progress(nt - 1, desc = "Direct Time Problem - Central difference...", showspeed = true)
     @views @inbounds for n in 1:nt-1
         progress ? next!(p) : nothing
 
@@ -264,7 +270,7 @@ end
 
 # Fourth-order Runge-Kutta
 function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
-    (; K, M, C, u0, h, F) = prob
+    (; K, M, C, F, u0, h) = prob
 
     Nddl, nt = size(F)
     # Initialization of the result matrices
@@ -289,7 +295,7 @@ function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
     lu!(M)
     A[:, 1] = M\rhs0
 
-    p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", color = :black, showspeed = true)
+    p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", showspeed = true)
     @views @inbounds for n = 1:nt-1
         progress ? next!(p) : nothing
 
@@ -312,7 +318,7 @@ end
 
 #Newmark family
 function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
-    (; K, M, C, u0, h, F) = prob
+    (; K, M, C, F, u0, h) = prob
     (; αf, αm, γ0, β0, name) = alg
 
     Nddl, nt = size(F)
@@ -354,7 +360,7 @@ function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     S = @. b₆*M + b₃*C + b₄*K
     lu!(S)
 
-    p = Progress(nt - 1, desc = name, color = :black, showspeed = true)
+    p = Progress(nt - 1, desc = name, showspeed = true)
     @views @inbounds for n = 1:nt-1
         progress ? next!(p) : nothing
 

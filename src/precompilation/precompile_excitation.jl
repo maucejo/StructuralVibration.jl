@@ -6,7 +6,7 @@ smoothrect = SmoothRect(F₀, tstart, duration, 5Δt)
 sinewave = SineWave(F₀, tstart, duration, 10.)
 halfsine = HalfSine(F₀, tstart, duration)
 haversine = HaverSine(F₀, tstart, duration)
-sweptsine = SweptSine(F₀, tstart, duration, 10., 20)
+sweptsine = SweptSine(F₀, tstart, duration, 10., 20.)
 gaussianpulse = GaussianPulse(F₀, tstart, duration, 10.)
 colorednoise = ColoredNoise(F₀, tstart, duration, color = :pink)
 
