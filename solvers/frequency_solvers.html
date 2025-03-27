@@ -440,9 +440,9 @@ solve(prob::ModalFRFProblem, type = :dis; ismat = false)</code></pre>
 <section id="response-spectrum" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="response-spectrum"><span class="header-section-number">2</span> Response spectrum</h2>
 <p>Similarly to the FRF, the response spectrum is a complex function that describes the steady-state response of a system to a sinusoidal input. At a given angular frequency <span class="math inline">\(\omega\)</span>, it is expressed as : <span class="math display">\[
-\mathbf{y}(\omega) = \left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right)^{-1} \mathbf{F}(\omega).
+\mathbf{x}(\omega) = \left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right)^{-1} \mathbf{F}(\omega).
 \]</span> or equivalently from the modes of the system: <span class="math display">\[
-\mathbf{H}(\omega) = \mathbf{\Phi}\left(\mathbf{\Omega}^2 - \omega^2\mathbf{I} + 2j\omega\mathbf{\Omega}\right)^{-1}\mathbf{L},
+\mathbf{x}(\omega) = \mathbf{\Phi}\left(\mathbf{\Omega}^2 - \omega^2\mathbf{I} + 2j\omega\mathbf{\Omega}\right)^{-1}\mathbf{L},
 \]</span> where <span class="math inline">\(\mathbf{L} = \mathbf{\Phi}^\mathsf{T}\mathbf{F}(\omega)\)</span> is the modal participation factor matrix<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <section id="api-1" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.1</span> API</h3>
