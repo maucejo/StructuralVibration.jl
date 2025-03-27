@@ -108,6 +108,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -226,6 +255,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api"><span class="header-section-number">1.1</span> API</a></li>
   <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">1.2</span> Example</a></li>
   </ul></li>
+  <li><a href="#frequency-domain-solvers" id="toc-frequency-domain-solvers" class="nav-link" data-scroll-target="#frequency-domain-solvers"><span class="header-section-number">2</span> Frequency-domain solvers</a>
+  <ul class="collapse">
+  <li><a href="#frequency-response-function" id="toc-frequency-response-function" class="nav-link" data-scroll-target="#frequency-response-function"><span class="header-section-number">2.1</span> Frequency Response Function</a></li>
+  <li><a href="#response-spectrum" id="toc-response-spectrum" class="nav-link" data-scroll-target="#response-spectrum"><span class="header-section-number">2.2</span> Response spectrum</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -251,7 +285,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This section describes the state-space solvers available in the <code>StructuralVibration.jl</code> package.</p>
 <section id="time-domain-solvers" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="time-domain-solvers"><span class="header-section-number">1</span> Time-domain solvers</h2>
 <p>For solving time-domain problems, the <code>StructuralVibration.jl</code> package provides two different approach. The first one consist in solving the problem using the discrete-time state equation (see <a href="https://maucejo.github.io/StructuralVibration.jl/models/#state-space-representation">Mechanical solvers - Section 3.2</a> for details). In this case, four discretization methods are available: Zero-Order Hold (<code>:zoh</code>), First-Order Hold (<code>:foh</code>), Band-Limited Hold (<code>:blh</code>), and Fourth order Runge-Kutta scheme (<code>:rk4</code>).</p>
@@ -266,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>StateSpaceProblem(css::ContinuousStateSpace, u0::Vector{Float64}, h::Float64, F::Matrix{Float64})</code></pre>
 <p>Structure containing data for the state-space model</p>
-<h1>Constructor</h1>
+<p><strong>Constructor</strong></p>
 <ul>
 <li><p><code>css</code>: Continuous-time state space model</p>
 </li>
@@ -419,7 +452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>x_forced_blh <span class="op">=</span> <span class="fu">solve</span>(prob_forced, <span class="op">:</span>blh).u</span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>x_forced_rk <span class="op">=</span> <span class="fu">solve</span>(prob_forced, <span class="op">:</span>rk4).u</span>
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span>  <span class="fu">ForcedModalTimeProblem</span>(K, M, ξ, F, (x0, v0), t)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(K, M, ξ, F, (x0, v0), t)</span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>x_forced_modal <span class="op">=</span> <span class="fu">solve</span>(prob_forced_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="14" class="cell" data-execution_count="1">
@@ -427,6 +460,332 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div>
 <figure class="figure">
 <p><img src="state_space_solvers_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="frequency-domain-solvers" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="frequency-domain-solvers"><span class="header-section-number">2</span> Frequency-domain solvers</h2>
+<p>The frequency-domain solvers are based on the state-space representation of the system, which includes both the state equation and the output equation. It is given that: <span class="math display">\[
+\begin{cases}
+\dot{\mathbf{z}}(t) &amp;= \mathbf{A}_c \mathbf{z}(t) + \mathbf{B}_c \mathbf{u}(t) \\
+\mathbf{y}(t) &amp;= \mathbf{C}_c \mathbf{z}(t) + \mathbf{D}_c \mathbf{u}(t)
+\end{cases},
+\]</span> where:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{z}(t)\)</span>: State vector</li>
+<li><span class="math inline">\(\mathbf{u}(t)\)</span>: Input vector</li>
+<li><span class="math inline">\(\mathbf{y}(t)\)</span>: Output vector</li>
+<li><span class="math inline">\(\mathbf{A}_c\)</span>: System matrix</li>
+<li><span class="math inline">\(\mathbf{B}_c\)</span>: Input matrix</li>
+<li><span class="math inline">\(\mathbf{C}_c\)</span>: Observation matrix</li>
+<li><span class="math inline">\(\mathbf{D}_c\)</span>: Direct feedthrough matrix</li>
+</ul>
+<p>It is also possible to express the state-space system. To this end, the state-space representation is transformed into modal coordinates, i.e., <span class="math inline">\(\mathbf{z} = \mathbf{\Psi} \mathbf{q}\)</span>, where <span class="math inline">\(\mathbf{\Psi}\)</span> is the matrix of eigenvectors of the system matrix <span class="math inline">\(\mathbf{A}_c\)</span>. The modal state-space representation is given by: <span class="math display">\[
+\begin{cases}
+\dot{\mathbf{q}}(t) &amp;= \mathbf{\Lambda} \mathbf{q}(t) + \mathbf{B}_m \mathbf{u}(t) \\
+\mathbf{y}(t) &amp;= \mathbf{C}_m \mathbf{q}(t) + \mathbf{D}_m \mathbf{u}(t)
+\end{cases},
+\]</span> where:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{q}(t)\)</span>: Modal state vector</li>
+<li><span class="math inline">\(\Lambda = \text{diag}(\lambda_1, \lambda_1^\ast, \dots, \lambda_N, \lambda_N^\ast)\)</span>: Eigenvalues matrix</li>
+<li><span class="math inline">\(\mathbf{B}_m = \mathbf{\Psi}^{-1} \mathbf{B}_c\)</span>: Modal input matrix</li>
+<li><span class="math inline">\(\mathbf{C}_m = \mathbf{C}_c \mathbf{\Psi}\)</span>: Modal observation matrix</li>
+<li><span class="math inline">\(\mathbf{D}_m = \mathbf{D}_c\)</span>: Modal direct feedthrough matrix</li>
+</ul>
+<p>Finally</p>
+<section id="frequency-response-function" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="frequency-response-function"><span class="header-section-number">2.1</span> Frequency Response Function</h3>
+<p>The Frequency Response Function (FRF) is a complex function that describes the steady-state response of a system to a sinusoidal input. The FRF is defined as the ratio of the output to the input in the frequency domain. From the state-space representation, the transfer function of the system at a given angular frequency <span class="math inline">\(\omega\)</span> can be obtained in a straightforward manner and is given by: <span class="math display">\[
+\mathbf{H}(\omega) = \mathbf{C}_c (j\omega \mathbf{I} - \mathbf{A}_c)^{-1} \mathbf{B}_c + \mathbf{D}_c,
+\]</span> or equivalently from the modes of the system: <span class="math display">\[
+\mathbf{H}(\omega) = \mathbf{C}_m (j\omega \mathbf{I} - \mathbf{\Lambda} )^{-1} \mathbf{B}_m + \mathbf{D}_m.
+\]</span></p>
+<p>Finally, it should be noted that the FRF can be computed for a given set of response dofs and a given set of excitation dofs by introducing the appropriate selection matrices <span class="math inline">\(\mathbf{S}_o\)</span> and <span class="math inline">\(\mathbf{S}_e\)</span>. In this case, the FRF is given by: <span class="math display">\[
+\mathbf{H}_{oe}(\omega) = \mathbf{S}_o\mathbf{H}(\omega)\mathbf{S}_e.
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>For the admittance : <span class="math inline">\(\mathbf{C}_c = [\mathbf{I},\quad \mathbf{0}]\)</span> and <span class="math inline">\(\mathbf{D}_c = \mathbf{0}\)</span>.</li>
+<li>For the mobility : <span class="math inline">\(\mathbf{C}_c = [\mathbf{0}, \quad \mathbf{I}]\)</span> and <span class="math inline">\(\mathbf{D}_c = \mathbf{0}\)</span>.</li>
+<li>For the accelerance, <span class="math inline">\(\mathbf{C}_c = \mathbf{A}_c[m:\text{end}, :]\)</span> and <span class="math inline">\(\mathbf{D}_c = \mathbf{B}_c[m:\text{end}, :]\)</span> with <span class="math inline">\(m = N/2\)</span> (this corresponds to a rewrite of the equation of motion).</li>
+</ul>
+</div>
+</div>
+<section id="api-1" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.1.1</span> API</h4>
+<p><strong>Data types</strong></p>
+<div class="api">
+<p><strong>StateSpaceFRFProblem</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>StateSpaceFRFProblem(css::ContinuousStateSpace, freq, type, So, Se)</code></pre>
+<p>Structure containing the data feeding the direct solver for calculating an FRF</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>css</code>: Continuous-time state space model</p>
+</li>
+<li><p><code>freq</code>: Frequencies of interest</p>
+</li>
+<li><p><code>So</code>: Selection matrix for observation points</p>
+</li>
+<li><p><code>Se</code>: Selection matrix for excitation points</p>
+</li>
+</ul>
+<h1>note: It is assumed that the output equation is of the form y = So*x</h1>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>StateSpaceModalFRFProblem</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>StateSpacemodalFRFProblem(css::ContinuousStateSpace, freq, type, So, Se, n)</code></pre>
+<p>Structure containing the data feeding the direct solver for calculating an FRF</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>css</code>: Continuous-time state space model</p>
+</li>
+<li><p><code>freq</code>: Frequencies of interest</p>
+</li>
+<li><p><code>So</code>: Selection matrix for observation points</p>
+</li>
+<li><p><code>Se</code>: Selection matrix for excitation points</p>
+</li>
+<li><p><code>n</code>: Number of modes to keep in the modal basis</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
+solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)</code></pre>
+<p>Computes the FRF matrix by direct or modal method</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the problem data</p>
+</li>
+<li><p><code>type</code>: Type of FRF to compute</p>
+<ul>
+<li><p><code>:dis</code>: Admittance</p>
+</li>
+<li><p><code>:vel</code>: Mobility</p>
+</li>
+<li><p><code>:acc</code>: Accelerance</p>
+</li>
+</ul>
+</li>
+<li><p><code>ismat</code>: Return the FRF matrix as a 3D array (default = false)</p>
+</li>
+<li><p><code>progress</code>: Show progress bar (default = true)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>sol</code>: FRFSolution structure</p>
+<ul>
+<li><p><code>u</code>: FRF matrix</p>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.1.2</span> Example</h4>
+<div id="22" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ω, Φ <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> <span class="fu">modal_damping_matrix</span>(M, ω, ξ, Φ)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># State-space model</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(K, M, C)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency vector</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">0.01</span><span class="op">:</span><span class="fl">0.001</span><span class="op">:</span><span class="fl">1</span>.</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 1 - Direct</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">StateSpaceFRFProblem</span>(css, freq)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>H_direct <span class="op">=</span> <span class="fu">solve</span>(prob_frf, ismat <span class="op">=</span> <span class="cn">true</span>).u</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>prob_frf_modal <span class="op">=</span> <span class="fu">StateSpaceModalFRFProblem</span>(css, freq)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>H_modal <span class="op">=</span> <span class="fu">solve</span>(prob_frf_modal, ismat <span class="op">=</span> <span class="cn">true</span>).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="24" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="state_space_solvers_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="response-spectrum" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="response-spectrum"><span class="header-section-number">2.2</span> Response spectrum</h3>
+<p>Similarly to the FRF, the response spectrum is a complex function that describes the steady-state response of a system to a sinusoidal input. From the state-space representation, the response spectrum of the system at a given angular frequency <span class="math inline">\(\omega\)</span> is given by: <span class="math display">\[
+\mathbf{y}(\omega) = \left[\mathbf{C}_c (j\omega \mathbf{I} - \mathbf{A}_c)^{-1} \mathbf{B}_c + \mathbf{D}_c\right] \mathbf{u}(\omega),
+\]</span> or equivalently from the modes of the system: <span class="math display">\[
+\mathbf{y}(\omega) = \left[\mathbf{C}_m (j\omega \mathbf{I} - \mathbf{\Lambda} )^{-1} \mathbf{B}_m + \mathbf{D}_m\right] \mathbf{u}(\omega).
+\]</span></p>
+<section id="api-2" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="api-2"><span class="header-section-number">2.2.1</span> API</h4>
+<div class="api">
+<p><strong>StateSpaceFreqProblem</strong></p>
+<hr>
+<div id="26" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>StateSpaceFreqProblem(css::ContinuousStateSpace, F, freq, So)</code></pre>
+<p>Structure containing the data feeding the modal solver for calculating the frequency response</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>css</code>: Continuous-time state space model</p>
+</li>
+<li><p><code>F</code>: External force matrix</p>
+</li>
+<li><p><code>freq</code>: Frequencies of interest</p>
+</li>
+<li><p><code>So</code>: Selection matrix for observation points</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>StateSpaceModalFreqProblem</strong></p>
+<hr>
+<div id="28" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>StateSpaceModalFreqProblem(css::ContinuousStateSpace, F, freq, So, n)</code></pre>
+<p>Structure containing the data feeding the modal solver for calculating the frequency response</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>css</code>: Continuous-time state space model</p>
+</li>
+<li><p><code>F</code>: External force matrix</p>
+</li>
+<li><p><code>freq</code>: Frequencies of interest</p>
+</li>
+<li><p><code>So</code>: Selection matrix for observation points</p>
+</li>
+<li><p><code>n</code>: Number of modes to keep in the modal basis</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="30" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
+solve(prob::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)</code></pre>
+<p>Computes the frequency response by direct or modal method</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the problem data</p>
+</li>
+<li><p><code>type::Symbol</code>: Type of FRF to compute</p>
+<ul>
+<li><p><code>:dis</code>: Displacement</p>
+</li>
+<li><p><code>:vel</code>: Velocity</p>
+</li>
+<li><p><code>:acc</code>: Acceleration</p>
+</li>
+</ul>
+</li>
+<li><p><code>progress</code>: Show progress bar</p>
+</li>
+</ul>
+<p><strong>Output</strong> <code>sol</code>: Solution of the problem     * <code>u</code>: Response spectrum matrix</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-2" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">2.2.2</span> Example</h4>
+<div id="32" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ω, Φ <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> <span class="fu">modal_damping_matrix</span>(M, ω, ξ, Φ)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># State-space model</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(K, M, C)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency vector</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">0.01</span><span class="op">:</span><span class="fl">0.001</span><span class="op">:</span><span class="fl">1</span>.</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Force matrix</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>, <span class="fu">length</span>(freq))</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>F[<span class="fl">1</span>, <span class="op">:</span>] <span class="op">.=</span> <span class="fl">10</span>.</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 1 - Direct</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>prob_freq <span class="op">=</span> <span class="fu">StateSpaceFreqProblem</span>(css, F, freq)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>y_freq <span class="op">=</span> <span class="fu">solve</span>(prob_freq).u</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>prob_freq_modal <span class="op">=</span> <span class="fu">StateSpaceModalFreqProblem</span>(css, F, freq)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>y_freq_modal <span class="op">=</span> <span class="fu">solve</span>(prob_freq_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="34" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="state_space_solvers_files/figure-html/cell-18-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

@@ -20,10 +20,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -69,7 +103,39 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -178,8 +244,23 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#frequency-response-function" id="toc-frequency-response-function" class="nav-link active" data-scroll-target="#frequency-response-function"><span class="header-section-number">1</span> Frequency response function</a>
+  <ul class="collapse">
+  <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api"><span class="header-section-number">1.1</span> API</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">1.2</span> Example</a></li>
+  </ul></li>
+  <li><a href="#response-spectrum" id="toc-response-spectrum" class="nav-link" data-scroll-target="#response-spectrum"><span class="header-section-number">2</span> Response spectrum</a>
+  <ul class="collapse">
+  <li><a href="#api-1" id="toc-api-1" class="nav-link" data-scroll-target="#api-1"><span class="header-section-number">2.1</span> API</a></li>
+  <li><a href="#example-1" id="toc-example-1" class="nav-link" data-scroll-target="#example-1"><span class="header-section-number">2.2</span> Example</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -203,10 +284,302 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>From a general perspective, the frequency-domain solvers are used to analyze the dynamic response of structures subjected to harmonic loads. In the frequency domain, Mdof systems are described at a given angular frequency <span class="math inline">\(\omega\)</span> by the following equation: <span class="math display">\[
+\left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right) \mathbf{x}(\omega) = \mathbf{F}(\omega).
+\]</span></p>
+<section id="frequency-response-function" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="frequency-response-function"><span class="header-section-number">1</span> Frequency response function</h2>
+<p>The Frequency response function (FRF) is computed by assuming a unit harmonic load at the <span class="math inline">\(i\)</span>-th degree of freedom (DOF) and zero loads at all other DOFs, meaning that <span class="math inline">\(\mathbf{F}(\omega) = \mathbf{I}\)</span>.</p>
+<p>Consequently, broadly speaking, the FRF is defined by: <span class="math display">\[
+\mathbf{H}(\omega) = \left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right)^{-1}.
+\]</span> This method is known as the direct method.</p>
+<p>Alternatively, the FRF can be computed using the modal method, which is based on the eigenvalue decomposition of the system matrices. The modal method is more efficient for large systems, as it reduces the problem to a smaller number of modes. In this case and assuming a modal damping ratio, the FRF is computed as: <span class="math display">\[
+\mathbf{H}(\omega) = \mathbf{\Phi}\left(\mathbf{\Omega}^2 - \omega^2\mathbf{I} + 2j\omega\mathbf{\Xi}\right)^{-1}\mathbf{\Phi}^T,
+\]</span> where <span class="math inline">\(\mathbf{\Phi}\)</span> is the mass-normalized mode shapes matrix and <span class="math inline">\(\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_n^2)\)</span> and <span class="math inline">\(\mathbf{\Xi} = \text{diag}(\xi_1\omega_1, \dots, \xi_n\omega_n)\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As explained in <a href="">State-Space solvers - Section 2.1</a>, the FRF can be computed for a given set of response dofs and a given set of excitation dofs by introducing the appropriate selection matrices <span class="math inline">\(\mathbf{S}_o\)</span> and <span class="math inline">\(\mathbf{S}_e\)</span>. In this case, the FRF is given by: <span class="math display">\[
+\mathbf{H}_{oe}(\omega) = \mathbf{S}_o\mathbf{H}(\omega)\mathbf{S}_e.
+\]</span></p>
+</div>
+</div>
+<section id="api" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">1.1</span> API</h3>
+<p><strong>Data types</strong></p>
+<div class="api">
+<p><strong>DirectFRFProblem</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>DirectFRFProblem(K, M, C, freq, So, Se)</code></pre>
+<p>Structure containing the data feeding the direct solver for calculating an FRF</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>K::AbstractMatrix</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M::AbstractMatrix</code>: Mass matrix</p>
+</li>
+<li><p><code>C::AbstractMatrix</code>: Damping matrix</p>
+</li>
+<li><p><code>freq::AbtractRange</code>: Frequencies of interest</p>
+</li>
+<li><p><code>So::AbstractMatrix</code>: Selection matrix for observation points</p>
+</li>
+<li><p><code>Se::AbstractMatrix</code>: Selection matrix for excitation points</p>
+</li>
+</ul>
 
 
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>ModalFRFProblem</strong></p>
+<hr>
+<div id="6" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>ModalFRFProblem(ωn, ξn, freq, ϕo, ϕe)</code></pre>
+<p>Structure containing the data feeding the modal solver for calculating an FRF</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>ωn::Vector{Real}</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ξn::Vector{Real}</code>: Modal damping ratios</p>
+</li>
+<li><p><code>freq::AbstractRange</code>: Frequencies of interest</p>
+</li>
+<li><p><code>ϕe::AbstractMatrix</code>: Mode shapes at excitation points</p>
+</li>
+<li><p><code>ϕo::AbstractMatrix</code>: Mode shapes at observation points</p>
+</li>
+</ul>
+<p><strong>Note</strong> The mode shapes must be mass-normalized</p>
 
-</main> <!-- /main -->
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::DirectFRF, type = :dis; ismat = false)
+solve(prob::ModalFRFProblem, type = :dis; ismat = false)</code></pre>
+<p>Computes the FRF matrix by direct or modal approach</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the problem data</p>
+</li>
+<li><p><code>type</code>: Type of FRF to compute (:dis, :vel, :acc)</p>
+</li>
+<li><p><code>ismat</code>: Return the FRF matrix as a 3D array (default = false)</p>
+</li>
+<li><p><code>progress</code>: Show progress bar (default = true)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>sol</code>: Solution of the problem</p>
+<ul>
+<li><p><code>u</code>: FRF matrix</p>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.2</span> Example</h3>
+<div id="10" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>ω, Φ <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> <span class="fu">modal_damping_matrix</span>(M, ω, ξ, Φ)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency vector</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">0.01</span><span class="op">:</span><span class="fl">0.001</span><span class="op">:</span><span class="fl">1</span>.</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">DirectFRFProblem</span>(K, M, C, freq)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>H_direct <span class="op">=</span> <span class="fu">solve</span>(prob_frf, ismat <span class="op">=</span> <span class="cn">true</span>).u</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>prob_frf_modal <span class="op">=</span> <span class="fu">ModalFRFProblem</span>(ω, ξ, freq, Φ, Φ)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>H_modal <span class="op">=</span> <span class="fu">solve</span>(prob_frf_modal, ismat <span class="op">=</span> <span class="cn">true</span>).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="12" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="frequency_solvers_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="response-spectrum" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="response-spectrum"><span class="header-section-number">2</span> Response spectrum</h2>
+<p>Similarly to the FRF, the response spectrum is a complex function that describes the steady-state response of a system to a sinusoidal input. At a given angular frequency <span class="math inline">\(\omega\)</span>, it is expressed as : <span class="math display">\[
+\mathbf{y}(\omega) = \left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right)^{-1} \mathbf{F}(\omega).
+\]</span> or equivalently from the modes of the system: <span class="math display">\[
+\mathbf{H}(\omega) = \mathbf{\Phi}\left(\mathbf{\Omega}^2 - \omega^2\mathbf{I} + 2j\omega\mathbf{\Omega}\right)^{-1}\mathbf{L},
+\]</span> where <span class="math inline">\(\mathbf{L} = \mathbf{\Phi}^\mathsf{T}\mathbf{F}(\omega)\)</span> is the modal participation factor matrix<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<section id="api-1" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.1</span> API</h3>
+<p><strong>Data types</strong></p>
+<div class="api">
+<p><strong>DirectFreqProblem</strong></p>
+<hr>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>DirectFreqProblem(K, M, C, F, freq, So)</code></pre>
+<p>Structure containing the data feeding the direct solver for calculating the modal frequencies</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>K::AbstractMatrix</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M::AbstractMatrix</code>: Mass matrix</p>
+</li>
+<li><p><code>C::AbstractMatrix</code>: Damping matrix</p>
+</li>
+<li><p><code>F::AbstractMatrix</code>: Force matrix</p>
+</li>
+<li><p><code>freq::AbstractRange</code>: Frequencies of interest</p>
+</li>
+<li><p><code>So::AbstractMatrix</code>: Selection matrix for observation points</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>ModalFreqProblem</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>ModalFreqProblem(ωn, ξn, Fn, freq, ϕo)</code></pre>
+<p>Structure containing the data feeding the modal solver for calculating the frequency response by modal approach</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>ωn::Vector{Real}</code>: Natural angular frequencies</p>
+</li>
+<li><p>ξn::Vector{Real}: Modal damping ratios</p>
+</li>
+<li><p><code>Ln::AbstractMatrix</code>: Modal participation factors</p>
+</li>
+<li><p><code>freq::AbstractRange</code>: Frequencies of interest</p>
+</li>
+<li><p><code>ϕo::Matrix{Real}</code>: Mode shapes at observation points</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>solve</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>solve(prob::DirectFreqProblem, type = :dis)
+solve(prob::ModalFreqProblem, type = :dis)</code></pre>
+<p>Computes the frequency response by direct or modal approach</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>prob</code>: Structure containing the problem data</p>
+</li>
+<li><p><code>type</code>: Type of response to compute (:dis, :vel, :acc)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>sol</code>: Solution of the problem</p>
+<ul>
+<li><p><code>u</code>: Response spectrum matrix</p>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2</span> Example</h3>
+<div id="20" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ω, Φ <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> <span class="fu">modal_damping_matrix</span>(M, ω, ξ, Φ)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency vector</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">0.01</span><span class="op">:</span><span class="fl">0.001</span><span class="op">:</span><span class="fl">1</span>.</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Force matrix</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">zeros</span>(<span class="fl">2</span>, <span class="fu">length</span>(freq))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>F[<span class="fl">1</span>, <span class="op">:</span>] <span class="op">.=</span> <span class="fl">10</span>.</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 1 - Direct</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>prob_freq <span class="op">=</span> <span class="fu">DirectFreqProblem</span>(K, M, C, F, freq)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>y_freq <span class="op">=</span> <span class="fu">solve</span>(prob_freq).u</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>prob_freq_modal <span class="op">=</span> <span class="fu">ModalFreqProblem</span>(ω, ξ, Φ<span class="ch">'*F, freq, Φ)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>y_freq_modal <span class="op">=</span> <span class="fu">solve</span>(prob_freq_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="frequency_solvers_files/figure-html/cell-12-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>The expression of the modal participation factor matrix is the same as the modal force matrix, because the mode shapes are assumed to be mass-normalized.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

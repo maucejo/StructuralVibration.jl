@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -1644,17 +1641,15 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>k_ss <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>c_ss <span class="op">=</span> [<span class="fl">0.67</span> <span class="op">-</span><span class="fl">0.11</span>; <span class="op">-</span><span class="fl">0.11</span> <span class="fl">0.39</span>]</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from system matrices</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>ωₙ, ϕₙ <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωₙ, <span class="fl">0.01</span>, ϕₙ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from system matrices</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ωₙ, ϕₙ <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωₙ, <span class="fl">0.01</span>, ϕₙ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="discrete-time-models" class="level3" data-number="3.2">
