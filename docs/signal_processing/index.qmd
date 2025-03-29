@@ -10,6 +10,6 @@ execute:
   cache: true
 ---
 
-`StructuralVibration.jl` provides a set of functions complementing the `DSP.jl` to simulate the signal processing pipelines used in structural dynamics applications, such as modal analysis, system identification, and vibration data processing. They can used to simulate or to process experimental data, which can then be used to validate new algorithms (e.g. direct or inverse problems) and to benchmark with existing ones.
+`StructuralVibration.jl` provides a set of functions complementing the `DSP.jl` to simulate the signal processing pipelines used in structural dynamics applications, such as modal analysis, system identification, and vibration data processing. They can for instance be used to simulate or to process experimental data, which can then be used to validate new algorithms (direct or inverse methods) and to benchmark with existing ones.
 
 ## Window functions
