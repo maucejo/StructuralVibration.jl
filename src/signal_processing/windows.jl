@@ -1,3 +1,136 @@
+# Export windows from DSP.jl
+import DSP
+
+# Rectangular window
+"""
+    rect
+
+Rectangular window
+
+Exported from DSP.jl
+"""
+rect = DSP.rect
+
+# Hann window
+"""
+    hann
+
+Hann(ing) window
+
+Exported from DSP.jl
+"""
+hann = DSP.hanning
+
+# Hamming window
+"""
+    hamming
+
+Hamming window
+
+Exported from DSP.jl
+"""
+hamming = DSP.hamming
+
+# Tukey window
+"""
+    tukey
+
+Tukey window
+
+Exported from DSP.jl
+"""
+tukey = DSP.tukey
+
+# Cosine window
+"""
+    cosine
+
+Cosine window
+
+Exported from DSP.jl
+"""
+cosine = DSP.cosine
+
+# Lanczos window
+"""
+    lanczos
+
+Lanczos window
+
+Exported from DSP.jl
+"""
+lanczos = DSP.lanczos
+
+# Triangle window
+"""
+    triang
+
+Triangle window
+
+Exported from DSP.jl
+"""
+triang = DSP.triang
+
+# Bartlett window
+"""
+    bartlett
+
+Bartlett window
+
+Exported from DSP.jl
+"""
+bartlett = DSP.bartlett
+
+# Gaussian window
+"""
+    gaussian
+
+Gaussian window
+
+Exported from DSP.jl
+"""
+gaussian = DSP.gaussian
+
+# Bartlett-Hann window
+"""
+    bartlett_hann
+
+Bartlett-Hann window
+
+Exported from DSP.jl
+"""
+bartlett_hann = DSP.bartlett_hann
+
+# Blackman window
+"""
+    blackman
+
+Blackman window
+
+Exported from DSP.jl
+"""
+blackman = DSP.blackman
+
+# Kaiser window
+"""
+    kaiser
+
+Kaiser window
+
+Exported from DSP.jl
+"""
+kaiser = DSP.kaiser
+
+# DPSS window
+"""
+    dpss
+
+DPSS window
+
+Exported from DSP.jl
+"""
+
+
 """
     exponential(N, exponential_end = 0.01)
 

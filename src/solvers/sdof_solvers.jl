@@ -30,7 +30,7 @@ Structure containing the data of a time problem for a sdof system subject to a h
 * `u0::AbstractVector`: Initial conditions
     * `x0`: Initial displacement [m]
     * `v0`: Initial velocity [m/s]
-* `t::AbstractVector`: Time points at which to evaluate the response
+* `t::AbstractRange`: Time points at which to evaluate the response
 * `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
@@ -69,7 +69,7 @@ Structure containing the data of a time problem for a sdof system subject to an 
 * `u0::AbstractVector`: Initial conditions
     * `x0`: Initial displacement [m]
     * `v0`: Initial velocity [m/s]
-* `t::AbstractVector`: Time points at which to evaluate the response
+* `t::AbstractRange`: Time points at which to evaluate the response
 * `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
@@ -112,9 +112,9 @@ Structure containing the data for computing the FRF a sdof system
     * `:force`: External force (default)
     * `:base`: Base motion
 * `type_resp::Symbol`: Type of response
-    * `:dis`: Displacement spectrum or Admittance (default)
-    * `:vel`: Velocity spectrum or Mobility
-    * `:acc`: Acceleration spectrum or Accelerance
+    * `:dis`: Admittance (default)
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 """
 @show_data struct SdofFRFProblem{Tf <: AbstractRange}
     sdof::Sdof
@@ -132,24 +132,24 @@ Structure containing the data for computing the frequency response of a sdof sys
 
 **Fields**
 * `sdof::Sdof`: Sdof structure
-* `freq::AbstractRange`: Vector of frequencies [Hz]
 * `F::AbstractVector`: Vector of the force excitation [N] or base motion [m]
+* `freq::AbstractRange`: Vector of frequencies [Hz]
 * `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
 * `type_resp::Symbol`: Type of response
-    * `:dis`: Displacement spectrum or Admittance (default)
-    * `:vel`: Velocity spectrum or Mobility
-    * `:acc`: Acceleration spectrum or Accelerance
+    * `:dis`: Displacement spectrum(default)
+    * `:vel`: Velocity spectrum
+    * `:acc`: Acceleration spectrum
 """
-@show_data struct SdofFrequencyProblem{Tf <: AbstractRange, TF <: AbstractVector}
+@show_data struct SdofFrequencyProblem{TF <: AbstractVector, Tf <: AbstractRange}
     sdof::Sdof
-    freq::Tf
     F::TF
+    freq::Tf
     type_exc::Symbol
     type_resp::Symbol
 
-    SdofFrequencyProblem(sdof, freq::Tf, F::TF; type_exc = :force, type_resp = :dis) where {Tf, TF} = new{Tf, TF}(sdof, freq, F, type_exc, type_resp)
+    SdofFrequencyProblem(sdof, F::TF, freq::Tf; type_exc = :force, type_resp = :dis) where {TF, Tf} = new{TF, Tf}(sdof, F, freq, type_exc, type_resp)
 end
 
 """
@@ -404,7 +404,7 @@ function solve(prob::SdofForcedTimeProblem; method = :filt)
     forced_response_sdof!(cache_p, F, m, ω0, ξ, t, type_exc, method)
 
     x = cache_h.xh .+ cache_p.xp
-    v = cache_h.vh .+ cache_p.ap
+    v = cache_h.vh .+ cache_p.vp
     a = cache_h.ah .+ cache_p.ap
 
     return SdofTimeSolution(x, v, a)
@@ -417,13 +417,13 @@ Compute the forced response of a single degree of freedom (Sdof) system due to a
 
 **Inputs**
 * `cache`: Cache for the solution
-    * `xp::AbstractVector`: Displacement
-    * `vp::AbstractVector`: Velocity
-    * `ap::AbstractVector`: Acceleration
-    * `h::AbstractVector`: Impulse response
-    * `num::AbstractVector`: Numerator of the transfer function in z-domain
-    * `denom::AbstractVector`: Denominator of the transfer function in z-domain
-* `F::AbstractVector`: Amplitude of the force excitation [N] or base motion [m]
+    * `xp`: Displacement
+    * `vp`: Velocity
+    * `ap`: Acceleration
+    * `h`: Impulse response
+    * `num`: Numerator of the transfer function in z-domain
+    * `denom`: Denominator of the transfer function in z-domain
+* `F`: Amplitude of the force excitation [N] or base motion [m]
 * `m`: Mass [kg]
 * `ω0`: Natural angular frequency [rad/s]
 * `ξ`: Damping ratio
@@ -543,6 +543,7 @@ Compute the FRF of a single degree of freedom (Sdof) system
 
 **Output**
 * `sol`: Solution of the FRF problem
+    * `u`: FRF of the system
 """
 function solve(prob::SdofFRFProblem)
     (; sdof, freq, type_exc, type_resp) = prob
@@ -573,10 +574,11 @@ Compute the frequency response function of a single degree of freedom (Sdof) sys
 * `prob`: Structure containing the parameters of the Sdof frequency problem
 
 **Output**
-* `sol`: Solution of the frequency problem
+* `sol`: Solution of the problem
+    * `u`: Response spectrum of the system
 """
 function solve(prob::SdofFrequencyProblem)
-    (; sdof, freq, F, type_exc, type_resp) = prob
+    (; sdof, F, freq, type_exc, type_resp) = prob
     (; m, ω0, ξ) = sdof
     ω = 2π*freq
 
@@ -726,7 +728,7 @@ end
 
 function srs_recursive_int(f0, ξ, acc, t)
     # Time step
-    h = step(t)
+    h = t[2] - t[1]
     nt = length(t)
 
     if ξ ≥ 1.
@@ -785,7 +787,7 @@ end
 
 function srs_recursive_filt(f0, ξ, acc, t)
     # Time step
-    h = step(t)
+    h = t[2] - t[1]
 
     if ξ ≥ 1.
         error("Damping ratio must be less than 1")
@@ -817,7 +819,7 @@ end
 
 function srs_smallwood(f0, ξ, acc, t)
     # Time step
-    h = step(t)
+    h = t[2] - t[1]
 
     if ξ ≥ 1.
         error("Damping ratio must be less than 1")

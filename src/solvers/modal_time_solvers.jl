@@ -56,7 +56,7 @@ Structure containing data for the modal time solver for computing the forced res
     * `u0[1]`: Initial displacement (or modal displacement)
     * `u0[2]`: Initial velocity (or modal velocity)
 * `t::AbstractRange`: Time points at which to evaluate the response
-* `F::Real`: External force matrix (or modal force matrix)
+* `F::Real`: External force matrix (or modal participation factors)
 * `freq::Real`: Excitation frequency
 * `n::Int`: Number of modes to retain in the modal basis
 * `ismodal::Bool`: Flag to indicate if the problem contains modal data
@@ -69,7 +69,7 @@ Structure containing data for the modal time solver for computing the forced res
     * `u0[1]`: Initial displacement (or modal displacement)
     * `u0[2]`: Initial velocity (or modal velocity)
 * `t`: Time points at which to evaluate the response
-* `F`: Amplitude vector (or modal force amplitude vector)
+* `F`: Amplitude vector (or modal participation vector)
 * `ω`: Excitation angular frequency
 * `n`: Number of modes to retain in the modal basis
 * `ismodal`: Flag to indicate if the problem contains modal data
@@ -109,7 +109,7 @@ Structure containing data for modal time solver for computing the forced respons
     * If `ismodal = false`: Mass matrix
     * If `ismodal = true`: Mass-normalized mode shapes
 * `ξn`: Damping ratios
-* `F::Matrix{Real}`: External force matrix (or modal force matrix)
+* `F::Matrix{Real}`: External force matrix (or modal participation factors)
 * `u0::Tuple`: Initial conditions
     * `u0[1]`: Initial displacement (or modal displacement)
     * `u0[2]`: Initial velocity (or modal velocity)
@@ -144,9 +144,9 @@ end
 Structure containing problem solutions
 
 **Fields**
-* `u::Matrix{Real}`: Displacement matrix or vector
-* `du::Matrix{Real}`: Velocity matrix or vector
-* `ddu::Matrix{Real}`: Acceleration matrix or vector
+* `u::Matrix{Real}`: Displacement matrix
+* `du::Matrix{Real}`: Velocity matrix
+* `ddu::Matrix{Real}`: Acceleration matrix
 """
 @show_data struct ModalTimeSolution{T <: Real}
     u::Matrix{T}
@@ -172,8 +172,8 @@ function solve(prob::FreeModalTimeProblem)
 
     # Modal analysis
     if !ismodal
-        ω, Φ = eigenmode(K, M)
-        ωn = ω[1:n]
+        ω0, Φ = eigenmode(K, M)
+        ωn = ω0[1:n]
         Φn = Φ[:, 1:n]
         # Note: The mode shapes are mass-normalized, so Mn = I
 
@@ -241,8 +241,8 @@ function solve(prob::HarmonicModalTimeProblem)
 
     if !ismodal
         # Modal analysis
-        ω, Φ = eigenmode(K, M)
-        ωn = ω[1:n]
+        ω0, Φ = eigenmode(K, M)
+        ωn = ω0[1:n]
         Φn = Φ[:, 1:n]
         # Note: The mode shapes are mass-normalized, so Mn = I
 
@@ -317,8 +317,8 @@ function solve(prob::ForcedModalTimeProblem; method = :filt)
 
     if !ismodal
         # Modal analysis
-        ω, Φ = eigenmode(K, M)
-        ωn = ω[1:n]
+        ω0, Φ = eigenmode(K, M)
+        ωn = ω0[1:n]
         Φn = Φ[:, 1:n]
         # Note: The mode shapes are mass-normalized, so Mn = I
 
@@ -407,8 +407,8 @@ Compute the impulse response of a multi-degrees of freedom (Mdof) system using t
 """
 function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false, ismat = false)
     if !ismodal
-        ω, Φ = eigenmode(K, M)
-        fn = ω[1:n]/2π
+        ω0, Φ = eigenmode(K, M)
+        fn = ω0[1:n]/2π
         Φn = Φ[:, 1:n]
         ndofs = size(K, 1)
     else

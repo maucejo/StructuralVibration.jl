@@ -79,6 +79,7 @@ fig_harmo
 
 ## Arbibtrary excitation
 sdof = Sdof(m, f0, ξ)
+
 # Haversine excitation signal
 F0 = 10.
 tstart = 0.5
@@ -120,7 +121,7 @@ sdof = Sdof(m, f0, ξ)
 h = impulse_response(sdof, t)
 
 fig_h = Figure()
-ax_h = Axis(fig_h[1, 1], xlabel="Time (s)", ylabel="Impulse response", title = "Impulse response")
+ax_h = Axis(fig_h[1, 1], xlabel = "Time (s)", ylabel = "Impulse response", title = "Impulse response")
 lines!(ax_h, t, h)
 xlims!(ax_h, minimum(t), maximum(t))
 
@@ -166,7 +167,7 @@ prob = SdofFRFProblem(sdof, f)
 H = solve(prob).u
 
 fig_frf = Figure()
-ax_frf = Axis(fig_frf[1, 1], xlabel="Frequency (Hz)", ylabel = "FRF (m/N)", title = "Frequency Response Function")
+ax_frf = Axis(fig_frf[1, 1], xlabel = "Frequency (Hz)", ylabel = "FRF (m/N)", title = "Frequency Response Function")
 lines!(ax_frf, f, abs.(H))
 xlims!(ax_frf, minimum(f), maximum(f))
 
@@ -185,12 +186,12 @@ f = 1.:0.1:30.
 
 # Instantiation of the problem - Force excitation
 F = fill(10., length(f))
-prob = SdofFrequencyProblem(sdof, f, F)
+prob = SdofFrequencyProblem(sdof, F, f)
 
 # Solve the problem
 y = solve(prob).u
 
 fig_y = Figure()
-ax_y = Axis(fig_y[1, 1], xlabel="Frequency (Hz)", ylabel = "Displacement (m)", title = "Response spectrum")
+ax_y = Axis(fig_y[1, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (m)", title = "Response spectrum")
 lines!(ax_y, f, abs.(y))
 xlims!(ax_y, minimum(f), maximum(f))

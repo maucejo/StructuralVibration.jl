@@ -5,12 +5,12 @@ Compute the gradient of a function `f` at points `t`.
 
 # Inputs
 - `f::Vector{Real}`: Function values
-- `t`: Points at which to evaluate the gradient
+- `t::AbstractRange`: Points at which to evaluate the gradient
 
 # Output
 - `df`: Gradient of the vector `f` at points `t`
 """
-function gradient(f::Vector{T}, t) where {T <: Real}
+function gradient(f::Vector{T}, t::AbstractRange) where {T <: Real}
 
     itp = cubic_spline_interpolation(t, f)
 
@@ -24,13 +24,13 @@ Compute the gradient of a function `f` at points `t`.
 
 # Inputs
 - `f::Matrix{Real}`: Function values
-- `t`: Points at which to evaluate the gradient
+- `t::AbstractRange`: Points at which to evaluate the gradient
 
 # Output
 
 - `df`: Gradient of the each row of the matrix `f` at points `t`
 """
-function gradient(f::Matrix{T}, t) where {T <: Real}
+function gradient(f::Matrix{T}, t::AbstractRange) where {T <: Real}
     nx, nt = size(f)
     df = zeros(nx, nt)
     for i in 1:nx
@@ -39,7 +39,6 @@ function gradient(f::Matrix{T}, t) where {T <: Real}
 
     return df
 end
-
 
 """
     curvature(x, y, p) where {T <: Real}

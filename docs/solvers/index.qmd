@@ -602,7 +602,7 @@ f = 1.:0.1:30.
 
 # Instantiation of the problem - Force excitation
 F = fill(10., length(f))
-prob = SdofFrequencyProblem(sdof, f, F)
+prob = SdofFrequencyProblem(sdof, F, f)
 
 # Solve the problem
 y = solve(prob).u

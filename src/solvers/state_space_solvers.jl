@@ -3,7 +3,7 @@
 
 Structure containing data for the state-space model
 
-# Constructor
+**Constructor**
 * `css`: Continuous-time state space model
 * `u0`: Initial conditions
 * `F`: External force matrix
@@ -23,7 +23,7 @@ Structure containing data for the state-space model
 
     function StateSpaceTimeProblem(css, F::Tf, u0::Tu, t::AbstractRange) where {Tf, Tu}
 
-        h = step(t)
+        h = t[2] - t[1]
         return new{Tf, Tu, typeof(h)}(css, F, u0, h)
     end
 end
@@ -57,7 +57,7 @@ Structure containing the data feeding the direct solver for calculating an FRF
 
 # note: It is assumed that the output equation is of the form y = So*x
 """
-@show_data struct StateSpaceFRFProblem{Tf <: AbstractVector, Ts <: AbstractMatrix}
+@show_data struct StateSpaceFRFProblem{Tf <: AbstractRange, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
     freq::Tf
     So::Ts
@@ -77,10 +77,8 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * `So`: Selection matrix for observation points
 * `Se`: Selection matrix for excitation points
 * `n`: Number of modes to keep in the modal basis
-
-# note: It is assumed that the output equation is of the form y = So*x
 """
-@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractVector, Ts <: AbstractMatrix}
+@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractRange, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
     freq::Tf
     So::Ts
@@ -266,17 +264,22 @@ end
 
 """
     solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
+    solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
 
-Computes the FRF matrix by direct method
+Computes the FRF matrix by direct or modal method
 
 **Inputs**
 * `prob`: Structure containing the problem data
-* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `type`: Type of FRF to compute
+    * `:dis`: Admittance
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
 * `progress`: Show progress bar (default = true)
 
 **Output**
 * `sol`: FRFSolution structure
+    * `u`: FRF matrix
 """
 function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
 
@@ -321,23 +324,28 @@ function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress 
 end
 
 """
-    solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
+    solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
+    solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
 
-Computes the FRF matrix by modal method
+Computes the FRF matrix by direct or modal method
 
 **Inputs**
-* `m`: Structure containing the problem data
-* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `prob`: Structure containing the problem data
+* `type`: Type of FRF to compute
+    * `:dis`: Admittance
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
-* `progress`: Show progress bar
+* `progress`: Show progress bar (default = true)
 
 **Output**
-* `sol`: StateSpaceFRFSolution
+* `sol`: FRFSolution structure
+    * `u`: FRF matrix
 """
-function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
 
     # Initialisation
-    (; css, freq, So, Se, n) = m
+    (; css, freq, So, Se, n) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
     Ne = size(Se, 1)
@@ -349,6 +357,8 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
     λ, Ψ = eigenmode(Ac, n)
     B = Ψ\Bc
 
+    m = n == 0 ? length(λ) : 2n
+
     if type == :dis
         Ψo = So*Ψ[1:ns, :]
     elseif type == :vel
@@ -358,10 +368,9 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
         D = So*Bc[ns+1:end, :]*Se'
     end
     Be = B*Se'
-    n = length(λ)
 
     FRF = [similar([], Complex{eltype(Ac)}, no, Ne) for _ in 1:nf]
-    M = Diagonal(similar([], Complex{eltype(Ac)}, n))
+    M = Diagonal(similar([], Complex{eltype(Ac)}, m))
     indm = diagind(M)
 
     ωf = 2π*freq
@@ -386,12 +395,13 @@ function solve(m::StateSpaceModalFRFProblem, type = :dis; ismat = false, progres
 end
 
 """
-    solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
+    solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
+    solve(prob::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)
 
-Computes the frequency response by direct method
+Computes the frequency response by direct or modal method
 
 **Inputs**
-* `m`: Structure containing the problem data
+* `prob`: Structure containing the problem data
 * `type::Symbol`: Type of FRF to compute
     * `:dis`: Displacement
     * `:vel`: Velocity
@@ -399,11 +409,12 @@ Computes the frequency response by direct method
 * `progress`: Show progress bar
 
 **Output**
-`sol`: StateSpaceFreqSolution
+`sol`: Solution of the problem
+    * `u`: Response spectrum matrix
 """
-function solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
+function solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
     # Initialisation
-    (; css, freq, F, So) = m
+    (; css, freq, F, So) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
     nstate, Nu = size(Bc)
@@ -438,13 +449,13 @@ function solve(m::StateSpaceFreqProblem, type = :dis; progress = true)
 end
 
 """
-    solve(m::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)
+    solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
+    solve(prob::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)
 
-Computes the frequency response by modal method
+Computes the frequency response by direct or modal method
 
 **Inputs**
-* `m`: Structure containing the problem data
-* `n`: Number of eigenodes to keep in the modal basis
+* `prob`: Structure containing the problem data
 * `type::Symbol`: Type of FRF to compute
     * `:dis`: Displacement
     * `:vel`: Velocity
@@ -452,11 +463,12 @@ Computes the frequency response by modal method
 * `progress`: Show progress bar
 
 **Output**
-`sol`: StateSpaceFreqSolution
+`sol`: Solution of the problem
+    * `u`: Response spectrum matrix
 """
-function solve(m::StateSpaceModalFreqProblem, type = :dis; progress = true)
+function solve(prob::StateSpaceModalFreqProblem, type = :dis; progress = true)
     # Initialisation
-    (; css, freq, F, So, n) = m
+    (; css, freq, F, So, n) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
     nstate = size(Ac, 1)

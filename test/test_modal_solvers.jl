@@ -4,7 +4,6 @@ using StructuralVibration, LinearAlgebra
 ## Matrices
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
-# c_ss = [0.67 -0.11; -0.11 0.39]
 ξ = 0.05
 t = 0.:1e-2:30.
 
@@ -32,8 +31,6 @@ lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - prob_modal", linestyle = :da
 axislegend(ax_2, position = :rb,
            backgroundcolor = (:white, 0.5))
 xlims!(ax_2, minimum(t), maximum(t))
-
-fig
 
 ## Harmonic response
 F = [1., 2.]
@@ -63,8 +60,6 @@ axislegend(ax_harmo_2, position = :rb,
            backgroundcolor = (:white, 0.5))
 xlims!(ax_harmo_2, minimum(t), maximum(t))
 
-fig_harmo
-
 ## Forced response
 u0 = (zeros(2), zeros(2))
 
@@ -86,7 +81,7 @@ x_forced = solve(prob_forced).u
 x_forced_modal = solve(prob_forced_modal).u
 
 fig_forced = Figure()
-ax_forced_1 = Axis(fig_forced[1, 1], ylabel = "Displacement (m)", title = "Free response")
+ax_forced_1 = Axis(fig_forced[1, 1], ylabel = "Displacement (m)", title = "Forced response")
 ax_forced_2 = Axis(fig_forced[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
 lines!(ax_forced_1, t, x_forced[1, :], label = "x₁ - prob")
 lines!(ax_forced_1, t, x_forced_modal[1, :], label = "x₁ - prob_modal", linestyle = :dash)

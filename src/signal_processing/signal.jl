@@ -3,32 +3,32 @@
 
 Structure to store the time and frequency parameters for the FFT analysis
 
-# Constructor parameters
+**Constructor**
 * `fs::Real`: Sampling rate of the signal
 * `bs::Real`: Block size of the signal
 * `pow2::Bool`: Flag for finding the next power of 2
 
-# Fields
-* `t::Vector{Real}`: Time vector
-* `dt`: Time step
-* `tspan::Tuple{Real, Real}`: Time span
-* `freq::Vector{Real}`: Frequency vector
-* `df::Real`: Frequency resolution
-* `freq_span::Tuple{Real, Real}`: Frequency span
-* `fs::Real`: Sampling rate
-* `bs::Real`: Block size
+**Fields**
+* `t::AbstractRange`: Time vector
+* `dt::Float64`: Time step
+* `tspan::Tuple{Float64, Float64}`: Time span
+* `freq::AbstractRange`: Frequency vector
+* `df::Float64`: Frequency resolution
+* `freq_span::Tuple{Float64, Float64}`: Frequency span
+* `fs::Int`: Sampling rate
+* `bs::Int`: Block size
 """
-@show_data struct FFTParameters{Tf <: Real, Tb <: Real}
-    t::Vector{Tf}
-    dt::Tf
-    tspan::Tuple{Tf, Tf}
-    freq::Vector{Tf}
-    df::Tf
-    freq_span::Tuple{Tf, Tf}
-    fs::Tf
-    bs::Tb
+@show_data struct FFTParameters{Tt <: AbstractRange, Tf <: AbstractRange, T <: Real}
+    t::Tt
+    dt::T
+    tspan::Tuple{T, T}
+    freq::Tf
+    df::T
+    freq_span::Tuple{T, T}
+    fs::Int
+    bs::Int
 
-    function FFTParameters(fs::Tf, bs::Tb; pow2 = true) where {Tf, Tb}
+    function FFTParameters(fs::Int, bs::Int; pow2 = true)
         # Sample rate & block size
         if pow2
             fs = nextpow(2, fs)
@@ -49,22 +49,22 @@ Structure to store the time and frequency parameters for the FFT analysis
         freq = 0.:df:(fmax - df)
         freq_span = (0., fmax)
 
-        return new{Tf, Tb}(t, dt, tspan, freq, df, freq_span, fs, bs)
+        return new{typeof(t), typeof(freq), typeof(dt)}(t, dt, tspan, freq, df, freq_span, fs, bs)
     end
 end
 
 """
-    tfestimate(input_signal, output_signal, fft_params, window_input = hanning(fft_params.bs), window_output = window_input; overlap = 0., type = :h1) where {T <: Real}
+    tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs), window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
 
 Estimation of the one-sided transfer function between two signals
 
-# Inputs
+**Inputs**
 * `input_signal::Vector{Real}`: Input signal
 * `output_signal::Vector{Real}`: Output signal
-* `fft_params::FFTParameters`: FFT parameters
+* `bs::Int` Block size
 * `window_input`: Window function for the input signal
 * `window_output`: Window function for the output signal
-* `fs::Real`: Sampling rate of the signal
+* `fs::Int`: Sampling rate
 * `overlap::Real`: Overlap ratio between the segments
 * `type::Symbol`: Type of transfer function to estimate
     * :h1 (default)
@@ -72,40 +72,41 @@ Estimation of the one-sided transfer function between two signals
     * :h3 - h3 = (h1 + h2)/2
     * :hv - hv = sqrt(h1*h2)
 
-# Outputs
-* `H::Vector{Complex}`: Transfer function
-* `coh::Vector{Real}`: Coherence
+**Outputs**
+* `H`: Transfer function
+* `freq`: Frequency range
+* `coh`: Coherence
 
-# Available window functions
+**Available window functions**
 
-## From DSP.jl
-* rect
-* hanning
-* hamming
-* tukey
-* cosine
-* lanczos
-* triang
-* bartlett
-* gaussian
-* bartlett_hann
-* blackman
-* kaiser
-* dpss
+**From DSP.jl**
+* `rect`
+* `hann` (default)
+* `hamming`
+* `tukey`
+* `cosine`
+* `lanczos`
+* `triang`
+* `bartlett`
+* `gaussian`
+* `bartlett_hann`
+* `blackman`
+* `kaiser`
+* `dpss`
 
-## From StructuralVibration.jl
-* exponential
-* force
-* flattop
-* nutall
-* blackman_nutall
-* parzen
-* planck
+**From StructuralVibration.jl**
+* `exponential`
+* `force`
+* `flattop`
+* `nutall`
+* `blackman_nutall`
+* `parzen`
+* `planck`
 """
-function tfestimation(input_signal::Vector{T}, output_signal::Vector{T}, bs, window_input = hanning(bs), window_output = window_input; fs = 1., overlap = 0., type = :h1) where {T <: Real}
+function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, window_input = hanning(bs), window_output = window_input; fs::Int = 1, overlap = 0., type = :h1) where {T <: Real}
 
     # FFT Parameters
-    (; freq) = FFTParameters(fs, bs, pow2 = false)
+    (; freq, fs, bs) = FFTParameters(fs, bs, pow2 = false)
 
     # Initialization
 
@@ -178,52 +179,56 @@ function tfestimation(input_signal::Vector{T}, output_signal::Vector{T}, bs, win
 end
 
 """
-    welch(input_signal, fft_params, window = hanning(fft_params.bs); overlap = 0.5, scale = :psd) where {T <: Real}
+    welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5, scaling = :psd)
 
 Estimation of the one-sided Power Spectral Density (PSD) of a signal using the Welch method
 
-# Inputs
+**Inputs**
 * `input_signal::Vector{Real}`: Input signal
-* `fft_params::FFTParameters`: FFT parameters
+* `bs::Int`: Block size
 * `window`: Window function
-* `overlap::Real`: Overlap ratio between the segments
-* `scaling::Symbol`: Scale of the PSD - see https://community.sw.siemens.com/s/article/the-autopower-function-demystified for more information
+* `fs::Int`: Sampling rate
+* `overlap`: Overlap ratio between the segments
+* `scaling`: Scale of the PSD - see https://community.sw.siemens.com/s/article/the-autopower-function-demystified for more information
     * :psd (default) - Autopower Power Spectral Density
     * :esd - Autopower Energy Spectral Density
     * :spectrum - Autopower spectrum
     * :linear - Autopower linear
 
-# Output
+**Outputs**
 * `pxx`: Autopower
-* `freq`: Frequency vector
+* `freq`: Frequency range
 
-# Available window functions
+**Available window functions**
 
-## From DSP.jl
-* rect
-* hanning
-* hamming
-* tukey
-* cosine
-* lanczos
-* triang
-* bartlett
-* gaussian
-* bartlett_hann
-* blackman
-* kaiser
-* dpss
+**From DSP.jl**
+* `rect`
+* `hann` (default)
+* `hamming`
+* `tukey`
+* `cosine`
+* `lanczos`
+* `triang`
+* `bartlett`
+* `gaussian`
+* `bartlett_hann`
+* `blackman`
+* `kaiser`
+* `dpss`
 
-## From StructuralVibration.jl
-* exponential
-* force
-* flattop
-* nutall
-* blackman_nutall
-* parzen
-* planck
+**From StructuralVibration.jl**
+* `exponential`
+* `force`
+* `flattop`
+* `nutall`
+* `blackman_nutall`
+* `parzen`
+* `planck`
+
+**Note**
+The welch function is already implemented in `DSP.jl` under the name `welch_pgram`. The function `welch` is implemented here for pedagogical purposes.
 """
-function welch(input_signal::Vector{T}, bs, window = hanning(bs); fs = 1, overlap = 0.5, scaling = :psd) where {T <: Real}
+function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::Int = 1, overlap = 0.5, scaling = :psd) where {T <: Real}
     # FFT Parameters
     (; tspan, freq) = FFTParameters(fs, bs, pow2 = false)
 
@@ -278,47 +283,48 @@ function welch(input_signal::Vector{T}, bs, window = hanning(bs); fs = 1, overla
 end
 
 """
-    spectrum(input_signal, fft_params::FFTParameters, window = hanning(fft_params.bs); overlap = 0.5)
+    spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5)
 
 Estimation of the spectrum of a signal
 
-# Inputs
+**Inputs**
 * `input_signal::Vector{Real}`: Input signal
-* `fft_params::FFTParameters`: FFT parameters
+* `bs::Int`: Block size
 * `window`: Window function
-* `overlap::Real`: Overlap ratio between the segments
+* `fs::Int`: Sampling rate
+* `overlap`: Overlap ratio between the segments
 
-# Output
-* `y`: Spectrum
-* `freq`: Frequency vector
+**Outputs**
+* `y`: Signal spectrum
+* `freq`: Frequency range
 
-# Available window functions
+**Available window functions**
 
-## From DSP.jl
-* rect
-* hanning
-* hamming
-* tukey
-* cosine
-* lanczos
-* triang
-* bartlett
-* gaussian
-* bartlett_hann
-* blackman
-* kaiser
-* dpss
+**From DSP.jl**
+* `rect`
+* `hann` (default)
+* `hamming`
+* `tukey`
+* `cosine`
+* `lanczos`
+* `triang`
+* `bartlett`
+* `gaussian`
+* `bartlett_hann`
+* `blackman`
+* `kaiser`
+* `dpss`
 
-## From StructuralVibration.jl
-* exponential
-* force
-* flattop
-* nutall
-* blackman_nutall
-* parzen
-* planck
+**From StructuralVibration.jl**
+* `exponential`
+* `force`
+* `flattop`
+* `nutall`
+* `blackman_nutall`
+* `parzen`
+* `planck`
 """
-function spectrum(input_signal::Vector{T}, bs, window = hanning(bs); fs = 1., overlap = 0.5) where {T <: Real}
+function spectrum(input_signal::Vector{T}, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5) where {T <: Real}
 
     # FFT Parameters
     (; freq) = FFTParameters(fs, bs, pow2 = false)
@@ -357,17 +363,17 @@ end
 
 Segmentation of a signal into blocks
 
-# Inputs
-* `signal::Vector{Real}`: Signal to be segmented
-* `bs::Real`: Size of a block
+**Inputs**
+* `signal`: Signal to be segmented
+* `bs::Int`: Size of a block
 * `window`: Window function
-* `overlap::Real`: Overlap ratio between the segments
+* `overlap`: Overlap ratio between the segments
 
-# Output
-* `segments::Vector{Real}`: Segmented signal
-* `n_segments::Int`: number of segments
+**Outputs**
+* `segments`: Segmented signal
+* `n_segments`: number of segments
 """
-function signal_segmentation(signal, bs, window, overlap)
+function signal_segmentation(signal, bs::Int, window, overlap)
     # Signal length
     n = length(signal)
 

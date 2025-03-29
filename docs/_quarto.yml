@@ -46,7 +46,8 @@ website:
     - title: "Signal processing"
       contents:
       - signal_processing/index.qmd
-
+      - signal_processing/noise.qmd
+      - signal_processing/modal_parameters_extraction.qmd
 
     - title: "Visualization"
       contents:

@@ -2,7 +2,7 @@ module StructuralVibration
 
 using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
 
-using DSP: conv, filt, remez, filtfilt
+using DSP: conv, filt, remez, filtfilt, rms
 
 # Structs - Models
 export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
@@ -47,8 +47,8 @@ export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
 
 export freq_extraction, modeshape_extraction
 
-export tfestimation, welch, spectrum, exponential, force, flattop, nutall,
-       blackman_nutall, parzen, planck
+export tfestimate, welch, spectrum, rect, hann, hamming, tukey, cosine,
+       lanczos, triang, bartlett, gaussian, bartlett_hann, blackman, kaiser, dpss, exponential, force, flattop, nutall, blackman_nutall, parzen, planck
 
 export gradient, detrend
 

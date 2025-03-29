@@ -11,7 +11,7 @@ Structure containing data for the time solver
 * `u0::Tuple`: Initial conditions
     * `u0[1]`: Initial displacement (or modal displacement)
     * `u0[2]`: Initial velocity (or modal velocity)
-* `t::AbstractRange`: Time points at which to evaluate the response
+* `t::AbstractVector`: Time points at which to evaluate the response
 
 **Fields**
 * `K`: Stiffness matrix
@@ -32,7 +32,7 @@ Structure containing data for the time solver
     h::Th
 
     function DirectTimeProblem(K::Tk, M::Tm, C::Tc, F::Tf, u0::Tuple{Tu, Tu}, t::AbstractRange) where {Tk, Tm, Tc, Tf, Tu}
-        h = step(t)
+        h = t[2] - t[1]
         return new{Tk, Tm, Tc, Tf, Tu, typeof(h)}(K, M, C, F, u0, h)
     end
 end

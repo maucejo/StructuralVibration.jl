@@ -3,17 +3,17 @@
 
 Structure containing the data feeding the modal solver for calculating an FRF
 
-# Fields
-* ωn : Resonance frequencies
-* ξn : Modal damping ratios
-* freq : Frequencies of interest
-* ϕe : Mode shapes at excitation points
-* ϕo : Mode shapes at observation points
+**Fields**
+* `ωn::Vector{Real}`: Natural angular frequencies
+* `ξn::Vector{Real}`: Modal damping ratios
+* `freq::AbstractRange`: Frequencies of interest
+* `ϕe::AbstractMatrix`: Mode shapes at excitation points
+* `ϕo::AbstractMatrix`: Mode shapes at observation points
 
-# note
+**Note**
 The mode shapes must be mass-normalized
 """
-@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractVector, Tp <: AbstractMatrix}
+@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractRange, Tp <: AbstractMatrix}
     ωn::Vector{T}
     ξn::Vector{T}
     freq::Tf
@@ -36,15 +36,15 @@ end
 
 Structure containing the data feeding the direct solver for calculating an FRF
 
-# Fields
-* K: Stiffness matrix
-* M: Mass matrix
-* C: Damping matrix
-* freq: Frequencies of interest
-* So: Selection matrix for observation points
-* Se: Selection matrix for excitation points
+**Fields**
+* `K::AbstractMatrix`: Stiffness matrix
+* `M::AbstractMatrix`: Mass matrix
+* `C::AbstractMatrix`: Damping matrix
+* `freq::AbtractRange`: Frequencies of interest
+* `So::AbstractMatrix`: Selection matrix for observation points
+* `Se::AbstractMatrix`: Selection matrix for excitation points
 """
-@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractVector, Ts <: AbstractMatrix}
+@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
     K::Tk
     M::Tm
     C::Tc
@@ -58,30 +58,30 @@ end
 """
     ModalFreqProblem(ωn, ξn, Fn, freq, ϕo)
 
-Structure containing the data feeding the modal solver for calculating the frequency reponse by modal approach
+Structure containing the data feeding the modal solver for calculating the frequency response by modal approach
 
-# Fields
-* ωn: Resonance frequencies
-* ξn: Modal damping ratios
-* Fn: Modal force matrix
-* freq: Frequencies of interest
-* ϕo: Mode shapes at observation points
+**Fields**
+* `ωn::Vector{Real}`: Natural angular frequencies
+* ξn::Vector{Real}: Modal damping ratios
+* `Ln::AbstractMatrix`: Modal participation factors
+* `freq::AbstractRange`: Frequencies of interest
+* `ϕo::Matrix{Real}`: Mode shapes at observation points
 """
-@show_data struct ModalFreqProblem{T <: Real, Tfn <: AbstractMatrix, Tf <: AbstractVector}
+@show_data struct ModalFreqProblem{T <: Real, Tln <: AbstractMatrix, Tf <: AbstractRange}
     ωn::Vector{T}
     ξn::Vector{T}
-    Fn::Tfn
+    Ln::Tln
     freq::Tf
     ϕo::Matrix{T}
 
-    function ModalFreqProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, Fn::Tfn, freq::Tf, ϕo::Matrix{T}) where {T, Tfn, Tf}
+    function ModalFreqProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, Ln::Tln, freq::Tf, ϕo::Matrix{T}) where {T, Tln, Tf}
         if !isa(ξn, Array)
             ξn = fill(ξn, length(ωn))
         elseif length(ξn) != length(ωn)
             throw(DimensionMismatch("The number of damping ratios must be equal to the number of resonance frequencies"))
         end
 
-        new{T, Tfn, Tf}(ωn, ξn, Fn, freq, ϕo)
+        new{T, Tln, Tf}(ωn, ξn, Ln, freq, ϕo)
     end
 end
 
@@ -90,15 +90,15 @@ end
 
 Structure containing the data feeding the direct solver for calculating the modal frequencies
 
-# Fields
-* K: Stiffness matrix
-* M: Mass matrix
-* C: Damping matrix
-* F: Force matrix
-* freq: Frequencies of interest
-* So: Selection matrix for observation points
+**Fields**
+* `K::AbstractMatrix`: Stiffness matrix
+* `M::AbstractMatrix`: Mass matrix
+* `C::AbstractMatrix`: Damping matrix
+* `F::AbstractMatrix`: Force matrix
+* `freq::AbstractRange`: Frequencies of interest
+* `So::AbstractMatrix`: Selection matrix for observation points
 """
-@show_data struct DirectFreqProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, TF <: AbstractMatrix, Tf <: AbstractVector, Ts <: AbstractMatrix}
+@show_data struct DirectFreqProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, TF <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
     K::Tk
     M::Tm
     C::Tc
@@ -114,7 +114,7 @@ end
 
 Structure containing the solution of the frequency response problem
 
-# Fields
+**Fields**
 * u: Transfer function matrix
 """
 @show_data struct FRFSolution{T <: Complex}
@@ -126,7 +126,7 @@ end
 
 Structure containing the solution of the frequency response problem
 
-# Fields
+**Fields**
 * u: Frequency response matrix
 """
 @show_data struct FrequencySolution{T <: Complex}
@@ -134,18 +134,20 @@ Structure containing the solution of the frequency response problem
 end
 
 """
-    solve(m::ModalFRFProblem, type = :dis; ismat = false)
+    solve(prob::DirectFRF, type = :dis; ismat = false)
+    solve(prob::ModalFRFProblem, type = :dis; ismat = false)
 
-Computes the FRF matrix by modal approach
+Computes the FRF matrix by direct or modal approach
 
-# Parameter
-* `m`: Structure containing the problem data
+**Inputs**
+* `prob`: Structure containing the problem data
 * `type`: Type of FRF to compute (:dis, :vel, :acc)
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
 * `progress`: Show progress bar (default = true)
 
-# Output
-* `sol`: FRFSolution structure
+**Output**
+* `sol`: Solution of the problem
+    * `u`: FRF matrix
 """
 function solve(prob::ModalFRFProblem, type = :dis; ismat = false, progress = true)
     # Initialisation
@@ -155,12 +157,12 @@ function solve(prob::ModalFRFProblem, type = :dis; ismat = false, progress = tru
     no = size(ϕo, 1)
     nf = length(freq)
 
-    FRF = [similar([], Complex{eltype(ωn)}, no, ne) for _ in 1:nf]
-    M = Diagonal(similar([], Complex{eltype(ωn)}, n))
+    FRF = [similar(ωn, Complex{eltype(ωn)}, no, ne) for _ in 1:nf]
+    M = Diagonal(similar(ωn, Complex{eltype(ωn)}, n))
     indm = diagind(M)
 
     ωf = 2π*freq
-    p = Progress(nf, color = :black, desc = "FRF calculation - Modal approach...", showspeed = true)
+    p = Progress(nf, desc = "FRF calculation - Modal approach...", showspeed = true)
     @inbounds for (f, ω) in enumerate(ωf)
         progress ? next!(p) : nothing
 
@@ -182,36 +184,40 @@ function solve(prob::ModalFRFProblem, type = :dis; ismat = false, progress = tru
 end
 
 """
-    solve(m::DirectFRF, type = :dis; ismat = false)
+    solve(prob::DirectFRF, type = :dis; ismat = false)
+    solve(prob::ModalFRFProblem, type = :dis; ismat = false)
 
-Computes the FRF matrix by direct method
+Computes the FRF matrix by direct or modal approach
 
-# Parameter
-* m: Structure containing the problem data
-* type: Type of FRF to compute (:dis, :vel, :acc)
-* ismat: Return the FRF matrix as a 3D array (default = false)
+**Inputs**
+* `prob`: Structure containing the problem data
+* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `ismat`: Return the FRF matrix as a 3D array (default = false)
+* `progress`: Show progress bar (default = true)
 
-# Output
-* sol: FRFSolution structure
+**Output**
+* `sol`: Solution of the problem
+    * `u`: FRF matrix
 """
-function solve(m::DirectFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::DirectFRFProblem, type = :dis; ismat = false, progress = true)
+
     # Initialisation
-    (; K, M, C, freq, So, Se) = m
+    (; K, M, C, freq, So, Se) = prob
     no = size(So, 1)
     ne = size(Se, 1)
     Ndofs = size(K, 1)
     nf = length(freq)
 
-    FRF = [similar([], Complex{eltype(ωn)}, no, ne) for _ in 1:nf]
-    D = similar([], Complex{eltype(ωn)}, Ndofs, Ndofs)
+    FRF = [similar(K, Complex{eltype(K)}, no, ne) for _ in 1:nf]
+    D = similar(K, Complex{eltype(K)}, Ndofs, Ndofs)
 
     ωf = 2π*freq
-    p = Progress(nf, color = :black, desc = "FRF calculation - Direct method...", showspeed = true)
+    p = Progress(nf, desc = "FRF calculation - Direct method...", showspeed = true)
     @inbounds for (f, ω) in enumerate(ωf)
         progress ? next!(p) : nothing
 
-        D .= (K + 1im*ω*C  - ω^2*M)\I
-        FRF[f] .= So*D*Se'
+        D .= (K + 1im*ω*C  - ω^2*M)\Se'
+        FRF[f] .= So*D
 
         if type == :vel
             FRF[f] .*= 1im*ω
@@ -228,35 +234,37 @@ function solve(m::DirectFRFProblem, type = :dis; ismat = false, progress = true)
 end
 
 """
-    solve(m::ModalFreqProblem, type = :dis)
+    solve(prob::DirectFreqProblem, type = :dis)
+    solve(prob::ModalFreqProblem, type = :dis)
 
-Computes the frequency response by modal approach
+Computes the frequency response by direct or modal approach
 
-# Inputs
-* m: Structure containing the problem data
-* type: Type of response to compute (:dis, :vel, :acc)
+**Inputs**
+* `prob`: Structure containing the problem data
+* `type`: Type of response to compute (:dis, :vel, :acc)
 
-# Output
-* sol: FrequencySolution structure
+**Output**
+* `sol`: Solution of the problem
+    * `u`: Response spectrum matrix
 """
-function solve(m::ModalFreqProblem, type = :dis; progress = true)
+function solve(prob::ModalFreqProblem, type = :dis; progress = true)
     # Initialisation
-    (; ωn, ξn, Fn, freq, ϕo) = m
+    (; ωn, ξn, Ln, freq, ϕo) = prob
     no, n = size(ϕo)
     nf = length(freq)
 
     ωf = 2π*freq
 
-    y = similar([], Complex{eltype(ωn)}, no, nf)
-    D = Diagonal(similar([], Complex{eltype(ωn)}, n))
+    y = similar(ωn, Complex{eltype(ωn)}, no, nf)
+    M = Diagonal(similar(ωn, Complex{eltype(ωn)}, n))
     indm = diagind(M)
 
-    p = Progress(nf, color = :black, desc = "Frequency Response - Modal approach...", showspeed = true)
-    @inbounds for (f, (ω, F)) in enumerate(zip(ωf, eachcol(Fn)))
+    p = Progress(nf, desc = "Frequency Response - Modal approach...", showspeed = true)
+    @inbounds for (f, (ω, L)) in enumerate(zip(ωf, eachcol(Ln)))
         progress ? next!(p) : nothing
 
         @. M[indm] = 1/(ωn^2 - ω^2 + 2im*ξn*ωn*ω)
-        y[:, f] .= ϕo*M*F
+        y[:, f] .= ϕo*M*L
 
         if type == :vel
             y[:, f] .*= 1im*ω
@@ -269,35 +277,32 @@ function solve(m::ModalFreqProblem, type = :dis; progress = true)
 end
 
 """
-    solve(m::DirectFreqProblem, type = :dis)
+    solve(prob::DirectFreqProblem, type = :dis)
+    solve(prob::ModalFreqProblem, type = :dis)
 
-Computes the frequency response by direct method
+Computes the frequency response by direct or modal approach
 
-# Inputs
-* m: Structure containing the problem data
-    * K: Stiffness matrix
-    * M: Mass matrix
-    * C: Damping matrix
-    * F: Force matrix
-    * freq: Frequencies of interest
-    * So: Selection matrix for observation points
-* type: Type of response to compute (:dis, :vel, :acc)
+**Inputs**
+* `prob`: Structure containing the problem data
+* `type`: Type of response to compute (:dis, :vel, :acc)
 
-# Output
-* sol: FrequencySolution structure
+**Output**
+* `sol`: Solution of the problem
+    * `u`: Response spectrum matrix
 """
-function solve(m::DirectFreqProblem, type = :dis; progress = true)
+function solve(prob::DirectFreqProblem, type = :dis; progress = true)
     # Initialisation
-    (; K, M, C, F, freq, So) = m
+    (; K, M, C, F, freq, So) = prob
     Ndofs = size(K, 1)
+    no = size(So, 1)
     nf = length(freq)
 
     ωf = 2π*freq
 
-    y = similar([], Complex{eltype(ωn)}, no, nf)
-    D = similar([], Complex{eltype(ωn)}, Ndofs, Ndofs)
+    y = similar(K, Complex{eltype(K)}, no, nf)
+    D = similar(K, Complex{eltype(K)}, Ndofs)
 
-    p = Progress(nf, color = :black, desc = "Frequency Response - Direct method...", showspeed = true)
+    p = Progress(nf, desc = "Frequency Response - Direct method...", showspeed = true)
     @inbounds for (f, (ω, Fe)) in enumerate(zip(ωf, eachcol(F)))
         progress ? next!(p) : nothing
 

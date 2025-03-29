@@ -38,7 +38,7 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
 **Inputs**
 * `css`: Continuous-time state-space model
 * `h`: Sampling time.
-* `method::Symbol`: Discretization method
+* `method`: Discretization method
     * `:zoh`: Zero-order Hold method
     * `:foh`: First-order Hold method
     * `:blh`: Band-limited Hold method
