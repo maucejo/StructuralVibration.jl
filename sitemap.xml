@@ -5,16 +5,12 @@
     <lastmod>2025-03-19T15:01:45.000Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/function_estimation.html</loc>
-    <lastmod>2025-02-20T15:35:39.000Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/index.html</loc>
-    <lastmod>2025-02-20T15:33:51.000Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/noise.html</loc>
+    <lastmod>2025-03-28T14:12:02.000Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/index.html</loc>
-    <lastmod>2025-03-25T10:48:35.000Z</lastmod>
+    <lastmod>2025-03-28T11:15:11.000Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/frequency_solvers.html</loc>
@@ -53,11 +49,7 @@
     <lastmod>2025-02-20T15:30:42.000Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/signal_denoising.html</loc>
-    <lastmod>2025-02-20T15:34:39.000Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/Sdof_modal_parameters_extraction.html</loc>
-    <lastmod>2025-02-20T15:36:52.000Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/modal_parameters_extraction.html</loc>
+    <lastmod>2025-03-29T11:00:22.000Z</lastmod>
   </url>
 </urlset>

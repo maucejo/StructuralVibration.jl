@@ -106,10 +106,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -176,7 +173,7 @@ window.Quarto = {
 <span class="menu-text">Solvers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../signal_processing/index.html"> 
+    <a class="nav-link" href="../signal_processing/index.qmd"> 
 <span class="menu-text">Signal processing</span></a>
   </li>  
   <li class="nav-item">
@@ -506,7 +503,7 @@ Note
 </li>
 <li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
 </li>
-<li><p><code>F::Real</code>: External force matrix (or modal force matrix)</p>
+<li><p><code>F::Real</code>: External force matrix (or modal participation factors)</p>
 </li>
 <li><p><code>freq::Real</code>: Excitation frequency</p>
 </li>
@@ -533,7 +530,7 @@ Note
 </li>
 <li><p><code>t</code>: Time points at which to evaluate the response</p>
 </li>
-<li><p><code>F</code>: Amplitude vector (or modal force amplitude vector)</p>
+<li><p><code>F</code>: Amplitude vector (or modal participation vector)</p>
 </li>
 <li><p><code>ω</code>: Excitation angular frequency</p>
 </li>
@@ -659,7 +656,7 @@ Note
 </li>
 <li><p><code>ξn</code>: Damping ratios</p>
 </li>
-<li><p><code>F::Matrix{Real}</code>: External force matrix (or modal force matrix)</p>
+<li><p><code>F::Matrix{Real}</code>: External force matrix (or modal participation factors)</p>
 </li>
 <li><p><code>u0::Tuple</code>: Initial conditions</p>
 <ul>
