@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -1264,7 +1261,8 @@ f_{max} = \frac{f_s}{2.56}.
 <hr>
 <div id="132" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5)</code></pre>
+<div class="markdown"><pre><code>spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, 
+         overlap = 0.5)</code></pre>
 <p>Estimation of the spectrum of a signal</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1419,7 +1417,8 @@ Note
 <hr>
 <div id="138" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5, scaling = :psd)</code></pre>
+<div class="markdown"><pre><code>welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1,
+      overlap = 0.5, scaling = :psd)</code></pre>
 <p>Estimation of one-sided Autopower functions of a signal using the Welch method</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1560,7 +1559,7 @@ H_1(\omega) = \frac{S_{yx}(\omega)}{S_{xx}(\omega)},
 H_2(\omega) = \frac{S_{yy}(\omega)}{S_{yx}(\omega)},
 \]</span> where <span class="math inline">\(S_{yy}(\omega)\)</span> is the power spectral density of the output signal.</li>
 </ul>
-<p>Contrary to the H1 estimator, the H2 estimator estimates the resonances better than the anti-resonances<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
+<p>Contrary to the H1 estimator, the H2 estimator estimates the resonances better than the anti-resonances.</p>
 <ul>
 <li><strong>H3 estimator</strong>: It is used when the noise is assumed to affect both the input and output signals. It is defined as the arithmetic mean of the H1 and H2 estimators: <span class="math display">\[
 H_3(\omega) = \frac{H_1(\omega) + H_2(\omega)}{2}.
@@ -1596,7 +1595,8 @@ Note
 <hr>
 <div id="144" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs), window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)</code></pre>
+<div class="markdown"><pre><code>tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs),
+           window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)</code></pre>
 <p>Estimation of the one-sided transfer function between two signals</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1753,7 +1753,6 @@ Note
 <li id="fn2"><p>Polytec, “Polytec Scanning Vibrometer, Theory Manual”. 2019.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3"><p>P. Avitabile, “Modal Testing: A practioner’s guide”. John Wiley &amp; Sons. 2018.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn4"><p>Simcenter Testing Knowledge. “What is a Frequency Response Function (FRF)?”. 2020. <a href="https://community.sw.siemens.com/s/article/what-is-a-frequency-response-function-frf">link</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5"><p>Simcenter Testing Knowledge. “What is a Frequency Response Function (FRF)?”. 2020. <a href="https://community.sw.siemens.com/s/article/what-is-a-frequency-response-function-frf">link</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

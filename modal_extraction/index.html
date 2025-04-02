@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Modal extraction methods – StructuralVibration.jl</title>
+<title>Generalities – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,10 +69,39 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="nav-sidebar floating nav-fixed">
+<body class="nav-sidebar floating nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -134,7 +163,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../modal_extraction/index.html">Modal extraction methods</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../modal_extraction/index.html">Generalities</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -149,7 +178,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../modal_extraction/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Modal extraction methods</span></a>
+ <span class="menu-text">Generalities</span></a>
   </div>
 </li>
     </ul>
@@ -157,15 +186,13 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Modal extraction methods</h1>
+<h1 class="title">Generalities</h1>
 </div>
 
 
@@ -182,6 +209,26 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>The modal approach allows evaluating the dynamic behavior of a structure based on the knowledge of its natural vibration modes, which are intrinsic characteristics of the system. From a practical perspective, this knowledge can, in particular, help assess the frequencies at which the structure is most likely to vibrate. For industrial applications, this information is valuable, as vibrations can cause discomfort, noise, premature wear of a system, or even its failure. It is in this context that <strong>Experimental Modal Analysis</strong> (EMA) comes into play.</p>
+<p>Based on vibration measurements, EMA aims to estimate the natural frequencies of the system, as well as other characteristic parameters (damping and mode shapes) to obtain a <strong>modal model</strong> of the considered system. This model can then be used subsequently to determine the dynamic behavior of the structure for a specific excitation.</p>
+<p>To achieve these objectives, we will assume here that:</p>
+<ul>
+<li><p>the system is <strong>linear</strong> and <strong>time-invariant</strong>;</p></li>
+<li><p>the system, which is continuous by nature, <strong>can be represented by a discrete system</strong> where the motion parameters are known at each node of a measurement grid;</p></li>
+<li><p>the modal damping is of <strong>viscous</strong> or <strong>structural</strong> type.</p></li>
+</ul>
+<p>By principle, EMA is an <strong>inverse method</strong>, i.e., based on the measured responses at each point of the grid, we aim to determine the modal characteristics of a structure.</p>
+<p>From a general perspective, the extraction of modal parameters consists of:</p>
+<ol type="1">
+<li><p><strong>identifying the natural frequencies</strong> <span class="math inline">\(\omega_i\)</span>;</p></li>
+<li><p><strong>estimating the modal damping factors</strong> <span class="math inline">\(\eta_i\)</span>;</p></li>
+<li><p><strong>determining the mode shapes</strong> <span class="math inline">\(\Phi_i\)</span>.</p></li>
+</ol>
+<p>In practice, different strategies can be used to extract the modal parameters, and we distinguish:</p>
+<ul>
+<li><p>the <strong>SDOF methods</strong>, which aim to fit ideal transfer functions of single degree of freedom systems to the experimental curves in the vicinity of the identified resonance frequencies of the system.</p></li>
+<li><p>the <strong>MDOF methods</strong>, which aim to fit ideal transfer functions of multiple degrees of freedom systems to the experimental curves.</p></li>
+</ul>
 
 
 

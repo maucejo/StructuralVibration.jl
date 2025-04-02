@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Modal parameters extraction methods – StructuralVibration.jl</title>
+<title>Sdof methods – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,14 +23,13 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../signal_processing/noise.html" rel="prev">
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -69,11 +68,43 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="nav-sidebar floating nav-fixed">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -110,7 +141,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Modal extraction</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../signal_processing/index.html" aria-current="page"> 
+    <a class="nav-link" href="../signal_processing/index.html"> 
 <span class="menu-text">Signal processing</span></a>
   </li>  
   <li class="nav-item">
@@ -130,55 +161,28 @@ ul.task-list li input[type="checkbox"] {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../signal_processing/modal_parameters_extraction.html">Modal parameters extraction methods</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-    </div>
-  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../signal_processing/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Digital Signal Processing</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../signal_processing/noise.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Noise estimation &amp; denoising methods</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../signal_processing/modal_parameters_extraction.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Modal parameters extraction methods</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#theory" id="toc-theory" class="nav-link active" data-scroll-target="#theory"><span class="header-section-number">1</span> Theory</a></li>
+  <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api"><span class="header-section-number">2</span> API</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">3</span> Example</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Modal parameters extraction methods</h1>
+<h1 class="title">Sdof methods</h1>
 </div>
 
 
@@ -195,8 +199,182 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="theory" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="theory"><span class="header-section-number">1</span> Theory</h2>
+<p>The SDOF methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The SDOF methods are typically used for systems that are lightly damped and for which the modes are well separated.</p>
+<p><code>StructuralDynamics.jl</code> provides two SDOF methods for modal extraction:</p>
+<ul>
+<li>Peak picking method</li>
+<li>Circle fit method</li>
+</ul>
+<p>For these methods, it is assumed that the FRF (admittance) is given by: <span class="math display">\[
+H_{pq}(\omega) = \sum_{i = 1}^N\frac{_{i}A_{pq}}{\omega_i^2 - \omega^2 + j\eta_i\omega_i^2}
+\]</span> where, for a mode <span class="math inline">\(i\)</span>, <span class="math inline">\(_{i}A_{pq} = \Phi_i(x_p)\Phi_i(x_q)\)</span> is the residue, <span class="math inline">\(\omega_i\)</span> is the natural frequency, <span class="math inline">\(\eta_i\)</span> is the modal damping factor, and <span class="math inline">\(\Phi_i(x_p)\)</span> is the mass-normalized mode shape at the point <span class="math inline">\(x_p\)</span>.</p>
+<p>When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency <span class="math inline">\(\omega\)</span> close to the natural frequency <span class="math inline">\(\omega_i\)</span>: <span class="math display">\[
+\fbox{$H_{pq}(\omega) \approx \frac{\Phi_i(x_p)\Phi_i(x_q)}{M_i\left(\omega_i^2 - \omega^2 + j\eta_i\omega_i^2\right)}.$}
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One can note that the modal damping factor <span class="math inline">\(\eta_i\)</span> is related to the damping ratio <span class="math inline">\(\xi_i\)</span> by the relation: <span class="math display">\[
+\eta_i = 2\xi_i.
+\]</span></p>
+</div>
+</div>
+<section id="peak-picking-method" class="level4" data-number="1.0.1">
+<h4 data-number="1.0.1" class="anchored" data-anchor-id="peak-picking-method"><span class="header-section-number">1.0.1</span> Peak picking method</h4>
+<p>The peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:</p>
+<ol type="1">
+<li><p><strong>Identification of natural frequencies</strong></p>
+<p>They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using <code>Peaks.jl</code>.</p></li>
+<li><p><strong>Estimation of modal damping factors</strong></p>
+<p>To estimate the value of the damping factor for mode <span class="math inline">\(i\)</span>, the half power bandwidth method is used. This procedure, valid for low damping (<span class="math inline">\(\eta_i &lt; 0.1\)</span>), first determines the frequencies <span class="math inline">\(\omega_1\)</span> and <span class="math inline">\(\omega_2\)</span> such that: <span class="math display">\[
+\vert H_{pq}(\omega_1)\vert = \vert H_{pq}(\omega_2)\vert = \frac{\vert H_{pq}(\omega_i)\vert}{\sqrt{2}},
+\]</span> with <span class="math inline">\(\omega_i \in [\omega_1, \omega_2]\)</span>.</p>
+<p>Knowing the values of <span class="math inline">\(\omega_i\)</span>, <span class="math inline">\(\omega_1\)</span>, and <span class="math inline">\(\omega_2\)</span>, the damping ratio for mode <span class="math inline">\(i\)</span> is determined using the formula: <span class="math display">\[
+\eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
+\]</span></p>
+<p>::: {.callout-note} If we consider that the shape of a resonance peak is symmetric then <span class="math inline">\(\omega_i = \frac{\omega_1 + \omega_2}{2}\)</span>.</p>
+<p>It comes that: <span class="math display">\[
+\omega_2^2 - \omega_1^2 \approx 2\omega_i(\omega_2 - \omega_1).
+\]</span></p>
+<p>Hence, the damping ratio can be approximated as: <span class="math display">\[
+\eta_i \approx \frac{\omega_2 - \omega_1}{\omega_i}.
+\]</span></p>
+<p>This formula is often given in textbooks when dealing with the half power bandwidth method. :::</p></li>
+<li><p><strong>Determination of mode shapes</strong> At the resonance frequency <span class="math inline">\(\omega_i\)</span>, the admittance matrix is expressed as: <span class="math display">\[
+\mathbf{H} = \frac{1}{j\eta_i\omega_i^2}
+   \begin{bmatrix}
+       \Phi_i(x_1)^2 &amp; \Phi_i(x_1)\Phi_i(x_2) &amp; \ldots\ &amp; \Phi_i(x_1)\Phi_i(x_N) \\
+       \Phi_i(x_2)\Phi_i(x_1) &amp; \Phi_i(x_2)^2 &amp;  &amp; \Phi_i(x_2)\Phi_i(x_N) \\
+       \vdots &amp; &amp; \ddots &amp; \vdots \\
+       \Phi_i(x_N)\Phi_i(x_1) &amp; \ldots &amp; \ldots &amp; \Phi_i(x_N)^2
+     \end{bmatrix}
+\]</span></p>
+<p>To determine the mode shapes from the knowledge of a column <span class="math inline">\(q\)</span> (or a row <span class="math inline">\(p\)</span>), proceed as follows:</p>
+<ul>
+<li><p>From the measurement of an input admittance (diagonal term of the admittance matrix), the mode shape value at point <span class="math inline">\(x_q\)</span> is obtained: <span class="math display">\[
+\Phi_i(x_q)^2 =  \eta_i\omega_i^2 \text{Im}(H_{qq}(\omega_i))
+\]</span></p>
+<!-- The sign of the mode shape is then given by the sign of the phase of $H_{qq}(\omega_i)$. --></li>
+<li><p>From the cross-admittances (off-diagonal terms of the admittance matrix), the mode shape value at a point <span class="math inline">\(x_p\)</span> is calculated: <span class="math display">\[
+\Phi_i(x_p)\Phi_i(x_q) = \eta_i\omega_i^2 \text{Im}(H_{pq}(\omega_i)).
+\]</span></p>
+<!-- The sign of the mode shape is then given by the sign of the phase of $H_{pq}(\omega_i)$. --></li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="api" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="api"><span class="header-section-number">2</span> API</h2>
+<div class="api">
+<p>** freq_extraction**</p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>freq_extraction(freq, H, method::ModalExtraction; type = :dis)</code></pre>
+<p>Extract natural frequencies and damping ratios from the Bode diagram fitting method</p>
+<h1>Inputs</h1>
+<ul>
+<li><p><code>freq</code>: Frequency vector</p>
+</li>
+<li><p><code>H</code>: Frequency response function</p>
+</li>
+<li><p><code>method</code>: Method to extract the natural frequencies and damping ratios</p>
+<ul>
+<li><p><code>PeakPickingExtract</code>: Peak picking method (default)</p>
+</li>
+<li><p><code>CircleFitExtract</code>: Circle fitting method</p>
+</li>
+</ul>
+</li>
+<li><p><code>type</code>: Type of FRF used to extract the natural frequencies and damping ratios</p>
+<ul>
+<li><p><code>:dis</code>: Admittance (default)</p>
+</li>
+<li><p><code>:vel</code>: Mobility</p>
+</li>
+<li><p><code>:acc</code>: Accelerance</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1>Outputs</h1>
+<ul>
+<li><p><code>fn</code>: Natural frequencies</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+</ul>
 
 
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modeshape_extraction</strong></p>
+<hr>
+<div id="6" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>modeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction; type = :dis)</code></pre>
+<p>Extract mode shapes from the Bode's diagram of Nyquiste's circle fitting method</p>
+<h1>Inputs</h1>
+<ul>
+<li><p><code>freq</code>: Frequency vector</p>
+</li>
+<li><p><code>H</code>: Frequency response function</p>
+</li>
+<li><p><code>fn</code>: Natural frequencies</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+<li><p><code>id_exc</code>: Identifier of the excited nodes</p>
+</li>
+<li><p><code>method</code>: Method to extract the mode shapes</p>
+<ul>
+<li><p><code>BodeExtract</code>: Bode diagram (default)</p>
+</li>
+<li><p><code>NyquistExtract</code>: Nyquist diagram</p>
+</li>
+</ul>
+</li>
+<li><p><code>type</code>: Type of FRF used to extract the natural frequencies and damping ratios</p>
+<ul>
+<li><p><code>:dis</code>: Admittance (default)</p>
+</li>
+<li><p><code>:vel</code>: Mobility</p>
+</li>
+<li><p><code>:acc</code>: Accelerance</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1>Output</h1>
+<ul>
+<li><p><code>ϕn</code>: Mode shapes</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="example"><span class="header-section-number">3</span> Example</h2>
+<p>#| output: false</p>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -616,15 +794,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../signal_processing/noise.html" class="pagination-link" aria-label="Noise estimation &amp; denoising methods">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Noise estimation &amp; denoising methods</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
