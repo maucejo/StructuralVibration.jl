@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Digital Signal Processing – StructuralVibration.jl</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../signal_processing/noise.html" rel="next">
+<link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-4d04b275c36bd460889107e331013233.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-585a77d67552b4a34eb0de6c9603dd02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">StructuralVibration.jl</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../models/index.html"> 
+<span class="menu-text">Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../solvers/index.html"> 
+<span class="menu-text">Solvers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modal_extraction/index.html"> 
+<span class="menu-text">Modal extraction</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../signal_processing/index.html" aria-current="page"> 
+<span class="menu-text">Signal processing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../visualization/index.html"> 
+<span class="menu-text">Visualization</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/maucejo/StructuralVibration.jl"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../signal_processing/index.html">Digital Signal Processing</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../signal_processing/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Digital Signal Processing</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../signal_processing/noise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Noise estimation &amp; denoising methods</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../signal_processing/modal_parameters_extraction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modal parameters extraction methods</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#window-functions" id="toc-window-functions" class="nav-link active" data-scroll-target="#window-functions"><span class="header-section-number">1</span> Window functions</a>
+  <ul class="collapse">
+  <li><a href="#windows-from-dsp.jl" id="toc-windows-from-dsp.jl" class="nav-link" data-scroll-target="#windows-from-dsp.jl"><span class="header-section-number">1.1</span> Windows from DSP.jl</a></li>
+  <li><a href="#additional-window-functions" id="toc-additional-window-functions" class="nav-link" data-scroll-target="#additional-window-functions"><span class="header-section-number">1.2</span> Additional window functions</a></li>
+  <li><a href="#choice-of-a-window-function" id="toc-choice-of-a-window-function" class="nav-link" data-scroll-target="#choice-of-a-window-function"><span class="header-section-number">1.3</span> Choice of a window function</a></li>
+  </ul></li>
+  <li><a href="#function-estimation" id="toc-function-estimation" class="nav-link" data-scroll-target="#function-estimation"><span class="header-section-number">2</span> Function estimation</a>
+  <ul class="collapse">
+  <li><a href="#acquisition-parameters" id="toc-acquisition-parameters" class="nav-link" data-scroll-target="#acquisition-parameters"><span class="header-section-number">2.1</span> Acquisition parameters</a></li>
+  <li><a href="#response-spectrum" id="toc-response-spectrum" class="nav-link" data-scroll-target="#response-spectrum"><span class="header-section-number">2.2</span> Response spectrum</a></li>
+  <li><a href="#autopower-functions" id="toc-autopower-functions" class="nav-link" data-scroll-target="#autopower-functions"><span class="header-section-number">2.3</span> Autopower functions</a></li>
+  <li><a href="#frequency-response-function" id="toc-frequency-response-function" class="nav-link" data-scroll-target="#frequency-response-function"><span class="header-section-number">2.4</span> Frequency Response Function</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Digital Signal Processing</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><code>StructuralVibration.jl</code> provides a set of functions complementing the <code>DSP.jl</code> to simulate the signal processing pipelines used in structural dynamics applications, such as modal analysis, system identification, and vibration data processing. They can for instance be used to simulate or to process experimental data, which can then be used to validate new algorithms (direct or inverse methods) and to benchmark with existing ones.</p>
+<section id="window-functions" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="window-functions"><span class="header-section-number">1</span> Window functions</h2>
+<p>The <code>DSP.jl</code> package provides a set of window functions that can be used to reduce spectral leakage in the frequency domain. The <code>StructuralVibration.jl</code> package exports the window functions defined in <code>DSP.jl</code> and provides additional ones for the sake of completeness.</p>
+<section id="windows-from-dsp.jl" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="windows-from-dsp.jl"><span class="header-section-number">1.1</span> Windows from DSP.jl</h3>
+<section id="rectangular-window" class="level4" data-number="1.1.1">
+<h4 data-number="1.1.1" class="anchored" data-anchor-id="rectangular-window"><span class="header-section-number">1.1.1</span> Rectangular window</h4>
+<p>The rectangular window is the simplest window function, which does not modify the signal. It is defined as: <span class="math display">\[
+w[n] = 1,
+\]</span> for <span class="math inline">\(n \in [0, N-1]\)</span>, where <span class="math inline">\(N\)</span> is the length of the window.</p>
+<p>The rectangular window is generally not recommended for spectral analysis, as it introduces significant spectral leakage. It is mainly used for testing purposes or when no windowing is required (such as impact testing for sufficiently long acquisition duration).</p>
+<section id="api" class="level5" data-number="1.1.1.1">
+<h5 data-number="1.1.1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">1.1.1.1</span> API</h5>
+<div class="api">
+<p><strong>rect</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>rect</code></pre>
+<p>Rectangular window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example" class="level5" data-number="1.1.1.2">
+<h5 data-number="1.1.1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.1.1.2</span> Example</h5>
+<div id="6" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>rectwin <span class="op">=</span> <span class="fu">rect</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="hanning-window" class="level4" data-number="1.1.2">
+<h4 data-number="1.1.2" class="anchored" data-anchor-id="hanning-window"><span class="header-section-number">1.1.2</span> Hann(ing) window</h4>
+<p>The Hann window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = \frac{1}{2} \left[1 - \cos\left(\frac{2\pi n}{N-1}\right)\right],
+\]</span> where <span class="math inline">\(N\)</span> is the length of the window and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-1" class="level5" data-number="1.1.2.1">
+<h5 data-number="1.1.2.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">1.1.2.1</span> API</h5>
+<div class="api">
+<p><strong>hann</strong></p>
+<hr>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>hann</code></pre>
+<p>Hann(ing) window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level5" data-number="1.1.2.2">
+<h5 data-number="1.1.2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">1.1.2.2</span> Example</h5>
+<div id="12" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hannwin <span class="op">=</span> <span class="fu">hanning</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="hamming-window" class="level4" data-number="1.1.3">
+<h4 data-number="1.1.3" class="anchored" data-anchor-id="hamming-window"><span class="header-section-number">1.1.3</span> Hamming window</h4>
+<p>The Hamming window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = 0.54 - 0.46 \cos\left(\frac{2\pi n}{N-1}\right),
+\]</span> where <span class="math inline">\(N\)</span> is the length of the window and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-2" class="level5" data-number="1.1.3.1">
+<h5 data-number="1.1.3.1" class="anchored" data-anchor-id="api-2"><span class="header-section-number">1.1.3.1</span> API</h5>
+<div class="api">
+<p><strong>hamming</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>hamming</code></pre>
+<p>Hamming window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-2" class="level5" data-number="1.1.3.2">
+<h5 data-number="1.1.3.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">1.1.3.2</span> Example</h5>
+<div id="18" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hammwin <span class="op">=</span> <span class="fu">hamming</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-11-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="tukey-window" class="level4" data-number="1.1.4">
+<h4 data-number="1.1.4" class="anchored" data-anchor-id="tukey-window"><span class="header-section-number">1.1.4</span> Tukey window</h4>
+<p>The Tukey window (also known as the cosine-tapered window) is defined by a tapering parameter <span class="math inline">\(\alpha \in [0,1]\)</span>, which controls the proportion of the window that is tapered. The window is defined as:</p>
+<p><span class="math display">\[
+\begin{align*}
+&amp; w[n] = \frac{1}{2} \left[1 - \cos\left(\frac{2\pi n}{\alpha(N-1)}\right)\right], &amp; 0 \leq n &lt; \frac{\alpha(N-1)}{2} \\
+&amp; w[n] = 1,  &amp; \frac{\alpha(N-1)}{2} \leq n \leq \frac{(N-1)}{2} \\
+&amp; w[N-1 - n] = w[n], &amp; 0 \leq n \leq \frac{\alpha(N-1)}{2} \\
+\end{align*}
+\]</span></p>
+<p>When <span class="math inline">\(\alpha = 0\)</span>, the Tukey window becomes a rectangular window, and when <span class="math inline">\(\alpha = 1\)</span>, it becomes equivalent to a Hann window.</p>
+<section id="api-3" class="level5" data-number="1.1.4.1">
+<h5 data-number="1.1.4.1" class="anchored" data-anchor-id="api-3"><span class="header-section-number">1.1.4.1</span> API</h5>
+<div class="api">
+<p><strong>tukey</strong></p>
+<hr>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>tukey</code></pre>
+<p>Tukey window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-3" class="level5" data-number="1.1.4.2">
+<h5 data-number="1.1.4.2" class="anchored" data-anchor-id="example-3"><span class="header-section-number">1.1.4.2</span> Example</h5>
+<div id="24" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tukeywin <span class="op">=</span> <span class="fu">tukey</span>(<span class="fl">1024</span>, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="26" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="cosine-window" class="level4" data-number="1.1.5">
+<h4 data-number="1.1.5" class="anchored" data-anchor-id="cosine-window"><span class="header-section-number">1.1.5</span> Cosine window</h4>
+<p>The cosine window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = \cos\left(\frac{\pi n}{N-1} - \frac{\pi}{2}\right),
+\]</span> where <span class="math inline">\(N\)</span> is the length of the window and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-4" class="level5" data-number="1.1.5.1">
+<h5 data-number="1.1.5.1" class="anchored" data-anchor-id="api-4"><span class="header-section-number">1.1.5.1</span> API</h5>
+<div class="api">
+<p><strong>cosine</strong></p>
+<hr>
+<div id="28" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>cosine</code></pre>
+<p>Cosine window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-4" class="level5" data-number="1.1.5.2">
+<h5 data-number="1.1.5.2" class="anchored" data-anchor-id="example-4"><span class="header-section-number">1.1.5.2</span> Example</h5>
+<div id="30" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>coswin <span class="op">=</span> <span class="fu">cosine</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="32" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-17-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="lanczos-window" class="level4" data-number="1.1.6">
+<h4 data-number="1.1.6" class="anchored" data-anchor-id="lanczos-window"><span class="header-section-number">1.1.6</span> Lanczos window</h4>
+<p>The Lanczos window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = \text{sinc}\left(\frac{2n}{N-1} - 1\right),
+\]</span> where <span class="math inline">\(N\)</span> is the length of the window and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-5" class="level5" data-number="1.1.6.1">
+<h5 data-number="1.1.6.1" class="anchored" data-anchor-id="api-5"><span class="header-section-number">1.1.6.1</span> API</h5>
+<div class="api">
+<p><strong>lanczos</strong></p>
+<hr>
+<div id="34" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>lanczos</code></pre>
+<p>Lanczos window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-5" class="level5" data-number="1.1.6.2">
+<h5 data-number="1.1.6.2" class="anchored" data-anchor-id="example-5"><span class="header-section-number">1.1.6.2</span> Example</h5>
+<div id="36" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lanczoswin <span class="op">=</span> <span class="fu">lanczos</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="38" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="triangular-window" class="level4" data-number="1.1.7">
+<h4 data-number="1.1.7" class="anchored" data-anchor-id="triangular-window"><span class="header-section-number">1.1.7</span> Triangular window</h4>
+<p>The triangular window is a simple window function that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = 1 - \frac{|2n - (N-1)|}{L},
+\]</span> where <span class="math inline">\(L = N/N+1\)</span> is <span class="math inline">\(N\)</span> is even/odd and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-6" class="level5" data-number="1.1.7.1">
+<h5 data-number="1.1.7.1" class="anchored" data-anchor-id="api-6"><span class="header-section-number">1.1.7.1</span> API</h5>
+<div class="api">
+<p><strong>triang</strong></p>
+<hr>
+<div id="40" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>triang</code></pre>
+<p>Triangle window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="42" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>triangwin <span class="op">=</span> <span class="fu">triang</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="44" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-23-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="bartlett-window" class="level4" data-number="1.1.8">
+<h4 data-number="1.1.8" class="anchored" data-anchor-id="bartlett-window"><span class="header-section-number">1.1.8</span> Bartlett window</h4>
+<p>The Bartlett window is a triangular window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = \left(1 - \frac{|n - L|}{L}\right),
+\]</span> where <span class="math inline">\(L = \frac{N-1}{2}\)</span> and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-7" class="level5" data-number="1.1.8.1">
+<h5 data-number="1.1.8.1" class="anchored" data-anchor-id="api-7"><span class="header-section-number">1.1.8.1</span> API</h5>
+<div class="api">
+<p><strong>bartlett</strong></p>
+<hr>
+<div id="46" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>bartlett</code></pre>
+<p>Bartlett window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-6" class="level5" data-number="1.1.8.2">
+<h5 data-number="1.1.8.2" class="anchored" data-anchor-id="example-6"><span class="header-section-number">1.1.8.2</span> Example</h5>
+<div id="48" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bartlettwin <span class="op">=</span> <span class="fu">bartlett</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="50" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-26-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="bartlett-hann-window" class="level4" data-number="1.1.9">
+<h4 data-number="1.1.9" class="anchored" data-anchor-id="bartlett-hann-window"><span class="header-section-number">1.1.9</span> Bartlett-Hann window</h4>
+<p>The Bartlett-Hann window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = 0.62 - 0.48 \left|\frac{n}{N-1} - 0.5\right| + 0.38 \cos\left(2\pi\left[\frac{n}{N-1} - 0.5\right]\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-8" class="level5" data-number="1.1.9.1">
+<h5 data-number="1.1.9.1" class="anchored" data-anchor-id="api-8"><span class="header-section-number">1.1.9.1</span> API</h5>
+<div class="api">
+<p><strong>bartlett_hann</strong></p>
+<hr>
+<div id="52" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>bartlett_hann</code></pre>
+<p>Bartlett-Hann window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-7" class="level5" data-number="1.1.9.2">
+<h5 data-number="1.1.9.2" class="anchored" data-anchor-id="example-7"><span class="header-section-number">1.1.9.2</span> Example</h5>
+<div id="54" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>barthannwin <span class="op">=</span> <span class="fu">bartlett_hann</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="56" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-29-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="gaussian-window" class="level4" data-number="1.1.10">
+<h4 data-number="1.1.10" class="anchored" data-anchor-id="gaussian-window"><span class="header-section-number">1.1.10</span> Gaussian window</h4>
+<p>The Gaussian window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = \text{exp}\left(-\frac{(n - \mu)^2}{2\sigma^2}\right),
+\]</span> where <span class="math inline">\(\mu = \frac{N-1}{2}\)</span> is the center of the window, <span class="math inline">\(\sigma\)</span> is the standard deviation, and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-9" class="level5" data-number="1.1.10.1">
+<h5 data-number="1.1.10.1" class="anchored" data-anchor-id="api-9"><span class="header-section-number">1.1.10.1</span> API</h5>
+<div class="api">
+<p><strong>gaussian</strong></p>
+<hr>
+<div id="58" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>gaussian</code></pre>
+<p>Gaussian window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-8" class="level5" data-number="1.1.10.2">
+<h5 data-number="1.1.10.2" class="anchored" data-anchor-id="example-8"><span class="header-section-number">1.1.10.2</span> Example</h5>
+<div id="60" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>gaussianwin <span class="op">=</span> <span class="fu">gaussian</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="62" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-32-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="blackman-window" class="level4" data-number="1.1.11">
+<h4 data-number="1.1.11" class="anchored" data-anchor-id="blackman-window"><span class="header-section-number">1.1.11</span> Blackman window</h4>
+<p>The Blackman window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = 0.42 - 0.5 \cos\left(\frac{2\pi n}{N-1}\right) + 0.08 \cos\left(\frac{4\pi n}{N-1}\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-10" class="level5" data-number="1.1.11.1">
+<h5 data-number="1.1.11.1" class="anchored" data-anchor-id="api-10"><span class="header-section-number">1.1.11.1</span> API</h5>
+<div class="api">
+<p><strong>blackman</strong></p>
+<hr>
+<div id="64" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>blackman</code></pre>
+<p>Blackman window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-9" class="level5" data-number="1.1.11.2">
+<h5 data-number="1.1.11.2" class="anchored" data-anchor-id="example-9"><span class="header-section-number">1.1.11.2</span> Example</h5>
+<div id="66" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>blackmanwin <span class="op">=</span> <span class="fu">blackman</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="68" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-35-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="kaiser-window" class="level4" data-number="1.1.12">
+<h4 data-number="1.1.12" class="anchored" data-anchor-id="kaiser-window"><span class="header-section-number">1.1.12</span> Kaiser window</h4>
+<p>The Kaiser window is a raised cosine window that tapers the signal at both ends. It is defined as: <span class="math display">\[
+w[n] = I_0\left(\pi\alpha \sqrt{1 - \left(\frac{2n}{N-1} - 1\right)^2}\right) / I_0(\pi\alpha),
+\]</span> where <span class="math inline">\(I_0\)</span> is the modified Bessel function of the first kind, <span class="math inline">\(\beta\)</span> is a parameter that controls the shape of the window, and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-11" class="level5" data-number="1.1.12.1">
+<h5 data-number="1.1.12.1" class="anchored" data-anchor-id="api-11"><span class="header-section-number">1.1.12.1</span> API</h5>
+<div class="api">
+<p><strong>kaiser</strong></p>
+<hr>
+<div id="70" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>kaiser</code></pre>
+<p>Kaiser window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-10" class="level5" data-number="1.1.12.2">
+<h5 data-number="1.1.12.2" class="anchored" data-anchor-id="example-10"><span class="header-section-number">1.1.12.2</span> Example</h5>
+<div id="72" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kaiserwin <span class="op">=</span> <span class="fu">kaiser</span>(<span class="fl">1024</span>, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="74" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-38-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="dpss-window" class="level4" data-number="1.1.13">
+<h4 data-number="1.1.13" class="anchored" data-anchor-id="dpss-window"><span class="header-section-number">1.1.13</span> DPSS window</h4>
+<p>The DPSS (Discrete Prolate Spheroidal Sequences) window maximizes the energy concentration in the main lobe. It has no closed form expression and depends on two parameters: the length of the window <span class="math inline">\(N\)</span> and the time-half-bandwidth product <span class="math inline">\(Nw\)</span> which controls the energy concentration in the main lobe.</p>
+<section id="api-12" class="level5" data-number="1.1.13.1">
+<h5 data-number="1.1.13.1" class="anchored" data-anchor-id="api-12"><span class="header-section-number">1.1.13.1</span> API</h5>
+<div class="api">
+<p><strong>dpss</strong></p>
+<hr>
+<div id="76" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>dpss</code></pre>
+<p>DPSS window</p>
+<p>Exported from DSP.jl</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-11" class="level5" data-number="1.1.13.2">
+<h5 data-number="1.1.13.2" class="anchored" data-anchor-id="example-11"><span class="header-section-number">1.1.13.2</span> Example</h5>
+<div id="78" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dpsswin <span class="op">=</span> <span class="fu">dpss</span>(<span class="fl">1024</span>, <span class="fl">4</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="80" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-41-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="additional-window-functions" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="additional-window-functions"><span class="header-section-number">1.2</span> Additional window functions</h3>
+<section id="exponential-window" class="level4" data-number="1.2.1">
+<h4 data-number="1.2.1" class="anchored" data-anchor-id="exponential-window"><span class="header-section-number">1.2.1</span> Exponential window</h4>
+<p>An exponential window is a window function that tapers the signal exponentially. It is defined as: <span class="math display">\[
+w[n] = \text{exp}\left(-\frac{\tau n}{N-1}\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span>, <span class="math inline">\(\tau = -\log(p)\)</span> is the time constant, and <span class="math inline">\(p\)</span> is the percentage of the original value by the end of the acquisition block.</p>
+<section id="api-13" class="level5" data-number="1.2.1.1">
+<h5 data-number="1.2.1.1" class="anchored" data-anchor-id="api-13"><span class="header-section-number">1.2.1.1</span> API</h5>
+<div class="api">
+<p><strong>exponential</strong></p>
+<hr>
+<div id="82" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>exponential(N, exponential_end = 0.01)</code></pre>
+<p>Create an exponential window</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+<li><p><code>exponential_end</code>: End value of the exponential window (between 0 and 1)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Exponential window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-12" class="level5" data-number="1.2.1.2">
+<h5 data-number="1.2.1.2" class="anchored" data-anchor-id="example-12"><span class="header-section-number">1.2.1.2</span> Example</h5>
+<div id="84" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>exponentialwin <span class="op">=</span> <span class="fu">exponential</span>(<span class="fl">1024</span>, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="86" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-44-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="force-window" class="level4" data-number="1.2.2">
+<h4 data-number="1.2.2" class="anchored" data-anchor-id="force-window"><span class="header-section-number">1.2.2</span> Force window</h4>
+<p>The force window is a window function a rectangular window over a given width. It is defined as: <span class="math display">\[
+w[n] = \begin{cases}
+1, &amp; 0 \leq n &lt; L \\
+0, &amp; L \leq n &lt; N
+\end{cases},
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span>, <span class="math inline">\(L = pN\)</span> is the width of the window, and <span class="math inline">\(p\)</span> is the percentage of the length of the data acquisition block.</p>
+<section id="api-14" class="level5" data-number="1.2.2.1">
+<h5 data-number="1.2.2.1" class="anchored" data-anchor-id="api-14"><span class="header-section-number">1.2.2.1</span> API</h5>
+<div class="api">
+<p><strong>force</strong></p>
+<hr>
+<div id="88" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>force(N, width = 0.1)</code></pre>
+<p>Create a force window</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+<li><p><code>width</code>: Width of the force window (between 0 and 1)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Force window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-13" class="level5" data-number="1.2.2.2">
+<h5 data-number="1.2.2.2" class="anchored" data-anchor-id="example-13"><span class="header-section-number">1.2.2.2</span> Example</h5>
+<div id="90" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>forcewin <span class="op">=</span> <span class="fu">force</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="92" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-47-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="flat-top-window" class="level4" data-number="1.2.3">
+<h4 data-number="1.2.3" class="anchored" data-anchor-id="flat-top-window"><span class="header-section-number">1.2.3</span> Flat-top window</h4>
+<p>The flat-top window is a window function that window is a partially negative-valued window that has minimal scalloping loss in the frequency domain. It is defined as: <span class="math display">\[
+w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}{N-1}\right) - a_3\cos\left(\frac{6\pi n}{N-1}\right) + a_4\cos\left(\frac{8\pi n}{N-1}\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span> and <span class="math inline">\(a_0 = 0.21557895\)</span>, <span class="math inline">\(a_1 = 0.41663158\)</span>, <span class="math inline">\(a_2 = 0.277263158\)</span>, <span class="math inline">\(a_3 = 0.083578947\)</span>, and <span class="math inline">\(a_4 = 0.006947368\)</span>.</p>
+<section id="api-15" class="level5" data-number="1.2.3.1">
+<h5 data-number="1.2.3.1" class="anchored" data-anchor-id="api-15"><span class="header-section-number">1.2.3.1</span> API</h5>
+<div class="api">
+<p><strong>flattop</strong></p>
+<hr>
+<div id="94" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>flattop(N)</code></pre>
+<p>Create a flat top window</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Flattop window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-14" class="level5" data-number="1.2.3.2">
+<h5 data-number="1.2.3.2" class="anchored" data-anchor-id="example-14"><span class="header-section-number">1.2.3.2</span> Example</h5>
+<div id="96" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>flattopwin <span class="op">=</span> <span class="fu">flattop</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="98" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-50-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="nuttall-window" class="level4" data-number="1.2.4">
+<h4 data-number="1.2.4" class="anchored" data-anchor-id="nuttall-window"><span class="header-section-number">1.2.4</span> Nuttall window</h4>
+<p>The Nutall window is a window function that returns a Nuttall four-term symmetric Blackman-Harris window. It produces slightly lower sidelobes than Blackman-Harris window. It is defined as: <span class="math display">\[
+w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}{N-1}\right) - a_3\cos\left(\frac{6\pi n}{N-1}\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span> and <span class="math inline">\(a_0 = 0.355768\)</span>, <span class="math inline">\(a_1 = 0.487396\)</span>, <span class="math inline">\(a_2 = 0.144232\)</span>, and <span class="math inline">\(a_3 = 0.012604\)</span>.</p>
+<section id="api-16" class="level5" data-number="1.2.4.1">
+<h5 data-number="1.2.4.1" class="anchored" data-anchor-id="api-16"><span class="header-section-number">1.2.4.1</span> API</h5>
+<div class="api">
+<p><strong>nuttall</strong></p>
+<hr>
+<div id="100" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>nuttall(N)</code></pre>
+<p>Create a Nuttall window</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Nuttall window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-15" class="level5" data-number="1.2.4.2">
+<h5 data-number="1.2.4.2" class="anchored" data-anchor-id="example-15"><span class="header-section-number">1.2.4.2</span> Example</h5>
+<div id="102" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nuttallwin <span class="op">=</span> <span class="fu">nuttall</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="104" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-53-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="blackman-nuttall-window" class="level4" data-number="1.2.5">
+<h4 data-number="1.2.5" class="anchored" data-anchor-id="blackman-nuttall-window"><span class="header-section-number">1.2.5</span> Blackman-Nuttall window</h4>
+<p>The Blackman-Nuttall window is a window function that is a modified version of the exact Blackman window. It is defined as: <span class="math display">\[
+w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}{N-1}\right) - a_3\cos\left(\frac{6\pi n}{N-1}\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span> and <span class="math inline">\(a_0 = 0.3635819\)</span>, <span class="math inline">\(a_1 = 0.4891775\)</span>, <span class="math inline">\(a_2 = 0.1365995\)</span>, and <span class="math inline">\(a_3 = 0.0106411\)</span>.</p>
+<section id="api-17" class="level5" data-number="1.2.5.1">
+<h5 data-number="1.2.5.1" class="anchored" data-anchor-id="api-17"><span class="header-section-number">1.2.5.1</span> API</h5>
+<div class="api">
+<p><strong>blackman_nuttall</strong></p>
+<hr>
+<div id="106" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>blackman_nuttall(N)</code></pre>
+<p>Create a Blackman-Nuttall window</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Blackman-Nutall window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-16" class="level5" data-number="1.2.5.2">
+<h5 data-number="1.2.5.2" class="anchored" data-anchor-id="example-16"><span class="header-section-number">1.2.5.2</span> Example</h5>
+<div id="108" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>blackman_nuttallwin <span class="op">=</span> <span class="fu">blackman_nuttall</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="110" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-56-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="blackman-harris-window" class="level4" data-number="1.2.6">
+<h4 data-number="1.2.6" class="anchored" data-anchor-id="blackman-harris-window"><span class="header-section-number">1.2.6</span> Blackman-Harris window</h4>
+<p>The Blackman-Harris window is a window function that is another modified version of the exact Blackman window. It is defined as: <span class="math display">\[
+w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}{N-1}\right) - a_3\cos\left(\frac{6\pi n}{N-1}\right),
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span> and <span class="math inline">\(a_0 = 0.35875\)</span>, <span class="math inline">\(a_1 = 0.48829\)</span>, <span class="math inline">\(a_2 = 0.14128\)</span>, and <span class="math inline">\(a_3 = 0.01168\)</span>.</p>
+<section id="api-18" class="level5" data-number="1.2.6.1">
+<h5 data-number="1.2.6.1" class="anchored" data-anchor-id="api-18"><span class="header-section-number">1.2.6.1</span> API</h5>
+<div class="api">
+<p><strong>blackman_harris</strong></p>
+<hr>
+<div id="112" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>blackman_harris(N)</code></pre>
+<p>Create a Blackman-Harris window</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Blackman-Harris window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-17" class="level5" data-number="1.2.6.2">
+<h5 data-number="1.2.6.2" class="anchored" data-anchor-id="example-17"><span class="header-section-number">1.2.6.2</span> Example</h5>
+<div id="114" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>blackman_harriswin <span class="op">=</span> <span class="fu">blackman_harris</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="116" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-59-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="parzen-window" class="level4" data-number="1.2.7">
+<h4 data-number="1.2.7" class="anchored" data-anchor-id="parzen-window"><span class="header-section-number">1.2.7</span> Parzen window</h4>
+<p>The parzen window is a window function is defined as: <span class="math display">\[
+w[n] = \begin{cases}
+1 - 6\left(\frac{2|n - M|}{N}\right)^2\left(1 - \frac{2|n - M|}{N}\right) &amp;  0 \leq |n - M| \leq \frac{M}{2}\\
+2\left(1 - \frac{2|n - M|}{N}\right)^3 &amp; \frac{M}{2} &lt; |n - M| \leq M\\
+\end{cases}
+\]</span> where <span class="math inline">\(M = \frac{N - 1}{2}\)</span> and <span class="math inline">\(n \in [0, N-1]\)</span>.</p>
+<section id="api-19" class="level5" data-number="1.2.7.1">
+<h5 data-number="1.2.7.1" class="anchored" data-anchor-id="api-19"><span class="header-section-number">1.2.7.1</span> API</h5>
+<div class="api">
+<p><strong>parzen</strong></p>
+<hr>
+<div id="118" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>parzen(N)</code></pre>
+<p>Create a Parzen window</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Parzen window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-18" class="level5" data-number="1.2.7.2">
+<h5 data-number="1.2.7.2" class="anchored" data-anchor-id="example-18"><span class="header-section-number">1.2.7.2</span> Example</h5>
+<div id="120" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>parzenwin <span class="op">=</span> <span class="fu">parzen</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="122" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-62-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="planck-taper-window" class="level4" data-number="1.2.8">
+<h4 data-number="1.2.8" class="anchored" data-anchor-id="planck-taper-window"><span class="header-section-number">1.2.8</span> Planck-taper window</h4>
+<p>The Planck-taper window is a window function that is defined as: <span class="math display">\[
+w[n] = \begin{cases}
+0, &amp; n = 0 \\
+(1 + \text{exp}\left(\frac{\epsilon N}{n} - \frac{\epsilon N}{\epsilon N - n}\right)), &amp; 1 \leq n &lt; \epsilon N \\
+1, &amp; \epsilon N \leq n &lt; N/2 \\
+w[N - n], &amp; 0 \leq n &lt; N/2 \\
+\end{cases},
+\]</span> where <span class="math inline">\(n \in [0, N-1]\)</span> and <span class="math inline">\(\epsilon\)</span> is a parameter, defined in [0, 1] that controls the amount of tapering</p>
+<section id="api-20" class="level5" data-number="1.2.8.1">
+<h5 data-number="1.2.8.1" class="anchored" data-anchor-id="api-20"><span class="header-section-number">1.2.8.1</span> API</h5>
+<div class="api">
+<p><strong>planck</strong></p>
+<hr>
+<div id="124" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>planck(N, ϵ = 0.25)</code></pre>
+<p>Create a Planck-taper window</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>N</code>: Number of points</p>
+</li>
+<li><p><code>ϵ</code>: Parameter controlling the tapering</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>w</code>: Planck-taper window</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-19" class="level5" data-number="1.2.8.2">
+<h5 data-number="1.2.8.2" class="anchored" data-anchor-id="example-19"><span class="header-section-number">1.2.8.2</span> Example</h5>
+<div id="126" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>planckwin <span class="op">=</span> <span class="fu">planck</span>(<span class="fl">1024</span>, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="128" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-65-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="choice-of-a-window-function" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="choice-of-a-window-function"><span class="header-section-number">1.3</span> Choice of a window function</h3>
+<p>The choice of a window function depends on the application and the desired properties of the window<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. Here are some general guidelines for the main windows used in structural dynamics applications:</p>
+<ul>
+<li><p><strong>Rectangular window</strong>: This window is suitable for signals which are periodic in the acquisition window or for non-periodic signals which tend to 0 whithin the time window (such as impact testing).</p></li>
+<li><p><strong>Hann window</strong>: This window is suitable for noisy signals. It is generally used with random signal due to its moderate impact on the frequency resolution and amplitude accuracy of porcessed signals.</p></li>
+<li><p><strong>Hamming window</strong>: This window is used in case of noisy measured signals as the Hann windows. However, contrary to the Hann window, the Hamming window doesn’t reach zero at its both ends.</p></li>
+<li><p><strong>Tukey window</strong>: This window is generally used to analyze transient data due to its shape, since it limits the alteration of the amplitude of transient signals.</p></li>
+<li><p><strong>Blackman-Harris window</strong>: This window is suitable for periodic measurement signals.</p></li>
+<li><p><strong>Flat-top window</strong>: This window is suitable for a calibration purposes (good reproduction of the amplitude height) and for measurements with sine excitation. However, it is not suitable for very noisy measurement signals.</p></li>
+<li><p><strong>Force window</strong>: This window is an effective mechanism for reducing noise on the input channel when the input signal is impulsive.</p></li>
+<li><p><strong>Exponential window</strong>: This window is suitable for transient signals that decay to zero, such as acceleration signal in impact testing.</p></li>
+</ul>
+</section>
+</section>
+<section id="function-estimation" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="function-estimation"><span class="header-section-number">2</span> Function estimation</h2>
+<p>Several functions can be estimated from the time domain data when operating in the frequency domain.</p>
+<p>The <code>StructuralVibration.jl</code> package provides functions to estimate some of the most common functions used in structural dynamics applications. All the functions listed below are based on the Welch’s method and include the option to use a window function (+ its correction factor) to reduce spectral leakage and signal overlapping to reduce the variance of the estimated function or to compensate for the windowing effect.</p>
+<section id="acquisition-parameters" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="acquisition-parameters"><span class="header-section-number">2.1</span> Acquisition parameters</h3>
+<p>When acquiring data, the user has to define the sample rate <span class="math inline">\(f_s\)</span> and the block size <span class="math inline">\(b_s\)</span>. The sample rate is the number of samples per second (in Hz), and the block size is the number of samples in each block. The block size is usually a power of 2, which allows for efficient computation of the FFT. From these two parameters, it is posiible to define the following parameters:</p>
+<ul>
+<li><p><strong>Sampling period</strong>: The sampling period (in s) is the time between two consecutive samples. It is defined as: <span class="math display">\[
+\Delta t = \frac{1}{f_s}.
+\]</span></p></li>
+<li><p><strong>Acquisition duration</strong>: The acquisition duration (in s) is the time taken to acquire a block of data. It is defined as: <span class="math display">\[
+T = b_s \Delta t = \frac{b_s}{f_s}.
+\]</span></p></li>
+<li><p><strong>Frequency resolution</strong>: The frequency resolution (in Hz) is the smallest frequency difference that can be resolved in the frequency domain. It is defined as: <span class="math display">\[
+\Delta f = \frac{f_s}{b_s}.
+\]</span></p></li>
+<li><p><strong>Maximum frequency</strong>: The maximum frequency (in Hz) is the highest frequency that can be resolved in the frequency domain and satisfying the Nyquist theorem. It is defined as: <span class="math display">\[
+f_{max} = \frac{f_s}{2.56}.
+\]</span></p></li>
+</ul>
+<p>All these parameters are implemented in the <code>FFTParameters</code> struct, which is used in the functions to estimate the functions listed below.</p>
+<div class="api">
+<p><strong>FFTParameters</strong></p>
+<hr>
+<div id="130" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>FFTParameters</code></pre>
+<p>Structure to store the time and frequency parameters for the FFT analysis</p>
+<p><strong>Constructor</strong></p>
+<ul>
+<li><p><code>fs::Real</code>: Sampling rate of the signal</p>
+</li>
+<li><p><code>bs::Real</code>: Block size of the signal</p>
+</li>
+<li><p><code>pow2::Bool</code>: Flag for finding the next power of 2</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>t::AbstractRange</code>: Time vector</p>
+</li>
+<li><p><code>dt::Float64</code>: Time step</p>
+</li>
+<li><p><code>tspan::Tuple{Float64, Float64}</code>: Time span</p>
+</li>
+<li><p><code>freq::AbstractRange</code>: Frequency vector</p>
+</li>
+<li><p><code>df::Float64</code>: Frequency resolution</p>
+</li>
+<li><p><code>freq_span::Tuple{Float64, Float64}</code>: Frequency span</p>
+</li>
+<li><p><code>fs::Int</code>: Sampling rate</p>
+</li>
+<li><p><code>bs::Int</code>: Block size</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="response-spectrum" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="response-spectrum"><span class="header-section-number">2.2</span> Response spectrum</h3>
+<p>The response spectrum is basically the Fourier transform of the response of a system to a given input.</p>
+<section id="api-21" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="api-21"><span class="header-section-number">2.2.1</span> API</h4>
+<div class="api">
+<p><strong>spectrum</strong></p>
+<hr>
+<div id="132" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5)</code></pre>
+<p>Estimation of the spectrum of a signal</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>input_signal::Vector{Real}</code>: Input signal</p>
+</li>
+<li><p><code>bs::Int</code>: Block size</p>
+</li>
+<li><p><code>window</code>: Window function</p>
+</li>
+<li><p><code>fs::Int</code>: Sampling rate</p>
+</li>
+<li><p><code>overlap</code>: Overlap ratio between the segments</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>y</code>: Signal spectrum</p>
+</li>
+<li><p><code>freq</code>: Frequency range</p>
+</li>
+</ul>
+<p><strong>Available window functions</strong></p>
+<p><strong>From DSP.jl</strong></p>
+<ul>
+<li><p><code>rect</code></p>
+</li>
+<li><p><code>hann</code> (default)</p>
+</li>
+<li><p><code>hamming</code></p>
+</li>
+<li><p><code>tukey</code></p>
+</li>
+<li><p><code>cosine</code></p>
+</li>
+<li><p><code>lanczos</code></p>
+</li>
+<li><p><code>triang</code></p>
+</li>
+<li><p><code>bartlett</code></p>
+</li>
+<li><p><code>gaussian</code></p>
+</li>
+<li><p><code>bartlett_hann</code></p>
+</li>
+<li><p><code>blackman</code></p>
+</li>
+<li><p><code>kaiser</code></p>
+</li>
+<li><p><code>dpss</code></p>
+</li>
+</ul>
+<p><strong>From StructuralVibration.jl</strong></p>
+<ul>
+<li><p><code>exponential</code></p>
+</li>
+<li><p><code>force</code></p>
+</li>
+<li><p><code>flattop</code></p>
+</li>
+<li><p><code>nutall</code></p>
+</li>
+<li><p><code>blackman_nutall</code></p>
+</li>
+<li><p><code>blackman_harris</code></p>
+</li>
+<li><p><code>parzen</code></p>
+</li>
+<li><p><code>planck</code></p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-20" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="example-20"><span class="header-section-number">2.2.2</span> Example</h4>
+<div id="134" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">256</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">1024</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> fft_params.t</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation signal generation</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, t[<span class="fl">1</span>], <span class="fl">0.8</span>t[<span class="kw">end</span>], freq[<span class="fl">1</span>], freq[<span class="kw">end</span>], zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">excitation</span>(chirp, t)</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference signal</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, x, [<span class="fl">0</span>., <span class="fl">0</span>.], t)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency domain</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>Fx <span class="op">=</span> Fx <span class="op">=</span> <span class="fu">rfft</span>(x)[<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(freq)]<span class="op">/</span>block_size</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>Fx[<span class="fl">2</span><span class="op">:</span><span class="kw">end</span>] <span class="op">.*=</span> <span class="fl">2</span>.</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Response spectrum</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>prob_y <span class="op">=</span> <span class="fu">SdofFrequencyProblem</span>(sdof, Fx, freq)</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">solve</span>(prob_y).u</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectrum stimation</span></span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>uest <span class="op">=</span> <span class="fu">spectrum</span>(y, block_size, <span class="fu">rect</span>(block_size), fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="136" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-69-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="autopower-functions" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="autopower-functions"><span class="header-section-number">2.3</span> Autopower functions</h3>
+<p>Autopower functions are used to estimate the power of a signal in the frequency domain. <code>StructuralVibration.jl</code> allows to compute the following autopower functions:</p>
+<ul>
+<li>Autopower Spectrum</li>
+<li>Autopower Linear</li>
+<li>Autopower Power Spectral Density (PSD)</li>
+<li>Autopower Energy Spectral Density (ESD)</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a detailed discussion on the differences between these functions, please refer to this excellent blogpost <a href="https://community.sw.siemens.com/s/article/the-autopower-function-demystified">The Autopower function… Demystified!</a>.</p>
+</div>
+</div>
+<section id="api-22" class="level4" data-number="2.3.1">
+<h4 data-number="2.3.1" class="anchored" data-anchor-id="api-22"><span class="header-section-number">2.3.1</span> API</h4>
+<div class="api">
+<p><strong>welch</strong></p>
+<hr>
+<div id="138" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5, scaling = :psd)</code></pre>
+<p>Estimation of one-sided Autopower functions of a signal using the Welch method</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>input_signal::Vector{Real}</code>: Input signal</p>
+</li>
+<li><p><code>bs::Int</code>: Block size</p>
+</li>
+<li><p><code>window</code>: Window function</p>
+</li>
+<li><p><code>fs::Int</code>: Sampling rate</p>
+</li>
+<li><p><code>overlap</code>: Overlap ratio between the segments</p>
+</li>
+<li><p><code>scaling</code>: Scale of the PSD - see https://community.sw.siemens.com/s/article/the-autopower-function-demystified for more information</p>
+<ul>
+<li><p><code>:psd</code> (default) - Power Spectral Density</p>
+</li>
+<li><p><code>:esd</code> - Autopower Energy Spectral Density</p>
+</li>
+<li><p><code>:spectrum</code> - Autopower spectrum</p>
+</li>
+<li><p><code>:linear</code> - Autopower linear</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>pxx</code>: Autopower</p>
+</li>
+<li><p><code>freq</code>: Frequency range</p>
+</li>
+</ul>
+<p><strong>Available window functions</strong></p>
+<p><strong>From DSP.jl</strong></p>
+<ul>
+<li><p><code>rect</code></p>
+</li>
+<li><p><code>hann</code> (default)</p>
+</li>
+<li><p><code>hamming</code></p>
+</li>
+<li><p><code>tukey</code></p>
+</li>
+<li><p><code>cosine</code></p>
+</li>
+<li><p><code>lanczos</code></p>
+</li>
+<li><p><code>triang</code></p>
+</li>
+<li><p><code>bartlett</code></p>
+</li>
+<li><p><code>gaussian</code></p>
+</li>
+<li><p><code>bartlett_hann</code></p>
+</li>
+<li><p><code>blackman</code></p>
+</li>
+<li><p><code>kaiser</code></p>
+</li>
+<li><p><code>dpss</code></p>
+</li>
+</ul>
+<p><strong>From StructuralVibration.jl</strong></p>
+<ul>
+<li><p><code>exponential</code></p>
+</li>
+<li><p><code>force</code></p>
+</li>
+<li><p><code>flattop</code></p>
+</li>
+<li><p><code>nutall</code></p>
+</li>
+<li><p><code>blackman_nutall</code></p>
+</li>
+<li><p><code>blackman_harris</code></p>
+</li>
+<li><p><code>parzen</code></p>
+</li>
+<li><p><code>planck</code></p>
+</li>
+</ul>
+<p><strong>Note</strong> The welch function is already implemented in <code>DSP.jl</code> under the name <code>welch_pgram</code>. The function <code>welch</code> is implemented here for pedagogical purposes.</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-21" class="level4" data-number="2.3.2">
+<h4 data-number="2.3.2" class="anchored" data-anchor-id="example-21"><span class="header-section-number">2.3.2</span> Example</h4>
+<p>This example is based on the one provided in the <code>DSP.jl</code> documentation. It generates a signal composed of two sine waves at 100 Hz and 150 Hz with amplitudes equal to 1 and 2 respectively, and then estimates the power spectral density using the Welch method.</p>
+<div id="140" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1000</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="fl">100</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(fs, bs, pow2 <span class="op">=</span> <span class="cn">false</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span>fs)<span class="op">/</span>fs</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> [<span class="fl">100</span> <span class="fl">150</span>]                      <span class="co"># 100Hz &amp; 150Hz frequencies</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [<span class="fl">1</span>; <span class="fl">2</span>]                         <span class="co"># Amplitudes</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">sin</span>.(<span class="fl">2</span>π<span class="op">*</span>f<span class="op">.*</span>t)<span class="op">*</span>A <span class="op">+</span> <span class="fu">randn</span>(<span class="fl">1000</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from DSP.jl</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>psd <span class="op">=</span> DSP.<span class="fu">welch_pgram</span>(x, bs; fs <span class="op">=</span> fs, window <span class="op">=</span> hamming)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>pxx_ref <span class="op">=</span> DSP.<span class="fu">power</span>(psd)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from StructuralVibration.jl</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>pxx <span class="op">=</span> <span class="fu">welch</span>(x, bs, <span class="fu">hamming</span>(bs), fs <span class="op">=</span> fs)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="142" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-72-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="frequency-response-function" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="frequency-response-function"><span class="header-section-number">2.4</span> Frequency Response Function</h3>
+<p>The frequency response function (FRF) is the relation between an input <span class="math inline">\(x\)</span> and the resulting output <span class="math inline">\(y\)</span> of a linear and time-invariant system. Independent of the input, it is an intrinsic property of the system describing its dynamic behavior w.r.t. the frequency.</p>
+<p>In practice, the FRF is computed from estimators. In <code>StructuralVibration.jl</code>, the following estimators are implemented:</p>
+<ul>
+<li><strong>H1 estimator</strong>: It is the most common estimator used in structural dynamics. It assumes that the noise only affects the output signal. It is defined as: <span class="math display">\[
+H_1(\omega) = \frac{S_{yx}(\omega)}{S_{xx}(\omega)},
+\]</span> where <span class="math inline">\(S_{yx}(\omega)\)</span> is the cross-power spectral density between the input and output signals, and <span class="math inline">\(S_{xx}(\omega)\)</span> is the power spectral density of the input signal.</li>
+</ul>
+<p>Generally, the H1 estimator estimates the anti-resonances better than the resonances<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. Furthermore, as the number of averages increases, the H1 estimator converges to the true FRF.</p>
+<ul>
+<li><strong>H2 estimator</strong>: It is used when the noise is assumed to affect the input signal only. It is defined as: <span class="math display">\[
+H_2(\omega) = \frac{S_{yy}(\omega)}{S_{yx}(\omega)},
+\]</span> where <span class="math inline">\(S_{yy}(\omega)\)</span> is the power spectral density of the output signal.</li>
+</ul>
+<p>Contrary to the H1 estimator, the H2 estimator estimates the resonances better than the anti-resonances<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
+<ul>
+<li><strong>H3 estimator</strong>: It is used when the noise is assumed to affect both the input and output signals. It is defined as the arithmetic mean of the H1 and H2 estimators: <span class="math display">\[
+H_3(\omega) = \frac{H_1(\omega) + H_2(\omega)}{2}.
+\]</span></li>
+</ul>
+<p>This estimator offers a good compromise between the H1 and H2 estimators, but it is not as commonly used as the H1 and H2 estimators.</p>
+<ul>
+<li><strong>Hv estimate</strong>: It is used when the noise is assumed to affect both the input and output signals. It is defined as the geometric mean of the H1 and H2 estimators: <span class="math display">\[
+H_v(\omega) = \sqrt{H_1(\omega) H_2(\omega)}.
+\]</span></li>
+</ul>
+<p>It generally provides the best overall estimate of the FRF, because the geometric mean is less sensitive to outliers than the arithmetic mean.</p>
+<p>These estimators are generally completed by other information such as the coherence function, which an averaged function that how much the output is linearly related to the input. In this sense, it can be an indicator of the quality of the FRF estimate. It can also serve to check the repeatability of individual FRF estimates. It is expressed as: <span class="math display">\[
+\gamma^2(\omega) = \frac{S_{yx}^2(\omega)}{S_{xx}(\omega) S_{yy}(\omega)} = \frac{H_1(\omega)}{H_2(\omega)},
+\]</span> where <span class="math inline">\(S_{yx}(\omega)\)</span> is the cross-power spectral density between the input and output signals, and <span class="math inline">\(S_{xx}(\omega)\)</span> and <span class="math inline">\(S_{yy}(\omega)\)</span> are the power spectral densities of the input and output signals respectively.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In absence of averaging, the coherence is equal to 1 over all the frequency range!</p>
+</div>
+</div>
+<section id="api-23" class="level4" data-number="2.4.1">
+<h4 data-number="2.4.1" class="anchored" data-anchor-id="api-23"><span class="header-section-number">2.4.1</span> API</h4>
+<div class="api">
+<p><strong>tfestimate</strong></p>
+<hr>
+<div id="144" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs), window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)</code></pre>
+<p>Estimation of the one-sided transfer function between two signals</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>input_signal::Vector{Real}</code>: Input signal</p>
+</li>
+<li><p><code>output_signal::Vector{Real}</code>: Output signal</p>
+</li>
+<li><p><code>bs::Int</code> Block size</p>
+</li>
+<li><p><code>window_input</code>: Window function for the input signal</p>
+</li>
+<li><p><code>window_output</code>: Window function for the output signal</p>
+</li>
+<li><p><code>fs::Int</code>: Sampling rate</p>
+</li>
+<li><p><code>overlap::Real</code>: Overlap ratio between the segments</p>
+</li>
+<li><p><code>type::Symbol</code>: Type of transfer function to estimate</p>
+<ul>
+<li><p><code>:h1</code> (default)</p>
+</li>
+<li><p><code>:h2</code></p>
+</li>
+<li><p><code>:h3</code> - h3 = (h1 + h2)/2</p>
+</li>
+<li><p><code>:hv</code> - hv = sqrt(h1*h2)</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><p><code>H</code>: Transfer function</p>
+</li>
+<li><p><code>freq</code>: Frequency range</p>
+</li>
+<li><p><code>coh</code>: Coherence</p>
+</li>
+</ul>
+<p><strong>Available window functions</strong></p>
+<p><strong>From DSP.jl</strong></p>
+<ul>
+<li><p><code>rect</code></p>
+</li>
+<li><p><code>hann</code> (default)</p>
+</li>
+<li><p><code>hamming</code></p>
+</li>
+<li><p><code>tukey</code></p>
+</li>
+<li><p><code>cosine</code></p>
+</li>
+<li><p><code>lanczos</code></p>
+</li>
+<li><p><code>triang</code></p>
+</li>
+<li><p><code>bartlett</code></p>
+</li>
+<li><p><code>bartlett_hann</code></p>
+</li>
+<li><p><code>gaussian</code></p>
+</li>
+<li><p><code>blackman</code></p>
+</li>
+<li><p><code>kaiser</code></p>
+</li>
+<li><p><code>dpss</code></p>
+</li>
+</ul>
+<p><strong>From StructuralVibration.jl</strong></p>
+<ul>
+<li><p><code>exponential</code></p>
+</li>
+<li><p><code>force</code></p>
+</li>
+<li><p><code>flattop</code></p>
+</li>
+<li><p><code>nutall</code></p>
+</li>
+<li><p><code>blackman_nutall</code></p>
+</li>
+<li><p><code>blackman_harris</code></p>
+</li>
+<li><p><code>parzen</code></p>
+</li>
+<li><p><code>planck</code></p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-22" class="level4" data-number="2.4.2">
+<h4 data-number="2.4.2" class="anchored" data-anchor-id="example-22"><span class="header-section-number">2.4.2</span> Example</h4>
+<div id="146" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters for one block</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">256</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">1024</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference FRF</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">SdofFRFProblem</span>(sdof, freq)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob_frf).u</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation - Input signal</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>nblocks <span class="op">=</span> <span class="fl">5</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>tb <span class="op">=</span> fft_params.t</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> fft_params.dt</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> tb[<span class="fl">1</span>]<span class="op">:</span>dt<span class="op">:</span>(<span class="fu">nblocks*</span>(tb[<span class="kw">end</span>] <span class="op">+</span> dt) <span class="op">-</span> dt)</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, tb[<span class="fl">1</span>], <span class="fl">0.8</span>tb[<span class="kw">end</span>], freq[<span class="fl">1</span>], freq[<span class="kw">end</span>], zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">repeat</span>(<span class="fu">excitation</span>(chirp, tb), outer <span class="op">=</span> nblocks)</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation - Output signal</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, x, [<span class="fl">0</span>., <span class="fl">0</span>.], t)</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="co"># FRF estimation</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>win <span class="op">=</span> <span class="fu">tukey</span>(block_size, <span class="fl">0.25</span>)</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>H1 <span class="op">=</span> <span class="fu">tfestimate</span>(x, y, block_size, win, fs <span class="op">=</span> sample_rate, overlap <span class="op">=</span> <span class="fl">0</span>.)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="148" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-75-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>M+P International, “M+P Analyzer. User Manual Revision 5.1”. 2017.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Polytec, “Polytec Scanning Vibrometer, Theory Manual”. 2019.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>P. Avitabile, “Modal Testing: A practioner’s guide”. John Wiley &amp; Sons. 2018.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Simcenter Testing Knowledge. “What is a Frequency Response Function (FRF)?”. 2020. <a href="https://community.sw.siemens.com/s/article/what-is-a-frequency-response-function-frf">link</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Simcenter Testing Knowledge. “What is a Frequency Response Function (FRF)?”. 2020. <a href="https://community.sw.siemens.com/s/article/what-is-a-frequency-response-function-frf">link</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/maucejo\.github\.io\/StructuralVibration\.jl\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../signal_processing/noise.html" class="pagination-link" aria-label="Noise estimation &amp; denoising methods">
+        <span class="nav-page-text">Noise estimation &amp; denoising methods</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>2025 Mathieu Aucejo ∙ Powered by <a href="https://quarto.org"><img src="..\assets/logo/quarto.png" class="img-fluid" style="width:4mm"></a> and <a href="https://julialang.org"><img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm"></a></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
