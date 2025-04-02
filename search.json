@@ -301,45 +301,54 @@
     "href": "modal_extraction/indicators.html",
     "title": "Quality and analysis indicators",
     "section": "",
-    "text": "To be implemented."
-  },
-  {
-    "objectID": "modal_extraction/sdof_methods.html",
-    "href": "modal_extraction/sdof_methods.html",
-    "title": "Sdof methods",
-    "section": "",
-    "text": "The SDOF methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The SDOF methods are typically used for systems that are lightly damped and for which the modes are well separated.\nStructuralDynamics.jl provides two SDOF methods for modal extraction:\n\nPeak picking method\nCircle fit method\n\nFor these methods, it is assumed that the FRF (admittance) is given by: \\[\nH_{pq}(\\omega) = \\sum_{i = 1}^N\\frac{_{i}A_{pq}}{\\omega_i^2 - \\omega^2 + j\\eta_i\\omega_i^2}\n\\] where, for a mode \\(i\\), \\(_{i}A_{pq} = \\Phi_i(x_p)\\Phi_i(x_q)\\) is the residue, \\(\\omega_i\\) is the natural frequency, \\(\\eta_i\\) is the modal damping factor, and \\(\\Phi_i(x_p)\\) is the mass-normalized mode shape at the point \\(x_p\\).\nWhen the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency \\(\\omega\\) close to the natural frequency \\(\\omega_i\\): \\[\n\\fbox{$H_{pq}(\\omega) \\approx \\frac{\\Phi_i(x_p)\\Phi_i(x_q)}{M_i\\left(\\omega_i^2 - \\omega^2 + j\\eta_i\\omega_i^2\\right)}.$}\n\\]\n\n\n\n\n\n\nNote\n\n\n\nOne can note that the modal damping factor \\(\\eta_i\\) is related to the damping ratio \\(\\xi_i\\) by the relation: \\[\n\\eta_i = 2\\xi_i.\n\\]\n\n\n\n\nThe peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:\n\nIdentification of natural frequencies\nThey are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using Peaks.jl.\nEstimation of modal damping factors\nTo estimate the value of the damping factor for mode \\(i\\), the half power bandwidth method is used. This procedure, valid for low damping (\\(\\eta_i &lt; 0.1\\)), first determines the frequencies \\(\\omega_1\\) and \\(\\omega_2\\) such that: \\[\n\\vert H_{pq}(\\omega_1)\\vert = \\vert H_{pq}(\\omega_2)\\vert = \\frac{\\vert H_{pq}(\\omega_i)\\vert}{\\sqrt{2}},\n\\] with \\(\\omega_i \\in [\\omega_1, \\omega_2]\\).\nKnowing the values of \\(\\omega_i\\), \\(\\omega_1\\), and \\(\\omega_2\\), the damping ratio for mode \\(i\\) is determined using the formula: \\[\n\\eta_i = \\frac{\\omega_2^2 - \\omega_1^2}{2\\omega_i^2}.\n\\]\n::: {.callout-note} If we consider that the shape of a resonance peak is symmetric then \\(\\omega_i = \\frac{\\omega_1 + \\omega_2}{2}\\).\nIt comes that: \\[\n\\omega_2^2 - \\omega_1^2 \\approx 2\\omega_i(\\omega_2 - \\omega_1).\n\\]\nHence, the damping ratio can be approximated as: \\[\n\\eta_i \\approx \\frac{\\omega_2 - \\omega_1}{\\omega_i}.\n\\]\nThis formula is often given in textbooks when dealing with the half power bandwidth method. :::\nDetermination of mode shapes At the resonance frequency \\(\\omega_i\\), the admittance matrix is expressed as: \\[\n\\mathbf{H} = \\frac{1}{j\\eta_i\\omega_i^2}\n   \\begin{bmatrix}\n       \\Phi_i(x_1)^2 & \\Phi_i(x_1)\\Phi_i(x_2) & \\ldots\\ & \\Phi_i(x_1)\\Phi_i(x_N) \\\\\n       \\Phi_i(x_2)\\Phi_i(x_1) & \\Phi_i(x_2)^2 &  & \\Phi_i(x_2)\\Phi_i(x_N) \\\\\n       \\vdots & & \\ddots & \\vdots \\\\\n       \\Phi_i(x_N)\\Phi_i(x_1) & \\ldots & \\ldots & \\Phi_i(x_N)^2\n     \\end{bmatrix}\n\\]\nTo determine the mode shapes from the knowledge of a column \\(q\\) (or a row \\(p\\)), proceed as follows:\n\nFrom the measurement of an input admittance (diagonal term of the admittance matrix), the mode shape value at point \\(x_q\\) is obtained: \\[\n\\Phi_i(x_q)^2 =  \\eta_i\\omega_i^2 \\text{Im}(H_{qq}(\\omega_i))\n\\]\n\nFrom the cross-admittances (off-diagonal terms of the admittance matrix), the mode shape value at a point \\(x_p\\) is calculated: \\[\n\\Phi_i(x_p)\\Phi_i(x_q) = \\eta_i\\omega_i^2 \\text{Im}(H_{pq}(\\omega_i)).\n\\]"
-  },
-  {
-    "objectID": "modal_extraction/sdof_methods.html#theory",
-    "href": "modal_extraction/sdof_methods.html#theory",
-    "title": "Sdof methods",
-    "section": "",
-    "text": "The SDOF methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The SDOF methods are typically used for systems that are lightly damped and for which the modes are well separated.\nStructuralDynamics.jl provides two SDOF methods for modal extraction:\n\nPeak picking method\nCircle fit method\n\nFor these methods, it is assumed that the FRF (admittance) is given by: \\[\nH_{pq}(\\omega) = \\sum_{i = 1}^N\\frac{_{i}A_{pq}}{\\omega_i^2 - \\omega^2 + j\\eta_i\\omega_i^2}\n\\] where, for a mode \\(i\\), \\(_{i}A_{pq} = \\Phi_i(x_p)\\Phi_i(x_q)\\) is the residue, \\(\\omega_i\\) is the natural frequency, \\(\\eta_i\\) is the modal damping factor, and \\(\\Phi_i(x_p)\\) is the mass-normalized mode shape at the point \\(x_p\\).\nWhen the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency \\(\\omega\\) close to the natural frequency \\(\\omega_i\\): \\[\n\\fbox{$H_{pq}(\\omega) \\approx \\frac{\\Phi_i(x_p)\\Phi_i(x_q)}{M_i\\left(\\omega_i^2 - \\omega^2 + j\\eta_i\\omega_i^2\\right)}.$}\n\\]\n\n\n\n\n\n\nNote\n\n\n\nOne can note that the modal damping factor \\(\\eta_i\\) is related to the damping ratio \\(\\xi_i\\) by the relation: \\[\n\\eta_i = 2\\xi_i.\n\\]\n\n\n\n\nThe peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:\n\nIdentification of natural frequencies\nThey are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using Peaks.jl.\nEstimation of modal damping factors\nTo estimate the value of the damping factor for mode \\(i\\), the half power bandwidth method is used. This procedure, valid for low damping (\\(\\eta_i &lt; 0.1\\)), first determines the frequencies \\(\\omega_1\\) and \\(\\omega_2\\) such that: \\[\n\\vert H_{pq}(\\omega_1)\\vert = \\vert H_{pq}(\\omega_2)\\vert = \\frac{\\vert H_{pq}(\\omega_i)\\vert}{\\sqrt{2}},\n\\] with \\(\\omega_i \\in [\\omega_1, \\omega_2]\\).\nKnowing the values of \\(\\omega_i\\), \\(\\omega_1\\), and \\(\\omega_2\\), the damping ratio for mode \\(i\\) is determined using the formula: \\[\n\\eta_i = \\frac{\\omega_2^2 - \\omega_1^2}{2\\omega_i^2}.\n\\]\n::: {.callout-note} If we consider that the shape of a resonance peak is symmetric then \\(\\omega_i = \\frac{\\omega_1 + \\omega_2}{2}\\).\nIt comes that: \\[\n\\omega_2^2 - \\omega_1^2 \\approx 2\\omega_i(\\omega_2 - \\omega_1).\n\\]\nHence, the damping ratio can be approximated as: \\[\n\\eta_i \\approx \\frac{\\omega_2 - \\omega_1}{\\omega_i}.\n\\]\nThis formula is often given in textbooks when dealing with the half power bandwidth method. :::\nDetermination of mode shapes At the resonance frequency \\(\\omega_i\\), the admittance matrix is expressed as: \\[\n\\mathbf{H} = \\frac{1}{j\\eta_i\\omega_i^2}\n   \\begin{bmatrix}\n       \\Phi_i(x_1)^2 & \\Phi_i(x_1)\\Phi_i(x_2) & \\ldots\\ & \\Phi_i(x_1)\\Phi_i(x_N) \\\\\n       \\Phi_i(x_2)\\Phi_i(x_1) & \\Phi_i(x_2)^2 &  & \\Phi_i(x_2)\\Phi_i(x_N) \\\\\n       \\vdots & & \\ddots & \\vdots \\\\\n       \\Phi_i(x_N)\\Phi_i(x_1) & \\ldots & \\ldots & \\Phi_i(x_N)^2\n     \\end{bmatrix}\n\\]\nTo determine the mode shapes from the knowledge of a column \\(q\\) (or a row \\(p\\)), proceed as follows:\n\nFrom the measurement of an input admittance (diagonal term of the admittance matrix), the mode shape value at point \\(x_q\\) is obtained: \\[\n\\Phi_i(x_q)^2 =  \\eta_i\\omega_i^2 \\text{Im}(H_{qq}(\\omega_i))\n\\]\n\nFrom the cross-admittances (off-diagonal terms of the admittance matrix), the mode shape value at a point \\(x_p\\) is calculated: \\[\n\\Phi_i(x_p)\\Phi_i(x_q) = \\eta_i\\omega_i^2 \\text{Im}(H_{pq}(\\omega_i)).\n\\]"
-  },
-  {
-    "objectID": "modal_extraction/sdof_methods.html#api",
-    "href": "modal_extraction/sdof_methods.html#api",
-    "title": "Sdof methods",
-    "section": "2 API",
-    "text": "2 API\n\n** freq_extraction**\n\n\n\nfreq_extraction(freq, H, method::ModalExtraction; type = :dis)\nExtract natural frequencies and damping ratios from the Bode diagram fitting method\nInputs\n\nfreq: Frequency vector\n\nH: Frequency response function\n\nmethod: Method to extract the natural frequencies and damping ratios\n\nPeakPickingExtract: Peak picking method (default)\n\nCircleFitExtract: Circle fitting method\n\n\n\ntype: Type of FRF used to extract the natural frequencies and damping ratios\n\n:dis: Admittance (default)\n\n:vel: Mobility\n\n:acc: Accelerance\n\n\n\n\nOutputs\n\nfn: Natural frequencies\n\nξn: Damping ratios\n\n\n\n\n\n\n\n\n\nmodeshape_extraction\n\n\n\nmodeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction; type = :dis)\nExtract mode shapes from the Bode's diagram of Nyquiste's circle fitting method\nInputs\n\nfreq: Frequency vector\n\nH: Frequency response function\n\nfn: Natural frequencies\n\nξn: Damping ratios\n\nid_exc: Identifier of the excited nodes\n\nmethod: Method to extract the mode shapes\n\nBodeExtract: Bode diagram (default)\n\nNyquistExtract: Nyquist diagram\n\n\n\ntype: Type of FRF used to extract the natural frequencies and damping ratios\n\n:dis: Admittance (default)\n\n:vel: Mobility\n\n:acc: Accelerance\n\n\n\n\nOutput\n\nϕn: Mode shapes"
-  },
-  {
-    "objectID": "modal_extraction/sdof_methods.html#example",
-    "href": "modal_extraction/sdof_methods.html#example",
-    "title": "Sdof methods",
-    "section": "3 Example",
-    "text": "3 Example\n#| output: false"
+    "text": "To be implemented.",
+    "crumbs": [
+      "Modal extraction",
+      "Quality and analysis indicators"
+    ]
   },
   {
     "objectID": "modal_extraction/index.html",
     "href": "modal_extraction/index.html",
-    "title": "Generalities",
+    "title": "Sdof methods",
     "section": "",
-    "text": "The modal approach allows evaluating the dynamic behavior of a structure based on the knowledge of its natural vibration modes, which are intrinsic characteristics of the system. From a practical perspective, this knowledge can, in particular, help assess the frequencies at which the structure is most likely to vibrate. For industrial applications, this information is valuable, as vibrations can cause discomfort, noise, premature wear of a system, or even its failure. It is in this context that Experimental Modal Analysis (EMA) comes into play.\nBased on vibration measurements, EMA aims to estimate the natural frequencies of the system, as well as other characteristic parameters (damping and mode shapes) to obtain a modal model of the considered system. This model can then be used subsequently to determine the dynamic behavior of the structure for a specific excitation.\nTo achieve these objectives, we will assume here that:\n\nthe system is linear and time-invariant;\nthe system, which is continuous by nature, can be represented by a discrete system where the motion parameters are known at each node of a measurement grid;\nthe modal damping is of viscous or structural type.\n\nBy principle, EMA is an inverse method, i.e., based on the measured responses at each point of the grid, we aim to determine the modal characteristics of a structure.\nFrom a general perspective, the extraction of modal parameters consists of:\n\nidentifying the natural frequencies \\(\\omega_i\\);\nestimating the modal damping factors \\(\\eta_i\\);\ndetermining the mode shapes \\(\\Phi_i\\).\n\nIn practice, different strategies can be used to extract the modal parameters, and we distinguish:\n\nthe SDOF methods, which aim to fit ideal transfer functions of single degree of freedom systems to the experimental curves in the vicinity of the identified resonance frequencies of the system.\nthe MDOF methods, which aim to fit ideal transfer functions of multiple degrees of freedom systems to the experimental curves.",
+    "text": "The SDOF methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The SDOF methods are typically used for systems that are lightly damped and for which the modes are well separated.",
     "crumbs": [
       "Modal extraction",
-      "Generalities"
+      "Sdof methods"
+    ]
+  },
+  {
+    "objectID": "modal_extraction/index.html#natural-frequencies-and-damping-ratios-extraction",
+    "href": "modal_extraction/index.html#natural-frequencies-and-damping-ratios-extraction",
+    "title": "Sdof methods",
+    "section": "1 Natural frequencies and damping ratios extraction",
+    "text": "1 Natural frequencies and damping ratios extraction\nStructuralDynamics.jl provides two SDOF methods for extracting the natural frequencies and damping ratios of a system from its frequency response function (FRF):\n\nPeak picking method\nCircle fit method\n\nFor these methods, it is assumed that the FRF (admittance) is given by: \\[\nH_{pq}(\\omega) = \\sum_{i = 1}^N\\frac{_{i}A_{pq}}{\\omega_i^2 - \\omega^2 + j\\eta_i\\omega_i^2}\n\\] where, for a mode \\(i\\), \\(_{i}A_{pq} = \\Phi_i(x_p)\\Phi_i(x_q)\\) is the residue, \\(\\omega_i\\) is the natural frequency, \\(\\eta_i\\) is the modal damping factor, and \\(\\Phi_i(x_p)\\) is the mass-normalized mode shape at the point \\(x_p\\).\nWhen the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency \\(\\omega\\) close to the natural frequency \\(\\omega_i\\): \\[\n\\fbox{$H_{pq}(\\omega) \\approx \\frac{\\Phi_i(x_p)\\Phi_i(x_q)}{M_i\\left(\\omega_i^2 - \\omega^2 + j\\eta_i\\omega_i^2\\right)}.$}\n\\]\n\n\n\n\n\n\nNote\n\n\n\nOne can note that the modal damping factor \\(\\eta_i\\) is related to the damping ratio \\(\\xi_i\\) by the relation: \\[\n\\eta_i = 2\\xi_i.\n\\]\n\n\n\n1.1 Peak picking method\nThe peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:\n\nIdentification of natural frequencies\nThey are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using Peaks.jl.\nEstimation of modal damping factors\nTo estimate the value of the damping factor for mode \\(i\\), the half power bandwidth method is used. This procedure, valid for low damping (\\(\\eta_i &lt; 0.1\\)), first determines the frequencies \\(\\omega_1\\) and \\(\\omega_2\\) such that: \\[\n\\vert H_{pq}(\\omega_1)\\vert = \\vert H_{pq}(\\omega_2)\\vert = \\frac{\\vert H_{pq}(\\omega_i)\\vert}{\\sqrt{2}},\n\\] with \\(\\omega_i \\in [\\omega_1, \\omega_2]\\).\nKnowing the values of \\(\\omega_i\\), \\(\\omega_1\\), and \\(\\omega_2\\), the damping ratio for mode \\(i\\) is determined using the formula: \\[\n\\eta_i = \\frac{\\omega_2^2 - \\omega_1^2}{2\\omega_i^2}.\n\\]\n::: {.callout-note} If we consider that the shape of a resonance peak is symmetric then \\(\\omega_i = \\frac{\\omega_1 + \\omega_2}{2}\\).\nIt comes that: \\[\n\\omega_2^2 - \\omega_1^2 \\approx 2\\omega_i(\\omega_2 - \\omega_1).\n\\]\nHence, the damping ratio can be approximated as: \\[\n\\eta_i \\approx \\frac{\\omega_2 - \\omega_1}{\\omega_i}.\n\\]\nThis formula is often given in textbooks when dealing with the half power bandwidth method. :::",
+    "crumbs": [
+      "Modal extraction",
+      "Sdof methods"
+    ]
+  },
+  {
+    "objectID": "modal_extraction/index.html#api",
+    "href": "modal_extraction/index.html#api",
+    "title": "Sdof methods",
+    "section": "2 API",
+    "text": "2 API\n\n** freq_extraction**\n\n\n\nfreq_extraction(freq, H, method::ModalExtraction; type = :dis)\nExtract natural frequencies and damping ratios from the Bode diagram fitting method\nInputs\n\nfreq: Frequency vector\n\nH: Frequency response function\n\nmethod: Method to extract the natural frequencies and damping ratios\n\nPeakPickingExtract: Peak picking method (default)\n\nCircleFitExtract: Circle fitting method\n\n\n\ntype: Type of FRF used to extract the natural frequencies and damping ratios\n\n:dis: Admittance (default)\n\n:vel: Mobility\n\n:acc: Accelerance\n\n\n\n\nOutputs\n\nfn: Natural frequencies\n\nξn: Damping ratios\n\n\n\n\n\n\n\n\n\nmodeshape_extraction\n\n\n\nmodeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction; type = :dis)\nExtract mode shapes from the Bode's diagram of Nyquiste's circle fitting method\nInputs\n\nfreq: Frequency vector\n\nH: Frequency response function\n\nfn: Natural frequencies\n\nξn: Damping ratios\n\nid_exc: Identifier of the excited nodes\n\nmethod: Method to extract the mode shapes\n\nBodeExtract: Bode diagram (default)\n\nNyquistExtract: Nyquist diagram\n\n\n\ntype: Type of FRF used to extract the natural frequencies and damping ratios\n\n:dis: Admittance (default)\n\n:vel: Mobility\n\n:acc: Accelerance\n\n\n\n\nOutput\n\nϕn: Mode shapes",
+    "crumbs": [
+      "Modal extraction",
+      "Sdof methods"
+    ]
+  },
+  {
+    "objectID": "modal_extraction/index.html#example",
+    "href": "modal_extraction/index.html#example",
+    "title": "Sdof methods",
+    "section": "3 Example",
+    "text": "3 Example\n#| output: false",
+    "crumbs": [
+      "Modal extraction",
+      "Sdof methods"
     ]
   },
   {
@@ -347,14 +356,22 @@
     "href": "modal_extraction/mdof_methods.html",
     "title": "Mdof methods",
     "section": "",
-    "text": "To be implemented."
+    "text": "To be implemented.",
+    "crumbs": [
+      "Modal extraction",
+      "Mdof methods"
+    ]
   },
   {
     "objectID": "modal_extraction/frf_reconstruction.html",
     "href": "modal_extraction/frf_reconstruction.html",
     "title": "FRF reconstruction",
     "section": "",
-    "text": "To be implemented."
+    "text": "To be implemented.",
+    "crumbs": [
+      "Modal extraction",
+      "FRF reconstruction"
+    ]
   },
   {
     "objectID": "models/index.html",
