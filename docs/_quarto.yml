@@ -1,0 +1,70 @@
+project:
+  type: website
+
+website:
+  title: "StructuralVibration.jl"
+  favicon: "assets/logo/doclogo.svg"
+  page-navigation: true
+  navbar:
+    logo: "assets/logo/doclogo.svg"
+    left:
+      - text: "Overview"
+        file: index.qmd
+      - text: "Models"
+        file: models/index.qmd
+      - text: "Solvers"
+        file: solvers/index.qmd
+      - text: "Modal extraction"
+        file: modal_extraction/index.qmd
+      - text: "Signal processing"
+        file: signal_processing/index.qmd
+      - text: "Visualization"
+        file: visualization/index.qmd
+    right:
+      - icon: github
+        href: https://github.com/maucejo/StructuralVibration.jl
+        aria-label: GitHub
+
+  sidebar:
+    - title: "Overview"
+      contents:
+        - index.qmd
+        - overview/installation.qmd
+
+    - title: "Models"
+      contents:
+        - models/index.qmd
+        - models/excitation.qmd
+        - models/noise.qmd
+
+    - title: "Solvers"
+      contents:
+        - solvers/index.qmd
+        - solvers/modal_time_solvers.qmd
+        - solvers/direct_time_solvers.qmd
+        - solvers/state_space_solvers.qmd
+        - solvers/frequency_solvers.qmd
+
+    - title: "Modal extraction"
+      contents:
+        - modal_extraction/index.qmd
+
+    - title: "Signal processing"
+      contents:
+      - signal_processing/index.qmd
+      - signal_processing/noise.qmd
+      - signal_processing/modal_parameters_extraction.qmd
+
+    - title: "Visualization"
+      contents:
+        - visualization/index.qmd
+
+  page-footer:
+    center: "2025 Mathieu Aucejo &#8729; Powered by [![](/assets/logo/quarto.png){width=4mm}](https://quarto.org) and [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org)"
+
+format:
+  html:
+    theme:
+      - cosmo
+      - assets/doctheme.scss
+    smooth-scroll: true

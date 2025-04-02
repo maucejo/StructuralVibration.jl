@@ -1,0 +1,51 @@
+name = "StructuralVibration"
+uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
+authors = ["Mathieu Aucejo <79322171+maucejo@users.noreply.github.com> and contributors"]
+version = "0.1.0"
+
+[deps]
+DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
+Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Peaks = "18e31ff7-3703-566c-8e60-38913d67486b"
+PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+
+[weakdeps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+
+[extensions]
+CairoMakieExt = "CairoMakie"
+GLMakieExt = "GLMakie"
+
+[compat]
+CairoMakie = "0.13.1"
+DSP = "0.8.0"
+FFTW = "1.8.0"
+FastGaussQuadrature = "1.0.2"
+GLMakie = "0.11.2"
+Interpolations = "0.15.1"
+LinearAlgebra = "1.11.0"
+Optim = "1.10.0"
+Peaks = "0.5.3"
+PrecompileTools = "1.2.1"
+ProgressMeter = "1.10.2"
+Random = "1.11.0"
+SpecialFunctions = "2.5.0"
+Statistics = "1.11.1"
+TestItems = "1.0.0"
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
+
+[targets]
+test = ["Test"]

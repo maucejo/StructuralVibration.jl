@@ -1,0 +1,154 @@
+---
+title: Visualization extensions
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+`StructuralVibration.jl` is accompanied by two extensions `CairoMakieExt.jl` and `GLMakieExt.jl` providing visualization capabilities. The extensions provide a set of functions to visualize the results of the structural dynamics analysis.
+
+To use one of these extensions, you need to import the desired plotting package by running the following command:
+```julia
+using CairoMakie
+
+# or
+
+using GLMakie
+```
+
+## Bode plot
+
+A Bode plot is a graph of the magnitude and phase of a transfer function versus frequency.
+
+::: {.api}
+**bode_plot**
+
+---
+```{julia}
+#| echo: false
+@doc bode_plot
+```
+:::
+
+```{julia}
+# Initialize a Sdof type
+m = 1.
+f₀ = 10.
+ξ = 0.01
+sdof = Sdof(m, f₀, ξ)
+
+# Computation parameters
+freq = 1.:0.01:30.
+
+# Compute the FRF
+prob_frf = SdofFRFProblem(sdof, freq)
+H = solve(prob_frf).u
+
+# Bode plot
+bode_plot(freq, H)
+```
+
+## Nyquist plot
+
+The Nyquist plot is either a 2D or 3D plot. In 2D, it is a graph of the imaginary part versus the real part of the transfer function. In 3D, it is a graph of the imaginary part versus the real part of the transfer function and the frequency.
+
+### 2D plot
+
+::: {.api}
+**nyquist_plot**
+
+---
+```{julia}
+#| echo: false
+@doc nyquist_plot(y::Vector{ComplexF64}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
+```
+:::
+
+```{julia}
+nyquist_plot(H)
+```
+
+### 3D plot
+
+::: {.api}
+**nyquist_plot**
+
+---
+```{julia}
+#| echo: false
+@doc nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS)
+```
+:::
+
+```{julia}
+nyquist_plot(freq, H, projection = true)
+```
+
+## Waterfall plot
+
+A waterfall plot is a 3D plot with a partial curtain along the y-axis.
+
+::: {.api}
+**waterfall_plot**
+
+---
+```{julia}
+#| echo: false
+@doc waterfall_plot
+```
+:::
+
+```julia
+x = range(0., 2π, 100)
+y = range(0., 1., 5)
+
+nx = length(x)
+ny = length(y)
+z = zeros(ny, nx)
+
+for i in eachindex(y)
+    z[i, :] = sin.(i*x/2.)
+end
+
+waterfall_plot(x, y, z, xlim = [-0.1, 2π + 0.1], ylim = [-0.1, 1.1])
+```
+
+![](../assets/images/waterfall.png){width=85%}
+
+## SV plot
+
+The SV plot (for _StructuralVibration plot_) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.
+
+::: {.api}
+**sv_plot**
+
+---
+```{julia}
+#| echo: false
+@doc sv_plot
+```
+:::
+
+```{julia}
+#| echo: false
+#| output: false
+x = range(0., 2π, 100)
+z_sv = ntuple(i -> sin.(i*x/2), 5)
+```
+
+```{julia}
+sv_plot(x, z_sv..., lw = 2., legend = (active = true,))
+# or sv_plot(x, z_sv[1], z_sv[2], z_sv[3], z_sv[4], z_sv[5], lw = 2., legend = (active = true,))
+```

@@ -1,0 +1,11 @@
+---
+title: Noise estimation & denoising methods
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---

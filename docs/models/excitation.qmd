@@ -1,0 +1,682 @@
+---
+title: Excitation models
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, FFTW, ShareAdd
+@usingany CairoMakie
+```
+
+## Available models
+
+To define an excitation, two steps must be followed:
+
+1. Initialize an excitation type:
+
+    ```julia
+    exc_type = MyExcitation(params...)
+    ```
+
+2. Compute the excitation signal corresponding to the given excitation type over a given duration `t` (See @sec-exc-api for details):
+
+    ```julia
+    F = excitation(exc_type, t)
+    ```
+
+### Rectangular signal
+
+The rectangular signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+F_0 & \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, and $T$ is the duration of the signal.
+
+::: {.api}
+**Rectangle**
+
+---
+```{julia}
+#| echo: false
+@doc Rectangle
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+
+# Initialize Rectangle type
+rect = Rectangle(F0, tstart, duration)
+
+# Compute the excitation
+F = excitation(rect, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "Rectangle")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Triangle signal
+
+The triangle signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+\frac{2F_0}{T}\left(t - t_\text{start}\right) & \text{if } t \in [t_\text{start}, t_m] \\
+F_0 - \frac{2F_0}{T}(t - t_m) & \text{if } t \in [t_m, t_\text{start} + T] \\
+0 & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, $T$ is the duration of the signal and $t_m = t_\text{start} + T/2$ is the time at which the signal reaches its maximum value.
+
+::: {.api}
+**Triangle**
+
+---
+```{julia}
+#| echo: false
+@doc Triangle
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+
+# Initialize Triangle type
+tri = Triangle(F0, tstart, duration)
+
+# Compute the excitation
+F = excitation(tri, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "Triangle")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Hammer impact
+
+The hammer impact signal is supposed to have the shape of a Gamma distribution
+$$
+F(t) = \begin{cases}
+F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\right), & \text{if } t \geq t_\text{start} \\
+0, & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_h = t - t_\text{start}$ is the time since the impact, $p$ is the shape parameter, and $\theta$ is the scale parameter.
+
+::: {.api}
+**Hammer**
+
+---
+```{julia}
+#| echo: false
+@doc Hammer
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-5
+t = 0.:Δt:0.05
+
+# Excitation parameters
+F0 = 1.
+tstart = 0.01
+k = 9.7
+θ = 6e-4
+
+# Initialize Hammer type
+hammer = Hammer(F0, tstart, k, θ)
+
+# Compute the excitation
+F = excitation(hammer, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "Hammer")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Smooth rectangular signal
+
+The smooth rectangular signal (custom Tukey window) is defined by the following equation:
+$$
+F(t) = \begin{cases}
+\frac{F_0}{2}\left[1 - \cos\left(\frac{2\pi (t - t_\text{start})}{\alpha T}\right)\right] & \text{if } t \in [t_\text{start}, t_\text{start} + t_\text{rise}] \\
+F_0 & \text{if } t \in [t_\text{start} + t_\text{rise}, t_\text{start} + t_\text{rise} + T_\text{rect}] \\
+\frac{F_0}{2}\left[1 - \cos\left(\frac{2\pi (t - t_\text{start} - t_\text{rise} - T_\text{rect})}{\alpha T}\right)\right] & \text{if } t \in [t_\text{start} + t_\text{rise} + T_\text{rect}, t_\text{start} + T] \\
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, $T$ is the duration of the signal, $t_\text{rise}$ is the duration to reach $F_0$ and $\alpha = \frac{2t_\text{rise}}{T}$ and $T_\text{rect} = T - 2t_\text{rise}$ is the duration of the rectangular part of the signal.
+
+::: {.api}
+**SmoothRect**
+
+---
+```{julia}
+#| echo: false
+@doc SmoothRect
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+trise = 1.
+
+# Initialize SmoothRect type
+srect = SmoothRect(F0, tstart, duration, trise)
+
+# Compute the excitation
+F = excitation(srect, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "SmoothRect")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Sine signal
+
+The sine signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+F_0 \sin\left(\omega (t - t_\text{start}) + \theta\right), & \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0, & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $\omega$ is the angular frequency of the signal, and $\theta$ is the phase of the signal.
+
+::: {.callout-note title="Zero-end signal" collapse="true"}
+Sometimes it is necessary to have a signal that ends at zero. In this case, the duration of the signal must be adjusted to ensure that the signal ends at zero. To do so, one have to find the smallest integer $n$ such that at $t = t_\text{start} + T$:
+$$
+\sin(\omega T + \theta) = 0 \Rightarrow \omega T + \theta = 2\pi n \Rightarrow n = \frac{\omega T + \theta}{2\pi}.
+$$
+
+Once $n$ is found, the duration of the signal must be adjusted to:
+$$
+T_\text{new} = \frac{2\pi n - \theta}{\omega}.
+$$
+:::
+
+::: {.api}
+**SineWave**
+
+---
+```{julia}
+#| echo: false
+@doc SineWave
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+f = 2.
+
+# Initialize HaverSine type
+sine = SineWave(F0, tstart, duration, f, zero_end = true)
+
+# Compute the excitation
+F = excitation(sine, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "SineWave")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Half-sine signal
+
+The half-sine signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+F_0 \sin(\frac{\pi (t - t_\text{start}}{T}) & \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, and $T$ is the duration of the signal.
+
+::: {.api}
+**HalfSine**
+
+---
+```{julia}
+#| echo: false
+@doc HalfSine
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+
+# Initialize HalfSine type
+hsine = HalfSine(F0, tstart, duration)
+
+# Compute the excitation
+F = excitation(hsine, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "HalfSine")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Haversine signal
+
+The haversine (or versed sine) signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+F_0\left(1 - cos(\frac{2\pi t}{T}\right) & \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, and $T$ is the duration of the signal.
+
+::: {.api}
+**HaverSine**
+
+---
+```{julia}
+#| echo: false
+@doc HaverSine
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+
+# Initialize HaverSine type
+haversine = HaverSine(F0, tstart, duration)
+
+# Compute the excitation
+F = excitation(haversine, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "HaverSine")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Swept sine
+
+The swept sine signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+F_0 \sin(\theta(t)) & \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, $T$ is the duration of the signal and $\theta(t)$ is the instantaneous phase.
+
+The instantaneous phase is given by:
+$$
+\theta(t) = \theta_0 + 2\pi\int_0^t f(\tau) d\tau,
+$$
+where $f(\tau)$ is the instantaneous frequency of the signal at time $\tau$ and $\theta_0$ is the initial phase (set to 0 here).
+
+In this package, three possible types of swept sine signals are available:
+
+- Linear swept sine:
+$$
+f(t) = f_\text{start} + \beta(t - t_\text{start}) \Rightarrow \theta(t) = 2\pi\left(f_\text{start}(t - t_\text{start}) + \frac{\beta (t - t_\text{start})^2}{2}\right),
+$$
+where:
+
+  - $\beta = \frac{f_\text{end} - f_\text{start}}{T}$
+  - $f_\text{start}$: Initial frequency of the signal at $t_\text{start}$
+  - $f_\text{end}$: Final frequency of the signal at $t_\text{start} + T$
+
+- Quadratic swept sine:
+$$
+f(t) = f_\text{start} + \beta (t - t_\text{start})^2 \Rightarrow \theta(t) = 2\pi\left(f_\text{start}(t - t_\text{start}) + \frac{\beta (t - t_\text{start})^3}{3}\right),
+$$
+where $\beta = \frac{f_\text{end} - f_\text{start}}{T^2}$.
+
+- Logarithmic swept sine:
+$$
+f(t) = f_\text{start}\beta^{t - t_\text{start}} \Rightarrow \theta(t) = \frac{2\pi f_\text{start}}{\log(\beta)}\left(\beta^{t - t_\text{start}} - 1\right),
+$$
+where $\beta = \left(\frac{f_\text{end}}{f_\text{start}}\right)^{1/T}$.
+
+::: {.callout-note title="Zero-end signal" collapse="true"}
+
+Similarly to the sine signal, the duration of the signal must be adjusted to ensure that the signal ends at zero. To do so, one have to find the smallest integer $n$ such that at $t = t_\text{start} + T$:
+$$
+  \theta(t) = 2\pi n.
+$$
+
+In doing so, we have for:
+
+- Linear swept sine:
+$$
+n = (f_\text{start} + f_\text{end})\frac{T}{2} \Rightarrow T_\text{new} = \frac{2n}{f_\text{start} + f_\text{end}}.
+$$
+
+- Quadratic swept sine:
+$$
+n = (2f_\text{start} + f_\text{end})\frac{T}{3} \Rightarrow T_\text{new} = \frac{3n}{2f_\text{start} + f_\text{end}}.
+$$
+
+- Logarithmic swept sine:
+$$
+n = \frac{f_\text{end} - f_\text{start}}{\log(f_\text{end}/f_\text{start})}T \Rightarrow T_\text{new} = \frac{n\log(f_\text{end}/f_\text{start})}{f_\text{end} - f_\text{start}}.
+$$
+:::
+
+::: {.api}
+**SweptSine**
+
+---
+```{julia}
+#| echo: false
+@doc SweptSine
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+fstart = 1.
+fend = 6.
+type_swept = :lin
+
+# Initialize SweptSine type
+chirp = SweptSine(F0, tstart, duration, fstart, fend, type_swept, zero_end = true)
+
+# Compute the excitation
+F = excitation(chirp, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "SweptSine")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Gaussian pulse
+
+The Gaussian pulse signal is defined by the following equation:
+$$
+F(t) = \begin{cases}
+F_0 \exp\left(-\frac{t_p^2}{2\sigma^2}\right) \cos(2\pi f_c t_p), & \text{if } t \geq t_\text{start} \\
+0, & \text{otherwise}
+\end{cases},
+$$
+where $F_0$ is the amplitude of the signal, $t_\text{start}$ is the start time of the signal, $\sigma$ is the standard deviation of the signal, and $f_c$ is the carrier frequency. Here $t_p = t - t_\text{start} - T/2$ so that the Gaussian pulse reaches its maximum value at $t = t_\text{start} + T/2$.
+
+::: {.callout-note title="Variance calibration" collapse="true"}
+The design of the Gaussian pulse assumes that it tends to zero when $t = t_\text{start} + T$. This requirement implies that the standard deviation $\sigma$ must be chosen such that the Gaussian pulse is zero at $t = t_\text{start} + T$. This condition can only be satisfied within some precision. More precisely, the idea is to find the quantile $n$ such that  $T = n\sigma$. Consequently, if we assume that $F(t_\text{start} + T) = 10^{-p}$ (with $p$ a given precision), we have:
+$$
+n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
+$$
+:::
+
+::: {.api}
+**GaussianPulse**
+
+---
+```{julia}
+#| echo: false
+@doc GaussianPulse
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-3
+t = 0.:Δt:10.
+
+# Excitation parameters
+F0 = 1.
+tstart = 2.5
+duration = 5.
+fc = 2.
+
+# Initialize GaussianPulse type
+gpulse = GaussianPulse(F0, tstart, duration, fc)
+
+# Compute the excitation
+F = excitation(gpulse, t)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Excitation signal",
+          title = "Gaussian Pulse")
+lines!(ax, t, F)
+display(fig);
+```
+
+### Colored noise {#sec-colored-noise}
+
+Colored noise is a random signal that has a power spectral density that is not (necessarily) flat over a given frequency range. In practice, colored noise is also refered to as "power-law noise" since its power spectral density is proportional to $f^{-\alpha}$ ($f$: frequency) and its spectrum is proportional to $f^{-\alpha/2}$.
+
+In this package, five types of colored noise are available:
+
+- White noise: $\alpha = 0$
+- Pink noise: $\alpha = 1$
+- Blue noise: $\alpha = -1$
+- Brown noise: $\alpha = 2$
+- Purple noise: $\alpha = -2$
+
+The general procedure to generate a colored noise signal is as follows:
+
+1. Generate a white noise signal and compute its FFT
+2. Multiply the FFT by $f^{-\alpha/2}$ to obtain the colored noise
+3. Compute the inverse FFT to obtain the colored noise signal
+
+Additional steps can be added such as:
+
+- Normalization: Ensure that the colored noise has the desired variance and preserves the energy of the white noise
+
+- Filtering: Obtain a band-limited colored noise
+
+::: {.api}
+**ColoredNoise**
+
+---
+```{julia}
+#| echo: false
+@doc ColoredNoise
+```
+:::
+
+```{julia}
+#| output: false
+
+# Time parameters
+Δt = 1e-4
+t = 0.:Δt:10.
+nt = length(t)
+fs = 1/Δt
+
+# Excitation parameters
+F0 = 1.
+tstart = 0.
+duration = 10.
+σ = 1.
+
+# Initialize ColoredNoise type
+exc_white = ColoredNoise(F0, tstart, duration, σ, color = :white)
+exc_pink = ColoredNoise(F0, tstart, duration, σ, color = :pink)
+exc_blue = ColoredNoise(F0, tstart, duration, σ, color = :blue)
+exc_brown = ColoredNoise(F0, tstart, duration, σ, color = :brown)
+exc_purple = ColoredNoise(F0, tstart, duration, σ, color = :purple)
+
+# Compute the spectrum of the colored noise
+freq = rfftfreq(nt, fs)
+S_white = rfft(excitation(exc_white, t))
+S_pink = rfft(excitation(exc_pink, t))
+S_blue = rfft(excitation(exc_blue, t))
+S_brown = rfft(excitation(exc_brown, t))
+S_purple = rfft(excitation(exc_purple, t))
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure(size = (700, 450))
+ax = Axis(fig[1, 1],
+          xscale = log10, yscale = log10,
+          xlabel = "Frequency (Hz)",
+          ylabel = "Amplitude",
+          title = "Colored noise")
+lines!(ax, freq, abs.(S_white), label = "White noise")
+lines!(ax, freq, abs.(S_pink), label = "Pink noise")
+lines!(ax, freq, abs.(S_blue), label = "Blue noise")
+lines!(ax, freq, abs.(S_brown), label = "Brown noise")
+lines!(ax, freq, abs.(S_purple), label = "Purple noise")
+axislegend(ax, position = :ct,
+           backgroundcolor = (:white, 0.5),
+           orientation = :horizontal)
+display(fig);
+```
+
+## `excitation` function {#sec-exc-api}
+
+::: {.api}
+**excitation**
+
+---
+```{julia}
+#| echo: false
+@doc excitation(type::Rectangle, t)
+```
+:::

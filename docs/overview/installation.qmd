@@ -1,0 +1,52 @@
+---
+title: Installation
+format:
+  html:
+    toc: true
+    page-layout: full
+---
+
+::: callout-note
+If you are already a Julia user, you can skip this section.
+:::
+
+This section explains how to install Julia and `Vibration.jl`.
+
+## Install Julia ![](/assets/logo/julia.svg){width=3%}
+
+There exists several ways of installing Julia and managing versions. The recommended way consists in installing `juliaup`, which is a Julia version manager.
+
+- **Windows**
+
+  On Windows, `juliaup` can be installed directly from the [Windows store](https://www.microsoft.com/store/apps/9NJNWW8PVKMN) or from a terminal by typing the following command:
+  ```bash
+  winget install julia -s msstore
+  ```
+
+- **MacOS and Linux**
+
+  On MacOS and Linux, `juliaup` can be installed from a terminal by typing:
+  ```bash
+  curl -fsSL https://install.julialang.org | sh
+  ```
+  or by using software repositories:
+  ```bash
+  # MacOS
+  brew install juliaup
+
+  # Arch-based distributions
+  yay -S juliaup
+  ```
+
+Once `juliaup` is installed, the latest version of Julia can be installed from a terminal as follows:
+```bash
+juliaup add release
+```
+
+## Install VibrationData.jl ![](/assets/logo/doclogo.svg){width=5%}
+
+The package is not yet registered in the Julia General Registry. To install the package, you can use the following command:
+
+```julia
+(Yourenv) pkg> add "git@https://github.com/maucejo/VibrationData.jl.git"
+```

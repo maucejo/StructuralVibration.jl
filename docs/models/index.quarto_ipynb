@@ -1,0 +1,774 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: Mechanical models\n",
+        "format:\n",
+        "  html:\n",
+        "    toc: true\n",
+        "    number-sections: true\n",
+        "---"
+      ],
+      "id": "0279ed65"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "#| output: false\n",
+        "using StructuralVibration"
+      ],
+      "id": "16f6a164",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Continuous models\n",
+        "\n",
+        "### 1D models {#sec-1d-models}\n",
+        "\n",
+        "#### Bar, Rod and strings\n",
+        "\n",
+        "Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form:\n",
+        "$$\n",
+        "m \\ddot y(x, t) - D \\frac{\\partial^2 y(x,t)}{\\partial x^2} = p(x, t),\n",
+        "$$\n",
+        "where:\n",
+        "\n",
+        "- $y(x, t)$: Kinematic data at location $x$ and time $t$\n",
+        "\n",
+        "- $p(x, t)$: External excitation term\n",
+        "\n",
+        "- $m$: Linear inertia of the type\n",
+        "\n",
+        "- $D$: Stiffness of the type\n",
+        "\n",
+        "*For a longitudinal bar:*\n",
+        "\n",
+        "  - $y(x, t) = u(x, t)$\n",
+        "      - $u(x, t)$: Longitudinal displacement [m]\n",
+        "\n",
+        "  - $p(x, t)$: Distributed longitudinal force [N/m]\n",
+        "\n",
+        "  - $m = \\rho S$: Linear mass density [Kg/m^2^]\n",
+        "      - $\\rho$: Mass density [kg/m^3^] and $S$: Cross-section area [m^2^]\n",
+        "\n",
+        "  - $D = E S$: Longitudinal stiffness [N]\n",
+        "      - $E$: Young's modulus [Pa]\n",
+        "\n",
+        "*For a torsional rod:*\n",
+        "\n",
+        "  - $y(x, t) = \\theta(x, t)$\n",
+        "      - $\\theta$: Torsion angle [rad]\n",
+        "\n",
+        "  - $p(x, t)$: Distributed moment [N.m/m]\n",
+        "\n",
+        "  - $m = \\rho I_G$: Linear rotational inertia [kg.m^4^]\n",
+        "    - $I_G$: Polar moment of area [m^4^]\n",
+        "\n",
+        "  - $D = G J_T$: Rotational stiffness [N.m^2^]\n",
+        "    - $G$: Shear modulus [Pa]\n",
+        "    - $J_T$: Torsion constant [m^4^]\n",
+        "\n",
+        "*For a string:*\n",
+        "\n",
+        "  - $y(x, y)$: Transverse displacement [m]\n",
+        "\n",
+        "  - $m$: Linear mass density [kg/m]\n",
+        "\n",
+        "  - $D$: Tension force [N]\n",
+        "\n",
+        "#### Beam\n",
+        "\n",
+        "Euler-Bernoulli beams are governed by the following equation of motion:\n",
+        "$$\n",
+        "m\\ddot v(x, t) + D\\frac{\\partial^4 v(x, t)}{\\partial x^4} = p(x, t),\n",
+        "$$\n",
+        "where:\n",
+        "\n",
+        "- $v(x, t)$: Transverse displacement [m]\n",
+        "\n",
+        "- $p(x, t)$: External excitation term [N/m]\n",
+        "\n",
+        "- $m = \\rho S$: Linear mass density [kg/m]\n",
+        "\n",
+        "- $D = E I_z$: Bending stiffness [N.m^2^]\n",
+        "  - $I_z$: Second moment of area [m^4^]\n",
+        "\n",
+        "#### API\n",
+        "\n",
+        "**Data types**\n",
+        "\n",
+        "All the following data types are a subtype of the super type `OneDtype`.\n",
+        "\n",
+        "::: {.api}\n",
+        "**Bar**\n"
+      ],
+      "id": "0feb1095"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Bar"
+      ],
+      "id": "896289f4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**Rod**\n"
+      ],
+      "id": "160a5b70"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Rod"
+      ],
+      "id": "9f6c6f42",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**Strings**\n"
+      ],
+      "id": "393993f3"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Strings"
+      ],
+      "id": "8b9a968b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**Beam**\n"
+      ],
+      "id": "b905cf47"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Beam"
+      ],
+      "id": "79f753b7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "**Associated functions**\n",
+        "\n",
+        "::: {.api}\n",
+        "**modefreq**\n"
+      ],
+      "id": "02463c2c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc modefreq(b::Bar, fmax, bc = :CC)"
+      ],
+      "id": "f616526e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**modeshape**\n"
+      ],
+      "id": "b366da5c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc modeshape(b::Bar, kn, x, bc = :CC)"
+      ],
+      "id": "4d080294",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "### 2D models\n",
+        "\n",
+        "#### Rectangular membranes\n",
+        "\n",
+        "Rectangular membranes are governed by the following equation of motion:\n",
+        "$$\n",
+        "m \\ddot w(x, y ,t) + D\\Delta w(x, y, t) = p(x, y, t),\n",
+        "$$\n",
+        "where:\n",
+        "\n",
+        "- $w(x, y, t)$: Transverse displacement [m] at point $(x, y)$ and time $t$\n",
+        "\n",
+        "- $m$: Surface mass [kg/m]\n",
+        "\n",
+        "- $D = \\tau$: Linear tension [N/m]\n",
+        "\n",
+        "- $\\Delta = \\frac{\\partial^2}{\\partial x^2} + \\frac{\\partial^2}{\\partial y^2}$: Laplacian operator\n",
+        "\n",
+        "#### Rectangular plate\n",
+        "\n",
+        "Rectangular plates are governed by the following equation of motion:\n",
+        "$$\n",
+        "m \\ddot w(x, y, t) + D \\Delta^2 w(x, y, t) = p(x, y, t),\n",
+        "$$\n",
+        "where:\n",
+        "\n",
+        "- $w(x, y, t)$: Transverse displacement [m] at point $(x, y)$ and time $t$\n",
+        "\n",
+        "- $m = \\rho h$: Surface mass [kg/m^2^]\n",
+        "    - $h$: Thickness [m]\n",
+        "\n",
+        "- $D = \\frac{Eh^3}{12(1 - \\nu^2)}$: Bending stiffness [N.m]\n",
+        "    - $\\nu$: Poisson's coefficient\n",
+        "\n",
+        "- $\\Delta^2 = \\frac{\\partial^4}{\\partial x^4} + 2\\frac{\\partial^4}{\\partial x^2 \\partial y^2} + \\frac{\\partial^4}{\\partial y^4}$: Bilaplacian operator\n",
+        "\n",
+        "#### API\n",
+        "\n",
+        "**Data type**\n",
+        "\n",
+        "All the following data types are a subtype of the super type `TwoDtype`.\n",
+        "\n",
+        "::: {.api}\n",
+        "**Membrane**\n"
+      ],
+      "id": "ee45dcf0"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Membrane"
+      ],
+      "id": "c91de82e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**Plate**\n"
+      ],
+      "id": "4b1f7359"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Plate"
+      ],
+      "id": "9942a749",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "**Associated functions**\n",
+        "\n",
+        "::: {.api}\n",
+        "**modefreq**\n"
+      ],
+      "id": "4a8043a9"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc modefreq(p::Plate, fmax)"
+      ],
+      "id": "d2765429",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**modeshape**\n"
+      ],
+      "id": "1be75755"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc modeshape(p::Plate)"
+      ],
+      "id": "3fc6e096",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "## Discrete models\n",
+        "\n",
+        "### Sdof systems\n",
+        "\n",
+        "Single degree of freedom (Sdof) systems are classically composed of a mass $m$, a stiffness $k$ and a viscous damper $c$ (see @fig-1dof).\n",
+        "\n",
+        "::: {#fig-1dof}\n",
+        "![](../assets/images/1dof.svg)\n",
+        "\n",
+        "Classical representation of an Sdof system\n",
+        ":::\n",
+        "\n",
+        "Mathematically, their dynamic behavior is governed by the following normalized equation of motion :\n",
+        "$$\n",
+        "\\ddot x(t) + 2\\xi\\,\\omega_0\\, \\dot x(t) + \\omega_0^2 x(t) = \\frac{F(t)}{m}.\n",
+        "$$\n",
+        "where $F(t)$ can be either a base or an external excitation applied to the system.\n",
+        "\n",
+        "The Sdof system can thus be defined by:\n",
+        "\n",
+        "- its mass $m$\n",
+        "- its natural angular frequency $\\omega_0$ (or its natural frequency $f_0$)\n",
+        "- its damping ratio $\\xi$\n",
+        "\n",
+        "#### API\n",
+        "\n",
+        ":::::: {.api}\n",
+        "**Sdof**\n"
+      ],
+      "id": "1fa426b3"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Sdof"
+      ],
+      "id": "2bbe835a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "#### Example\n",
+        "\n",
+        "```julia\n",
+        "# Definition of the structural parameters\n",
+        "m = 1.\n",
+        "f₀ = 10.\n",
+        "ξ = 0.01\n",
+        "\n",
+        "# Create an instance of Sdof\n",
+        "sdof = Sdof(m, f₀, ξ)\n",
+        "```\n",
+        "\n",
+        "### Mdof systems\n",
+        "\n",
+        "`StructuralVibration.jl` considers Multi-degrees of freedom (Mdof) systems, which topology is presented in @fig-mdof. This choice has been made, because it allows modeling a large variety of possible configurations.\n",
+        "\n",
+        "::: {#fig-mdof}\n",
+        "![](../assets/images/mdof.svg)\n",
+        "\n",
+        "General topology of an Mdof system\n",
+        ":::\n",
+        "\n",
+        "The dynamic behavior of such a system is governed by the following matrix system:\n",
+        "$$\n",
+        "\\mathbf{M} \\ddot{\\mathbf{X}}(t) + \\mathbf{K} \\mathbf{X}(t) = \\mathbf{F}(t),\n",
+        "$$\n",
+        "where:\n",
+        "\n",
+        "- $\\mathbf{M} = \\text{diag}(m_1, \\dots, m_j, \\dots, m_N)$ is the mass matrix.\n",
+        "\n",
+        "- $\\mathbf{K}$ is the stiffness matrix such that:\n",
+        "$$\n",
+        "\\mathbf{K} = \\begin{bmatrix}\n",
+        "k_1 & -k_1 & 0 & \\ldots & 0 & 0 \\\\\n",
+        "-k_1 & k_1 + k_2 & -k_2 & \\ddots & \\vdots & \\vdots \\\\\n",
+        "0 & -k_2 & \\ddots & \\ddots & 0 & \\vdots \\\\\n",
+        "\\vdots & 0 & \\ddots & \\ddots & -k_{N-1} & 0 \\\\\n",
+        "\\vdots & \\vdots & \\ddots & -k_{N-1} & k_{N-1} + k_N & -k_N \\\\\n",
+        "0 & 0 & \\ldots & 0 & -k_N & k_N\n",
+        "\\end{bmatrix}.\n",
+        "$$\n",
+        "\n",
+        "- $\\mathbf{X}(t) = \\left[x_1(t), \\dots, x_j(t), \\dots, x_N(t)\\right]^\\mathsf{T}$ is the displacement vector.\n",
+        "\n",
+        "- $\\mathbf{F}(t) = \\left[F_1(t), \\dots, F_j(t), \\dots, F_N(t)\\right]^\\mathsf{T}$ is the external force vector.\n",
+        "\n",
+        "#### API {#sec-api-mdof}\n",
+        "\n",
+        "**Data types**\n",
+        "\n",
+        ":::: {.api}\n",
+        "**Mdof**\n"
+      ],
+      "id": "d44d34eb"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc Mdof"
+      ],
+      "id": "a70ff13c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "::: {.callout-note title=\"About the damping matrix C\" collapse=\"true\"}\n",
+        "If viscous dampers are defined, the damping matrix $\\mathbf{C}$ is consistent with the stiffness matrix $\\mathbf{K}$, meaning that:\n",
+        "$$\n",
+        "\\mathbf{C} = \\begin{bmatrix}\n",
+        "c_1 & -c_1 & 0 & \\ldots & 0 & 0 \\\\\n",
+        "-c_1 & c_1 + c_2 & -c_2 & \\ddots & \\vdots & \\vdots \\\\\n",
+        "0 & -k_2 & \\ddots & \\ddots & 0 & \\vdots \\\\\n",
+        "\\vdots & 0 & \\ddots & \\ddots & -c_{N-1} & 0 \\\\\n",
+        "\\vdots & \\vdots & \\ddots & -c_{N-1} & c_{N-1} + c_N & -c_N \\\\\n",
+        "0 & 0 & \\ldots & 0 & -c_N & c_N\n",
+        "\\end{bmatrix}.\n",
+        "$$\n",
+        ":::\n",
+        "::::\n",
+        "\n",
+        "::: {.api}\n",
+        "**MdofMesh**\n"
+      ],
+      "id": "22113f1a"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "@doc MdofMesh"
+      ],
+      "id": "469f0ce7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "**Associated functions**\n",
+        "\n",
+        "::: {.api}\n",
+        "**assembly**\n"
+      ],
+      "id": "8068a154"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc assembly(model::Mdof)"
+      ],
+      "id": "5b457ea7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**apply_bc**\n"
+      ],
+      "id": "308ab4e8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc apply_bc"
+      ],
+      "id": "f3cb1892",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**eigenmode**\n"
+      ],
+      "id": "7e265e7b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc eigenmode(K::Matrix{Float64}, M::Matrix{Float64})"
+      ],
+      "id": "d5f23a0f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "#### Example\n",
+        "\n",
+        "```julia\n",
+        "# Definition of the structural parameters\n",
+        "k_mdof = [1., 1.]\n",
+        "m_mdof = ones(3)\n",
+        "c_mdof = [0.1, 0.1]\n",
+        "\n",
+        "# Create an instance of Mdof\n",
+        "mdof = Mdof(k_mdof, m_mdof, c_mdof)\n",
+        "\n",
+        "# Definition of a MdofMesh\n",
+        "mdof_mesh = MdofMesh(mdof, bc = :FF)\n",
+        "\n",
+        "# System assembly\n",
+        "K_mdof, M_mdof, C_mdof = assembly(mdof)\n",
+        "\n",
+        "# Apply boundary conditions (if any)\n",
+        "K_bc = apply_bc(K_mdof, mesh)\n",
+        "M_bc = apply_bc(M_mdof, mesh)\n",
+        "C_bc = apply_bc(C_mdof, mesh)\n",
+        "\n",
+        "# Compute the eigenmodes of the systems\n",
+        "ωₙ, Φₙ = eigenmode(K_bc, M_bc)\n",
+        "```\n",
+        "\n",
+        "### FE model\n",
+        "\n",
+        "Finite element models are available for the 1D continuous systems defined in @sec-1d-models.\n",
+        "\n",
+        "#### API\n",
+        "**Data type**\n",
+        "\n",
+        "::: {.api}\n",
+        "**OneDMesh**\n"
+      ],
+      "id": "bcdb8501"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc OneDMesh"
+      ],
+      "id": "fe29fa00",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "**Associated functions**\n",
+        "\n",
+        "::: {.api}\n",
+        "**assemby**\n"
+      ],
+      "id": "5eaa5216"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc assembly(model::Beam, mesh::OneDMesh)"
+      ],
+      "id": "2282b473",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**rayleigh_damping_matrix**\n"
+      ],
+      "id": "45013a43"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)"
+      ],
+      "id": "4a0ccc22",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**modal_damping_matrix**\n"
+      ],
+      "id": "a55629a5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc modal_damping_matrix"
+      ],
+      "id": "3de57d1f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**Selection matrix**\n"
+      ],
+      "id": "c217c2c8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "\n",
+        "@doc selection_matrix"
+      ],
+      "id": "508028f2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**apply_bc** - See @sec-api-mdof.\n",
+        ":::\n",
+        "\n",
+        "::: {.api}\n",
+        "**eigenmode** - See @sec-api-mdof.\n",
+        ":::"
+      ],
+      "id": "feb34589"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-1.11",
+      "language": "julia",
+      "display_name": "Julia 1.11.1",
+      "path": "C:\\Users\\maucejo\\AppData\\Roaming\\jupyter\\kernels\\julia-1.11"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

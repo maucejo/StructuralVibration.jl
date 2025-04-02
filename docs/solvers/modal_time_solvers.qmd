@@ -1,0 +1,396 @@
+---
+title: Modal time solvers
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd, LinearAlgebra
+@usingany CairoMakie
+```
+
+The aim of this section is to describe the modal time solvers available for solving Multi-degrees of freedom (Mdof) systems. To explain, the theoretical foundations of the proposed solvers, let's consider a Mdof system with $N$ degrees of freedom. The equation of motion of the system is given by:
+$$
+\mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{C} \dot{\mathbf{x}}(t) + \mathbf{K} \mathbf{x}(t) = \mathbf{F}(t)
+$$
+where $\mathbf{M}$ is the mass matrix, $\mathbf{C}$ is the damping matrix, $\mathbf{K}$ is the stiffness matrix, $\mathbf{x}(t)$ is the displacement vector, and $\mathbf{F}(t)$ is the vector of external forces.
+
+To solve the previous in the modal space, the solution $\mathbf{x}(t)$ is expressed as:
+$$
+\mathbf{x}(t) = \mathbf{\Phi} \mathbf{q}(t)
+$$
+where $\mathbf{\Phi}$ is the matrix of the mode shapes and $\mathbf{q}(t)$ is the vector of modal coordinates.
+
+Substituting the previous expression in the equation of motion, premultiplying by $\mathbf{\Phi}^\mathsf{T}$, and using the orthogonality property of the mode shapes, one obtains a set of $N$ independent modal equations of motion given by:
+$$
+\ddot{q}_n(t) + 2 \xi_n \omega_n \dot{q}_n(t) + \omega_n^2 q_n(t) = \frac{f_n(t)}{m_n}
+$$
+where for the n-th mode,  $q_n(t)$ is the generalized coordinate, $\xi_n$ is the damping ratio, $\omega_n$ is the natural angular frequency, $f_n(t)$ is the modal force, and $m_n$ is the modal mass.
+
+It should be noticed that a modal equation of motion corresponds to the equation of motion of a Sdof system with mass $m_n$, damping ratio $\xi_n$, natural angular frequency $\omega_n$.
+
+It results that computing the response of an Mdof system in the modal space is equivalent to solving $N$ independent Sdof systems.
+
+:::{.callout-note}
+In the following, only modal damping is considered. This means that:
+$$
+\mathbf{C}_n = \mathbf{\Phi}^\mathsf{T} \mathbf{C} \mathbf{\Phi} = \text{diag}(2\xi_1 \omega_1, 2\xi_2 \omega_2, \ldots, 2\xi_N \omega_N).
+$$
+:::
+
+## Free response
+
+The free response of an MDOF system is the response of the system when there are no external forces acting on it. In this case, the modal equations of motion of the system is given by:
+$$
+\ddot{q}_n(t) + 2 \xi_n \omega_n \dot{q}_n(t) + \omega_n^2 q_n(t) = 0
+$$
+
+The solution of the previous equation can be found in [Sdof solvers - Section 1.1](https://maucejo.github.io/StructuralVibration.jl/solvers/#free-response).
+
+### API
+
+**Data type**
+
+:::: {.api}
+**FreeModalTimeProblem**
+
+---
+```{julia}
+#| echo: false
+@doc FreeModalTimeProblem
+```
+
+:::{.callout-note}
+Two possibilities are offered to the user to enter the structural properties of the system.
+
+1. Provide the stiffness and mass matrices.
+2. Provide the squared natural frequencies and (mass-normalized) mode shapes. This allows to use the modal information computed analytically for continuous systems or numerically for discrete systems.
+
+In the latter case, the initial conditions must be expressed in the modal space.
+:::
+::::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::FreeModalTimeProblem)
+```
+:::
+
+### Example
+```{julia}
+#| output: false
+
+# System parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+# Time vector
+t = 0.:1e-2:30.
+
+# Initial conditions
+x0 = [0.2, 0.1]
+v0 = zeros(2)
+
+# Problem definition - case 1 - Provide the stiffness and mass matrices
+u0 = (x0, v0)
+prob = FreeModalTimeProblem(K, M, ξ, u0, t)
+
+# Problem definition - case 2 - Provide the squared natural frequencies and mode shapes
+ωm, Φm = eigenmode(K, M)
+x0m = Φm'*M*x0
+v0m = Φm'*M*v0
+u0m = (x0m, v0m)
+prob_modal = FreeModalTimeProblem(ωm, Φm, ξ, u0m, t, ismodal = true)
+
+# Solution
+x_free = solve(prob).u
+x_free_modal = solve(prob_modal).u
+```
+
+```{julia}
+#| echo: false
+fig = Figure()
+ax_1 = Axis(fig[1, 1], ylabel = "Displacement (m)", title = "Free response")
+ax_2 = Axis(fig[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_1, t, x_free[1, :], label = "x₁ - prob")
+lines!(ax_1, t, x_free_modal[1, :], label = "x₁ - prob_modal", linestyle = :dash)
+axislegend(ax_1, position = :rt,
+           backgroundcolor = (:white, 0.5))
+xlims!(ax_1, minimum(t), maximum(t))
+
+lines!(ax_2, t, x_free[2, :], label = "x₂ - prob")
+lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - prob_modal", linestyle = :dash)
+axislegend(ax_2, position = :rb,
+           backgroundcolor = (:white, 0.5))
+xlims!(ax_2, minimum(t), maximum(t))
+
+display(fig);
+```
+
+## Forced response
+
+The forced response of an Mdof system is the response of the system when external forces are acting on it. In this case, the modal equations of motion of the system is given by:
+$$
+\ddot{q}_n(t) + 2 \xi_n \omega_n \dot{q}_n(t) + \omega_n^2 q_n(t) = \frac{f_n(t)}{m_n}
+$$
+
+The solution of the previous equation can be found in [Sdof solvers - Section 1.2](https://maucejo.github.io/StructuralVibration.jl/solvers/#forced-response).
+
+### Harmonic excitation
+
+#### API
+
+**Data type**
+
+::: {.api}
+**HarmonicModalTimeProblem**
+
+---
+
+```{julia}
+#| echo: false
+@doc HarmonicModalTimeProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::HarmonicModalTimeProblem)
+```
+:::
+
+#### Example
+
+```{julia}
+#| output: false
+
+# System parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+# Time vector
+t = 0.:1e-2:30.
+
+# Initial conditions
+x0 = [0.2, 0.1]
+v0 = zeros(2)
+u0 = (x0, v0)
+
+# Excitation parameters
+F = [1., 2.]
+freq = 1.
+
+# Problem definition - case 1 - Provide the stiffness and mass matrices
+prob_harmo = HarmonicModalTimeProblem(K, M, ξ, F, 2π*freq, u0, t)
+
+# Problem definition - case 2 - Provide the squared natural frequencies and mode shapes
+ωm, Φm = eigenmode(K, M)
+x0m = Φm'*M*x0
+v0m = Φm'*M*v0
+u0m = (x0m, v0m)
+Lm = Φm'*F
+prob_harmo_modal = HarmonicModalTimeProblem(ωm, Φm, ξ, Lm, 2π*freq, u0m, t, ismodal = true)
+
+# Solution
+x_harmo = solve(prob_harmo).u
+x_harmo_modal = solve(prob_harmo_modal).u
+```
+
+```{julia}
+#| echo: false
+fig_harmo = Figure()
+ax_harmo_1 = Axis(fig_harmo[1, 1], ylabel = "Displacement (m)", title = "Harmonic excitation")
+ax_harmo_2 = Axis(fig_harmo[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_harmo_1, t, x_harmo[1, :], label = "x₁ - prob")
+lines!(ax_harmo_1, t, x_harmo_modal[1, :], label = "x₁ - prob_modal", linestyle = :dash)
+axislegend(ax_harmo_1, position = :rt,
+           backgroundcolor = (:white, 0.5))
+xlims!(ax_harmo_1, minimum(t), maximum(t))
+
+lines!(ax_harmo_2, t, x_harmo[2, :], label = "x₂ - prob")
+lines!(ax_harmo_2, t, x_harmo_modal[2, :], label = "x₂ - prob_modal", linestyle = :dash)
+axislegend(ax_harmo_2, position = :rb,
+           backgroundcolor = (:white, 0.5))
+xlims!(ax_harmo_2, minimum(t), maximum(t))
+
+display(fig_harmo);
+```
+
+### Arbitrary excitation
+
+#### API
+
+**Data type**
+
+::: {.api}
+**ForcedModalTimeProblem**
+
+---
+
+```{julia}
+#| echo: false
+@doc ForcedModalTimeProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::ForcedModalTimeProblem)
+```
+:::
+
+#### Example
+
+```{julia}
+#| output: false
+
+# System parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+# Time vector
+t = 0.:1e-2:30.
+
+# Initial conditions
+u0 = (zeros(2), zeros(2))
+
+# Excitation parameters
+F0 = 10.
+tstart = 2.
+duration = 5.
+haversine = HaverSine(F0, tstart, duration)
+F0 = excitation(haversine, t)
+F = zeros(2, length(t))
+F[1, :] .= F0
+
+# Problem definition - case 1 - Provide the stiffness and mass matrices
+prob_forced = ForcedModalTimeProblem(K, M, ξ, F, u0, t)
+
+# Problem definition - case 2 - Provide the squared natural frequencies and mode shapes
+ωm, Φm = eigenmode(K, M)
+u0m = (zeros(2), zeros(2))
+Lm = Φm'*F
+prob_forced_modal = ForcedModalTimeProblem(ωm, Φm, ξ, Lm, u0m, t, ismodal = true)
+
+# Solution
+x_forced = solve(prob_forced).u
+x_forced_modal = solve(prob_forced_modal).u
+```
+
+```{julia}
+#| echo: false
+fig_forced = Figure()
+ax_forced_1 = Axis(fig_forced[1, 1], ylabel = "Displacement (m)", title = "Harversine excitation")
+ax_forced_2 = Axis(fig_forced[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_forced_1, t, x_forced[1, :], label = "x₁ - prob")
+lines!(ax_forced_1, t, x_forced_modal[1, :], label = "x₁ - prob_modal", linestyle = :dash)
+axislegend(ax_forced_1, position = :rt,
+           backgroundcolor = (:white, 0.5))
+xlims!(ax_forced_1, minimum(t), maximum(t))
+
+lines!(ax_forced_2, t, x_forced[2, :], label = "x₂ - prob")
+lines!(ax_forced_2, t, x_forced_modal[2, :], label = "x₂ - prob_modal", linestyle = :dash)
+axislegend(ax_forced_2, position = :rt,
+           backgroundcolor = (:white, 0.5))
+xlims!(ax_forced_2, minimum(t), maximum(t))
+
+display(fig_forced);
+```
+
+## Additional function - Impulse response matrix
+
+The impulse response matrix of an Mdof system is obtained from the modal impulse response matrix. The modal impulse response matrix is given by:
+$$
+\mathbf{h}(t) = \Phi \begin{bmatrix}
+h_1(t) & & & & \\
+& \ddots & & & \\
+& & h_n(t) & & \\
+& & & \ddots & \\
+& & & & h_N(t)
+\end{bmatrix}
+\Phi^\mathsf{T},
+$$
+where $h_n(t)$ is the modal impulse response of the mode $n$ computed as in [Sdof solvers - Section 1.3](https://maucejo.github.io/StructuralVibration.jl/solvers/#impulse-response).
+
+::: {.api}
+**impulse_response**
+
+---
+```{julia}
+#| echo: false
+@doc impulse_response(K, M, ξn, t, n = size(K, 1); ismat = false)
+```
+:::
+
+```{julia}
+# System parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+# Time vector
+t = 0.:1e-2:30.
+
+# Impulse response matrix
+h = impulse_response(K, M, ξ, t, ismat = true);
+```
+
+```{julia}
+#| echo: false
+fig_h = Figure()
+ax_h11 = Axis(fig_h[1, 1], ylabel = "Impulse response")
+ax_h12 = Axis(fig_h[1, 2])
+ax_h21 = Axis(fig_h[2, 1], xlabel = "Time (s)", ylabel = "Impulse response")
+ax_h22 = Axis(fig_h[2, 2], xlabel = "Time (s)")
+lines!(ax_h11, t, h[1, 1, :], label = "h₁₁")
+xlims!(ax_h11, minimum(t), maximum(t))
+axislegend(ax_h11, position = :rt,
+           backgroundcolor = (:white, 0.5))
+
+lines!(ax_h12, t, h[1, 2, :], label = "h₁₂")
+xlims!(ax_h12, minimum(t), maximum(t))
+axislegend(ax_h12, position = :rt,
+           backgroundcolor = (:white, 0.5))
+
+lines!(ax_h21, t, h[2, 1, :], label = "h₂₁")
+xlims!(ax_h21, minimum(t), maximum(t))
+axislegend(ax_h21, position = :rt,
+           backgroundcolor = (:white, 0.5))
+
+lines!(ax_h22, t, h[2, 2, :], label = "h₂₂")
+xlims!(ax_h22, minimum(t), maximum(t))
+axislegend(ax_h22, position = :rt,
+           backgroundcolor = (:white, 0.5))
+
+display(fig_h);
+```
+

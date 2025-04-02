@@ -1,0 +1,230 @@
+---
+title: Frequency-domain solvers
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd, LinearAlgebra
+@usingany CairoMakie
+```
+
+From a general perspective, the frequency-domain solvers are used to analyze the dynamic response of structures subjected to harmonic loads. In the frequency domain, Mdof systems are described at a given angular frequency $\omega$ by the following equation:
+$$
+\left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right) \mathbf{x}(\omega) = \mathbf{F}(\omega).
+$$
+
+## Frequency response function
+
+The Frequency response function (FRF) is computed by assuming a unit harmonic load at the $i$-th degree of freedom (DOF) and zero loads at all other DOFs, meaning that $\mathbf{F}(\omega) = \mathbf{I}$.
+
+Consequently, broadly speaking, the FRF is defined by:
+$$
+\mathbf{H}(\omega) = \left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right)^{-1}.
+$$
+This method is known as the direct method.
+
+Alternatively, the FRF can be computed using the modal method, which is based on the eigenvalue decomposition of the system matrices. The modal method is more efficient for large systems, as it reduces the problem to a smaller number of modes. In this case and assuming a modal damping ratio, the FRF is computed as:
+$$
+\mathbf{H}(\omega) = \mathbf{\Phi}\left(\mathbf{\Omega}^2 - \omega^2\mathbf{I} + 2j\omega\mathbf{\Xi}\right)^{-1}\mathbf{\Phi}^T,
+$$
+where $\mathbf{\Phi}$ is the mass-normalized mode shapes matrix and $\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_n^2)$ and $\mathbf{\Xi} = \text{diag}(\xi_1\omega_1, \dots, \xi_n\omega_n)$.
+
+::: {.callout-note}
+As explained in [State-Space solvers - Section 2.1](https://maucejo.github.io/StructuralVibration.jl/solvers/state_space_solvers.html), the FRF can be computed for a given set of response dofs and a given set of excitation dofs by introducing the appropriate selection matrices $\mathbf{S}_o$ and $\mathbf{S}_e$. In this case, the FRF is given by:
+$$
+\mathbf{H}_{oe}(\omega) = \mathbf{S}_o\mathbf{H}(\omega)\mathbf{S}_e.
+$$
+:::
+
+### API
+
+**Data types**
+
+::: {.api}
+**DirectFRFProblem**
+
+---
+```{julia}
+#| echo: false
+@doc DirectFRFProblem
+```
+:::
+
+::: {.api}
+**ModalFRFProblem**
+
+---
+```{julia}
+#| echo: false
+@doc ModalFRFProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(problem::DirectFRFProblem)
+```
+:::
+
+### Example
+
+```{julia}
+#| output: false
+# Structural parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# Frequency vector
+freq = 0.01:0.001:1.
+
+prob_frf = DirectFRFProblem(K, M, C, freq)
+H_direct = solve(prob_frf, ismat = true).u
+
+# Problem definition - Case 2 - Modal
+prob_frf_modal = ModalFRFProblem(ω, ξ, freq, Φ, Φ)
+H_modal = solve(prob_frf_modal, ismat = true).u
+```
+
+```{julia}
+#| echo: false
+fig_frf = Figure()
+ax_frf11 = Axis(fig_frf[1, 1], ylabel = "FRF (dB)", title = "H₁₁")
+ax_frf12 = Axis(fig_frf[1, 2], title = "H₁₂")
+ax_frf21 = Axis(fig_frf[2, 1], xlabel = "Frequency (Hz)", ylabel = "FRF (dB)", title = "H₂₁")
+ax_frf22 = Axis(fig_frf[2, 2], xlabel = "Frequency (Hz)", title = "H₂₂")
+
+lines!(ax_frf11, freq, 20log10.(abs.(H_direct[1, 1, :])), label = "Direct")
+lines!(ax_frf11, freq, 20log10.(abs.(H_modal[1, 1, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf11, minimum(freq), maximum(freq))
+axislegend(ax_frf11, position = :rt, backgroundcolor = (:white, 0.5))
+
+lines!(ax_frf12, freq, 20log10.(abs.(H_direct[1, 2, :])), label = "Direct")
+lines!(ax_frf12, freq, 20log10.(abs.(H_modal[1, 2, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf12, minimum(freq), maximum(freq))
+
+lines!(ax_frf21, freq, 20log10.(abs.(H_direct[2, 1, :])), label = "Direct")
+lines!(ax_frf21, freq, 20log10.(abs.(H_modal[2, 1, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf21, minimum(freq), maximum(freq))
+
+lines!(ax_frf22, freq, 20log10.(abs.(H_direct[2, 2, :])), label = "Direct")
+lines!(ax_frf22, freq, 20log10.(abs.(H_modal[2, 2, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf22, minimum(freq), maximum(freq))
+
+display(fig_frf);
+```
+
+## Response spectrum
+
+Similarly to the FRF, the response spectrum is a complex function that describes the steady-state response of a system to a sinusoidal input. At a given angular frequency $\omega$, it is expressed as :
+$$
+\mathbf{x}(\omega) = \left(\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}\right)^{-1} \mathbf{F}(\omega).
+$$
+or equivalently from the modes of the system:
+$$
+\mathbf{x}(\omega) = \mathbf{\Phi}\left(\mathbf{\Omega}^2 - \omega^2\mathbf{I} + 2j\omega\mathbf{\Omega}\right)^{-1}\mathbf{L},
+$$
+where $\mathbf{L} = \mathbf{\Phi}^\mathsf{T}\mathbf{F}(\omega)$ is the modal participation factor matrix[^1].
+
+[^1]: The expression of the modal participation factor matrix is the same as the modal force matrix, because the mode shapes are assumed to be mass-normalized.
+
+### API
+
+**Data types**
+
+::: {.api}
+**DirectFreqProblem**
+
+---
+```{julia}
+#| echo: false
+@doc DirectFreqProblem
+```
+:::
+
+::: {.api}
+**ModalFreqProblem**
+
+---
+```{julia}
+#| echo: false
+@doc ModalFreqProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(problem::DirectFreqProblem)
+```
+:::
+
+### Example
+
+```{julia}
+#| output: false
+# Structural parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# Frequency vector
+freq = 0.01:0.001:1.
+
+# Force matrix
+F = zeros(2, length(freq))
+F[1, :] .= 10.
+
+# Problem definition - Case 1 - Direct
+prob_freq = DirectFreqProblem(K, M, C, F, freq)
+y_freq = solve(prob_freq).u
+
+# Problem definition - Case 2 - Modal
+prob_freq_modal = ModalFreqProblem(ω, ξ, Φ'*F, freq, Φ)
+y_freq_modal = solve(prob_freq_modal).u
+```
+
+```{julia}
+#| echo: false
+fig_y = Figure()
+ax_y1 = Axis(fig_y[1, 1], ylabel = "Displacement (dB)")
+ax_y2 = Axis(fig_y[2, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (dB)", title = "y₂")
+
+lines!(ax_y1, freq, 20log10.(abs.(y_freq[1, :])), label = "y₁ - Direct")
+lines!(ax_y1, freq, 20log10.(abs.(y_freq_modal[1, :])), label = "y₁ - Modal", linestyle = :dash)
+xlims!(ax_y1, minimum(freq), maximum(freq))
+axislegend(ax_y1, position = :rt, backgroundcolor = (:white, 0.5))
+
+lines!(ax_y2, freq, 20log10.(abs.(y_freq[2, :])), label = "y₂ - Direct")
+lines!(ax_y2, freq, 20log10.(abs.(y_freq_modal[2, :])), label = "y₂ - Modal", linestyle = :dash)
+xlims!(ax_y2, minimum(freq), maximum(freq))
+axislegend(ax_y2, position = :rt, backgroundcolor = (:white, 0.5))
+
+display(fig_y);
+```

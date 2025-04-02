@@ -1,0 +1,217 @@
+---
+title: Noise models
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+In real-world applications, the noise is always present in the measured data. The noise can be due to various reasons such as the sensor noise, the environmental noise, the quantization noise, etc. The noise can be modeled as a random process. The package implements various type of noise in order to cover a wide range of practical situations.
+
+## Additive Gaussian White noise
+
+When a signal, real or complex, $x$ is corrupted by an additive Gaussian white noise $n$, the measured signal $y$ can be written as:
+$$
+    y = x + n
+$$
+where $n \sim \mathcal{N}(n| 0, \sigma^2)$
+
+::: {.api}
+**agwn**
+
+---
+```{julia}
+#| echo: false
+@doc agwn
+```
+:::
+
+```{julia}
+#| output: false
+
+# Noiseless signal
+Δt = 1e-4
+t = 0:Δt:1
+x = sin.(2π*5*t)
+
+# Signal to noise ratio
+snr_dB = 25.
+
+# Noisy signal
+y = agwn(x, snr_dB)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Signal",
+          title = "Additive Gaussian White Noise")
+lines!(ax, t, y, label = "Original signal")
+lines!(ax, t, x, color = :red, label = "Noisy signal")
+Legend(fig[1, 2], ax)
+display(fig);
+```
+
+## Additive Colored noise
+
+When a signal, real or complex, $x$ is corrupted by an additive colored noise $n$, the measured signal $y$ can be written as:
+$$
+    y = x + n,
+$$
+where $n$ is a colored noise defined as in [Excitation models - Colored noise](https://maucejo.github.io/StructuralVibration.jl/models/excitation.html#sec-colored-noise).
+
+::: {.api}
+**acn - Real signal**
+
+---
+```{julia}
+#| echo: false
+@doc acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
+```
+:::
+
+::: {.api}
+**acn - Complex signal**
+
+---
+```{julia}
+#| echo: false
+@doc acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color = :pink; rst = true)
+```
+:::
+
+```{julia}
+#| output: false
+
+# Noiseless signal
+Δt = 1e-4
+fs = 1/Δt
+t = 0:Δt:1
+x = sin.(2π*5*t)
+
+# Signal to noise ratio
+snr_dB = 25.
+
+# Noisy signal
+y = acn(x, snr_dB, fs, :blue)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Signal",
+          title = "Additive Colored Noise")
+lines!(ax, t, y, label = "Original signal")
+lines!(ax, t, x, color = :red, label = "Noisy signal")
+Legend(fig[1, 2], ax)
+display(fig);
+```
+
+## Multiplicative Gaussian White noise
+
+When a signal, real or complex, $x$ is corrupted by a multiplicative Gaussian white noise $n$, the measured signal $y$ can be written as:
+$$
+    y = (1 + n)x
+$$
+
+::: {.api}
+**mgwn**
+
+---
+```{julia}
+#| echo: false
+@doc mgwn
+```
+:::
+
+```{julia}
+#| output: false
+
+# Noiseless signal
+Δt = 1e-4
+t = 0:Δt:1
+x = sin.(2π*5*t)
+
+# Signal to noise ratio
+snr_dB = 25.
+
+# Noisy signal
+y = mgwn(x, snr_dB)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Signal",
+          title = "Multiplicative Gaussian White Noise")
+lines!(ax, t, y, label = "Original signal")
+lines!(ax, t, x, color = :red, label = "Noisy signal")
+Legend(fig[1, 2], ax)
+display(fig);
+```
+
+## Mixed noise
+
+When a signal, real or complex, $x$ is corrupted by a mixed noise $n$, the measured signal $y$ can be written as:
+$$
+    y = (1 + n_m)x + n_a
+$$
+where $n_m$ is a multiplicative Gaussian white noise and $n_a$ is an additive Gaussian white noise.
+
+::: {.api}
+**mixed_noise**
+
+---
+```{julia}
+#| echo: false
+@doc mixed_noise
+```
+:::
+
+```{julia}
+#| output: false
+
+# Noiseless signal
+Δt = 1e-4
+t = 0:Δt:1
+x = sin.(2π*5*t)
+
+# Signal to noise ratio
+snr_dB = 25.
+
+# Noisy signal
+y = mixed_noise(x, snr_dB)
+```
+
+```{julia}
+#| echo: false
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+          xlabel = "Time (s)",
+          ylabel = "Signal",
+          title = "Mixed Noise")
+lines!(ax, t, y, label = "Original signal")
+lines!(ax, t, x, color = :red, label = "Noisy signal")
+Legend(fig[1, 2], ax)
+display(fig);

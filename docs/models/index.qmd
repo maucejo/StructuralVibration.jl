@@ -1,0 +1,891 @@
+---
+title: Mechanical models
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration
+```
+
+## Continuous models
+
+### 1D models {#sec-1d-models}
+
+#### Bars, Rods and strings
+
+Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form:
+$$
+m \ddot y(x, t) - D \frac{\partial^2 y(x,t)}{\partial x^2} = p(x, t),
+$$
+where:
+
+- $y(x, t)$: Kinematic data at location $x$ and time $t$
+
+- $p(x, t)$: External excitation term
+
+- $m$: Linear inertia of the type
+
+- $D$: Stiffness of the type
+
+*For a longitudinal bar:*
+
+  - $y(x, t) = u(x, t)$
+      - $u(x, t)$: Longitudinal displacement [m]
+
+  - $p(x, t)$: Distributed longitudinal force [N/m]
+
+  - $m = \rho S$: Linear mass density [kg/m^2^]
+      - $\rho$: Mass density [kg/m^3^]
+      - $S$: Cross-section area [m^2^]
+
+  - $D = E S$: Longitudinal stiffness [N]
+      - $E$: Young's modulus [Pa]
+
+*For a torsional rod:*
+
+  - $y(x, t) = \theta(x, t)$
+      - $\theta$: Torsion angle [rad]
+
+  - $p(x, t)$: Distributed moment [N.m/m]
+
+  - $m = \rho I_G$: Linear rotational inertia [kg.m^4^]
+    - $I_G$: Polar moment of area [m^4^]
+
+  - $D = G J_T$: Rotational stiffness [N.m^2^]
+    - $G$: Shear modulus [Pa]
+    - $J_T$: Torsion constant [m^4^]
+
+*For a string:*
+
+  - $y(x, y)$: Transverse displacement [m]
+
+  - $m$: Linear mass density [kg/m]
+
+  - $D$: Tension force [N]
+
+#### Euler-Bernoulli beams
+
+Euler-Bernoulli beams are governed by the following equation of motion:
+$$
+m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
+$$
+where:
+
+- $v(x, t)$: Transverse displacement [m]
+
+- $p(x, t)$: External excitation term [N/m]
+
+- $m = \rho S$: Linear mass density [kg/m]
+
+- $D = E I_z$: Bending stiffness [N.m^2^]
+  - $I_z$: Second moment of area [m^4^]
+
+#### API
+
+**Data types**
+
+All the following data types are a subtype of the super type `OneDtype`.
+
+::: {.api}
+**Bar**
+
+---
+```{julia}
+#| echo: false
+@doc Bar
+```
+:::
+
+::: {.api}
+**Rod**
+
+---
+```{julia}
+#| echo: false
+@doc Rod
+```
+:::
+
+::: {.api}
+**Strings**
+
+---
+```{julia}
+#| echo: false
+@doc Strings
+```
+:::
+
+::: {.api}
+**Beam**
+
+---
+```{julia}
+#| echo: false
+@doc Beam
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**modefreq**
+
+---
+```{julia}
+#| echo: false
+@doc modefreq(b::Bar, fmax, bc = :CC)
+```
+:::
+
+::: {.api}
+**modeshape**
+
+---
+```{julia}
+#| echo: false
+@doc modeshape(b::Bar, kn::Vector{Float64}, x, bc = :CC)
+```
+:::
+
+#### Example
+
+```julia
+# Dimensions
+L = 1.
+d = 3e-2
+
+# Section features
+S = π*d^2/4
+Iz = π*d^4/64
+IG = 2Iz
+J = IG
+
+# Tension for string
+T = 100.
+
+# Material
+E = 2.1e11
+ν = 0.33
+G = E/(1 - 2*ν)
+ρ = 7800.
+
+# Computation parameters
+fmax = 2000.
+x = [0.1, 0.9]
+
+# Initialization of the data types
+bar = Bar(L, S, E, ρ)
+rod = Rod(L, IG, J, G, ρ)
+strings = Strings(L, S, T, ρ)
+beam = Beam(L, S, Iz, E, ρ)
+
+# Computation of the natural frequencies
+ωₙ, kₙ = modefreq(bar, fmax)
+
+# Computation of the corresponding mode shapes
+ϕₙ = modeshape(bar, kₙ, x, :CC)
+```
+
+### 2D models
+
+#### Rectangular membranes
+
+Rectangular membranes are governed by the following equation of motion:
+$$
+m \ddot w(x, y ,t) + D\Delta w(x, y, t) = p(x, y, t),
+$$
+where:
+
+- $w(x, y, t)$: Transverse displacement [m] at point $(x, y)$ and time $t$
+
+- $m$: Surface mass [kg/m]
+
+- $D = \tau$: Linear tension [N/m]
+
+- $\Delta = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}$: Laplacian operator
+
+#### Rectangular Kirchhoff-Love plates
+
+Rectangular Kirchhoff-Love plates are governed by the following equation of motion:
+$$
+m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
+$$
+where:
+
+- $w(x, y, t)$: Transverse displacement [m] at point $(x, y)$ and time $t$
+
+- $m = \rho h$: Surface mass [kg/m^2^]
+    - $h$: Thickness [m]
+
+- $D = \frac{Eh^3}{12(1 - \nu^2)}$: Bending stiffness [N.m]
+    - $\nu$: Poisson's coefficient
+
+- $\Delta^2 = \frac{\partial^4}{\partial x^4} + 2\frac{\partial^4}{\partial x^2 \partial y^2} + \frac{\partial^4}{\partial y^4}$: Bilaplacian operator
+
+#### API
+
+**Data type**
+
+All the following data types are a subtype of the super type `TwoDStructure`.
+
+::: {.api}
+**Membrane**
+
+---
+```{julia}
+#| echo: false
+@doc Membrane
+```
+:::
+
+::: {.api}
+**Plate**
+
+---
+```{julia}
+#| echo: false
+@doc Plate
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**modefreq**
+
+---
+```{julia}
+#| echo: false
+@doc modefreq(p::Plate, fmax)
+```
+:::
+
+::: {.api}
+**modeshape**
+
+---
+```{julia}
+#| echo: false
+@doc modeshape(p::Plate, kn, x, y)
+```
+:::
+
+#### Example
+
+```julia
+# Dimensions
+Lp = 0.6
+bp = 0.4
+hp = 1e-3
+
+# Material parameters
+E = 2.1e11
+ρ = 7800.
+ν = 0.33
+
+# Computation parameters
+fmax = 1000.
+xp = [0.1, 0.5]
+yp = [0.1, 0.3]
+
+# Initialization of the data types
+plate = Plate(Lp, bp, hp, E, ρ, ν)
+
+# Computation of the natural frequencies
+ωₙ, kₙ = modefreq(plate, fmax)
+
+# Computation of the corresponding mode shapes
+ϕₙ = modeshape(plate, kₙ, xp, yp)
+```
+
+## Discrete models
+
+### Sdof systems
+
+Single degree of freedom (Sdof) systems are classically composed of a mass $m$, a stiffness $k$ and a viscous damper $c$ (see @fig-1dof).
+
+::: {#fig-1dof}
+![](../assets/images/1dof.svg)
+
+Classical representation of an Sdof system
+:::
+
+Mathematically, their dynamic behavior is governed by the following normalized equation of motion :
+$$
+\ddot x(t) + 2\xi\,\omega_0\, \dot x(t) + \omega_0^2 x(t) = \frac{F(t)}{m}.
+$$
+where $F(t)$ can be either a base or an external excitation applied to the system.
+
+The Sdof system can thus be defined by:
+
+- its mass $m$
+- its natural angular frequency $\omega_0$ (or its natural frequency $f_0$)
+- its damping ratio $\xi$
+
+#### API
+
+:::::: {.api}
+**Sdof**
+
+---
+```{julia}
+#| echo: false
+@doc Sdof
+```
+:::
+
+#### Example
+
+```julia
+# Definition of the structural parameters
+m = 1.
+f₀ = 10.
+ξ = 0.01
+
+# Initialization of Sdof
+sdof = Sdof(m, f₀, ξ)
+```
+
+### Mdof systems
+
+`StructuralVibration.jl` considers Multi-degrees of freedom (Mdof) systems, which topology is presented in @fig-mdof. This choice has been made, because it allows modeling a large variety of possible configurations.
+
+::: {#fig-mdof}
+![](../assets/images/mdof.svg)
+
+General topology of an Mdof system
+:::
+
+The dynamic behavior of such a system is governed by the following matrix system:
+$$
+\mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{K}\mathbf{x}(t) = \mathbf{f}(t),
+$$
+where:
+
+- $\mathbf{M} = \text{diag}(m_1, \dots, m_j, \dots, m_N)$ is the mass matrix.
+
+- $\mathbf{K}$ is the stiffness matrix such that:
+$$
+\mathbf{K} = \begin{bmatrix}
+k_1 & -k_1 & 0 & \ldots & 0 & 0 \\
+-k_1 & k_1 + k_2 & -k_2 & \ddots & \vdots & \vdots \\
+0 & -k_2 & \ddots & \ddots & 0 & \vdots \\
+\vdots & 0 & \ddots & \ddots & -k_{N-1} & 0 \\
+\vdots & \vdots & \ddots & -k_{N-1} & k_{N-1} + k_N & -k_N \\
+0 & 0 & \ldots & 0 & -k_N & k_N
+\end{bmatrix}.
+$$
+
+- $\mathbf{x}(t) = \left[x_1(t), \dots, x_j(t), \dots, x_N(t)\right]^\mathsf{T}$ is the displacement vector.
+
+- $\mathbf{f}(t) = \left[F_1(t), \dots, F_j(t), \dots, F_N(t)\right]^\mathsf{T}$ is the external force vector.
+
+#### API {#sec-api-mdof}
+
+**Data types**
+
+:::: {.api}
+**Mdof**
+
+---
+```{julia}
+#| echo: false
+@doc Mdof
+```
+
+::: {.callout-note title="About the damping matrix C" collapse="true"}
+If viscous dampers are defined, the damping matrix $\mathbf{C}$ is consistent with the stiffness matrix $\mathbf{K}$, meaning that:
+$$
+\mathbf{C} = \begin{bmatrix}
+c_1 & -c_1 & 0 & \ldots & 0 & 0 \\
+-c_1 & c_1 + c_2 & -c_2 & \ddots & \vdots & \vdots \\
+0 & -k_2 & \ddots & \ddots & 0 & \vdots \\
+\vdots & 0 & \ddots & \ddots & -c_{N-1} & 0 \\
+\vdots & \vdots & \ddots & -c_{N-1} & c_{N-1} + c_N & -c_N \\
+0 & 0 & \ldots & 0 & -c_N & c_N
+\end{bmatrix}.
+$$
+:::
+::::
+
+::: {.api}
+**MdofMesh**
+
+---
+```{julia}
+#| echo: false
+@doc MdofMesh
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**assembly**
+
+---
+```{julia}
+#| echo: false
+
+@doc assembly(model::Mdof)
+```
+:::
+
+::: {.api}
+**apply_bc**
+
+---
+```{julia}
+#| echo: false
+
+@doc apply_bc
+```
+:::
+
+::: {.api}
+**eigenmode**
+
+---
+```{julia}
+#| echo: false
+
+@doc eigenmode(K::Matrix{Float64}, M::Matrix{Float64})
+```
+:::
+
+::: {.api}
+**modal_matrices**
+
+---
+```{julia}
+#| echo: false
+@doc modal_matrices
+```
+:::
+
+::: {.api}
+**modal_effective_mass**
+
+---
+```{julia}
+#| echo: false
+@doc modal_effective_mass
+```
+:::
+
+#### Example
+
+```julia
+# Definition of the structural parameters
+k_mdof = [1., 1.]
+m_mdof = ones(3)
+c_mdof = [0.1, 0.1]
+
+# Initialization of Mdof
+mdof = Mdof(k_mdof, m_mdof, c_mdof)
+
+# Definition of a MdofMesh
+mdof_mesh = MdofMesh(mdof, bc = :CF)
+
+# System assembly
+K_mdof, M_mdof, C_mdof = assembly(mdof)
+
+# Apply boundary conditions (if any)
+K_bc = apply_bc(K_mdof, mdof_mesh)
+M_bc = apply_bc(M_mdof, mdof_mesh)
+C_bc = apply_bc(C_mdof, mdof_mesh)
+
+# Compute the eigenmodes of the systems
+ωₙ, Φₙ = eigenmode(K_bc, M_bc)
+
+# Computation of the modal matrices
+Kmodal, Mmodal, Cmodal = modal_matrices(ωₙ, 0.01)
+
+# Computation of modal effective mass
+meff = modal_effective_mass(M_bc, Φₙ, ones(2))
+```
+
+### FE model
+
+Finite element models are available for the 1D continuous systems defined in @sec-1d-models.
+
+#### API
+**Data type**
+
+::: {.api}
+**OneDMesh**
+
+---
+```{julia}
+#| echo: false
+
+@doc OneDMesh
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**assemby**
+
+---
+```{julia}
+#| echo: false
+
+@doc assembly(model::Beam, mesh::OneDMesh)
+```
+:::
+
+::: {.api}
+**rayleigh_damping_matrix**
+
+---
+```{julia}
+#| echo: false
+
+@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+```
+:::
+
+::: {.api}
+**modal_damping_matrix**
+
+---
+```{julia}
+#| echo: false
+
+@doc modal_damping_matrix
+```
+:::
+
+::: {.api}
+**Selection matrix**
+
+---
+```{julia}
+#| echo: false
+
+@doc selection_matrix
+```
+:::
+
+::: {.api}
+**apply_bc** - See @sec-api-mdof.
+:::
+
+::: {.api}
+**eigenmode** - See @sec-api-mdof.
+:::
+
+::: {.api}
+**modal_matrices** - See @sec-api-mdof.
+:::
+
+::: {.api}
+**modal_effective_mass** - See @sec-api-mdof.
+:::
+
+#### Example
+
+```julia
+# Dimensions
+L = 1.
+d = 3e-2
+
+# Section features
+S = π*d^2/4
+Iz = π*d^4/64
+
+# Material
+E = 2.1e11
+ρ = 7800.
+
+# Computation parameters
+fmax = 2000.
+
+# Initialization of the data types
+beam = Beam(L, S, Iz, E, ρ)
+
+# Mesh definition
+oned_mesh = OneDMesh(beam, 0., 20, :SS)
+
+# Construction of K and M
+Kfe, Mfe = assembly(beam, oned_mesh)
+
+# Application of the BCs
+Kbc = apply_bc(Kfe, oned_mesh)
+Mbc = apply_bc(Mfe, oned_mesh)
+
+# Computation ofthe eigenmodes of the structure
+ωfe, Φfe = eigenmode(Kbc, Mbc)
+
+# Calculation of the damping matrix
+Cray = rayleigh_damping_matrix(Kbc, Mbc, 1., 1.)
+Cmodal = modal_damping_matrix(Mbc, ωfe, 0.01, Φfe)
+```
+
+## State space representation
+
+The state space representation of a mechanical system is expressed as:
+$$
+\dot{\mathbf{z}}(t) = \mathbf{A}_c \mathbf{z}(t) + \mathbf{B}_c \mathbf{u}(t),
+$$
+where:
+
+- $\mathbf{z}(t)$: State vector
+
+- $\mathbf{u}(t)$: Input vector
+
+- $\mathbf{A}_c$: System matrix
+
+- $\mathbf{B}_c$: Input matrix
+
+### Continuous-time models
+
+For a mechanical system, whose equation of motion is:
+$$
+\mathbf{M}\ddot{\mathbf{x}}(t) + \mathbf{C}\dot{\mathbf{x}}(t) + \mathbf{K x}(t) = \mathbf{u}(t),
+$$
+the corresponding continuous-time state equation is given by:
+$$
+\begin{bmatrix}
+\dot{\mathbf{x}}(t) \\
+\ddot{\mathbf{x}}(t)
+\end{bmatrix} = \begin{bmatrix}
+\mathbf{0} & \mathbf{I} \\
+-\mathbf{M}^{-1}\mathbf{K} & -\mathbf{M}^{-1}\mathbf{C}
+\end{bmatrix}\begin{bmatrix}
+\mathbf{x}(t) \\
+\dot{\mathbf{x}}(t)
+\end{bmatrix}+ \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{M}^{-1}
+\end{bmatrix}\mathbf{u}(t).
+$$
+
+When using a modal expansion such that
+$$
+\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t),
+$$
+where $\mathbf{\Phi}$ is the mode shapes matrix and $\mathbf{q}(t)$ is the modal coordinate vector, a modal state space equation can be obtained. The latter is written:
+$$
+\begin{bmatrix}
+\dot{\mathbf{q}}(t) \\
+\ddot{\mathbf{q}}(t)
+\end{bmatrix} = \begin{bmatrix}
+\mathbf{0} & \mathbf{I} \\
+-\mathbf{\Omega}^2 & -\mathbf{\Xi}
+\end{bmatrix}\begin{bmatrix}
+\mathbf{q}(t) \\
+\dot{\mathbf{q}}(t)
+\end{bmatrix}+ \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{\Phi}^\mathsf{T}
+\end{bmatrix}\mathbf{u}(t),
+$$
+where $\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_N^2)$ and $\mathbf{\Xi} = \text{diag}(2\xi_1\omega_1, \dots, 2\xi_N\omega_N)$.
+
+#### API
+
+**Data type**
+
+::: {.api}
+**ContinuousStateSpace**
+
+---
+```{julia}
+#| echo: false
+@doc ContinuousStateSpace
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**ss_model**
+
+---
+```{julia}
+#| echo: false
+@doc ss_model
+```
+:::
+
+::: {.api}
+**ss_modal_model**
+
+---
+```{julia}
+#| echo: false
+@doc ss_modal_model
+```
+:::
+
+::: {.api}
+**eigenmode**
+
+---
+```{julia}
+#| echo: false
+@doc eigenmode(Ac::Matrix{Float64}, Nₘ::Int = 0)
+```
+:::
+
+::: {.api}
+**modal_parameters**
+
+---
+```{julia}
+#| echo: false
+@doc modal_parameters
+```
+:::
+
+::: {.api}
+**c2r_modeshape**
+
+---
+```{julia}
+#| echo: false
+@doc c2r_modeshape
+```
+:::
+
+#### Example
+
+```julia
+# System matrices
+m_ss = Diagonal([2., 1.])
+k_ss = [6. -2.; -2. 4.]
+c_ss = [0.67 -0.11; -0.11 0.39]
+
+# Continuous-time state space from system matrices
+css = ss_model(k_ss, m_ss, c_ss)
+λ, Ψ = eigenmode(css.Ac)
+ω, ξ = modal_parameters(λss)
+Ψr = c2r_modeshape(Ψ)
+
+# Continuous-time state space from modal information
+ωₙ, ϕₙ = eigenmode(k_ss, m_ss)
+css_modal = ss_modal_model(ωₙ, 0.01, ϕₙ)
+```
+
+### Discrete-time models
+
+Discrete-time models can be either be obtained using sampled strategies from direct-time integration methods (e.g. Newmark's scheme). However, both approaches lead to a discrete-time state equation of the form:
+$$
+	\mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{z}_k + \mathbf{B}_f\, \mathbf{u}_k + \mathbf{B}_g\, \mathbf{u}_{k+1},
+$$
+
+The previous formulation is rather non-standard, since the state vector at frequency step $k + 1$ requires the knowledge of the input vector at time steps $k$ and $k + 1$. To reduce the state-space representation to its standard form, a reduced state $\mathbf{\overline{z}}_{k+1}$ is introduced:
+$$
+	\mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{x}_k + \mathbf{B}_f\, \mathbf{u}_k,
+$$
+
+In doing so, the discretized state equation becomes:
+$$
+	\mathbf{\overline{z}}_{k+1} = \mathbf{A}\, \mathbf{\overline{z}}_k + \mathbf{B}\, \mathbf{u}_k
+$$
+where $\mathbf{B} = \mathbf{B}_f + \mathbf{A\, B}_g$.
+
+#### Sampling methods
+
+Sampling methods are based on the discretization of the solution of the continuous-time state equation. Once discretized, the state equation can be written as:
+$$
+\mathbf{z}_{k+1} = \mathbf{A} \, \mathbf{z}_k + \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,\mathbf{u}(\tau + kh)\, d\tau,
+$$
+where $\mathbf{A} = e^{\mathbf{A_c} h}$ is the the discretized system matrix and $h$ is the discretization timestep.
+
+To cover a wide range of situations, the input vector is assumed to be parameterized as follows:
+$$
+\mathbf{u}(\tau + kh) = f(\tau)\, \mathbf{u}_k + g(\tau)\, \mathbf{u}_{k+1},
+$$
+where the basis function $f(\tau)$ and $g(\tau)$ control the evolution of the input vector between two time steps.
+
+Introducing the parameterization of the input vector into the convolution integral, one obtains the following state equation:
+$$
+	\mathbf{z}_{k+1} = \mathbf{A}\, \mathbf{z}_k + \mathbf{B}_f\, \mathbf{u}_k + \mathbf{B}_g\, \mathbf{u}_{k+1},
+$$
+where $\mathbf{B}_f$ and $\mathbf{B}_g$ are the discretized input matrices defined such that:
+$$
+	\mathbf{B}_f = \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,f(\tau)\, d\tau \; \text{ and } \; \mathbf{B}_g = \mathbf{A}\, \int_{0}^{h} e^{-\mathbf{A_c}\tau}\, \mathbf{B_c}\,g(\tau)\, d\tau.
+$$
+
+In the literature, the most commonly used sampling methods are the following[^1]:
+
+[^1]: D. Bernal. "Optimal discrete to continuous transfer for band limited inputs", *Journal of Engineering Mechanics*, vol. 133 (12), pp. 1370-1377, 2007.
+
+-  The Zero-Order Hold (ZOH) strategy, which assumes that the input vector is constant between two samples. This assumption is satisfied for $f(\tau) = 1$ and $g(\tau) = 0$ and leads to:
+$$
+		\mathbf{B} = \mathbf{B}_f = (\mathbf{A} - \mathbf{I})\, \mathbf{A}_\mathbf{c}^{-1}\, \mathbf{B_c}.
+$$
+
+- The First-Order Hold (FOH) sampling method, which assumes that the input vector varies linearly between two samples. This assumption is satisfied for $f(\tau) = 1 - \tau/h$ and $g(\tau) = \tau/h$ and leads to:
+$$
+		\begin{split}
+			&\mathbf{B}_f + \mathbf{B}_g = (\mathbf{A} - \mathbf{I})\, \mathbf{A}_\mathbf{c}^{-1}\, \mathbf{B_c}, \\
+			&\mathbf{B}_g = (\mathbf{A} - \mathbf{A_c}h - \mathbf{I})\mathbf{A}_\mathbf{c}^{-2}\, \mathbf{B_c}/h.
+		\end{split}
+$$
+
+- The Band-Limited Hold (BLH) sampling method, which assumes that the input signal can be approximated as a band-limited signal (i.e. the energy of the signal is concentrated in a defined frequency range). This assumption is satisfied for $f(\tau) = h\, \delta(\tau)$ and $g(\tau) = 0$, where $\delta(\tau)$ is the Dirac delta function and leads to:
+$$
+		\mathbf{B} = \mathbf{B}_f = \mathbf{A}\, \mathbf{B_c}\, h.
+$$
+
+#### Direct-time integration based methods
+
+Despite several methods can be found in the literature, such as the Newmark's family schemes, this package only provides the Runge-Kutta approach, because it is an explicit method (i.e. does not require any matrix inversion). After some calculation not detailed here[^2], the discrete system and input matrices are expressed as:
+$$
+	\begin{split}
+	&\mathbf{A} = \frac{1}{24}\left[24\,(\mathbf{I} + \mathbf{A_c}\, h) + 12\, \mathbf{A}_\mathbf{c}^2\, h^2 + 4\, \mathbf{A}_\mathbf{c}^3\, h^3 + \mathbf{A}_\mathbf{c}^4\, h^4\right], \\
+	&\mathbf{B}_f = \frac{h}{24}\left[12\, \mathbf{I} + 8\, \mathbf{A_c}\, h + 3 \mathbf{A}_\mathbf{c}^2\, h^2 + \mathbf{A}_\mathbf{c}^3\, h^3\right]\mathbf{B_c}, \\
+	&\mathbf{B}_g = \frac{h}{24}\left[12\, \mathbf{I} + 4\, \mathbf{A_c}\, h + \mathbf{A}_\mathbf{c}^2\, h^2\right]\mathbf{B_c}.
+	\end{split}
+$$
+
+[^2]: For further details, see: J. Ghibaudo. "Inverse estimation of sparse mechanical excitation sources by Bayesian filtering", *PhD thesis*, Conservatoire national des arts et métiers, 2024.
+
+#### API
+
+**Data type**
+
+::: {.api}
+**DiscreteStateSpace**
+
+---
+```{julia}
+#| echo: false
+
+@doc DiscreteStateSpace
+```
+:::
+
+**Related function**
+
+::: {.api}
+**c2d**
+
+---
+```{julia}
+#| echo: false
+
+@doc c2d
+```
+:::
+
+#### Example
+
+```julia
+dss = c2d(css, 0.01, :zoh)
+```

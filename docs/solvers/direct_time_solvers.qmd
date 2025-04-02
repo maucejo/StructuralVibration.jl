@@ -1,0 +1,289 @@
+---
+title: Direct-time integration solvers
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd, LinearAlgebra
+@usingany CairoMakie
+```
+
+Similarly to the previous section, the aim is to describe the direct time solvers available for solving Mdof systems. As a remainder, the equation of motion of the system is given by:
+$$
+\mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{C} \dot{\mathbf{x}}(t) + \mathbf{K} \mathbf{x}(t) = \mathbf{F}(t)
+$$
+where $\mathbf{M}$ is the mass matrix, $\mathbf{C}$ is the damping matrix, $\mathbf{K}$ is the stiffness matrix, $\mathbf{x}(t)$ is the displacement vector, and $\mathbf{F}(t)$ is the vector of external forces.
+
+Direct-time integration solvers are used to solve the previous equation in the time domain. In Julia [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org), we have the option of using [DiffentialEquations.jl](https://docs.sciml.ai/DiffEqDocs/stable/) which provides a wide range of solvers for solving differential equations.
+
+The `StructuralVibration` package provides its own set of fixed-step linear second-order ODE solvers for pedagogical purposes and for the sake of completeness of the package. It should also be noted that some of the solvers implemented in the package are not available in [DiffentialEquations.jl](https://docs.sciml.ai/DiffEqDocs/stable/). This is the case of the solvers of the Newmark family, which are widely used in structural dynamics.
+
+The solvers available in the `StructuralVibration` package are:
+
+- Central difference method (CentralDiff)
+- Fourth-order Runge-Kutta method (RK4)
+- Newmark family solvers
+    - Newmark-beta method (Newmark) [^1]
+    - HHT method (HHT) [^2]
+    - WBZ method (WBZ) [^3]
+    - Fox-Goodwin method (FoxGoodwin) [^4]
+    - Mid-Point rule (MidPoint) [^5]
+    - Generalized-alpha method (GeneralizedAlpha) [^6]
+
+  [^1]: N. M. Newmark. "A method of computation for structural dynamics". Journal of the Engineering Mechanics Division, 85(3), 67-94, 1959.
+  [^2]: H. M. Hilber, T. J. Hughes and R. L. Taylor. "Improved numerical dissipation for time integration algorithms in structural dynamics". Earthquake Engineering & Structural Dynamics 5(3), 283–292. 1977.
+  [^3]: W. L. Wood, M. Bossak, O. Zienkiewicz. "An alpha modification of Newmark's method". International Journal for Numerical Methods in Engineering, 15(10), 1562-1566, 1980.
+  [^4]: L. Fox, E. T. Goodwin. "Some new methods for numerical integration of ordinary differential equations". Mathematical Proceedings of the Cambridge Philosophical Society, 45(3), 373-388, 1949.
+  [^5]: M. Géradin and D. Rixen. "Mechanical Vibrations: Theory and Application to Structural Dynamics". Third Edition. John Wiley & Sons, 2015.
+  [^6]: J. Chung and G. M. Hulbert. "A time integration algorithm for structural dynamics with improved numerical dissipation: the generalized-alpha method". Journal of Applied Mechanics, 60(2), 371-375, 1993.
+
+## API
+
+**Data types**
+
+::: {.api}
+**DirectTimeProblem**
+
+---
+
+```{julia}
+#| echo: false
+@doc DirectTimeProblem
+```
+:::
+
+::: {.api}
+**CentralDiff**
+
+---
+
+```{julia}
+#| echo: false
+@doc CentralDiff
+```
+:::
+
+::: {.api}
+**RK4**
+
+---
+
+```{julia}
+#| echo: false
+@doc RK4
+```
+:::
+
+::: {.api}
+**Newmark**
+
+---
+
+```{julia}
+#| echo: false
+@doc Newmark
+```
+:::
+
+::: {.api}
+**HHT**
+
+---
+
+```{julia}
+#| echo: false
+@doc HHT
+```
+:::
+
+::: {.api}
+**WBZ**
+
+---
+
+```{julia}
+#| echo: false
+@doc WBZ
+```
+:::
+
+::: {.api}
+**FoxGoodwin**
+
+---
+
+```{julia}
+#| echo: false
+@doc FoxGoodwin
+```
+:::
+
+::: {.api}
+**MidPoint**
+
+---
+
+```{julia}
+#| echo: false
+@doc MidPoint
+```
+:::
+
+::: {.api}
+**GeneralizedAlpha**
+
+---
+
+```{julia}
+#| echo: false
+@doc GeneralizedAlpha
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::DirectTimeProblem, alg::CentralDiff)
+```
+:::
+
+
+## Free response
+
+The free response of a 2-dofs system is obtained by setting the external forces to zero. In this condition, the motion of the system is initiated by non-zero initial conditions. In the following example, the response provided by the direct time solvers is compared with the solution obtained by the modal solver described in [Modal time solvers - Section 1](https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html) for the purpose of cross-validation.
+
+```{julia}
+#| output: false
+# System parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# Time vector
+t = 0.:1e-2:30.
+
+# Initial conditions
+x0 = [0.2, 0.1]
+v0 = zeros(2)
+u0 = (x0, v0)
+
+# External forces
+F_free = zeros(2, length(t))
+
+# Direct time problem
+prob_free = DirectTimeProblem(K, M, C, F_free, u0, t)
+x_free_gα = solve(prob_free).u
+x_free_cd = solve(prob_free, CentralDiff()).u
+x_free_rk = solve(prob_free, RK4()).u
+
+# Modal time problem
+prob_free_modal =  FreeModalTimeProblem(K, M, ξ, u0, t)
+x_free_modal = solve(prob_free_modal).u
+```
+
+```{julia}
+#| echo: false
+fig = Figure(size = (600, 600))
+ax_1 = Axis(fig[1, 1], ylabel = "Displacement (m)", title = "Free response")
+ax_2 = Axis(fig[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_1, t, x_free_gα[1, :], label = "x₁ - Generalized-α")
+lines!(ax_1, t, x_free_cd[1, :], label = "x₁ - CentralDiff", linestyle = :dash)
+lines!(ax_1, t, x_free_rk[1, :], label = "x₁ - RK4", linestyle = :dashdot)
+lines!(ax_1, t, x_free_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
+axislegend(ax_1, position = :ct,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_1, minimum(t), maximum(t))
+
+lines!(ax_2, t, x_free_gα[2, :], label = "x₂ - Generalized-α")
+lines!(ax_2, t, x_free_cd[2, :], label = "x₂ - CentralDiff", linestyle = :dash)
+lines!(ax_2, t, x_free_rk[2, :], label = "x₂ - RK4", linestyle = :dashdot)
+lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
+axislegend(ax_2, position = :cb,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_2, minimum(t), maximum(t))
+
+display(fig);
+```
+
+## Forced response
+
+The forced response of a 2-dofs system is obtained by applying a haversine excitation to the first dof of the system. As in the previous section, the response provided by the direct time solvers is compared with the solution obtained by the modal solver described in [Modal time solvers - Section 2](https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html) for the purpose of cross-validation.
+
+```{julia}
+#| output: false
+# System parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# Time vector
+t = 0.:1e-2:30.
+
+# Initial conditions
+x0 = zeros(2)
+v0 = zeros(2)
+u0 = (x0, v0)
+
+# External forces
+F0 = 10.
+tstart = 2.
+duration = 5.
+haversine = HaverSine(F0, tstart, duration)
+F0 = excitation(haversine, t)
+F = zeros(2, length(t))
+F[1, :] .= F0
+
+# Direct time problem
+prob_forced = DirectTimeProblem(K, M, C, F, u0, t)
+x_forced_gα = solve(prob_forced).u
+x_forced_cd = solve(prob_forced, CentralDiff()).u
+x_forced_rk = solve(prob_forced, RK4()).u
+
+# Modal time problem
+prob_forced_modal = ForcedModalTimeProblem(K, M, ξ, F, u0, t)
+x_forced_modal = solve(prob_forced_modal).u
+```
+
+```{julia}
+#| echo: false
+fig_forced = Figure(size = (600, 600))
+ax_forced_1 = Axis(fig_forced[1, 1], ylabel = "Displacement (m)", title = "Forced response")
+ax_forced_2 = Axis(fig_forced[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_forced_1, t, x_forced_gα[1, :], label = "x₁ - Generalized-α")
+lines!(ax_forced_1, t, x_forced_cd[1, :], label = "x₁ - CentralDiff", linestyle = :dash)
+lines!(ax_forced_1, t, x_forced_rk[1, :], label = "x₁ - RK4", linestyle = :dashdot)
+lines!(ax_forced_1, t, x_forced_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
+axislegend(ax_forced_1, position = :ct,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_forced_1, minimum(t), maximum(t))
+
+lines!(ax_forced_2, t, x_forced_gα[2, :], label = "x₂ - Generalized-α")
+lines!(ax_forced_2, t, x_forced_cd[2, :], label = "x₂ - CentralDiff", linestyle = :dash)
+lines!(ax_forced_2, t, x_forced_rk[2, :], label = "x₂ - RK4", linestyle = :dashdot)
+lines!(ax_forced_2, t, x_forced_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
+axislegend(ax_forced_2, position = :cb,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_forced_2, minimum(t), maximum(t))
+
+display(fig_forced);
+```

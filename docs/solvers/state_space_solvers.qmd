@@ -1,0 +1,430 @@
+---
+title: State-space solvers
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd, LinearAlgebra
+@usingany CairoMakie
+```
+
+## Time-domain solvers
+
+For solving time-domain problems, the `StructuralVibration.jl` package provides two different approach. The first one consist in solving the problem using the discrete-time state equation (see [Mechanical solvers - Section 3.2](https://maucejo.github.io/StructuralVibration.jl/models/#state-space-representation) for details). In this case, four discretization methods are available: Zero-Order Hold (`:zoh`), First-Order Hold (`:foh`), Band-Limited Hold (`:blh`), and Fourth order Runge-Kutta scheme (`:rk4`).
+
+The second approach is to solve the problem using the continuous-time state equation. In this case, the user can build a continuous state-space model and solve it using [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/) to take advantage of one of its numerous solvers or use the Fourth order Runge-Kutta scheme implemented in the package.
+
+### API
+
+**Data type**
+
+::: {.api}
+**StateSpaceTimeProblem**
+
+---
+
+```{julia}
+#| echo: false
+@doc StateSpaceTimeProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::StateSpaceTimeProblem)
+```
+:::
+
+### Example
+
+#### Free response
+
+```{julia}
+#| output: false
+# Structural parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# Time vector
+t = 0.:1e-2:30.
+
+# State-space model
+css = ss_model(K, M, C)
+
+# Force
+F_free = zeros(2, length(t))
+
+# Initial conditions
+x0 = [0.2, 0.1]
+v0 = zeros(2)
+u0 = [x0; v0]
+
+# Problem definition
+prob_free = StateSpaceTimeProblem(css, F_free, u0, t)
+x_free_zoh = solve(prob_free).u
+x_free_foh = solve(prob_free, :foh).u
+x_free_blh = solve(prob_free, :blh).u
+x_free_rk = solve(prob_free, RK4()).u
+# Other possibility
+# x_free_rk = solve(prob_free, :rk4).u
+
+prob_free_modal =  FreeModalTimeProblem(K, M, ξ, (x0, v0), t)
+x_free_modal = solve(prob_free_modal).u
+```
+
+```{julia}
+#| echo: false
+fig = Figure(size = (600, 600))
+ax_1 = Axis(fig[1, 1], ylabel = "Displacement (m)", title = "Free response")
+ax_2 = Axis(fig[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_1, t, x_free_zoh[1, :], label = "x₁ - ZOH")
+lines!(ax_1, t, x_free_foh[1, :], label = "x₁ - FOH", linestyle = :dash)
+lines!(ax_1, t, x_free_blh[1, :], label = "x₁ - BLH", linestyle = :dashdot)
+lines!(ax_1, t, x_free_rk[1, :], label = "x₁ - RK4", linestyle = :dashdotdot)
+lines!(ax_1, t, x_free_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
+axislegend(ax_1, position = :ct,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_1, minimum(t), maximum(t))
+
+lines!(ax_2, t, x_free_zoh[2, :], label = "x₂ - ZOH")
+lines!(ax_2, t, x_free_foh[2, :], label = "x₂ - FOH", linestyle = :dash)
+lines!(ax_2, t, x_free_blh[2, :], label = "x₁ - BLH", linestyle = :dashdot)
+lines!(ax_2, t, x_free_rk[2, :], label = "x₂ - RK4", linestyle = :dashdotdot)
+lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
+axislegend(ax_2, position = :cb,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_2, minimum(t), maximum(t))
+
+display(fig);
+```
+
+#### Forced response
+```{julia}
+#| output: false
+# Structural parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# Time vector
+t = 0.:1e-2:30.
+
+# State-space model
+css = ss_model(K, M, C)
+
+F0 = 10.
+tstart = 2.
+duration = 5.
+haversine = HaverSine(F0, tstart, duration)
+F0 = excitation(haversine, t)
+F = zeros(2, length(t))
+F[1, :] .= F0
+
+# Initial conditions
+x0 = zeros(2)
+v0 = zeros(2)
+u0 = [x0; v0]
+
+# Problem definition
+prob_forced = StateSpaceTimeProblem(css, F, u0, t)
+x_forced_zoh = solve(prob_forced).u
+x_forced_foh = solve(prob_forced, :foh).u
+x_forced_blh = solve(prob_forced, :blh).u
+x_forced_rk = solve(prob_forced, :rk4).u
+
+prob_forced_modal = ForcedModalTimeProblem(K, M, ξ, F, (x0, v0), t)
+x_forced_modal = solve(prob_forced_modal).u
+```
+
+```{julia}
+#| echo: false
+fig_forced = Figure(size = (600, 600))
+ax_forced_1 = Axis(fig_forced[1, 1], ylabel = "Displacement (m)", title = "Forced response")
+ax_forced_2 = Axis(fig_forced[2, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax_forced_1, t, x_forced_zoh[1, :], label = "x₁ - ZOH")
+lines!(ax_forced_1, t, x_forced_foh[1, :], label = "x₁ - FOH", linestyle = :dash)
+lines!(ax_forced_1, t, x_forced_blh[1, :], label = "x₁ - BLH", linestyle = :dashdot)
+lines!(ax_forced_1, t, x_forced_rk[1, :], label = "x₁ - RK4", linestyle = :dashdotdot)
+lines!(ax_forced_1, t, x_forced_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
+axislegend(ax_forced_1, position = :ct,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_forced_1, minimum(t), maximum(t))
+
+lines!(ax_forced_2, t, x_forced_zoh[2, :], label = "x₂ - ZOH")
+lines!(ax_forced_2, t, x_forced_foh[2, :], label = "x₂ - FOH", linestyle = :dash)
+lines!(ax_forced_2, t, x_forced_blh[2, :], label = "x₁ - BLH", linestyle = :dashdot)
+lines!(ax_forced_2, t, x_forced_rk[2, :], label = "x₂ - RK4", linestyle = :dashdotdot)
+lines!(ax_forced_2, t, x_forced_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
+axislegend(ax_forced_2, position = :cb,
+           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+xlims!(ax_forced_2, minimum(t), maximum(t))
+
+display(fig_forced);
+```
+
+## Frequency-domain solvers
+
+The frequency-domain solvers are based on the state-space representation of the system, which includes both the state equation and the output equation. It is given that:
+$$
+\begin{cases}
+\dot{\mathbf{z}}(t) &= \mathbf{A}_c \mathbf{z}(t) + \mathbf{B}_c \mathbf{u}(t) \\
+\mathbf{y}(t) &= \mathbf{C}_c \mathbf{z}(t) + \mathbf{D}_c \mathbf{u}(t)
+\end{cases},
+$$
+where:
+
+- $\mathbf{z}(t)$: State vector
+- $\mathbf{u}(t)$: Input vector
+- $\mathbf{y}(t)$: Output vector
+- $\mathbf{A}_c$: System matrix
+- $\mathbf{B}_c$: Input matrix
+- $\mathbf{C}_c$: Observation matrix
+- $\mathbf{D}_c$: Direct feedthrough matrix
+
+It is also possible to express the state-space system. To this end, the state-space representation is transformed into modal coordinates, i.e., $\mathbf{z} = \mathbf{\Psi} \mathbf{q}$, where $\mathbf{\Psi}$ is the matrix of eigenvectors of the system matrix $\mathbf{A}_c$. The modal state-space representation is given by:
+$$
+\begin{cases}
+\dot{\mathbf{q}}(t) &= \mathbf{\Lambda} \mathbf{q}(t) + \mathbf{B}_m \mathbf{u}(t) \\
+\mathbf{y}(t) &= \mathbf{C}_m \mathbf{q}(t) + \mathbf{D}_m \mathbf{u}(t)
+\end{cases},
+$$
+where:
+
+- $\mathbf{q}(t)$: Modal state vector
+- $\Lambda = \text{diag}(\lambda_1, \lambda_1^\ast, \dots, \lambda_N, \lambda_N^\ast)$: Eigenvalues matrix
+- $\mathbf{B}_m = \mathbf{\Psi}^{-1} \mathbf{B}_c$: Modal input matrix
+- $\mathbf{C}_m = \mathbf{C}_c \mathbf{\Psi}$: Modal observation matrix
+- $\mathbf{D}_m = \mathbf{D}_c$: Modal direct feedthrough matrix
+
+Finally
+
+### Frequency Response Function
+
+The Frequency Response Function (FRF) is a complex function that describes the steady-state response of a system to a sinusoidal input. The FRF is defined as the ratio of the output to the input in the frequency domain. From the state-space representation, the transfer function of the system at a given angular frequency $\omega$ can be obtained in a straightforward manner and is given by:
+$$
+\mathbf{H}(\omega) = \mathbf{C}_c (j\omega \mathbf{I} - \mathbf{A}_c)^{-1} \mathbf{B}_c + \mathbf{D}_c,
+$$
+or equivalently from the modes of the system:
+$$
+\mathbf{H}(\omega) = \mathbf{C}_m (j\omega \mathbf{I} - \mathbf{\Lambda} )^{-1} \mathbf{B}_m + \mathbf{D}_m.
+$$
+
+Finally, it should be noted that the FRF can be computed for a given set of response dofs and a given set of excitation dofs by introducing the appropriate selection matrices $\mathbf{S}_o$ and $\mathbf{S}_e$. In this case, the FRF is given by:
+$$
+\mathbf{H}_{oe}(\omega) = \mathbf{S}_o\mathbf{H}(\omega)\mathbf{S}_e.
+$$
+
+::: {.callout-note}
+- For the admittance : $\mathbf{C}_c = [\mathbf{I},\quad \mathbf{0}]$ and $\mathbf{D}_c = \mathbf{0}$.
+- For the mobility : $\mathbf{C}_c = [\mathbf{0}, \quad \mathbf{I}]$ and $\mathbf{D}_c = \mathbf{0}$.
+- For the accelerance, $\mathbf{C}_c = \mathbf{A}_c[m:\text{end}, :]$ and $\mathbf{D}_c = \mathbf{B}_c[m:\text{end}, :]$ with $m = N/2$ (this corresponds to a rewrite of the equation of motion).
+:::
+
+#### API
+
+**Data types**
+
+::: {.api}
+**StateSpaceFRFProblem**
+
+---
+```{julia}
+#| echo: false
+@doc StateSpaceFRFProblem
+```
+:::
+
+::: {.api}
+**StateSpaceModalFRFProblem**
+
+---
+```{julia}
+#| echo: false
+@doc StateSpaceModalFRFProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+
+```{julia}
+#| echo: false
+@doc solve(prob::StateSpaceFRFProblem)
+```
+:::
+
+#### Example
+
+```{julia}
+#| output: false
+# Structural parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# State-space model
+css = ss_model(K, M, C)
+
+# Frequency vector
+freq = 0.01:0.001:1.
+
+# Problem definition - Case 1 - Direct
+prob_frf = StateSpaceFRFProblem(css, freq)
+H_direct = solve(prob_frf, ismat = true).u
+
+# Problem definition - Case 2 - Modal
+prob_frf_modal = StateSpaceModalFRFProblem(css, freq)
+H_modal = solve(prob_frf_modal, ismat = true).u
+```
+
+```{julia}
+#| echo: false
+fig_frf = Figure()
+ax_frf11 = Axis(fig_frf[1, 1], ylabel = "FRF (dB)", title = "H₁₁")
+ax_frf12 = Axis(fig_frf[1, 2], title = "H₁₂")
+ax_frf21 = Axis(fig_frf[2, 1], xlabel = "Frequency (Hz)", ylabel = "FRF (dB)", title = "H₂₁")
+ax_frf22 = Axis(fig_frf[2, 2], xlabel = "Frequency (Hz)", title = "H₂₂")
+
+lines!(ax_frf11, freq, 20log10.(abs.(H_direct[1, 1, :])), label = "Direct")
+lines!(ax_frf11, freq, 20log10.(abs.(H_modal[1, 1, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf11, minimum(freq), maximum(freq))
+axislegend(ax_frf11, position = :rt, backgroundcolor = (:white, 0.5))
+
+lines!(ax_frf12, freq, 20log10.(abs.(H_direct[1, 2, :])), label = "Direct")
+lines!(ax_frf12, freq, 20log10.(abs.(H_modal[1, 2, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf12, minimum(freq), maximum(freq))
+
+lines!(ax_frf21, freq, 20log10.(abs.(H_direct[2, 1, :])), label = "Direct")
+lines!(ax_frf21, freq, 20log10.(abs.(H_modal[2, 1, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf21, minimum(freq), maximum(freq))
+
+lines!(ax_frf22, freq, 20log10.(abs.(H_direct[2, 2, :])), label = "Direct")
+lines!(ax_frf22, freq, 20log10.(abs.(H_modal[2, 2, :])), label = "Modal", linestyle = :dash)
+xlims!(ax_frf22, minimum(freq), maximum(freq))
+
+display(fig_frf);
+```
+
+### Response spectrum
+
+Similarly to the FRF, the response spectrum is a complex function that describes the steady-state response of a system to a sinusoidal input. From the state-space representation, the response spectrum of the system at a given angular frequency $\omega$ is given by:
+$$
+\mathbf{y}(\omega) = \left[\mathbf{C}_c (j\omega \mathbf{I} - \mathbf{A}_c)^{-1} \mathbf{B}_c + \mathbf{D}_c\right] \mathbf{u}(\omega),
+$$
+or equivalently from the modes of the system:
+$$
+\mathbf{y}(\omega) = \left[\mathbf{C}_m (j\omega \mathbf{I} - \mathbf{\Lambda} )^{-1} \mathbf{B}_m + \mathbf{D}_m\right] \mathbf{u}(\omega).
+$$
+
+#### API
+
+::: {.api}
+**StateSpaceFreqProblem**
+
+---
+```{julia}
+#| echo: false
+@doc StateSpaceFreqProblem
+```
+:::
+
+::: {.api}
+**StateSpaceModalFreqProblem**
+
+---
+```{julia}
+#| echo: false
+@doc StateSpaceModalFreqProblem
+```
+:::
+
+**Related function**
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::StateSpaceFreqProblem)
+```
+:::
+
+#### Example
+
+```{julia}
+#| output: false
+# Structural parameters
+M = Diagonal([2., 1.])
+K = [6. -2.; -2. 4.]
+ξ = 0.05
+
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, ξ, Φ)
+
+# State-space model
+css = ss_model(K, M, C)
+
+# Frequency vector
+freq = 0.01:0.001:1.
+
+# Force matrix
+F = zeros(2, length(freq))
+F[1, :] .= 10.
+
+# Problem definition - Case 1 - Direct
+prob_freq = StateSpaceFreqProblem(css, F, freq)
+y_freq = solve(prob_freq).u
+
+# Problem definition - Case 2 - Modal
+prob_freq_modal = StateSpaceModalFreqProblem(css, F, freq)
+y_freq_modal = solve(prob_freq_modal).u
+```
+
+```{julia}
+#| echo: false
+fig_y = Figure()
+ax_y1 = Axis(fig_y[1, 1], ylabel = "Displacement (dB)")
+ax_y2 = Axis(fig_y[2, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (dB)", title = "y₂")
+
+lines!(ax_y1, freq, 20log10.(abs.(y_freq[1, :])), label = "y₁ - Direct")
+lines!(ax_y1, freq, 20log10.(abs.(y_freq_modal[1, :])), label = "y₁ - Modal", linestyle = :dash)
+xlims!(ax_y1, minimum(freq), maximum(freq))
+axislegend(ax_y1, position = :rt, backgroundcolor = (:white, 0.5))
+
+lines!(ax_y2, freq, 20log10.(abs.(y_freq[2, :])), label = "y₂ - Direct")
+lines!(ax_y2, freq, 20log10.(abs.(y_freq_modal[2, :])), label = "y₂ - Modal", linestyle = :dash)
+xlims!(ax_y2, minimum(freq), maximum(freq))
+axislegend(ax_y2, position = :rt, backgroundcolor = (:white, 0.5))
+
+display(fig_y);
+```

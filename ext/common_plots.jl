@@ -1,0 +1,468 @@
+const DEFAULT_MAKIE_FONTS = Makie.theme(:fonts)
+
+"""
+    theme_choice(name::Symbol)
+
+Choose the theme for the plots.
+
+# Inputs
+* `name`: Name of the theme
+    * :makie
+    * :article
+
+# Output
+* `theme`: Theme
+"""
+function theme_choice(name::Symbol)
+    labelsize = 18.
+    ticklabelsize = 14.
+    linestyle = [:solid, :dash, :dashdot, :dashdotdot, :dot]
+    if name == :makie
+        colorline = Makie.wong_colors()
+    else name == :article
+        colorline = [:blue, :red, :green, :magenta, :orange, :cyan, :black]
+    end
+
+    theme = Theme(
+        palette = (color = colorline, linestyle = linestyle),
+        Lines = (cycle = Cycle([:color, :linestyle], covary = true), ),
+        Axis = (
+            xlabelsize = labelsize,
+            xlabelfont = :bold,
+            ylabelsize = labelsize,
+            ylabelfont = :bold,
+            xticklabelsize = ticklabelsize,
+            yticklabelsize = ticklabelsize,
+        ),
+        Axis3 = (
+            xlabelsize = labelsize,
+            xlabelfont = :bold,
+            ylabelsize = labelsize,
+            ylabelfont = :bold,
+            zlabelsize = labelsize,
+            zlabelfont = :bold,
+            xticklabelsize = ticklabelsize,
+            yticklabelsize = ticklabelsize,
+            zticklabelsize = ticklabelsize,
+        )
+    )
+
+    return theme
+end
+
+"""
+    sv_plot(x, y...; lw = 1., theme = :makie, xscale = identity, yscale = identity,
+    axis_tight = true, xlabel = "x", ylabel = "y",
+    legend = (active = false, position = :rt, orientation = :vertical, entry = " "),
+    fonts = DEFAULT_MAKIE_FONTS)
+
+Plot a 2D plot.
+
+**Inputs**
+* `x`: x-axis values
+* `y`: y-axis values
+* `lw`: linewidth
+* `theme`: Theme (default: :makie)
+* `xscale`: x-axis scale (default: identity)
+* `yscale`: y-axis scale (default: identity)
+* `axis_tight`: Tight axis (default: true)
+* `xlabel`: x-axis label
+* `ylabel`: y-axis label
+* `legend`: Legend parameters
+    * active : Bool
+    * position : Symbol
+    * entry : String
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
+
+**Output**
+* `fig`: Figure
+"""
+function sv_plot(x, y...; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, orientation = :vertical, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
+
+    set_theme!(theme_choice(theme))
+
+    # Some checks
+    t = typeof(legend)
+
+    ny = length(y)
+
+    if legend.active
+        if !hasfield(t, :position)
+            legend_position = :rt
+        else
+            legend_position = legend.position
+        end
+
+        if !hasfield(t, :orientation)
+            legend_orientation = :vertical
+        else
+            legend_orientation = legend.orientation
+        end
+
+        if !hasfield(t, :entry)
+            if ny == 1
+                legend_entry = ["Data 1"]
+            else
+                legend_entry = ["Data $i" for i in 1:ny]
+            end
+        else
+            if length(legend.entry) != ny
+                error("The number of entries in the legend must be equal to the number of rows in y")
+            end
+
+            legend_entry = legend.entry
+        end
+
+        leg = (active = legend.active, position = legend_position, entry = legend_entry, orientation = legend_orientation)
+    else
+        if ny == 1
+            legend_entry = [" "]
+        else
+            legend_entry = [" " for _ in 1:ny]
+        end
+
+        leg = (active = false, entry = legend_entry)
+    end
+
+
+    fig = Figure(fonts = fonts)
+    ax = Axis(fig[1,1], xlabel = xlabel, ylabel = ylabel, xscale = xscale, yscale = yscale)
+
+    if ny == 1
+        lines!(ax, x, y[1], linewidth = lw, label = leg.entry)
+    else
+        for (yi, labeli) in zip(y, leg.entry)
+            lines!(ax, x, yi, linewidth = lw, label = labeli)
+        end
+    end
+
+    if leg.active
+        axislegend(ax, position = leg.position, backgroundcolor = (:white, 0.5), orientation = leg.orientation)
+    end
+
+    if axis_tight
+        xlims!(ax, minimum(x), maximum(x))
+    end
+
+    return fig
+end
+
+"""
+    bode_plot(freq, y...; lw = 1., xlab = "Frequency (Hz)",
+              ylab = "Magnitude (dB)", xscale = identity,
+              axis_tight = true, isdeg = false, layout = :vertical,
+              ref_dB = 1., legend = (active = false, position = :rt, entry = " "),
+              fonts = DEFAULT_MAKIE_FONTS)
+
+Plot Bode diagram of a frequency response or a FRF.
+
+**Inputs**
+* `freq`: Frequency range of interest
+* `y`: Frequency response or FRF
+* `lw`: Line width
+* `theme`: Theme (default: :makie)
+* `xlab`: x-axis label
+* `xscale`: x-axis scale (default: :log)
+* `axis_tight`: Tight axis (default: false)
+* `isdeg`: Phase in degrees (default: false)
+* `layout`: Layout of the plot (default: :vertical)
+* `ref_dB`: Reference value for magnitude (default: 1.)
+* `legend`: Legend parameters (default: (active = false, position = :rt, entry = " "))
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
+
+**Output**
+* `fig`: Figure
+"""
+function bode_plot(freq, y...; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
+
+    set_theme!(theme_choice(theme))
+
+    # Some checks
+    ny = length(y)
+
+    t = typeof(legend)
+    if !hasfield(t, :active)
+        error("legend must be a NamedTuple with at least the fields active")
+    end
+
+    if legend.active
+        if !hasfield(t, :position)
+            legend_position = :rt
+        else
+            legend_position = legend.position
+        end
+
+        if !hasfield(t, :entry)
+            if ny == 1
+                legend_entry = ["Data 1"]
+            else
+                legend_entry = ["Data $i" for i in 1:ny]
+            end
+        else
+            entry = legend.entry
+        end
+
+        leg = (active = legend.active, position = legend_position, entry = legend_entry)
+    else
+        if ny == 1
+            legend_entry = [" "]
+        else
+            legend_entry = [" " for _ in 1:ny]
+        end
+
+        leg = (active = false, entry = legend_entry)
+    end
+
+    ylab1 = "Magnitude (dB)"
+    if isdeg
+        ylab2 = "Phase (deg)"
+    else
+        ylab2 = "Phase (rad)"
+    end
+
+    fig = Figure(fonts = fonts)
+    if layout == :vert
+        ax1 = Axis(fig[1,1], xscale = xscale)
+        ax2 = Axis(fig[2,1], xscale = xscale)
+        ax1.ylabel = ylab1
+        ax2.xlabel = xlabel
+        ax2.ylabel = ylab2
+    else
+        ax1 = Axis(fig[1,1], xscale = xscale)
+        ax2 = Axis(fig[1,2], xscale = xscale)
+        ax1.xlabel = xlabel
+        ax1.ylabel = ylab1
+        ax2.xlabel = xlabel
+        ax2.ylabel = ylab2
+    end
+
+    ymag = similar(freq)
+    ϕ = similar(freq)
+    if ny == 1
+        @. ymag = abs(y[1])
+        if isdeg
+            @. ϕ = rad2deg(angle(y[1]))
+        else
+            @. ϕ = angle(y[1])
+        end
+        lines!(ax1, freq, 20log10.(ymag/ref_dB), linewidth = lw, label = leg.entry[1])
+        lines!(ax2, freq, unwrap(ϕ), linewidth = lw)
+    else
+        for (yi, labeli) in zip(y, leg.entry)
+            @. ymag = abs(yi)
+            if isdeg
+                @. ϕ = rad2deg(angle(yi))
+            else
+                @. ϕ = angle(yi)
+            end
+            lines!(ax1, freq, 20log10.(ymag/ref_dB), linewidth = lw, label = labeli)
+            lines!(ax2, freq, unwrap(ϕ), linewidth = lw, label = labeli)
+        end
+    end
+
+    if layout == :vert
+        if leg.active
+            axislegend(ax1, position = leg.position, backgroundcolor = (:white, 0.5))
+        end
+    else
+        if leg.active
+            axislegend(ax1, position = leg.position, backgroundcolor = (:white, 0.5))
+            axislegend(ax2, position = leg.position, backgroundcolor = (:white, 0.5))
+        end
+    end
+
+    if axis_tight
+        xlims!(ax1, minimum(freq), maximum(freq))
+        xlims!(ax2, minimum(freq), maximum(freq))
+    end
+
+    return fig
+end
+
+"""
+    nyquist_plot(y; theme = :makie fonts = DEFAULT_MAKIE_FONTS)
+
+Plot Nyquist diagram
+
+**Inputs**
+* `y`: Complex data vector
+* `theme`: Theme (default: :makie)
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
+
+**Output**
+* `fig`: Figure
+"""
+function nyquist_plot(y::Vector{ComplexF64}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
+
+    set_theme!(theme_choice(theme))
+
+    fig = Figure(fonts = fonts)
+    ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part", aspect = DataAspect())
+    lines!(ax, real.(y), imag.(y))
+
+    return fig
+end
+
+"""
+    nyquist_plot(freq, y, xlab = "Frequency (Hz)"; theme = :makie,
+                 projection = false, fonts = DEFAULT_MAKIE_FONTS)
+
+Plot Nyquist diagram in 3D
+
+**Inputs**
+* `freq`: Frequency range
+* `y`: Complex vector
+* `ylabel`: y-axis label
+* `theme`: Theme (default: :makie)
+* `projection`: Projection of the curve on the xy, yz, and xz planes (default: false)
+    * on the xy plane: (freq, real(y))
+    * on the yz plane: (imag(y), freq)
+    * on the xz plane: (real(y), imag(y))
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
+
+**Output**
+* `fig`: Figure
+"""
+function nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS)
+
+    set_theme!(theme_choice(theme))
+
+    fig = Figure(fonts = fonts)
+    ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part", aspect = (1, 2, 1))
+
+    yr = real.(y)
+    yi = imag.(y)
+    lines!(ax, yr, freq, yi)
+
+    # Some checks
+    minyr, maxyr = extrema(yr)
+    if minyr*maxyr > 0.
+        if maxyr > 0.
+            minyr -= 0.1maxyr
+        else
+            maxyr -= 0.1minyr
+        end
+    end
+
+    minyi, maxyi = extrema(yi)
+    if minyi*maxyi > 0.
+        if maxyi > 0.
+            minyi -= 0.1maxyi
+        else
+            maxyi -= 0.1minyi
+        end
+    end
+
+    minf, maxf = extrema(freq)
+    if minf == 0.
+        minf = -0.1
+        α = 0.9
+    else
+        minf -= 0.1
+        α = 1.1
+    end
+
+    ax.yreversed = true
+
+    if projection
+        lines!(ax, yr, yi, color = :black, linewidth = 0.5, transformation = (:xz, α*minf))
+        lines!(ax, freq, yi, color = :black, linewidth = 0.5, transformation = (:yz, 1.09maxyr))
+        lines!(ax, yr, freq, color = :black, linewidth = 0.5, transformation = (:yx, 1.09minyi))
+    end
+
+    xlims!(ax, 1.1minyr, 1.1maxyr)
+    ylims!(ax, maxf, minf)
+    zlims!(ax, 1.1minyi, 1.1maxyi)
+
+    ax.zticklabelpad = 5.
+
+    return fig
+end
+
+"""
+    waterfall_plot(x, y, z; zmin = minimum(z), lw = 1.,
+                   colorline = :auto, colmap = :viridis, colorband = (:white, 1.),
+                   xlabel = "x", ylabel = "y", zlabel = "z", edge = true,
+                   axis_tight = false, xlim = [minimum(x), maximum(x)],
+                   ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)],
+                   fonts = DEFAULT_MAKIE_FONTS)
+
+Plot a waterfall plot.
+
+**Inputs**
+* `x`: x-axis values
+* `y`: y-axis values
+* `z`: z-axis values
+* `zmin`: minimum value of z-axis
+* `lw::Real`: linewidth
+* `colorline`: color of the lines
+* `colmap`: Name of the colormap
+* `colorband`: Tuple defining the color of the band
+    * color : Color
+    * alpha : Alpha value for transparency
+* `xlabel`: x-axis label
+* `ylabel`: y-axis label
+* `zlabel`: z-axis label
+* `edge`: Display edges (default: true)
+* `axis_tight`: Tight axis (default: false)
+* `xlim`: x-axis limits
+* `ylim`: y-axis limits
+* `zlim`: z-axis limits
+* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
+
+**Output**
+* `fig`: Figure
+"""
+function waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)], fonts = DEFAULT_MAKIE_FONTS)
+
+    set_theme!(theme_choice(:makie))
+
+    # Initialization
+    ny = length(y)
+    I₂ = ones(2)
+
+    fig = Figure(fonts = fonts)
+    ax = Axis3(fig[1,1], xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
+    for (j, yv) in enumerate(reverse(y))
+        idz = ny - j + 1
+        zj = z[idz, :]
+        lower = Point3f.(x, yv, zmin)
+        upper = Point3f.(x, yv, zj)
+        band!(ax, lower, upper, color = colorband)
+
+        if edge
+            edge_start = [Point3f(x[1], yv, zmin), Point3f(x[1], yv, zj[1])]
+            edge_end = [Point3f(x[end], yv, zmin), Point3f(x[end], yv, zj[end])]
+        end
+
+        if colorline == :auto
+            lines!(ax, upper, color = zj, colormap = colmap, linewidth = lw)
+
+            if edge
+                lines!(ax, edge_start, color = zj[1]*I₂, colormap = colmap, linewidth = lw)
+                lines!(ax, edge_end, color = zj[end]*I₂, colormap = colmap, linewidth = lw)
+            end
+        else
+            lines!(ax, upper, color = colorline, linewidth = lw)
+
+            if edge
+                lines!(ax, edge_start, color = colorline, linewidth = lw)
+                lines!(ax, edge_end, color = colorline, linewidth = lw)
+            end
+        end
+    end
+
+    if axis_tight
+        xlims!(ax, minimum(x), maximum(x))
+        ylims!(ax, minimum(y), 1.01*maximum(y))
+        zlims!(ax, zmin, maximum(z))
+    else
+        xlims!(ax, xlim[1], xlim[2])
+        ylims!(ax, ylim[1], ylim[2])
+        zlims!(ax, zlim[1], zlim[2])
+    end
+
+    ax.zticklabelpad = 5.
+
+    return fig
+end
