@@ -105,7 +105,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -321,17 +324,41 @@ Note
 \]</span> with <span class="math inline">\(\omega_i \in [\omega_1, \omega_2]\)</span>.</p>
 <p>Knowing the values of <span class="math inline">\(\omega_i\)</span>, <span class="math inline">\(\omega_1\)</span>, and <span class="math inline">\(\omega_2\)</span>, the damping ratio for mode <span class="math inline">\(i\)</span> is determined using the formula: <span class="math display">\[
 \eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
-\]</span></p>
-<p>::: {.callout-note} If we consider that the shape of a resonance peak is symmetric then <span class="math inline">\(\omega_i = \frac{\omega_1 + \omega_2}{2}\)</span>.</p>
+\]</span></p></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If we consider that the shape of a resonance peak is symmetric then <span class="math inline">\(\omega_i = \frac{\omega_1 + \omega_2}{2}\)</span>.</p>
 <p>It comes that: <span class="math display">\[
 \omega_2^2 - \omega_1^2 \approx 2\omega_i(\omega_2 - \omega_1).
 \]</span></p>
 <p>Hence, the damping ratio can be approximated as: <span class="math display">\[
 \eta_i \approx \frac{\omega_2 - \omega_1}{\omega_i}.
 \]</span></p>
-<p>This formula is often given in textbooks when dealing with the half power bandwidth method. :::</p>
-<p>::: {.callout-warning} Thanks to its extreme simplicity, this method allows for quick analysis. However, this method generally does not provide satisfactory results, as it relies on measuring the resonance peak, which is very difficult to measure precisely. This is why this method is mainly applicable to lightly damped structures with well-separated modes, whose transfer functions have been measured with good frequency resolution. :::</p></li>
-</ol>
+<p>This formula is often given in textbooks when dealing with the half power bandwidth method.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Thanks to its extreme simplicity, this method allows for quick analysis. However, this method generally does not provide satisfactory results, as it relies on measuring the resonance peak, which is very difficult to measure precisely. This is why this method is mainly applicable to lightly damped structures with well-separated modes, whose transfer functions have been measured with good frequency resolution.</p>
+</div>
+</div>
 </section>
 <section id="circle-fit-method" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="circle-fit-method"><span class="header-section-number">1.2</span> Circle fit method</h3>
@@ -403,7 +430,7 @@ Note
 <section id="api" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="api"><span class="header-section-number">3</span> API</h2>
 <div class="api">
-<p>** freq_extraction**</p>
+<p><strong>freq_extraction</strong></p>
 <hr>
 <div id="4" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -441,11 +468,7 @@ Note
 <li><p><code>ξn</code>: Damping ratios</p>
 </li>
 </ul>
-<p><strong>Note</strong></p>
-<ul>
-<li><p>It is supposed that <code>H</code> is a row or a column of the FRF, meaning that H is a Vector</p>
-</li>
-</ul>
+<p><strong>Note</strong> It is supposed that <code>H</code> is a row or a column of the FRF, meaning that H is a Vector</p>
 
 
 </div>
@@ -458,7 +481,7 @@ Note
 <div id="6" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>modeshape_extraction(freq, H, fn, ξn, dpi; type = :dis)</code></pre>
-<p>Extract mode shapes from the Bode's diagram of Nyquist's circle fitting method</p>
+<p>Extract mode shapes using Sdof approximation</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>freq</code>: Frequency vector</p>
@@ -501,11 +524,7 @@ Note
 <li><p><code>ϕn</code>: Mode shapes</p>
 </li>
 </ul>
-<p><strong>Note</strong></p>
-<ul>
-<li><p>If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).</p>
-</li>
-</ul>
+<p><strong>Note</strong> If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).</p>
 
 
 </div>
