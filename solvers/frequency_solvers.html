@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -382,14 +379,22 @@ Note
 <hr>
 <div id="8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>solve(prob::DirectFRF, type = :dis; ismat = false)
-solve(prob::ModalFRFProblem, type = :dis; ismat = false)</code></pre>
+<div class="markdown"><pre><code>solve(prob::DirectFRF; type = :dis, ismat = false, progress = true)
+solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)</code></pre>
 <p>Computes the FRF matrix by direct or modal approach</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>prob</code>: Structure containing the problem data</p>
 </li>
-<li><p><code>type</code>: Type of FRF to compute (:dis, :vel, :acc)</p>
+<li><p><code>type</code>: Type of FRF to compute</p>
+<ul>
+<li><p><code>:dis</code>: Admittance (default)</p>
+</li>
+<li><p><code>:vel</code>: Mobility</p>
+</li>
+<li><p><code>:acc</code>: Accelerance</p>
+</li>
+</ul>
 </li>
 <li><p><code>ismat</code>: Return the FRF matrix as a 3D array (default = false)</p>
 </li>
@@ -514,14 +519,24 @@ solve(prob::ModalFRFProblem, type = :dis; ismat = false)</code></pre>
 <hr>
 <div id="18" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>solve(prob::DirectFreqProblem, type = :dis)
-solve(prob::ModalFreqProblem, type = :dis)</code></pre>
+<div class="markdown"><pre><code>solve(prob::DirectFreqProblem, type = :dis, progress = true)
+solve(prob::ModalFreqProblem, type = :dis, progress = true)</code></pre>
 <p>Computes the frequency response by direct or modal approach</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>prob</code>: Structure containing the problem data</p>
 </li>
-<li><p><code>type</code>: Type of response to compute (:dis, :vel, :acc)</p>
+<li><p><code>type</code>: Type of response to compute</p>
+<ul>
+<li><p><code>:dis</code>: Displacement (default)</p>
+</li>
+<li><p><code>:vel</code>: Velocity</p>
+</li>
+<li><p><code>:acc</code>: Acceleration</p>
+</li>
+</ul>
+</li>
+<li><p><code>progress</code>: Show progress bar (default = true)</p>
 </li>
 </ul>
 <p><strong>Output</strong></p>
