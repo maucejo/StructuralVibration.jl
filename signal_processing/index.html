@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -250,12 +247,17 @@ window.Quarto = {
   <li><a href="#additional-window-functions" id="toc-additional-window-functions" class="nav-link" data-scroll-target="#additional-window-functions"><span class="header-section-number">1.2</span> Additional window functions</a></li>
   <li><a href="#choice-of-a-window-function" id="toc-choice-of-a-window-function" class="nav-link" data-scroll-target="#choice-of-a-window-function"><span class="header-section-number">1.3</span> Choice of a window function</a></li>
   </ul></li>
-  <li><a href="#function-estimation" id="toc-function-estimation" class="nav-link" data-scroll-target="#function-estimation"><span class="header-section-number">2</span> Function estimation</a>
+  <li><a href="#anti-aliasing-filter" id="toc-anti-aliasing-filter" class="nav-link" data-scroll-target="#anti-aliasing-filter"><span class="header-section-number">2</span> Anti-aliasing filter</a>
   <ul class="collapse">
-  <li><a href="#acquisition-parameters" id="toc-acquisition-parameters" class="nav-link" data-scroll-target="#acquisition-parameters"><span class="header-section-number">2.1</span> Acquisition parameters</a></li>
-  <li><a href="#response-spectrum" id="toc-response-spectrum" class="nav-link" data-scroll-target="#response-spectrum"><span class="header-section-number">2.2</span> Response spectrum</a></li>
-  <li><a href="#autopower-functions" id="toc-autopower-functions" class="nav-link" data-scroll-target="#autopower-functions"><span class="header-section-number">2.3</span> Autopower functions</a></li>
-  <li><a href="#frequency-response-function" id="toc-frequency-response-function" class="nav-link" data-scroll-target="#frequency-response-function"><span class="header-section-number">2.4</span> Frequency Response Function</a></li>
+  <li><a href="#api-21" id="toc-api-21" class="nav-link" data-scroll-target="#api-21"><span class="header-section-number">2.1</span> API</a></li>
+  <li><a href="#example-20" id="toc-example-20" class="nav-link" data-scroll-target="#example-20"><span class="header-section-number">2.2</span> Example</a></li>
+  </ul></li>
+  <li><a href="#function-estimation" id="toc-function-estimation" class="nav-link" data-scroll-target="#function-estimation"><span class="header-section-number">3</span> Function estimation</a>
+  <ul class="collapse">
+  <li><a href="#acquisition-parameters" id="toc-acquisition-parameters" class="nav-link" data-scroll-target="#acquisition-parameters"><span class="header-section-number">3.1</span> Acquisition parameters</a></li>
+  <li><a href="#response-spectrum" id="toc-response-spectrum" class="nav-link" data-scroll-target="#response-spectrum"><span class="header-section-number">3.2</span> Response spectrum</a></li>
+  <li><a href="#autopower-functions" id="toc-autopower-functions" class="nav-link" data-scroll-target="#autopower-functions"><span class="header-section-number">3.3</span> Autopower functions</a></li>
+  <li><a href="#frequency-response-function" id="toc-frequency-response-function" class="nav-link" data-scroll-target="#frequency-response-function"><span class="header-section-number">3.4</span> Frequency Response Function</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1196,12 +1198,78 @@ w[N - n], &amp; 0 \leq n &lt; N/2 \\
 </ul>
 </section>
 </section>
-<section id="function-estimation" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="function-estimation"><span class="header-section-number">2</span> Function estimation</h2>
+<section id="anti-aliasing-filter" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="anti-aliasing-filter"><span class="header-section-number">2</span> Anti-aliasing filter</h2>
+<p>Anti-aliasing filtering is a technique used to prevent aliasing, which occurs when high-frequency components of a signal are misrepresented as lower-frequency components due to insufficient sampling. The <code>anti_alias</code> function in <code>StructuralVibration.jl</code> applies a high-order low-pass filter to the signal whose cut-off frequency is the Nyquist frequency. The proposed filter is designed using the Remez exchange algorithm implemented in <code>DSP.jl</code>.</p>
+<section id="api-21" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="api-21"><span class="header-section-number">2.1</span> API</h3>
+<div class="api">
+<p><strong>anti_alias</strong></p>
+<hr>
+<div id="130" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>anti_alias(signal, fc; fs = 2fc)</code></pre>
+<p>Apply an anti-aliasing filter to a signal</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>signal</code>: Signal to be filtered</p>
+</li>
+<li><p><code>fc</code>: Cut-off frequency</p>
+</li>
+<li><p><code>fs</code>: Sampling rate</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>signal</code>: Filtered signal</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-20" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="example-20"><span class="header-section-number">2.2</span> Example</h3>
+<div id="132" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-4</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>Δt</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fu">length</span>(t)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">randn</span>(nt)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># filtered signal</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>yf <span class="op">=</span> <span class="fu">anti_alias</span>(y, <span class="fl">2500</span>., fs <span class="op">=</span> fs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="134" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-68-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-68-output-2.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="function-estimation" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="function-estimation"><span class="header-section-number">3</span> Function estimation</h2>
 <p>Several functions can be estimated from the time domain data when operating in the frequency domain.</p>
 <p>The <code>StructuralVibration.jl</code> package provides functions to estimate some of the most common functions used in structural dynamics applications. All the functions listed below are based on the Welch’s method and include the option to use a window function (+ its correction factor) to reduce spectral leakage and signal overlapping to reduce the variance of the estimated function or to compensate for the windowing effect.</p>
-<section id="acquisition-parameters" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="acquisition-parameters"><span class="header-section-number">2.1</span> Acquisition parameters</h3>
+<section id="acquisition-parameters" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="acquisition-parameters"><span class="header-section-number">3.1</span> Acquisition parameters</h3>
 <p>When acquiring data, the user has to define the sample rate <span class="math inline">\(f_s\)</span> and the block size <span class="math inline">\(b_s\)</span>. The sample rate is the number of samples per second (in Hz), and the block size is the number of samples in each block. The block size is usually a power of 2, which allows for efficient computation of the FFT. From these two parameters, it is posiible to define the following parameters:</p>
 <ul>
 <li><p><strong>Sampling period</strong>: The sampling period (in s) is the time between two consecutive samples. It is defined as: <span class="math display">\[
@@ -1221,7 +1289,7 @@ f_{max} = \frac{f_s}{2.56}.
 <div class="api">
 <p><strong>FFTParameters</strong></p>
 <hr>
-<div id="130" class="cell" data-execution_count="1">
+<div id="136" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>FFTParameters</code></pre>
 <p>Structure to store the time and frequency parameters for the FFT analysis</p>
@@ -1260,15 +1328,15 @@ f_{max} = \frac{f_s}{2.56}.
 </div>
 </div>
 </section>
-<section id="response-spectrum" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="response-spectrum"><span class="header-section-number">2.2</span> Response spectrum</h3>
+<section id="response-spectrum" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="response-spectrum"><span class="header-section-number">3.2</span> Response spectrum</h3>
 <p>The response spectrum is basically the Fourier transform of the response of a system to a given input.</p>
-<section id="api-21" class="level4" data-number="2.2.1">
-<h4 data-number="2.2.1" class="anchored" data-anchor-id="api-21"><span class="header-section-number">2.2.1</span> API</h4>
+<section id="api-22" class="level4" data-number="3.2.1">
+<h4 data-number="3.2.1" class="anchored" data-anchor-id="api-22"><span class="header-section-number">3.2.1</span> API</h4>
 <div class="api">
 <p><strong>spectrum</strong></p>
 <hr>
-<div id="132" class="cell" data-execution_count="1">
+<div id="138" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, 
          overlap = 0.5)</code></pre>
@@ -1349,56 +1417,56 @@ f_{max} = \frac{f_s}{2.56}.
 </div>
 </div>
 </section>
-<section id="example-20" class="level4" data-number="2.2.2">
-<h4 data-number="2.2.2" class="anchored" data-anchor-id="example-20"><span class="header-section-number">2.2.2</span> Example</h4>
-<div id="134" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">256</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">1024</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> fft_params.t</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation signal generation</span></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, t[<span class="fl">1</span>], <span class="fl">0.8</span>t[<span class="kw">end</span>], freq[<span class="fl">1</span>], freq[<span class="kw">end</span>], zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">excitation</span>(chirp, t)</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference signal</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, x, [<span class="fl">0</span>., <span class="fl">0</span>.], t)</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency domain</span></span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>Fx <span class="op">=</span> Fx <span class="op">=</span> <span class="fu">rfft</span>(x)[<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(freq)]<span class="op">/</span>block_size</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>Fx[<span class="fl">2</span><span class="op">:</span><span class="kw">end</span>] <span class="op">.*=</span> <span class="fl">2</span>.</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Response spectrum</span></span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>prob_y <span class="op">=</span> <span class="fu">SdofFrequencyProblem</span>(sdof, Fx, freq)</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">solve</span>(prob_y).u</span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectrum stimation</span></span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>uest <span class="op">=</span> <span class="fu">spectrum</span>(y, block_size, <span class="fu">rect</span>(block_size), fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-21" class="level4" data-number="3.2.2">
+<h4 data-number="3.2.2" class="anchored" data-anchor-id="example-21"><span class="header-section-number">3.2.2</span> Example</h4>
+<div id="140" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">256</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">1024</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> fft_params.t</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation signal generation</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, t[<span class="fl">1</span>], <span class="fl">0.8</span>t[<span class="kw">end</span>], freq[<span class="fl">1</span>], freq[<span class="kw">end</span>], zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">excitation</span>(chirp, t)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference signal</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, x, [<span class="fl">0</span>., <span class="fl">0</span>.], t)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency domain</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>Fx <span class="op">=</span> Fx <span class="op">=</span> <span class="fu">rfft</span>(x)[<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(freq)]<span class="op">/</span>block_size</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>Fx[<span class="fl">2</span><span class="op">:</span><span class="kw">end</span>] <span class="op">.*=</span> <span class="fl">2</span>.</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Response spectrum</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>prob_y <span class="op">=</span> <span class="fu">SdofFrequencyProblem</span>(sdof, Fx, freq)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">solve</span>(prob_y).u</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectrum stimation</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>uest <span class="op">=</span> <span class="fu">spectrum</span>(y, block_size, <span class="fu">rect</span>(block_size), fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="136" class="cell" data-execution_count="1">
+<div id="142" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-69-output-1.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-72-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
 </section>
-<section id="autopower-functions" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="autopower-functions"><span class="header-section-number">2.3</span> Autopower functions</h3>
+<section id="autopower-functions" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="autopower-functions"><span class="header-section-number">3.3</span> Autopower functions</h3>
 <p>Autopower functions are used to estimate the power of a signal in the frequency domain. <code>StructuralVibration.jl</code> allows to compute the following autopower functions:</p>
 <ul>
 <li>Autopower Spectrum</li>
@@ -1419,12 +1487,12 @@ Note
 <p>For a detailed discussion on the differences between these functions, please refer to this excellent blogpost <a href="https://community.sw.siemens.com/s/article/the-autopower-function-demystified">The Autopower function… Demystified!</a>.</p>
 </div>
 </div>
-<section id="api-22" class="level4" data-number="2.3.1">
-<h4 data-number="2.3.1" class="anchored" data-anchor-id="api-22"><span class="header-section-number">2.3.1</span> API</h4>
+<section id="api-23" class="level4" data-number="3.3.1">
+<h4 data-number="3.3.1" class="anchored" data-anchor-id="api-23"><span class="header-section-number">3.3.1</span> API</h4>
 <div class="api">
 <p><strong>welch</strong></p>
 <hr>
-<div id="138" class="cell" data-execution_count="1">
+<div id="144" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1,
       overlap = 0.5, scaling = :psd)</code></pre>
@@ -1518,43 +1586,43 @@ Note
 </div>
 </div>
 </section>
-<section id="example-21" class="level4" data-number="2.3.2">
-<h4 data-number="2.3.2" class="anchored" data-anchor-id="example-21"><span class="header-section-number">2.3.2</span> Example</h4>
+<section id="example-22" class="level4" data-number="3.3.2">
+<h4 data-number="3.3.2" class="anchored" data-anchor-id="example-22"><span class="header-section-number">3.3.2</span> Example</h4>
 <p>This example is based on the one provided in the <code>DSP.jl</code> documentation. It generates a signal composed of two sine waves at 100 Hz and 150 Hz with amplitudes equal to 1 and 2 respectively, and then estimates the power spectral density using the Welch method.</p>
-<div id="140" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1000</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="fl">100</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(fs, bs, pow2 <span class="op">=</span> <span class="cn">false</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span>fs)<span class="op">/</span>fs</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> [<span class="fl">100</span> <span class="fl">150</span>]                      <span class="co"># 100Hz &amp; 150Hz frequencies</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [<span class="fl">1</span>; <span class="fl">2</span>]                         <span class="co"># Amplitudes</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">sin</span>.(<span class="fl">2</span>π<span class="op">*</span>f<span class="op">.*</span>t)<span class="op">*</span>A <span class="op">+</span> <span class="fu">randn</span>(<span class="fl">1000</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from DSP.jl</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>psd <span class="op">=</span> DSP.<span class="fu">welch_pgram</span>(x, bs; fs <span class="op">=</span> fs, window <span class="op">=</span> hamming)</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>pxx_ref <span class="op">=</span> DSP.<span class="fu">power</span>(psd)</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from StructuralVibration.jl</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>pxx <span class="op">=</span> <span class="fu">welch</span>(x, bs, <span class="fu">hamming</span>(bs), fs <span class="op">=</span> fs)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="146" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1000</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="fl">100</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(fs, bs, pow2 <span class="op">=</span> <span class="cn">false</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span>fs)<span class="op">/</span>fs</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> [<span class="fl">100</span> <span class="fl">150</span>]                      <span class="co"># 100Hz &amp; 150Hz frequencies</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [<span class="fl">1</span>; <span class="fl">2</span>]                         <span class="co"># Amplitudes</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">sin</span>.(<span class="fl">2</span>π<span class="op">*</span>f<span class="op">.*</span>t)<span class="op">*</span>A <span class="op">+</span> <span class="fu">randn</span>(<span class="fl">1000</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from DSP.jl</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>psd <span class="op">=</span> DSP.<span class="fu">welch_pgram</span>(x, bs; fs <span class="op">=</span> fs, window <span class="op">=</span> hamming)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>pxx_ref <span class="op">=</span> DSP.<span class="fu">power</span>(psd)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from StructuralVibration.jl</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>pxx <span class="op">=</span> <span class="fu">welch</span>(x, bs, <span class="fu">hamming</span>(bs), fs <span class="op">=</span> fs)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="142" class="cell" data-execution_count="1">
+<div id="148" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-72-output-1.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-75-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
 </section>
-<section id="frequency-response-function" class="level3" data-number="2.4">
-<h3 data-number="2.4" class="anchored" data-anchor-id="frequency-response-function"><span class="header-section-number">2.4</span> Frequency Response Function</h3>
+<section id="frequency-response-function" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="frequency-response-function"><span class="header-section-number">3.4</span> Frequency Response Function</h3>
 <p>The frequency response function (FRF) is the relation between an input <span class="math inline">\(x\)</span> and the resulting output <span class="math inline">\(y\)</span> of a linear and time-invariant system. Independent of the input, it is an intrinsic property of the system describing its dynamic behavior w.r.t. the frequency.</p>
 <p>In practice, the FRF is computed from estimators. In <code>StructuralVibration.jl</code>, the following estimators are implemented:</p>
 <ul>
@@ -1597,12 +1665,12 @@ Note
 <p>In absence of averaging, the coherence is equal to 1 over all the frequency range!</p>
 </div>
 </div>
-<section id="api-23" class="level4" data-number="2.4.1">
-<h4 data-number="2.4.1" class="anchored" data-anchor-id="api-23"><span class="header-section-number">2.4.1</span> API</h4>
+<section id="api-24" class="level4" data-number="3.4.1">
+<h4 data-number="3.4.1" class="anchored" data-anchor-id="api-24"><span class="header-section-number">3.4.1</span> API</h4>
 <div class="api">
 <p><strong>tfestimate</strong></p>
 <hr>
-<div id="144" class="cell" data-execution_count="1">
+<div id="150" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs),
            window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)</code></pre>
@@ -1701,49 +1769,49 @@ Note
 </div>
 </div>
 </section>
-<section id="example-22" class="level4" data-number="2.4.2">
-<h4 data-number="2.4.2" class="anchored" data-anchor-id="example-22"><span class="header-section-number">2.4.2</span> Example</h4>
-<div id="146" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters for one block</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">256</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">1024</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference FRF</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">SdofFRFProblem</span>(sdof, freq)</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob_frf).u</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation - Input signal</span></span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>nblocks <span class="op">=</span> <span class="fl">5</span></span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>tb <span class="op">=</span> fft_params.t</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> fft_params.dt</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> tb[<span class="fl">1</span>]<span class="op">:</span>dt<span class="op">:</span>(<span class="fu">nblocks*</span>(tb[<span class="kw">end</span>] <span class="op">+</span> dt) <span class="op">-</span> dt)</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, tb[<span class="fl">1</span>], <span class="fl">0.8</span>tb[<span class="kw">end</span>], freq[<span class="fl">1</span>], freq[<span class="kw">end</span>], zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">repeat</span>(<span class="fu">excitation</span>(chirp, tb), outer <span class="op">=</span> nblocks)</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation - Output signal</span></span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, x, [<span class="fl">0</span>., <span class="fl">0</span>.], t)</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="co"># FRF estimation</span></span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>win <span class="op">=</span> <span class="fu">tukey</span>(block_size, <span class="fl">0.25</span>)</span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>H1 <span class="op">=</span> <span class="fu">tfestimate</span>(x, y, block_size, win, fs <span class="op">=</span> sample_rate, overlap <span class="op">=</span> <span class="fl">0</span>.)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-23" class="level4" data-number="3.4.2">
+<h4 data-number="3.4.2" class="anchored" data-anchor-id="example-23"><span class="header-section-number">3.4.2</span> Example</h4>
+<div id="152" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters for one block</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">256</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">1024</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference FRF</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> fft_params.freq</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">SdofFRFProblem</span>(sdof, freq)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob_frf).u</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation - Input signal</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>nblocks <span class="op">=</span> <span class="fl">5</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>tb <span class="op">=</span> fft_params.t</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> fft_params.dt</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> tb[<span class="fl">1</span>]<span class="op">:</span>dt<span class="op">:</span>(<span class="fu">nblocks*</span>(tb[<span class="kw">end</span>] <span class="op">+</span> dt) <span class="op">-</span> dt)</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, tb[<span class="fl">1</span>], <span class="fl">0.8</span>tb[<span class="kw">end</span>], freq[<span class="fl">1</span>], freq[<span class="kw">end</span>], zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">repeat</span>(<span class="fu">excitation</span>(chirp, tb), outer <span class="op">=</span> nblocks)</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal generation - Output signal</span></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofForcedTimeProblem</span>(sdof, x, [<span class="fl">0</span>., <span class="fl">0</span>.], t)</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a><span class="co"># FRF estimation</span></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>win <span class="op">=</span> <span class="fu">tukey</span>(block_size, <span class="fl">0.25</span>)</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>H1 <span class="op">=</span> <span class="fu">tfestimate</span>(x, y, block_size, win, fs <span class="op">=</span> sample_rate, overlap <span class="op">=</span> <span class="fl">0</span>.)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="148" class="cell" data-execution_count="1">
+<div id="154" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-75-output-1.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-78-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
