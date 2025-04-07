@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
 
 </head>
@@ -224,11 +221,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#api-1" id="toc-api-1" class="nav-link" data-scroll-target="#api-1"><span class="header-section-number">2.1</span> API</a></li>
   <li><a href="#example-1" id="toc-example-1" class="nav-link" data-scroll-target="#example-1"><span class="header-section-number">2.2</span> Example</a></li>
-  </ul></li>
-  <li><a href="#anti-aliasing-filter" id="toc-anti-aliasing-filter" class="nav-link" data-scroll-target="#anti-aliasing-filter"><span class="header-section-number">3</span> Anti-aliasing filter</a>
-  <ul class="collapse">
-  <li><a href="#api-2" id="toc-api-2" class="nav-link" data-scroll-target="#api-2"><span class="header-section-number">3.1</span> API</a></li>
-  <li><a href="#example-2" id="toc-example-2" class="nav-link" data-scroll-target="#example-2"><span class="header-section-number">3.2</span> Example</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -403,56 +395,6 @@ Note
 </div>
 <div class="callout-body-container callout-body">
 <p>Being based on interpolation, <code>gradient</code> is not robust against noise. In a future release, robust differentiation methods will be added to <code>StructuralVibration.jl</code>.</p>
-</div>
-</div>
-</section>
-</section>
-<section id="anti-aliasing-filter" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="anti-aliasing-filter"><span class="header-section-number">3</span> Anti-aliasing filter</h2>
-<p>Anti-aliasing filtering is a technique used to prevent aliasing, which occurs when high-frequency components of a signal are misrepresented as lower-frequency components due to insufficient sampling. The <code>anti_aliasin_filter</code> function in <code>StructuralVibration.jl</code> applies a high-order low-pass filter to the signal whose cut-off frequency is the Nyquist frequency. The proposed filter is designed using the Remez exchange algorithm implemented in <code>DSP.jl</code>.</p>
-<section id="api-2" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="api-2"><span class="header-section-number">3.1</span> API</h3>
-<div class="api">
-<p><strong>anti_alias</strong></p>
-<hr>
-<div id="16" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><p>No documentation found.</p>
-<p>Binding <code>Main.Notebook.anti_aliasing_filter</code> does not exist.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="example-2" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">3.2</span> Example</h3>
-<div id="18" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-4</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>Δt</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fu">length</span>(t)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">randn</span>(nt)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># filtered signal</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>yf <span class="op">=</span> <span class="fu">anti_alias</span>(y, <span class="fl">2500</span>., fs <span class="op">=</span> fs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="20" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="other_files/figure-html/cell-11-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="other_files/figure-html/cell-11-output-2.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
 </div>
 </div>
 

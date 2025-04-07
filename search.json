@@ -561,17 +561,6 @@
     ]
   },
   {
-    "objectID": "signal_processing/other.html#anti-aliasing-filter",
-    "href": "signal_processing/other.html#anti-aliasing-filter",
-    "title": "Other processing",
-    "section": "3 Anti-aliasing filter",
-    "text": "3 Anti-aliasing filter\nAnti-aliasing filtering is a technique used to prevent aliasing, which occurs when high-frequency components of a signal are misrepresented as lower-frequency components due to insufficient sampling. The anti_aliasin_filter function in StructuralVibration.jl applies a high-order low-pass filter to the signal whose cut-off frequency is the Nyquist frequency. The proposed filter is designed using the Remez exchange algorithm implemented in DSP.jl.\n\n3.1 API\n\nanti_alias\n\n\n\nNo documentation found.\nBinding Main.Notebook.anti_aliasing_filter does not exist.\n\n\n\n\n\n\n3.2 Example\n\n# Time parameters\nΔt = 1e-4\nt = 0.:Δt:10.\nfs = 1/Δt\n\n# Signal\nnt = length(t)\ny = randn(nt)\n\n# filtered signal\nyf = anti_alias(y, 2500., fs = fs)",
-    "crumbs": [
-      "Signal processing",
-      "Other processing"
-    ]
-  },
-  {
     "objectID": "solvers/frequency_solvers.html",
     "href": "solvers/frequency_solvers.html",
     "title": "Frequency-domain solvers",
