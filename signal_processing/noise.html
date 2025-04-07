@@ -106,10 +106,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -612,7 +609,7 @@ Note
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code>KalmanDenoising(; rts = false)</code></pre>
 <p>Kalman filter denoising method</p>
-<h1>Fields</h1>
+<p><strong>Fields</strong></p>
 <ul>
 <li><p><code>rts</code>: Flag to enable the Rauch-Tung-Striebel smoother</p>
 </li>
@@ -623,9 +620,39 @@ Note
 </div>
 </div>
 </div>
+<p><strong>Related function</strong></p>
+<div class="api">
+<p><strong>denoising</strong></p>
+<hr>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>denoising(y::AbstractArray, alg)</code></pre>
+<p>Denoises a signal <code>y</code></p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>y</code>: Noisy signal</p>
+</li>
+<li><p><code>alg</code>: Denoising method       * <code>BayesDenoising</code>: Bayesian Regularization denoising method (to be implemented)       * <code>GCVDenoising</code>: GCV denoising method       * <code>LCurveDenoising</code>: L-curve denoising method</p>
+<ul>
+<li><p><code>KalmanDenoising</code>: Kalman filter denoising method</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>x</code>: Denoised signal</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
 <section id="example-1" class="level4" data-number="2.2.1">
 <h4 data-number="2.2.1" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2.1</span> Example</h4>
-<div id="22" class="cell" data-execution_count="1">
+<div id="24" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Beam definition</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="fl">3e-2</span></span>
@@ -678,18 +705,18 @@ Note
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>yc_kalman <span class="op">=</span> <span class="fu">denoising</span>(y, <span class="fu">KalmanDenoising</span>())</span>
 <span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>yc_rts <span class="op">=</span> <span class="fu">denoising</span>(y, <span class="fu">KalmanDenoising</span>(rts <span class="op">=</span> <span class="cn">true</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="24" class="cell" data-execution_count="1">
+<div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="noise_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+<p><img src="noise_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="noise_files/figure-html/cell-13-output-2.svg" class="img-fluid figure-img"></p>
+<p><img src="noise_files/figure-html/cell-14-output-2.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
