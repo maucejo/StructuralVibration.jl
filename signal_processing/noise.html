@@ -236,6 +236,11 @@ window.Quarto = {
    
   <ul>
   <li><a href="#noise-estimation" id="toc-noise-estimation" class="nav-link active" data-scroll-target="#noise-estimation"><span class="header-section-number">1</span> Noise estimation</a></li>
+  <li><a href="#signal-denoising" id="toc-signal-denoising" class="nav-link" data-scroll-target="#signal-denoising"><span class="header-section-number">2</span> Signal denoising</a>
+  <ul class="collapse">
+  <li><a href="#denoising-methods" id="toc-denoising-methods" class="nav-link" data-scroll-target="#denoising-methods"><span class="header-section-number">2.1</span> Denoising methods</a></li>
+  <li><a href="#api-1" id="toc-api-1" class="nav-link" data-scroll-target="#api-1"><span class="header-section-number">2.2</span> API</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -273,13 +278,13 @@ window.Quarto = {
 <p>Noise estimation is the process of quantifying the level of noise present in a signal. This can be done using various methods, such as statistical analysis, spectral analysis, or model-based approaches. In <code>StructuralVibration.jl</code>, two main strategies are available for noise estimation:</p>
 <ul>
 <li>Regularization-based : These methods involve the resolution of an optimization problem.</li>
-<li>Heuristic-based : These methods are based on a careful analysis of the statistics of a noisy signal and do not involve optimization.</li>
+<li>Filtering-based : These methods are based on a careful analysis of the statistics of a noisy signal and do not involve optimization.</li>
 </ul>
-<section id="regularization-based-noise-estimation" class="level4" data-number="1.0.1">
-<h4 data-number="1.0.1" class="anchored" data-anchor-id="regularization-based-noise-estimation"><span class="header-section-number">1.0.1</span> Regularization-based noise estimation</h4>
+<section id="sec-reg" class="level4" data-number="1.0.1">
+<h4 data-number="1.0.1" class="anchored" data-anchor-id="sec-reg"><span class="header-section-number">1.0.1</span> Regularization-based noise estimation</h4>
 <p>Regularization-based noise estimation methods involve solving an optimization problem to estimate the noise variance associated to each measurement channel. The optimization problem is typically formulated as a minimization of a cost function that balances the fidelity to the data and a regularization term.</p>
 <p>From a general perspective, the denoising problem can be formulated as: <span class="math display">\[
-J(\mathbf{x}_i) = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \mathbf{x}_i \Vert_2^2 + \lambda \Vert \mathbf{D} \mathbf{x}_i \Vert_2^2,
+\widehat{\mathbf{x}}_i = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \mathbf{x}_i \Vert_2^2 + \lambda \Vert \mathbf{D} \mathbf{x}_i \Vert_2^2,
 \]</span> where <span class="math inline">\(\mathbf{D}\)</span> is generally the second order finite difference operator, <span class="math inline">\(\lambda\)</span> is a regularization parameter.</p>
 <p>The solution of the previous optimization problem is given by: <span class="math display">\[
 \widehat{\mathbf{x}}_i = \left( \mathbf{I} + \lambda \mathbf{D}^\mathsf{T} \mathbf{D} \right)^{-1} \mathbf{y}_i,
@@ -287,14 +292,27 @@ J(\mathbf{x}_i) = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \m
 <p>A classical estimator of the noise variance is the biased sample variance given by: <span class="math display">\[
 \widehat{\sigma}_i^2 = \frac{1}{n} \Vert \mathbf{y}_i - \widehat{\mathbf{x}}_i \Vert_2^2.
 \]</span></p>
-<p>In practice, this estimator can be computed without computing the denoised signal <span class="math inline">\(\widehat{\mathbf{x}}_i\)</span> explicitly. The main point here is to find an appropriate regularization parameter <span class="math inline">\(\lambda\)</span>. In the literature, several methods have been proposed to estimate the regularization parameter. In this package, the following methods are implemented:</p>
+<p>The main point here is to find an appropriate regularization parameter <span class="math inline">\(\lambda\)</span>. In the literature, several methods have been proposed to estimate the regularization parameter. In this package, the following methods are implemented:</p>
 <ul>
 <li>Generalized Cross Validation (GCV)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></li>
 <li>L-curve method<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></li>
 </ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In practice, this estimator can be computed without computing the denoised signal <span class="math inline">\(\widehat{\mathbf{x}}_i\)</span> explicitly. To do so, the implementation makes use of the discrete cosine transform (DCT).</p>
+</div>
+</div>
 </section>
-<section id="heuristic-based-noise-estimation" class="level4" data-number="1.0.2">
-<h4 data-number="1.0.2" class="anchored" data-anchor-id="heuristic-based-noise-estimation"><span class="header-section-number">1.0.2</span> Heuristic-based noise estimation</h4>
+<section id="filtering-based-noise-estimation" class="level4" data-number="1.0.2">
+<h4 data-number="1.0.2" class="anchored" data-anchor-id="filtering-based-noise-estimation"><span class="header-section-number">1.0.2</span> Filtering-based noise estimation</h4>
 <p>Heuristic-based noise estimation methods are based on a careful analysis of the statistics of a noisy signal and often rely on the assumption that the noise is Gaussian. These methods do not involve optimization and are typically faster than regularization-based methods. They can be used to estimate the noise variance directly from the noisy signal. <code>StructuralVibration.jl</code> implements the method proposed John D’Errico in the Matlab function <code>estimatenoise.m</code><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 </section>
 <section id="api" class="level4" data-number="1.0.3">
@@ -356,7 +374,7 @@ J(\mathbf{x}_i) = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \m
 </li>
 </ul>
 <p><strong>Reference</strong></p>
-<p>[1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023</p>
+<p>[1] John D'Errico (2023). Estimatenoise, MATLAB Central File Exchange. Retrieved December 7, 2023. (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)</p>
 
 
 </div>
@@ -448,11 +466,12 @@ J(\mathbf{x}_i) = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \m
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Variance estimation - Average over all channels</span></span>
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>v1 <span class="op">=</span> <span class="fu">varest</span>(y, <span class="fu">GCVEst</span>())</span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>SNR_est1 <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">estimated_SNR</span>(y, v1))</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>v2 <span class="op">=</span> <span class="fu">varest</span>(y, <span class="fu">LCurveEst</span>())</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>SNR_est2 <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">estimated_SNR</span>(y, v2))</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>v3 <span class="op">=</span> <span class="fu">varest</span>(y, <span class="fu">DerricoEst</span>())</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>SNR_est3 <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">estimated_SNR</span>(y, v3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>v2 <span class="op">=</span> <span class="fu">varest</span>(y, <span class="fu">LCurveEst</span>())</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>SNR_est2 <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">estimated_SNR</span>(y, v2))</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>v3 <span class="op">=</span> <span class="fu">varest</span>(y, <span class="fu">DerricoEst</span>())</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>SNR_est3 <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">estimated_SNR</span>(y, v3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -478,8 +497,196 @@ J(\mathbf{x}_i) = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \m
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="signal-denoising" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="signal-denoising"><span class="header-section-number">2</span> Signal denoising</h2>
+<p>Signal denoising is the process of removing noise from a signal to recover the underlying clean signal. This can be done using various methods, such as filtering, wavelet transforms, or model-based approaches. In <code>StructuralVibration.jl</code>, the denoising process is typically performed using the same methods as those used for noise estimation. As for noise estimation, the proposed methods can be applied to real or complex signals.</p>
+<section id="denoising-methods" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="denoising-methods"><span class="header-section-number">2.1</span> Denoising methods</h3>
+<p><code>StructuralVibration.jl</code> proposes two main methods for denoising signals:</p>
+<ul>
+<li><p>Regularization-based denoising: This method involves solving an optimization problem to estimate the noise-free signal. The optimization problem is typically formulated as a minimization of a cost function that balances the fidelity to the data and a regularization term.</p></li>
+<li><p>Filtering-based denoising: This method is based on the implementation of a Kalman filter, which is a recursive algorithm that estimates the state of a dynamic system from a series of noisy measurements.</p></li>
+</ul>
+<section id="regularization-based-denoising" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="regularization-based-denoising"><span class="header-section-number">2.1.1</span> Regularization-based denoising</h4>
+<p>Regularization-based denoising consists in solving the minimization problem defined in <a href="#sec-reg" class="quarto-xref">Section&nbsp;1.0.1</a>. This implies a proper estimation of the regularization parameter <span class="math inline">\(\lambda\)</span>. Similar to the noise estimation process, two methods are available for estimating the regularization parameter, namely GCV and L-curve methods.</p>
+</section>
+<section id="filtering-based-denoising" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="filtering-based-denoising"><span class="header-section-number">2.1.2</span> Filtering-based denoising</h4>
+<p>As stated above, filtering-based denoising is based on the implementation of a Kalman filter. For denoising problems, the Kalman filter is based on the following state-space model: <span class="math display">\[
+\begin{cases}
+\mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{w}_k \\
+\mathbf{y}_k = \mathbf{x}_k + \mathbf{n}_k
+\end{cases},
+\]</span> where <span class="math inline">\(\mathbf{x}_k\)</span> is the state vector (clean signal) at time <span class="math inline">\(k\)</span>, <span class="math inline">\(\mathbf{y}_k\)</span> is the measurement vector at time <span class="math inline">\(k\)</span>, <span class="math inline">\(\mathbf{w}_k\)</span> is the process noise, and <span class="math inline">\(\mathbf{n}_k\)</span> is the measurement noise. The process noise is assumed to be zero-mean Gaussian with constant covariance matrix <span class="math inline">\(\mathbf{Q}\)</span>, and the measurement noise is assumed to be zero-mean Gaussian with constant covariance matrix <span class="math inline">\(\mathbf{R}\)</span>.</p>
+<p>Practically, a Kalman filter is implemented in two steps:</p>
+<ol type="1">
+<li><p><strong>Prediction step</strong>: The state vector and its covariance matrix are predicted based on the knowledge of the solution at the previous step. <span class="math display">\[
+\begin{align*}
+\widetilde{\mathbf{x}}_{k} &amp;= \widehat{\mathbf{x}}_{k-1} \\
+\widetilde{\mathbf{P}}_{k} &amp;= \widehat{\mathbf{P}}_{k-1} + \mathbf{Q}
+\end{align*},
+\]</span> where <span class="math inline">\(\widetilde{\mathbf{x}}_{k}\)</span> is the predicted state vector, <span class="math inline">\(\widehat{\mathbf{x}}_{k-1}\)</span> is the estimated state vector at step <span class="math inline">\(k-1\)</span>, <span class="math inline">\(\widetilde{\mathbf{P}}_{k}\)</span> is the predicted covariance matrix, and <span class="math inline">\(\widehat{\mathbf{P}}_{k-1}\)</span> is the estimated covariance matrix at step <span class="math inline">\(k-1\)</span>.</p></li>
+<li><p><strong>Update step</strong>: The state vector and its covariance matrix are updated based on the measurement at the current step. <span class="math display">\[
+\begin{align*}
+\mathbf{i}_k &amp;= \mathbf{y}_k - \widetilde{\mathbf{x}}_{k} \\
+\mathbf{S}_k &amp;= \widetilde{\mathbf{P}}_{k} + \mathbf{R} \\
+\mathbf{K}_{k} &amp;= \widetilde{\mathbf{P}}_{k} \mathbf{S}_k^{-1} \\
+\widehat{\mathbf{x}}_{k} &amp;= \widetilde{\mathbf{x}}_{k} + \mathbf{K}_{k} \mathbf{i}_k \\
+\widehat{\mathbf{P}}_{k} &amp;= \left( \mathbf{I} - \mathbf{K}_{k}\right) \widetilde{\mathbf{P}}_{k}
+\end{align*},
+\]</span> where <span class="math inline">\(\widehat{\mathbf{x}}_{k}\)</span> is the updated state vector, <span class="math inline">\(\widehat{\mathbf{P}}_{k}\)</span> is the updated covariance matrix and <span class="math inline">\(\mathbf{K}_{k}\)</span> is the Kalman gain, <span class="math inline">\(\mathbf{i}_k\)</span> is the innovation vector and <span class="math inline">\(\mathbf{S}_k\)</span> is the innovation covariance matrix.</p></li>
+</ol>
+<p>For a successful denoising process, the Kalman filter requires a proper tuning of the noise covariance matrices <span class="math inline">\(\mathbf{Q}\)</span> and <span class="math inline">\(\mathbf{R}\)</span> as wel as a proper initialization of the state vector and its covariance matrix.</p>
+<p>Here, the measurement noise covariance matrix <span class="math inline">\(\mathbf{R}\)</span> is estimated using the methods described in the previous section. The process noise covariance matrix <span class="math inline">\(\mathbf{Q}\)</span> is assumed to be isotropic and its variance <span class="math inline">\(\sigma_x^2\)</span> results from the resolution of the following optimization problem: <span class="math display">\[
+\widehat{\sigma}_x^2 = \underset{\sigma_x^2}{\text{argmin}} \sum_{i = 1}^N \left[\log|\mathbf{S}_k| + \mathbf{i}_k^\mathsf{T}\mathbf{S}_k^{-1}\mathbf{i}_k\right],
+\]</span> where <span class="math inline">\(N\)</span> is the length of the measurement sequence.</p>
+<p>In addition to the filtering step, a smoothing step can be added. In the present case, a Rauch-Tung-Striebel (RTS) smoother is used. From a practical point of view, the RTS smoother is implemented as a post-processing step that uses the Kalman filter output to improve the estimate of the state vector. The RTS smoother is based on the following equations: <span class="math display">\[
+\begin{align*}
+\widehat{\mathbf{x}}_k^s &amp;= \widehat{\mathbf{x}}_k + \mathbf{K}_k \left( \widehat{\mathbf{x}}_{k+1}^s - \widehat{\mathbf{x}}_k \right) \\
+\widehat{\mathbf{P}}_k^s &amp;= \widehat{\mathbf{P}}_k + \mathbf{K}_k \left( \widehat{\mathbf{P}}_{k+1}^s - \widehat{\mathbf{P}}_k \right) \mathbf{K}_k^\mathsf{T} \\
+\mathbf{K}_k &amp;= \widehat{\mathbf{P}}_k (\widehat{\mathbf{P}}_k + \mathbf{Q})^{-1} \\
+\end{align*},
+\]</span> where <span class="math inline">\(\widehat{\mathbf{x}}_k^s\)</span> is the smoothed state vector, <span class="math inline">\(\widehat{\mathbf{P}}_k^s\)</span> is the smoothed covariance matrix, and <span class="math inline">\(\mathbf{K}_k\)</span> is the Kalman gain.</p>
+</section>
+</section>
+<section id="api-1" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.2</span> API</h3>
+<p><strong>Data types</strong></p>
+<div class="api">
+<p><strong>GCVDenoising</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>GCVDenoising()</code></pre>
+<p>Regularization-based denoising method using the GCV method for estimating the regularization parameter</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>nothing</code></p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] Garcia, D. (2010). Robust smoothing of gridded data in one and higher dimensions with missing values. Computational Statistics and Data Analysis, 54(5), 1167-1178</p>
 
 
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>LCurveDenoising</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>LCurveDenoising()</code></pre>
+<p>Regularization-based denoising method using the L-curve method for estimating the regularization parameter</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>nothing</code></p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] Hansen, P. C. (1999). The L-curve and its use in the numerical treatment of inverse problems. Computational Inverse Problems in Electrocardiology, 119-142</p>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>KalmanDenoising</strong></p>
+<hr>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>KalmanDenoising(; rts = false)</code></pre>
+<p>Kalman filter denoising method</p>
+<h1>Fields</h1>
+<ul>
+<li><p><code>rts</code>: Flag to enable the Rauch-Tung-Striebel smoother</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<section id="example-1" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2.1</span> Example</h4>
+<div id="22" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Beam definition</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="fl">3e-2</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">1e-2</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> <span class="fl">2.1e11</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ρ <span class="op">=</span> <span class="fl">7850</span>.</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>ξn <span class="op">=</span> <span class="fl">1e-2</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> b<span class="op">*</span>h</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>Iz <span class="op">=</span> b<span class="op">*</span>h<span class="op">^</span><span class="fl">3</span><span class="op">/</span><span class="fl">12</span>.</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Measurement mesh</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>Δx <span class="op">=</span> <span class="fl">5e-2</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>Npoint <span class="op">=</span> <span class="fl">20</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>Xm <span class="op">=</span> <span class="fu">LinRange</span>(Δx, L <span class="op">-</span> Δx, Npoint)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Modes calculation</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ωn, kn <span class="op">=</span> <span class="fu">modefreq</span>(beam, <span class="fl">2000</span>.)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ϕm <span class="op">=</span> <span class="fu">modeshape</span>(beam, kn, Xm)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ϕe <span class="op">=</span> <span class="fu">modeshape</span>(beam, kn, Xm[<span class="fl">13</span>])</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Modal model</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>Kn, Mn, Cn <span class="op">=</span> <span class="fu">modal_matrices</span>(ωn, ξn)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition &amp; solution</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>tmax <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fl">5_000</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fu">LinRange</span>(<span class="fl">0</span>., tmax, nt)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>harmo <span class="op">=</span> <span class="fu">SineWave</span>(<span class="fl">1e4</span>, <span class="fl">0</span>., tmax, <span class="fl">2</span>π<span class="op">*</span><span class="fl">10</span>.)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(harmo, t)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>Fn <span class="op">=</span> ϕe<span class="op">'*</span>F<span class="op">'</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> (<span class="fu">zeros</span>(<span class="fu">length</span>(ωn)), <span class="fu">zeros</span>(<span class="fu">length</span>(ωn)))</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">DirectTimeProblem</span>(Kn, Mn, Cn, Fn, u0, t)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>sol <span class="op">=</span> <span class="fu">solve</span>(prob)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> ϕm<span class="op">*</span>sol.u</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Gaussian White Noise</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>snr_dB <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">agwn</span>(u, snr_dB)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Regularization denoising</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>yc_gcv <span class="op">=</span> <span class="fu">denoising</span>(y, <span class="fu">GCVDenoising</span>())</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>yc_lcurve <span class="op">=</span> <span class="fu">denoising</span>(y, <span class="fu">LCurveDenoising</span>())</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Kalman denoising</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>yc_kalman <span class="op">=</span> <span class="fu">denoising</span>(y, <span class="fu">KalmanDenoising</span>())</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>yc_rts <span class="op">=</span> <span class="fu">denoising</span>(y, <span class="fu">KalmanDenoising</span>(rts <span class="op">=</span> <span class="cn">true</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="24" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="noise_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="noise_files/figure-html/cell-13-output-2.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
 </section>
 </section>
 
