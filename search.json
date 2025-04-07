@@ -37,7 +37,7 @@
     "href": "index.html#license",
     "title": "StructuralVibration.jl",
     "section": "License",
-    "text": "License\nThis package is under MIT License.\n\nOverview StructuralVibration.jl Installation StructuralVibration.jl Installation Overview /index.html Models /models/index.html Solvers /solvers/index.html Modal extraction /modal_extraction/index.html Signal processing /signal_processing/index.html Visualization /visualization/index.html https://github.com/maucejo/StructuralVibration.jl StructuralVibration.jl\n\n2025 Mathieu Aucejo ∙ Powered by  and \n\n\n\nStructuralVibration.jl StructuralVibration.jl StructuralVibration.jl StructuralVibration.jl",
+    "text": "License\nThis package is under MIT License.",
     "crumbs": [
       "Overview",
       "StructuralVibration.jl"
