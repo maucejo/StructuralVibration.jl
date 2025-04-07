@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
 
 </head>
@@ -215,7 +212,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#detrending" id="toc-detrending" class="nav-link active" data-scroll-target="#detrending"><span class="header-section-number">1</span> Detrending</a></li>
+  <li><a href="#detrending" id="toc-detrending" class="nav-link active" data-scroll-target="#detrending"><span class="header-section-number">1</span> Detrending</a>
+  <ul class="collapse">
+  <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api"><span class="header-section-number">1.1</span> API</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">1.2</span> Example</a></li>
+  </ul></li>
+  <li><a href="#gradient" id="toc-gradient" class="nav-link" data-scroll-target="#gradient"><span class="header-section-number">2</span> Gradient</a>
+  <ul class="collapse">
+  <li><a href="#api-1" id="toc-api-1" class="nav-link" data-scroll-target="#api-1"><span class="header-section-number">2.1</span> API</a></li>
+  <li><a href="#example-1" id="toc-example-1" class="nav-link" data-scroll-target="#example-1"><span class="header-section-number">2.2</span> Example</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -245,8 +251,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="detrending" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="detrending"><span class="header-section-number">1</span> Detrending</h2>
 <p>Detrending is the process of removing trends from a signal. This is useful when you want to analyze the fluctuations around a trend. The <code>detrend</code> function can be used to remove linear or polynomial trends from a signal.</p>
-<section id="api" class="level4" data-number="1.0.1">
-<h4 data-number="1.0.1" class="anchored" data-anchor-id="api"><span class="header-section-number">1.0.1</span> API</h4>
+<section id="api" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="api"><span class="header-section-number">1.1</span> API</h3>
 <div class="api">
 <p><strong>detrend</strong></p>
 <hr>
@@ -270,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><code>y_detrended</code>: Detrended signal</p>
 </li>
 </ul>
-<p>***Notes**</p>
+<p><strong>Notes</strong></p>
 <p><code>order</code> can be a vector if the trend is different over the segments defined by the breakpoints <code>bp</code>.</p>
 <p>The breakpoints <code>bp</code> are the points where the polynomial order changes. If <code>bp</code> is empty, a single polynomial is fitted to the entire signal.</p>
 
@@ -280,8 +286,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="example" class="level4" data-number="1.0.2">
-<h4 data-number="1.0.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.0.2</span> Example</h4>
+<section id="example" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.2</span> Example</h3>
 <div id="6" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal 1</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">0.5</span></span>
@@ -300,6 +306,115 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div>
 <figure class="figure">
 <p><img src="other_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="gradient" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="gradient"><span class="header-section-number">2</span> Gradient</h2>
+<p>The gradient of a signal is the rate of change of the signal with respect to time. Julia [<img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm">] has a lot of packages for computing thegradient of a signal. The <code>gradient</code> function in <code>StructuralVibration.jl</code> is a simple helper function built around the <code>gradient</code> function in <code>Interpolations.jl</code>.</p>
+<section id="api-1" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.1</span> API</h3>
+<div class="api">
+<p><strong>gradient</strong></p>
+<hr>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>gradient(f::Vector{Real}, t; method = :cubic)
+gradient(f::Matrix{Real}, t; method = :cubic, dims = 1)</code></pre>
+<p>Compute the gradient of a function <code>f</code> at points <code>t</code>.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>f</code>: Function values</p>
+</li>
+<li><p><code>t</code>: Points at which to evaluate the gradient</p>
+</li>
+<li><p><code>method</code>: Interpolation method</p>
+<ul>
+<li><p><code>:linear</code>: Linear interpolation</p>
+</li>
+<li><p><code>:cubic</code>: Cubic spline interpolation (default)</p>
+</li>
+</ul>
+</li>
+<li><p><code>dims</code>: Dimension along which to compute the gradient</p>
+<ul>
+<li><p><code>1</code>: Rows (default)</p>
+</li>
+<li><p><code>2</code>: Columns</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>df</code>: Gradient of the vector <code>f</code> at points <code>t</code></p>
+</li>
+</ul>
+<p><strong>Note</strong></p>
+<p>If <code>method</code> is <code>:cubic</code>, <code>t</code> must be an <code>AbstractRange</code>.</p>
+
+
+<pre><code>gradient(f::Vector{Real}, t; method = :cubic)
+gradient(f::Matrix{Real}, t; method = :cubic, dims = 1)</code></pre>
+<p>Compute the gradient of a function <code>f</code> at points <code>t</code>.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>f::Matrix{Real}</code>: Function values</p>
+</li>
+<li><p><code>t</code>: Points at which to evaluate the gradient</p>
+</li>
+<li><p><code>method</code>: Interpolation method</p>
+<ul>
+<li><p><code>:linear</code>: Linear interpolation</p>
+</li>
+<li><p><code>:cubic</code>: Cubic spline interpolation (default)</p>
+</li>
+</ul>
+</li>
+<li><p><code>dims</code>: Dimension along which to compute the gradient</p>
+<ul>
+<li><p><code>1</code>: Rows (default)</p>
+</li>
+<li><p><code>2</code>: Columns</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>df</code>: Gradient of the each row of the matrix <code>f</code> at points <code>t</code></p>
+</li>
+</ul>
+<p><strong>Note</strong></p>
+<p>If <code>method</code> is <code>:cubic</code>, <code>t</code> must be an <code>AbstractRange</code>.</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="example-1" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2</span> Example</h3>
+<div id="12" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Signal</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">LinRange</span>(<span class="fl">0</span>., <span class="fl">3</span>π, <span class="fl">100</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">sin</span>.(x)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># True gradient</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>dy <span class="op">=</span> <span class="fu">cos</span>.(x)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated gradient</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>dy_approx <span class="op">=</span> <span class="fu">gradient</span>(y, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="other_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
