@@ -106,10 +106,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -288,7 +285,7 @@ window.Quarto = {
 <p>Similarly to the previous section, the aim is to describe the direct time solvers available for solving Mdof systems. As a remainder, the equation of motion of the system is given by: <span class="math display">\[
 \mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{C} \dot{\mathbf{x}}(t) + \mathbf{K} \mathbf{x}(t) = \mathbf{F}(t)
 \]</span> where <span class="math inline">\(\mathbf{M}\)</span> is the mass matrix, <span class="math inline">\(\mathbf{C}\)</span> is the damping matrix, <span class="math inline">\(\mathbf{K}\)</span> is the stiffness matrix, <span class="math inline">\(\mathbf{x}(t)\)</span> is the displacement vector, and <span class="math inline">\(\mathbf{F}(t)\)</span> is the vector of external forces.</p>
-<p>Direct-time integration solvers are used to solve the previous equation in the time domain. In Julia <a href="https://julialang.org"><img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm"></a>, we have the option of using <a href="https://docs.sciml.ai/DiffEqDocs/stable/">DiffentialEquations.jl</a> which provides a wide range of solvers for solving differential equations.</p>
+<p>Direct-time integration solvers are used to solve the previous equation in the time domain. In Julia <a href="https://julialang.org"><img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm"></a>, we have the option of using <a href="https://docs.sciml.ai/DiffEqDocs/stable/">DifferentialEquations.jl</a> which provides a wide range of solvers for solving differential equations.</p>
 <p>The <code>StructuralVibration</code> package provides its own set of fixed-step linear second-order ODE solvers for pedagogical purposes and for the sake of completeness of the package. It should also be noted that some of the solvers implemented in the package are not available in <a href="https://docs.sciml.ai/DiffEqDocs/stable/">DiffentialEquations.jl</a>. This is the case of the solvers of the Newmark family, which are widely used in structural dynamics.</p>
 <p>The solvers available in the <code>StructuralVibration</code> package are:</p>
 <ul>

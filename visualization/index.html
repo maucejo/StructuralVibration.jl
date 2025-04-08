@@ -104,10 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
 
 </head>
@@ -558,13 +555,16 @@ fonts = DEFAULT_MAKIE_FONTS)</code></pre>
 </div>
 </div>
 </div>
-<div id="22" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sv_plot</span>(x, z_sv<span class="op">...</span>, lw <span class="op">=</span> <span class="fl">2</span>., legend <span class="op">=</span> (active <span class="op">=</span> <span class="cn">true</span>,))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or sv_plot(x, z_sv[1], z_sv[2], z_sv[3], z_sv[4], z_sv[5], lw = 2., legend = (active = true,))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="20" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0</span>., <span class="fl">2</span>π, <span class="fl">100</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>z_sv <span class="op">=</span> <span class="fu">ntuple</span>(i <span class="op">-&gt;</span> <span class="fu">sin</span>.(i<span class="op">*</span>x<span class="op">/</span><span class="fl">2</span>), <span class="fl">5</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SV plot</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sv_plot</span>(x, z_sv<span class="op">...</span>, lw <span class="op">=</span> <span class="fl">2</span>., legend <span class="op">=</span> (active <span class="op">=</span> <span class="cn">true</span>,))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-12-output-1.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-11-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

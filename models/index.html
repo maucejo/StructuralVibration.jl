@@ -105,10 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -638,10 +635,10 @@ modeshape(model::Beam, kn, x, bc = :SS)</code></pre>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ωₙ, kₙ <span class="op">=</span> <span class="fu">modefreq</span>(bar, fmax)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ωn, kn <span class="op">=</span> <span class="fu">modefreq</span>(bar, fmax)</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>ϕₙ <span class="op">=</span> <span class="fu">modeshape</span>(bar, kₙ, x, <span class="op">:</span>CC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>ϕn <span class="op">=</span> <span class="fu">modeshape</span>(bar, kn, x, <span class="op">:</span>CC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="d-models" class="level3" data-number="1.2">
@@ -820,10 +817,10 @@ modeshape(model::Membrane, kpq, x, y)</code></pre>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plate <span class="op">=</span> <span class="fu">Plate</span>(Lp, bp, hp, E, ρ, ν)</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ωₙ, kₙ <span class="op">=</span> <span class="fu">modefreq</span>(plate, fmax)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ωn, kn <span class="op">=</span> <span class="fu">modefreq</span>(plate, fmax)</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ϕₙ <span class="op">=</span> <span class="fu">modeshape</span>(plate, kₙ, xp, yp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ϕn <span class="op">=</span> <span class="fu">modeshape</span>(plate, kn, xp, yp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 </section>
@@ -1176,13 +1173,13 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>C_bc <span class="op">=</span> <span class="fu">apply_bc</span>(C_mdof, mdof_mesh)</span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the eigenmodes of the systems</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>ωₙ, Φₙ <span class="op">=</span> <span class="fu">eigenmode</span>(K_bc, M_bc)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>ωn, Φn <span class="op">=</span> <span class="fu">eigenmode</span>(K_bc, M_bc)</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the modal matrices</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>Kmodal, Mmodal, Cmodal <span class="op">=</span> <span class="fu">modal_matrices</span>(ωₙ, <span class="fl">0.01</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>Kmodal, Mmodal, Cmodal <span class="op">=</span> <span class="fu">modal_matrices</span>(ωn, <span class="fl">0.01</span>)</span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of modal effective mass</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>meff <span class="op">=</span> <span class="fu">modal_effective_mass</span>(M_bc, Φₙ, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>meff <span class="op">=</span> <span class="fu">modal_effective_mass</span>(M_bc, Φn, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="fe-model" class="level3" data-number="2.3">
@@ -1655,8 +1652,8 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ωₙ, ϕₙ <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωₙ, <span class="fl">0.01</span>, ϕₙ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ωn, ϕn <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωn, <span class="fl">0.01</span>, ϕn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="discrete-time-models" class="level3" data-number="3.2">
