@@ -1,28 +1,31 @@
-abstract type ModalExtraction end
-struct PeakPicking <: ModalExtraction end
-struct CircleFit <: ModalExtraction end
+abstract type SdofModalExtraction end
+struct PeakPicking <: SdofModalExtraction end
+struct CircleFit <: SdofModalExtraction end
 
 """
-    freq_extraction(freq, H, method::ModalExtraction; type = :dis)
+    freq_extraction(freq, H, method::SdofModalExtraction; type = :dis)
 
 Extract natural frequencies and damping ratios from the Bode diagram fitting method
 
-# Inputs
+**Inputs**
 * `freq`: Frequency vector
 * `H`: Frequency response function
 * `method`: Method to extract the natural frequencies and damping ratios
-    * `PeakPickingExtract`: Peak picking method (default)
-    * `CircleFitExtract`: Circle fitting method
+    * `PeakPicking`: Peak picking method (default)
+    * `CircleFit`: Circle fitting method
 * `type`: Type of FRF used to extract the natural frequencies and damping ratios
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
 
-# Outputs
+**Outputs**
 * `fn`: Natural frequencies
 * `ξn`: Damping ratios
+
+**Note**
+It is supposed that `H` is a row or a column of the FRF, meaning that H is a Vector
 """
-function freq_extraction(freq, H, method::ModalExtraction = PeakPicking(); type = :dis)
+function freq_extraction(freq, H::AbstractVector, method::SdofModalExtraction = PeakPicking(); type = :dis)
     if method isa PeakPicking
         return freq_ppm_extract(freq, H, type = type)
     elseif method isa CircleFit
@@ -42,7 +45,7 @@ function freq_ppm_extract(freq, H; type = :dis)
 
     # Convert to displacement
     if type == :vel
-        H ./= ω
+        H ./= 1im*ω
     elseif type == :acc
         H ./= -ω.^2
     end
@@ -84,15 +87,15 @@ function freq_cfm_extract(freq, H; type = :dis)
 
     # Convert to displacement
     if type == :vel
-        H ./= ω
+        H ./= 1im*ω
     elseif type == :acc
-        H ./= ω.^2
+        H ./= -ω.^2
     end
 
-    fn = similar(pks.indices)
+    fn = similar(freq[pks.indices])
     ξn = similar(fn)
 
-    nfreq_itp = 500
+    nfreq_itp = length(freq)
     ReH_itp = similar(fn, nfreq_itp)
     ImH_itp = similar(ReH_itp)
     freq_itp = similar(ReH_itp)
@@ -108,8 +111,6 @@ function freq_cfm_extract(freq, H; type = :dis)
         ImH = imag(H[edges[1]:edges[2]])
 
         # Circle fitting
-        xc = circfit(ReH, ImH)[1]
-
         itp_real = linear_interpolation(freqs, ReH)
         itp_imag = linear_interpolation(freqs, ImH)
 
@@ -118,7 +119,7 @@ function freq_cfm_extract(freq, H; type = :dis)
         ImH_itp .= itp_imag(freq_itp)
 
         # Angles
-        @. α = atan(ImH_itp, ReH_itp - xc)
+        @. α = atan(ImH_itp, ReH_itp)
         @. θ = π + 2α
 
         # Angular frequency such that θ₁ = π/2
@@ -134,50 +135,51 @@ function freq_cfm_extract(freq, H; type = :dis)
         # Calculation of the natural frequency and damping ratio
         fn[n] = √((f₁^2*tan(θ₂/2) - f₂^2*tan(θ₁/2))/(tan(θ₂/2) - tan(θ₁/2)))
         ξn[n] = (f₂^2 - f₁^2)/(2fn[n]^2*(tan(θ₁/2) - tan(θ₂/2)))
+
     end
 
     return fn, ξn
 end
 
 """
-    modeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction; type = :dis)
+    modeshape_extraction(freq, H, fn, ξn, dpi; type = :dis)
 
-Extract mode shapes from the Bode's diagram of Nyquiste's circle fitting method
+Extract mode shapes using Sdof approximation
 
-# Inputs
+**Inputs**
 * `freq`: Frequency vector
 * `H`: Frequency response function
 * `fn`: Natural frequencies
 * `ξn`: Damping ratios
-* `id_exc`: Identifier of the excited nodes
+* `dpi`: Driving point indices
+    * `dpi[1]`: Driving point index on the measurement mesh
+    * `dpi[2]`: Driving point index on the excitation mesh
 * `method`: Method to extract the mode shapes
-    * `BodeExtract`: Bode diagram (default)
-    * `NyquistExtract`: Nyquist diagram
+    * `PeakPicking`: Peak picking method (default)
+    * `CircleFit`: Circle fitting method
 * `type`: Type of FRF used to extract the natural frequencies and damping ratios
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
 
-# Output
+**Output**
 * `ϕn`: Mode shapes
-"""
-function modeshape_extraction(freq, H, fn, ξn, id_exc, method::ModalExtraction = PeakPicking(); type = :dis)
-    if method isa PeakPicking
-        return modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = type)
-    elseif method isa CircleFit
-        return modeshape_nyquist_extract(freq, H, fn, ξn, id_exc; type = type)
-    end
-end
 
-function modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = :dis)
+**Note**
+If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
+"""
+function modeshape_extraction(freq, H, fn, ξn, dpi = [1, 1]; type = :dis)
     ω = 2π*freq
     ωn = 2π*fn
 
-    ndim = ndims(H)
-    if ndim == 1
-        H = transpose(H)
-    elseif ndim == 2
-        H = H[:, id_exc, :]
+    nmes, nexc = size(H)[1:2]
+    if nmes < nexc
+        # Roving hammer test
+        H = H[dpi[1], :, :]
+        dpi = [dpi[2], dpi[1]]
+    else
+        # Roving accelerometer test
+        H = H[:, dpi[2], :]
     end
 
     # Convert to displacement
@@ -192,8 +194,8 @@ function modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = :dis)
     nfreq = length(fn)
     ϕn = similar(fn, nx, nfreq)
 
-    # Unexcited nodes
-    pos_nexc = findall(x -> x ∉ id_exc, 1:nx)
+    # Nodes other than driving point
+    pos_ndi = findall(x -> x ∉ dpi[1], 1:nx)
 
     for (n, (ω₀, ξ)) in enumerate(zip(ωn, ξn))
         # Trick for estimating the mode shape when ξ = 0
@@ -202,85 +204,15 @@ function modeshape_ppm_extract(freq, H, fn, ξn, id_exc; type = :dis)
             η = 1e-16
         end
 
-        pos_max = argmin(abs.(ω - ω₀))
+        pos_max = argmin(@. abs(ω - ω₀))
 
         # Mode shape estimation at driving point
-        Hmax = H[id_exc, pos_max]
-        signH = sign(angle(Hmax))
-        ϕn[id_exc, n] = signH*√(η*ω₀^2*abs(Hmax))
+        Hmax = -imag(H[:, pos_max])
+        ϕn[dpi[1], n] = √(η*ω₀^2*Hmax[dpi[1]])
 
         # Mode shape estimation at other nodes
-        for pos in pos_nexc
-            Hmax = H[pos, pos_max]
-            signH = sign(angle(Hmax))
-            ϕn[pos, n] = signH*η*ω₀^2*abs(Hmax)/abs(ϕn[id_exc, n])
-        end
-    end
-
-    return ϕn
-end
-
-function modeshape_cfm_extract(freq, H, fn, ξn, id_exc; type = :dis)
-
-    ω = 2π*freq
-    ωn = 2π*fn
-
-    ndim = ndims(H)
-    if ndim == 1
-        H = transpose(H)
-    elseif ndim == 2
-        H = H[:, id_exc, :]
-    end
-
-    pks = findmaxima(abs.(H[id_exc, :])) |> peakproms! |> peakwidths!
-
-    # Convert to displacement
-    if type == :vel
-        H ./= ω'
-    elseif type == :acc
-        H ./= ω'.^2
-    end
-
-    #Initialization
-    nx = size(H, 1)
-    nfreq = length(fn)
-    ϕn = similar(fn, nx, nfreq)
-
-    # Unexcited nodes
-    pos_nexc = findall(x -> x ∉ id_exc, 1:nx)
-
-    for (n, (ω₀, ξ, edg)) in enumerate(zip(ωn, ξn, pks.edges))
-        η = 2ξ
-        edges = round.(Int, edg) .+ [-5, 5]
-        freqs = freq[edges[1]:edges[2]]
-
-        # Real and imaginary parts of the frequency response function
-        Hd = H[id_exc, edges[1]:edges[2]]
-        ReH = real(Hd)
-        ImH = imag(Hd)
-
-        # Circle fitting
-        R = circfit(ReH, ImH)[end]
-        An = 2R*η*ω₀^2
-
-        # Mode shape estimation at driving point
-        pos_max = argmin(abs.(ω - ω₀))
-        Hmax = Hd[pos_max]
-        signH = sign(angle(Hmax))
-        ϕn[id_exc, n] = signH*√(An)
-
-        # Mode shape estimation at other nodes
-        for pos in pos_nexc
-            Hd = H[pos, edges[1]:edges[2]]
-            ReH = real(Hd)
-            ImH = imag(Hd)
-
-            R = circfit(ReH, ImH)[end]
-            An = 2R*η*ω₀^2
-
-            Hmax = Hd[pos_max]
-            signH = sign(angle(Hmax))
-            ϕn[pos, n] = signH*An/abs(ϕn[id_exc, n])
+        for pos in pos_ndi
+            ϕn[pos, n] = η*ω₀^2*Hmax[pos]/ϕn[dpi[1], n]
         end
     end
 

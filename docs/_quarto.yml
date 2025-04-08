@@ -48,12 +48,15 @@ website:
     - title: "Modal extraction"
       contents:
         - modal_extraction/index.qmd
+        - modal_extraction/mdof_methods.qmd
+        - modal_extraction/frf_reconstruction.qmd
+        - modal_extraction/indicators.qmd
 
     - title: "Signal processing"
       contents:
       - signal_processing/index.qmd
       - signal_processing/noise.qmd
-      - signal_processing/modal_parameters_extraction.qmd
+      - signal_processing/other.qmd
 
     - title: "Visualization"
       contents:

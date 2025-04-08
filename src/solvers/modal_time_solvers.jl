@@ -294,7 +294,6 @@ function solve(prob::HarmonicModalTimeProblem)
     return ModalTimeSolution(u, du, ddu)
 end
 
-
 """
     solve(prob::ForcedModalTimeProblem)
 

@@ -24,13 +24,13 @@ export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
        Newmark, HHT, WBZ, GeneralizedAlpha, MidPoint
 
 # Structs - Noise estimation
-export BayesianEst, GCVEst, LcurveEst, DerricoEst
+export BayesianEst, GCVEst, LCurveEst, DerricoEst
 
 # Structs - Noise denoising
-export BayesDenoising, GCVDenoising, LcurveDenoising, KalmanDenoising
+export BayesDenoising, GCVDenoising, LCurveDenoising, KalmanDenoising
 
 # Structs - Modal extraction
-export BodeExtract, NyquistExtract
+export PeakPicking, CircleFit
 
 # Structs - Signal processing
 export FFTParameters
@@ -41,7 +41,8 @@ export excitation, solve, impulse_response, srs
 export modefreq, modeshape, eigenmode, modal_matrices, modal_effective_mass,
        assembly, apply_bc, selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
 
-export agwn, acn, mgwn, mixed_noise, varest, estimated_SNR, denoising
+export agwn, acn, mgwn, mixed_noise, varest, estimated_SNR, denoising,
+       anti_alias
 
 export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
 

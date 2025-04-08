@@ -1,5 +1,5 @@
 abstract type DenoisingMethod end
-struct RegDenoising <: DenoisingMethod end
+abstract type RegDenoising <: DenoisingMethod end
 
 """
     BayesDenoising(prior = :invgamma)
@@ -11,7 +11,7 @@ Regularization-based denoising using Bayesian inference for estimating the regul
     * `:invgamma`: Inverse Gamma distribution
     * `:uniform`: Uniform distribution
 """
-@show_data struct BayesDenoising <: DenoisingMethod
+@show_data struct BayesDenoising <: RegDenoising
     prior::Symbol
 
     BayesDenoising(prior = :invgamma) = new(prior)
@@ -26,12 +26,13 @@ Regularization-based denoising method using the GCV method for estimating the re
 * `nothing`
 
 **Reference**
+
 [1] Garcia, D. (2010). Robust smoothing of gridded data in one and higher dimensions with missing values. Computational Statistics and Data Analysis, 54(5), 1167-1178
 """
-struct GCVDenoising <: DenoisingMethod end
+struct GCVDenoising <: RegDenoising end
 
 """
-    LcurveDenoising()
+    LCurveDenoising()
 
 Regularization-based denoising method using the L-curve method for estimating the regularization parameter
 
@@ -39,16 +40,17 @@ Regularization-based denoising method using the L-curve method for estimating th
 * `nothing`
 
 **Reference**
+
 [1] Hansen, P. C. (1999). The L-curve and its use in the numerical treatment of inverse problems. Computational Inverse Problems in Electrocardiology, 119-142
 """
-struct LcurveDenoising <: DenoisingMethod end
+struct LCurveDenoising <: RegDenoising end
 
 """
     KalmanDenoising(; rts = false)
 
 Kalman filter denoising method
 
-# Fields
+**Fields**
 * `rts`: Flag to enable the Rauch-Tung-Striebel smoother
 """
 @show_data struct KalmanDenoising <: DenoisingMethod
@@ -62,15 +64,15 @@ end
 
 Denoises a signal `y`
 
-# Inputs
+**Inputs**
 * `y`: Noisy signal
 * `alg`: Denoising method
-    * `RegDenoising`: Bayesian Regularization denoising method
-        * `GCVDenoising`: GCV denoising method
-        * `LcurveDenoising`: L-curve denoising method
+    * `BayesDenoising`: Bayesian Regularization denoising method (to be implemented)
+    * `GCVDenoising`: GCV denoising method
+    * `LCurveDenoising`: L-curve denoising method
     * `KalmanDenoising`: Kalman filter denoising method
 
-# Output
+**Output**
 * `x`: Denoised signal
 """
 function denoising(y::T, alg::RegDenoising) where {T <: AbstractArray}
@@ -79,7 +81,7 @@ function denoising(y::T, alg::RegDenoising) where {T <: AbstractArray}
             (x, s², U) -> bayes_denoise(x, s², U, alg.prior)
         elseif alg isa GCVDenoising
             gcv_denoise
-        elseif alg isa LcurveDenoising
+        elseif alg isa LCurveDenoising
             lcurve_denoise
         end
     end
@@ -149,13 +151,13 @@ function lcurve_denoise(z, s², U)
     ub = 22.
     Λ = 10 .^LinRange(lb, ub, npoints)
 
-    ρ = similar(s, npoints)
-    η = similar(s, npoints)
+    ρ = similar(Λ)
+    η = similar(Λ)
 
     for (i, λ) in enumerate(Λ)
         fₖ = @. 1/(1 + λ*s²)
         ρ[i] = mean(abs2, @. z*(fₖ - 1.))
-        η[i] = mean(abs2, @. z*s*fₖ)
+        η[i] = mean(abs2, @. z*√(s²)*fₖ)
     end
 
     k = curvature(log.(ρ), log.(η), Λ, method = :linear)

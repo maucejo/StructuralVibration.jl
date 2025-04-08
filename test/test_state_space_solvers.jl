@@ -150,7 +150,7 @@ y_freq_modal = solve(prob_freq_modal).u
 
 fig_y = Figure()
 ax_y1 = Axis(fig_y[1, 1], ylabel = "Displacement (dB)")
-ax_y2 = Axis(fig_y[2, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (dB)", title = "y₂")
+ax_y2 = Axis(fig_y[2, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (dB)")
 
 lines!(ax_y1, freq, 20log10.(abs.(y_freq[1, :])), label = "y₁ - Direct")
 lines!(ax_y1, freq, 20log10.(abs.(y_freq_modal[1, :])), label = "y₁ - Modal", linestyle = :dash)

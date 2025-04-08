@@ -54,7 +54,8 @@ Structure to store the time and frequency parameters for the FFT analysis
 end
 
 """
-    tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs), window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
+    tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs),
+               window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
 
 Estimation of the one-sided transfer function between two signals
 
@@ -180,7 +181,8 @@ function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, 
 end
 
 """
-    welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5, scaling = :psd)
+    welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1,
+          overlap = 0.5, scaling = :psd)
 
 Estimation of one-sided Autopower functions of a signal using the Welch method
 
@@ -285,7 +287,8 @@ function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::
 end
 
 """
-    spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5)
+    spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, 
+             overlap = 0.5)
 
 Estimation of the spectrum of a signal
 
@@ -391,25 +394,26 @@ function signal_segmentation(signal, bs::Int, window, overlap)
 end
 
 """
-    anti_aliasing_filter(signal, fs)
+    anti_alias(signal, fc; fs = 2fc)
 
 Apply an anti-aliasing filter to a signal
 
 **Inputs**
 * `signal`: Signal to be filtered
-* `fs::Int`: Sampling rate
+* `fc`: Cut-off frequency
+* `fs`: Sampling rate
 
 **Output**
 * `signal`: Filtered signal
 """
-function anti_aliasing_filter(signal, fs)
+function anti_alias(signal, fc; fs = 2fc)
     # nyquist frequency
     fn = fs/2
 
     # Filter design
     order = 200        # Filter order
-    fb = 0.05*fn       # Filter bandwith = 2*fb
-    freq_filt = [(0., fn - fb) => 1]
+    fb = 0.05*fc       # Filter bandwith = 2*fb
+    freq_filt = [(0., fc - fb) => 1, (fc, fn) => 0]
     filt_coeff = remez(order, freq_filt, Hz = fs, maxiter = 50)
 
     return filtfilt(filt_coeff, signal)

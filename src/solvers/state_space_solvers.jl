@@ -55,7 +55,8 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * `So`: Selection matrix for observation points
 * `Se`: Selection matrix for excitation points
 
-# note: It is assumed that the output equation is of the form y = So*x
+**Note**
+It is assumed that the output equation is of the form y = So*x
 """
 @show_data struct StateSpaceFRFProblem{Tf <: AbstractRange, Ts <: AbstractMatrix}
     css::ContinuousStateSpace

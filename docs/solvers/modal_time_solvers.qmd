@@ -135,8 +135,6 @@ xlims!(ax_1, minimum(t), maximum(t))
 
 lines!(ax_2, t, x_free[2, :], label = "x₂ - prob")
 lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - prob_modal", linestyle = :dash)
-axislegend(ax_2, position = :rb,
-           backgroundcolor = (:white, 0.5))
 xlims!(ax_2, minimum(t), maximum(t))
 
 display(fig);
@@ -194,13 +192,13 @@ K = [6. -2.; -2. 4.]
 t = 0.:1e-2:30.
 
 # Initial conditions
-x0 = [0.2, 0.1]
+x0 = [0., 1e-4]
 v0 = zeros(2)
 u0 = (x0, v0)
 
 # Excitation parameters
 F = [1., 2.]
-freq = 1.
+freq = 0.5
 
 # Problem definition - case 1 - Provide the stiffness and mass matrices
 prob_harmo = HarmonicModalTimeProblem(K, M, ξ, F, 2π*freq, u0, t)
@@ -231,8 +229,6 @@ xlims!(ax_harmo_1, minimum(t), maximum(t))
 
 lines!(ax_harmo_2, t, x_harmo[2, :], label = "x₂ - prob")
 lines!(ax_harmo_2, t, x_harmo_modal[2, :], label = "x₂ - prob_modal", linestyle = :dash)
-axislegend(ax_harmo_2, position = :rb,
-           backgroundcolor = (:white, 0.5))
 xlims!(ax_harmo_2, minimum(t), maximum(t))
 
 display(fig_harmo);
@@ -319,8 +315,6 @@ xlims!(ax_forced_1, minimum(t), maximum(t))
 
 lines!(ax_forced_2, t, x_forced[2, :], label = "x₂ - prob")
 lines!(ax_forced_2, t, x_forced_modal[2, :], label = "x₂ - prob_modal", linestyle = :dash)
-axislegend(ax_forced_2, position = :rt,
-           backgroundcolor = (:white, 0.5))
 xlims!(ax_forced_2, minimum(t), maximum(t))
 
 display(fig_forced);

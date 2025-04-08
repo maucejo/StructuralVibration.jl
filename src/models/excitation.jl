@@ -173,9 +173,9 @@ Struct to define a Gaussian pulse excitation signal
 * `fc::Real`: Center frequency of the pulse [Hz]
 * `precision::Real`: Precision of the pulse (default = 4.)
 
-*Note on the parameter `precision`*
+**Note**
 
-The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
+The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F x exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
 """
 @show_data struct GaussianPulse{Tf <: Real, Tt <: Real, Td <: Real, Tc <: Real, Tp <: Real} <: ArbitraryExc
     F::Tf

@@ -837,6 +837,64 @@ The choice of a window function depends on the application and the desired prope
 
 - **Exponential window**: This window is suitable for transient signals that decay to zero, such as acceleration signal in impact testing.
 
+## Anti-aliasing filter
+
+Anti-aliasing filtering is a technique used to prevent aliasing, which occurs when high-frequency components of a signal are misrepresented as lower-frequency components due to insufficient sampling. The `anti_alias` function in `StructuralVibration.jl` applies a high-order low-pass filter to the signal whose cut-off frequency is the Nyquist frequency. The proposed filter is designed using the Remez exchange algorithm implemented in `DSP.jl`.
+
+### API
+
+::: {.api}
+**anti_alias**
+
+---
+```{julia}
+#| echo: false
+@doc anti_alias
+```
+:::
+
+### Example
+```{julia}
+#| output: false
+# Time parameters
+Δt = 1e-4
+t = 0.:Δt:10.
+fs = 1/Δt
+
+# Signal
+nt = length(t)
+y = randn(nt)
+
+# filtered signal
+yf = anti_alias(y, 2500., fs = fs)
+```
+
+```{julia}
+#| echo: false
+freq = rfftfreq(nt, fs)
+fig_a = Figure()
+ax_a1 = Axis(fig_a[1, 1], xlabel = "Time (s)", ylabel = "Signal", title = "Original data")
+ax_a2 = Axis(fig_a[2, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
+lines!(ax_a1, t, y, label = "Original signal")
+xlims!(ax_a1, 0., t[end])
+
+lines!(ax_a2, freq, 10log10.(abs.(rfft(y))), label = "FFT")
+xlims!(ax_a2, 0., freq[end])
+
+display(fig_a);
+
+fig_b = Figure()
+ax_b1 = Axis(fig_b[1, 1], xlabel = "Time (s)", ylabel = "Signal", title = "Filtered data")
+ax_b2 = Axis(fig_b[2, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
+lines!(ax_b1, t, yf, label = "Filtered signal")
+xlims!(ax_b1, 0., t[end])
+
+lines!(ax_b2, freq, 10log10.(abs.(rfft(yf))), label = "FFT")
+xlims!(ax_b2, 0., freq[end])
+
+display(fig_b);
+```
+
 ## Function estimation
 
 Several functions can be estimated from the time domain data when operating in the frequency domain.
@@ -1033,7 +1091,7 @@ H_2(\omega) = \frac{S_{yy}(\omega)}{S_{yx}(\omega)},
 $$
 where $S_{yy}(\omega)$ is the power spectral density of the output signal.
 
-Contrary to the H1 estimator, the H2 estimator estimates the resonances better than the anti-resonances[^4].
+Contrary to the H1 estimator, the H2 estimator estimates the resonances better than the anti-resonances.
 
 - **H3 estimator**: It is used when the noise is assumed to affect both the input and output signals. It is defined as the arithmetic mean of the H1 and H2 estimators:
 $$

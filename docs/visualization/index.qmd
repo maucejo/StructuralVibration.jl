@@ -142,13 +142,9 @@ The SV plot (for _StructuralVibration plot_) is a general function for 2D plotti
 :::
 
 ```{julia}
-#| echo: false
-#| output: false
 x = range(0., 2π, 100)
 z_sv = ntuple(i -> sin.(i*x/2), 5)
-```
 
-```{julia}
+# SV plot
 sv_plot(x, z_sv..., lw = 2., legend = (active = true,))
-# or sv_plot(x, z_sv[1], z_sv[2], z_sv[3], z_sv[4], z_sv[5], lw = 2., legend = (active = true,))
 ```

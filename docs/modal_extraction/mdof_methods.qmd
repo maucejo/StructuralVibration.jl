@@ -1,0 +1,13 @@
+---
+title: Mdof methods
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+To be implemented.

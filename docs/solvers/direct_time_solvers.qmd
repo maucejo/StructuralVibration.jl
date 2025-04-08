@@ -23,7 +23,7 @@ $$
 $$
 where $\mathbf{M}$ is the mass matrix, $\mathbf{C}$ is the damping matrix, $\mathbf{K}$ is the stiffness matrix, $\mathbf{x}(t)$ is the displacement vector, and $\mathbf{F}(t)$ is the vector of external forces.
 
-Direct-time integration solvers are used to solve the previous equation in the time domain. In Julia [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org), we have the option of using [DiffentialEquations.jl](https://docs.sciml.ai/DiffEqDocs/stable/) which provides a wide range of solvers for solving differential equations.
+Direct-time integration solvers are used to solve the previous equation in the time domain. In Julia [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org), we have the option of using [DifferentialEquations.jl](https://docs.sciml.ai/DiffEqDocs/stable/) which provides a wide range of solvers for solving differential equations.
 
 The `StructuralVibration` package provides its own set of fixed-step linear second-order ODE solvers for pedagogical purposes and for the sake of completeness of the package. It should also be noted that some of the solvers implemented in the package are not available in [DiffentialEquations.jl](https://docs.sciml.ai/DiffEqDocs/stable/). This is the case of the solvers of the Newmark family, which are widely used in structural dynamics.
 
@@ -207,17 +207,15 @@ lines!(ax_1, t, x_free_gα[1, :], label = "x₁ - Generalized-α")
 lines!(ax_1, t, x_free_cd[1, :], label = "x₁ - CentralDiff", linestyle = :dash)
 lines!(ax_1, t, x_free_rk[1, :], label = "x₁ - RK4", linestyle = :dashdot)
 lines!(ax_1, t, x_free_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
-axislegend(ax_1, position = :ct,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_1, minimum(t), maximum(t))
 
 lines!(ax_2, t, x_free_gα[2, :], label = "x₂ - Generalized-α")
 lines!(ax_2, t, x_free_cd[2, :], label = "x₂ - CentralDiff", linestyle = :dash)
 lines!(ax_2, t, x_free_rk[2, :], label = "x₂ - RK4", linestyle = :dashdot)
 lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
-axislegend(ax_2, position = :cb,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_2, minimum(t), maximum(t))
+
+Legend(fig[:, 2], ax_1)
 
 display(fig);
 ```
@@ -273,17 +271,15 @@ lines!(ax_forced_1, t, x_forced_gα[1, :], label = "x₁ - Generalized-α")
 lines!(ax_forced_1, t, x_forced_cd[1, :], label = "x₁ - CentralDiff", linestyle = :dash)
 lines!(ax_forced_1, t, x_forced_rk[1, :], label = "x₁ - RK4", linestyle = :dashdot)
 lines!(ax_forced_1, t, x_forced_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
-axislegend(ax_forced_1, position = :ct,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_forced_1, minimum(t), maximum(t))
 
 lines!(ax_forced_2, t, x_forced_gα[2, :], label = "x₂ - Generalized-α")
 lines!(ax_forced_2, t, x_forced_cd[2, :], label = "x₂ - CentralDiff", linestyle = :dash)
 lines!(ax_forced_2, t, x_forced_rk[2, :], label = "x₂ - RK4", linestyle = :dashdot)
 lines!(ax_forced_2, t, x_forced_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
-axislegend(ax_forced_2, position = :cb,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_forced_2, minimum(t), maximum(t))
+
+Legend(fig_forced[:, 2], ax_forced_1)
 
 display(fig_forced);
 ```

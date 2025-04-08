@@ -1,5 +1,5 @@
 ---
-title: Noise estimation & denoising methods
+title: Noise estimation & denoising
 format:
   html:
     toc: true
@@ -9,3 +9,403 @@ execute:
   freeze: auto
   cache: true
 ---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd, Statistics, Markdown
+@usingany CairoMakie
+```
+
+Noise estimation and denoising are important steps in signal processing, especially in the context of structural vibration analysis. Noise can obscure the underlying signal, making it difficult to extract meaningful information. For instance, in inverse problems, noise can significantly affects the accuracy of the estimated solution when the system is ill-posed. Another example is Kalman filtering for which the noise covariance matrix is a key parameter.
+
+`StructuralVibration.jl` provides a set of tools for estimating noise in signals and for denoising them. The implemented methods can be applied to real or complex signals.
+
+Here, it is assumed that the noise is additive and Gaussian. This means that the noisy signal on a sensor $i$, $\mathbf{y}_i$, can thus be modeled as the sum of a noise-free signal $\mathbf{x}_i$ and a noise term $\mathbf{n}_i$:
+$$
+\mathbf{y}_i = \mathbf{x}_i + \mathbf{n}_i,
+$$
+where $\mathbf{n}_i$ is a zero-mean Gaussian noise with covariance matrix $\mathbf{R}_i$. A common assumption is that the noise covariance matrix is isotropic, implying that:
+$$
+\mathbf{R}_i = \sigma_i^2 \mathbf{I}_n,
+$$
+where $\sigma_i^2$ is the noise variance on the channel $i$ and $\mathbf{I}$ is the identity matrix of size $n$ (the number of samples in the signal).
+
+## Noise estimation
+
+Noise estimation is the process of quantifying the level of noise present in a signal. This can be done using various methods, such as statistical analysis, spectral analysis, or model-based approaches. In `StructuralVibration.jl`, two main strategies are available for noise estimation:
+
+- Regularization-based : These methods involve the resolution of an optimization problem.
+- Filtering-based : These methods are based on a careful analysis of the statistics of a noisy signal and do not involve optimization.
+
+### Estimation methods
+
+#### Regularization-based noise estimation {#sec-reg}
+
+Regularization-based noise estimation methods involve solving an optimization problem to estimate the noise variance associated to each measurement channel. The optimization problem is typically formulated as a minimization of a cost function that balances the fidelity to the data and a regularization term.
+
+From a general perspective, the denoising problem can be formulated as:
+$$
+\widehat{\mathbf{x}}_i = \underset{\mathbf{x}_i}{\text{argmin}} \Vert \mathbf{y}_i - \mathbf{x}_i \Vert_2^2 + \lambda \Vert \mathbf{D} \mathbf{x}_i \Vert_2^2,
+$$
+where $\mathbf{D}$ is generally the second order finite difference operator, $\lambda$ is a regularization parameter.
+
+The solution of the previous optimization problem is given by:
+$$
+\widehat{\mathbf{x}}_i = \left( \mathbf{I} + \lambda \mathbf{D}^\mathsf{T} \mathbf{D} \right)^{-1} \mathbf{y}_i,
+$$
+
+A classical estimator of the noise variance is the biased sample variance given by:
+$$
+\widehat{\sigma}_i^2 = \frac{1}{n} \Vert \mathbf{y}_i - \widehat{\mathbf{x}}_i \Vert_2^2.
+$$
+
+The main point here is to find an appropriate regularization parameter $\lambda$. In the literature, several methods have been proposed to estimate the regularization parameter. In this package, the following methods are implemented:
+
+- Generalized Cross Validation (GCV)[^1]
+- L-curve method[^2]
+
+::: {.callout-note}
+In practice, this estimator can be computed without computing the denoised signal $\widehat{\mathbf{x}}_i$ explicitly. To do so, the implementation makes use of the discrete cosine transform (DCT).
+:::
+
+[^1]: D. Garcia. "Robust smoothing of gridded data in one and higher dimensions with missing values". Computational Statistics & Data Analysis, 54(5), pp. 1167-1178, 2010.
+[^2]: P. C. Hansen. "The L-curve and its use in the numerical treatment of inverse problems". Computational Inverse Problems in Electrocardiology, pp. 119-142, 2001.
+
+#### Filtering-based noise estimation
+
+Heuristic-based noise estimation methods are based on a careful analysis of the statistics of a noisy signal and often rely on the assumption that the noise is Gaussian. These methods do not involve optimization and are typically faster than regularization-based methods. They can be used to estimate the noise variance directly from the noisy signal. `StructuralVibration.jl` implements the method proposed John D'Errico in the Matlab function `estimatenoise.m`[^3]
+
+[^3]: John D'Errico. "Estimatenoise", MATLAB Central File Exchange. Retrieved December 7, 2023. [Link](https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
+
+### API
+
+**Data types**
+
+::: {.api}
+**GCVEst**
+
+---
+```{julia}
+#| echo: false
+@doc GCVEst
+```
+:::
+
+::: {.api}
+**LCurveEst**
+
+---
+```{julia}
+#| echo: false
+@doc LCurveEst
+```
+:::
+
+::: {.api}
+**DerricoEst**
+
+---
+```{julia}
+#| echo: false
+@doc DerricoEst
+```
+:::
+
+**Related function**
+
+::: {.api}
+**varest**
+
+---
+```{julia}
+#| echo: false
+@doc varest
+```
+:::
+
+### Example
+```{julia}
+#| output: false
+# Beam definition
+L = 1.
+b = 3e-2
+h = 1e-2
+E = 2.1e11
+ρ = 7850.
+ξn = 1e-2
+S = b*h
+Iz = b*h^3/12.
+
+beam = Beam(L, S, Iz, E, ρ)
+
+# Measurement mesh
+Δx = 5e-2
+Npoint = 20
+Xm = LinRange(Δx, L - Δx, Npoint)
+
+# Modes calculation
+ωn, kn = modefreq(beam, 2000.)
+ϕm = modeshape(beam, kn, Xm)
+ϕe = modeshape(beam, kn, Xm[13])
+
+# Modal model
+Kn, Mn, Cn = modal_matrices(ωn, ξn)
+
+# Excitation
+tmax = 0.5
+nt = 10_000
+t = LinRange(0., tmax, nt)
+
+harmo = SineWave(1e4, 0., tmax, 2π*10.)
+F = excitation(harmo, t)
+Fn = ϕe'*F'
+
+# Solution calculation
+u0 = (zeros(length(ωn)), zeros(length(ωn)))
+prob = DirectTimeProblem(Kn, Mn, Cn, Fn, u0, t)
+u = ϕm*solve(prob).u
+
+# Signal corruption - Additive Gaussian White Noise
+SNR_ref = 25.
+y = agwn(u, SNR_ref)
+
+# Variance estimation - Average over all channels
+v1 = varest(y, GCVEst())
+SNR_est1 = mean(estimated_SNR(y, v1))
+
+v2 = varest(y, LCurveEst())
+SNR_est2 = mean(estimated_SNR(y, v2))
+
+v3 = varest(y, DerricoEst())
+SNR_est3 = mean(estimated_SNR(y, v3))
+```
+
+```{julia}
+#| echo: false
+#| tbl-cap: Noise variance estimation
+
+s1 = round(SNR_est1, digits=2)
+s2 = round(SNR_est2, digits=2)
+s3 = round(SNR_est3, digits=2)
+
+Markdown.parse("""
+|  Reference  |   GCV  |L-curve |D'Errico|
+|:-----------:|:------:|:------:|:------:|
+| $SNR_ref dB | $s1 dB | $s2 dB | $s3 dB |
+""")
+```
+
+## Signal denoising
+
+Signal denoising is the process of removing noise from a signal to recover the underlying clean signal. This can be done using various methods, such as filtering, wavelet transforms, or model-based approaches. In `StructuralVibration.jl`, the denoising process is typically performed using the same methods as those used for noise estimation. As for noise estimation, the proposed methods can be applied to real or complex signals.
+
+### Denoising methods
+
+`StructuralVibration.jl` proposes two main methods for denoising signals:
+
+- Regularization-based denoising: This method involves solving an optimization problem to estimate the noise-free signal. The optimization problem is typically formulated as a minimization of a cost function that balances the fidelity to the data and a regularization term.
+
+- Filtering-based denoising: This method is based on the implementation of a Kalman filter, which is a recursive algorithm that estimates the state of a dynamic system from a series of noisy measurements.
+
+#### Regularization-based denoising
+
+Regularization-based denoising consists in solving the minimization problem defined in @sec-reg. This implies a proper estimation of the regularization parameter $\lambda$. Similar to the noise estimation process, two methods are available for estimating the regularization parameter, namely GCV and L-curve methods.
+
+#### Filtering-based denoising
+
+As stated above, filtering-based denoising is based on the implementation of a Kalman filter. For denoising problems, the Kalman filter is based on the following state-space model:
+$$
+\begin{cases}
+\mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{w}_k \\
+\mathbf{y}_k = \mathbf{x}_k + \mathbf{n}_k
+\end{cases},
+$$
+where $\mathbf{x}_k$ is the state vector (clean signal) at time $k$, $\mathbf{y}_k$ is the measurement vector at time $k$, $\mathbf{w}_k$ is the process noise, and $\mathbf{n}_k$ is the measurement noise. The process noise is assumed to be zero-mean Gaussian with constant covariance matrix $\mathbf{Q}$, and the measurement noise is assumed to be zero-mean Gaussian with constant covariance matrix $\mathbf{R}$.
+
+Practically, a Kalman filter is implemented in two steps:
+
+1. **Prediction step**: The state vector and its covariance matrix are predicted based on the knowledge of the solution at the previous step.
+   $$
+   \begin{align*}
+    \widetilde{\mathbf{x}}_{k} &= \widehat{\mathbf{x}}_{k-1} \\
+    \widetilde{\mathbf{P}}_{k} &= \widehat{\mathbf{P}}_{k-1} + \mathbf{Q}
+   \end{align*},
+   $$
+   where $\widetilde{\mathbf{x}}_{k}$ is the predicted state vector, $\widehat{\mathbf{x}}_{k-1}$ is the estimated state vector at step $k-1$, $\widetilde{\mathbf{P}}_{k}$ is the predicted covariance matrix, and $\widehat{\mathbf{P}}_{k-1}$ is the estimated covariance matrix at step $k-1$.
+
+2. **Update step**: The state vector and its covariance matrix are updated based on the measurement at the current step.
+   $$
+   \begin{align*}
+    \mathbf{i}_k &= \mathbf{y}_k - \widetilde{\mathbf{x}}_{k} \\
+    \mathbf{S}_k &= \widetilde{\mathbf{P}}_{k} + \mathbf{R} \\
+    \mathbf{K}_{k} &= \widetilde{\mathbf{P}}_{k} \mathbf{S}_k^{-1} \\
+    \widehat{\mathbf{x}}_{k} &= \widetilde{\mathbf{x}}_{k} + \mathbf{K}_{k} \mathbf{i}_k \\
+    \widehat{\mathbf{P}}_{k} &= \left( \mathbf{I} - \mathbf{K}_{k}\right) \widetilde{\mathbf{P}}_{k}
+   \end{align*},
+   $$
+   where $\widehat{\mathbf{x}}_{k}$ is the updated state vector, $\widehat{\mathbf{P}}_{k}$ is the updated covariance matrix and $\mathbf{K}_{k}$ is the Kalman gain, $\mathbf{i}_k$ is the innovation vector and $\mathbf{S}_k$ is the innovation covariance matrix.
+
+For a successful denoising process, the Kalman filter requires a proper tuning of the noise covariance matrices $\mathbf{Q}$ and $\mathbf{R}$ as wel as a proper initialization of the state vector and its covariance matrix.
+
+Here, the measurement noise covariance matrix $\mathbf{R}$ is estimated using the methods described in the previous section. The process noise covariance matrix $\mathbf{Q}$ is assumed to be isotropic and its variance $\sigma_x^2$ results from the resolution of the following optimization problem:
+$$
+\widehat{\sigma}_x^2 = \underset{\sigma_x^2}{\text{argmin}} \sum_{i = 1}^N \left[\log|\mathbf{S}_k| + \mathbf{i}_k^\mathsf{T}\mathbf{S}_k^{-1}\mathbf{i}_k\right],
+$$
+where $N$ is the length of the measurement sequence.
+
+In addition to the filtering step, a smoothing step can be added. In the present case, a Rauch-Tung-Striebel (RTS) smoother is used. From a practical point of view, the RTS smoother is implemented as a post-processing step that uses the Kalman filter output to improve the estimate of the state vector. The RTS smoother is based on the following equations:
+$$
+\begin{align*}
+\widehat{\mathbf{x}}_k^s &= \widehat{\mathbf{x}}_k + \mathbf{K}_k \left( \widehat{\mathbf{x}}_{k+1}^s - \widehat{\mathbf{x}}_k \right) \\
+\widehat{\mathbf{P}}_k^s &= \widehat{\mathbf{P}}_k + \mathbf{K}_k \left( \widehat{\mathbf{P}}_{k+1}^s - \widehat{\mathbf{P}}_k \right) \mathbf{K}_k^\mathsf{T} \\
+\mathbf{K}_k &= \widehat{\mathbf{P}}_k (\widehat{\mathbf{P}}_k + \mathbf{Q})^{-1} \\
+\end{align*},
+$$
+where $\widehat{\mathbf{x}}_k^s$ is the smoothed state vector, $\widehat{\mathbf{P}}_k^s$ is the smoothed covariance matrix, and $\mathbf{K}_k$ is the Kalman gain.
+
+### API
+
+**Data types**
+
+::: {.api}
+**GCVDenoising**
+
+---
+```{julia}
+#| echo: false
+@doc GCVDenoising
+```
+:::
+
+::: {.api}
+**LCurveDenoising**
+
+---
+```{julia}
+#| echo: false
+@doc LCurveDenoising
+```
+:::
+
+::: {.api}
+**KalmanDenoising**
+
+---
+```{julia}
+#| echo: false
+@doc KalmanDenoising
+```
+:::
+
+**Related function**
+
+::: {.api}
+**denoising**
+
+---
+```{julia}
+#| echo: false
+@doc denoising
+```
+:::
+
+### Example
+```{julia}
+#| output: false
+# Beam definition
+L = 1.
+b = 3e-2
+h = 1e-2
+E = 2.1e11
+ρ = 7850.
+ξn = 1e-2
+S = b*h
+Iz = b*h^3/12.
+
+beam = Beam(L, S, Iz, E, ρ)
+
+# Measurement mesh
+Δx = 5e-2
+Npoint = 20
+Xm = LinRange(Δx, L - Δx, Npoint)
+
+# Modes calculation
+ωn, kn = modefreq(beam, 2000.)
+ϕm = modeshape(beam, kn, Xm)
+ϕe = modeshape(beam, kn, Xm[13])
+
+# Modal model
+Kn, Mn, Cn = modal_matrices(ωn, ξn)
+
+# Problem definition & solution
+tmax = 0.1
+nt = 5_000
+t = LinRange(0., tmax, nt)
+
+harmo = SineWave(1e4, 0., tmax, 2π*10.)
+F = excitation(harmo, t)
+Fn = ϕe'*F'
+
+u0 = (zeros(length(ωn)), zeros(length(ωn)))
+prob = DirectTimeProblem(Kn, Mn, Cn, Fn, u0, t)
+sol = solve(prob)
+
+u = ϕm*sol.u
+
+# Gaussian White Noise
+snr_dB = 10.
+y = agwn(u, snr_dB)
+
+# Regularization denoising
+yc_gcv = denoising(y, GCVDenoising())
+yc_lcurve = denoising(y, LCurveDenoising())
+
+# Kalman denoising
+yc_kalman = denoising(y, KalmanDenoising())
+yc_rts = denoising(y, KalmanDenoising(rts = true))
+```
+
+```{julia}
+#| echo: false
+fig = Figure()
+Label(fig[0, 1:2], "Regularization Denoising", fontsize = 22)
+ax1 = Axis(fig[1, 1], title = "Node 4", ylabel = "Displacement (m)")
+ax2 = Axis(fig[2, 1], title = "Node 13", xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax1, t, y[4, :], color = (:blue, 0.1), label = "Noisy signal", transparency = true)
+lines!(ax1, t, u[4, :], label = "Reference")
+lines!(ax1, t, yc_gcv[4, :], color = :red, linewidth = 2, linestyle = :dash, label = "GCV")
+lines!(ax1, t, yc_lcurve[4, :], color = :green, linewidth = 2, linestyle = :dashdot, label = "LCurve")
+xlims!(ax1, 0., tmax)
+
+lines!(ax2, t, y[13, :], color = (:blue, 0.1), label = "Noisy signal", transparency = true)
+lines!(ax2, t, u[13, :], label = "Reference")
+lines!(ax2, t, yc_gcv[13, :], color = :red, linewidth = 2, linestyle = :dash, label = "GCV")
+lines!(ax2, t, yc_lcurve[13, :], color = :green, linewidth = 2, linestyle = :dashdot, label = "LCurve")
+xlims!(ax2, 0., tmax)
+
+Legend(fig[1:2, 2], ax1)
+
+display(fig);
+
+fig1 = Figure()
+Label(fig1[0, 1:2], "Kalman Denoising", fontsize = 22)
+ax3 = Axis(fig1[1, 1], title = "Node 4", ylabel = "Displacement (m)")
+ax4 = Axis(fig1[2, 1], title = "Node 13", xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax3, t, y[4, :], color = (:blue, 0.1), label = "Noisy signal", transparency = true)
+lines!(ax3, t, u[4, :], label = "Reference")
+lines!(ax3, t, yc_kalman[4, :], color = :red, linewidth = 2, linestyle = :dash, label = "Kalman")
+lines!(ax3, t, yc_rts[4, :], color = :green, linewidth = 2, linestyle = :dashdot, label = "RTS")
+xlims!(ax3, 0., tmax)
+
+lines!(ax4, t, y[13, :], color = (:blue, 0.1), label = "Noisy signal", transparency = true)
+lines!(ax4, t, u[13, :], label = "Reference")
+lines!(ax4, t, yc_kalman[13, :], color = :red, linewidth = 2, linestyle = :dash, label = "Kalman filter")
+lines!(ax4, t, yc_rts[13, :], color = :green, linewidth = 2, linestyle = :dashdot, label = "Kalman smoother")
+xlims!(ax4, 0., tmax)
+
+Legend(fig1[1:2, 2], ax3)
+
+display(fig1);
+```
+

@@ -69,45 +69,45 @@ function modefreq(model::TwoDStructure, fmax)
     c = sqrt(D/m)
     ωmax = 2π*fmax
 
-    m = 1
-    n = 1
-    km = m*π/L
-    kn = n*π/b
-    ωi = c*(km^2 + kn^2)
+    p = 1
+    q = 1
+    kp = p*π/L
+    kq = q*π/b
+    ωi = c*(kp^2 + kq^2)
 
-    ωmn = Float64[]
-    kmn = Float64[]
-    ind = Int64[]
+    ωpq = typeof(D)[]
+    kpq = typeof(D)[]
+    ind = typeof(p)[]
     # Boucle sur m
     while ωi ≤ ωmax
         # Boucle sur n
         while ωi ≤ ωmax
-            push!(ωmn,  ωi)
-            append!(kmn, [km, kn])
-            append!(ind, [m, n])
-            n += 1
-            km = m*π/L
-            kn = n*π/b
-            ωi = c*(km^2 + kn^2)
+            push!(ωpq,  ωi)
+            append!(kpq, [kp, kq])
+            append!(ind, [p, q])
+            q += 1
+            kp = p*π/L
+            kq = q*π/b
+            ωi = c*(kp^2 + kq^2)
         end
 
-        m += 1
-        n = 1
-        km = m*π/L
-        kn = n*π/b
-        ωi = c*(km^2 + kn^2)
+        p += 1
+        q = 1
+        kp = p*π/L
+        kq = q*π/b
+        ωi = c*(kp^2 + kq^2)
     end
 
-    kmn = reshape(kmn, (2, Int(length(kmn)/2)))
+    kpq = reshape(kpq, (2, Int(length(kpq)/2)))
     ind = reshape(ind, (2, Int(length(ind)/2)))
-    pos = sortperm(ωmn)
+    pos = sortperm(ωpq)
 
-    return ωmn[pos], kmn[:, pos], ind[:, pos]
+    return ωpq[pos], kpq[:, pos], ind[:, pos]
 end
 
 """
-    modeshape(model::Plate, kmn, x, y)
-    modeshape(model::Membrane, kmn, x, y)
+    modeshape(model::Plate, kpq, x, y)
+    modeshape(model::Membrane, kpq, x, y)
 
 Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane
 
@@ -119,22 +119,19 @@ Computes the mass-normalized mode shapes of a simply supported rectangular plate
 **Output**
 * `ϕ`: Mass-normalized mode shapes
 """
-function modeshape(p::TwoDStructure, kmn, x, y)
+function modeshape(p::TwoDStructure, kpq, x, y)
     (; L, b, m) = p
 
-    if isa(x, Number)
-        x = [x]
-    else !isa(x, Array)
-        x = collect(x)
-    end
-
-    if isa(y, Number)
-        y = [y]
-    else !isa(y, Array)
-        y = collect(y)
+    if length(x) != length(y)
+        throw(ArgumentError("x and y must have the same length"))
     end
 
     Mn = m*L*b/4
 
-    return sin.(x*kmn[1, :]').*sin.(y*kmn[2, :]')./sqrt(Mn)
+    ϕ = similar(kpq, length(x), size(kpq, 2))
+
+    for (i, (xi, yi)) in enumerate(zip(x, y))
+        @. ϕ[i, :] = sin(kpq[1, :]*xi).*sin(kpq[2, :]*yi)/sqrt(Mn)
+    end
+
 end

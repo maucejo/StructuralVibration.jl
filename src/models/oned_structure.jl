@@ -297,49 +297,45 @@ function modeshape(model::WaveEquation, kn, x, bc = :CC)
 
     (; L, m) = model
 
-    if x isa Number
-        x = [x]
-    else !(x isa Array)
-        x = collect(x)
-    end
+    ϕ = similar(kn, length(x), length(kn))
 
-    if bc == :CC
+    if bc == :CC || bc == :CF
         # Modal mass
         M = m*L/2
 
-        return sin.(x*kn')./sqrt(M)
-    elseif bc == :CF
-        # Modal mass
-        M = m*L/2
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = sin(xi*kn)/sqrt(M)
+        end
 
-        return sin.(x*kn')./sqrt(M)
     elseif bc == :FF
         # Modal mass
         n = length(kn)
         Mn = m*L.*ones(length(n))./2
         Mn[1] *= 2.
 
-        return cos.(x*kn')./sqrt.(Mn')
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = cos(xi*kn)/sqrt(Mn)
+        end
     else
-        error("Boundary conditions not implemented")
+        throw(ArgumentError("Boundary conditions not implemented"))
     end
+
+    return ϕ
 end
 
 function modeshape(model::Beam, kn, x, bc = :SS)
 
     (; L, m) = model
 
-    if x isa Number
-        x = [x]
-    else !(x isa Array)
-        x = collect(x)
-    end
+    ϕ = similar(kn, length(x), length(kn))
 
     if bc == :SS
         # Modal mass
         M = m*L/2.
 
-        return sin.(x*kn')./sqrt(M)
+        for (i, xi) in enumerate(x)
+           @. ϕ[i, :] = sin(xi*kn)/sqrt(M)
+        end
     elseif bc == :CC
         Mn = @. m*(
                 -kn*L*cos(2kn*L)
@@ -350,7 +346,10 @@ function modeshape(model::Beam, kn, x, bc = :SS)
                 - cos(kn*L)^2*sinh(2kn*L)
                 )/(2kn*(cos(kn*L) - cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L))^2)
 
-        return @. ((cosh(x*kn') - cos(x*kn'))/(cosh(kn'*L) - cos(kn'*L)) - (sinh(x*kn') - sin(x*kn'))/(sinh(kn'*L) - sin(kn'*L)))/sqrt(Mn')
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = ((cosh(xi*kn) - cos(xi*kn))/(cosh(kn*L) - cos(kn*L)) - (sinh(xi*kn) - sin(xi*kn))/(sinh(kn*L) - sin(kn*L)))/sqrt(Mn)
+        end
+
     elseif bc == :CS
         Mn = @. m*(
                 -kn*L*cos(2kn*L)
@@ -361,7 +360,9 @@ function modeshape(model::Beam, kn, x, bc = :SS)
                 - cos(kn*L)^2*sinh(2kn*L)
                 )/(2kn*(cos(kn*L) - cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L))^2)
 
-        return @. ((cosh(x*kn') - cos(x*kn'))/(cosh(kn'*L) - cos(kn'*L)) - (sinh(x*kn') - sin(x*kn'))/(sinh(kn'*L) - sin(kn'*L)))/sqrt(Mn')
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = ((cosh(xi*kn) - cos(xi*kn))/(cosh(kn*L) - cos(kn*L)) - (sinh(xi*kn) - sin(xi*kn))/(sinh(kn*L) - sin(kn*L)))/sqrt(Mn)
+        end
 
     elseif bc == :CF
         Mn = @. m*(
@@ -374,7 +375,9 @@ function modeshape(model::Beam, kn, x, bc = :SS)
                 + 6cos(kn*L)^2*sinh(2kn*L)
                 )/(4kn*(cos(kn*L) + cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L)).^2)
 
-        return @. ((cosh(x*kn') - cos(x*kn'))/(cosh(kn'*L) + cos(kn'*L)) - (sinh(x*kn') - sin(x*kn'))/(sinh(kn'*L) + sin(kn'*L)))/sqrt(Mn')
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = ((cosh(xi*kn) - cos(xi*kn))/(cosh(kn*L) + cos(kn*L)) - (sinh(xi*kn) - sin(xi*kn))/(sinh(kn*L) + sin(kn*L)))/sqrt(Mn)
+        end
 
     elseif bc == :SF
         Mn = @. m*(
@@ -383,7 +386,9 @@ function modeshape(model::Beam, kn, x, bc = :SS)
             + kn*L/sin(kn*L)^2
             - kn*L/sinh(kn*L)^2)/2kn
 
-        return @. (sin(x*kn')/sin(kn'*L) + sinh(x*kn')/sinh(kn'*L))/sqrt(Mn')
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = (sin(xi*kn)/sin(kn*L) + sinh(xi*kn)/sinh(kn*L))/sqrt(Mn)
+        end
 
     elseif bc == :FF
         Mn = @. m*(
@@ -397,13 +402,16 @@ function modeshape(model::Beam, kn, x, bc = :SS)
 
         Mn[1:2] .= m*L
 
-        ϕn = @. ((cosh(x*kn') + cos(x*kn'))/(cosh(kn'*L) - cos(kn'*L))) - ((sinh(x*kn') + sin(x*kn'))/(sinh(kn'*L) - sin(kn'*L)))
+        for (i, xi) in enumerate(x)
+            @. ϕ[i, :] = ((cosh(xi*kn) + cos(xi*kn))/(cosh(kn*L) - cos(kn*L))) - ((sinh(xi*kn) + sin(xi*kn))/(sinh(kn*L) - sin(kn*L)))/sqrt(Mn)
+        end
 
-        ϕn[:, 1] .= 1.
-        ϕn[:, 2] = x .- L/2
+        ϕ[:, 1] .= 1/sqrt(Mn[1])
+        ϕ[:, 2] = (x .- L/2)/sqrt(Mn[2])
 
-        return @. ϕn/sqrt(Mn')
     else
-        error("Boundary conditions not implemented")
+        throw(ArgumentError("Boundary conditions not implemented"))
     end
+
+    return ϕ
 end

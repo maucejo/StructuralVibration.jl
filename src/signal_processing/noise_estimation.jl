@@ -28,12 +28,13 @@ This method has been proposed by Garcia in [1]
 * `nothing`
 
 **Reference**
+
 [1] Garcia, D. (2010). Robust smoothing of gridded data in one and higher dimensions with missing values. Computational Statistics and Data Analysis, 54(5), 1167-1178
 """
 struct GCVEst <: OptimFamily end
 
 """
-    LcurveEst
+    LCurveEst
 
 L-curve noise estimation
 
@@ -43,9 +44,10 @@ This method is based on the method proposed by Hansen in [1]
 * `nothing`
 
 **Reference**
+
 [1] Hansen, P. C. (1999). The L-curve and its use in the numerical treatment of inverse problems. Computational Inverse Problems in Electrocardiology, 119-142
 """
-struct LcurveEst <: OptimFamily end
+struct LCurveEst <: OptimFamily end
 
 """
     DerricoEst
@@ -58,7 +60,8 @@ This method has been proposed by John D'Errico in [1]
 * `nothing`
 
 **Reference**
-[1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023
+
+[1] John D'Errico (2023). Estimatenoise, MATLAB Central File Exchange. Retrieved December 7, 2023. (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
 """
 struct DerricoEst <: NoiseEstimation end
 
@@ -70,9 +73,9 @@ Estimates the noise variance of a signal `x` using a given method
 **Inputs**
 * `x`: Signal
 * `method`: Noise estimation method
-    * `BayesianEst`: Bayesian noise estimation
+    * `BayesianEst`: Bayesian noise estimation (To be implemented)
     * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
-    * `LcurveEst`: L-curve noise estimation
+    * `LCurveEst`: L-curve noise estimation
     * `DerricoEst`: D'Errico noise estimation
 * `batch_size`: Batch size for batch processing (default = 0)
 * `summary`: Summary function for batch processing (default = mean)
@@ -122,7 +125,7 @@ Estimates the noise variance of a signal `x` using Bayesian denoising.
 * `method`: Noise estimation method
     * `BayesianEst`: Bayesian noise estimation
     * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
-    * `LcurveEst`: L-curve noise estimation
+    * `LCurveEst`: L-curve noise estimation
 
 **Output**
 * `noisevar`: Noise variance - Vector{Float64}
@@ -133,7 +136,7 @@ function varest_optim(x, method::OptimFamily)
             x -> varest_bayesian(x, method.prior)
         elseif method isa GCVEst
             varest_gcv
-        elseif method isa LcurveEst
+        elseif method isa LCurveEst
             varest_lcurve
         end
     end
@@ -258,6 +261,7 @@ Estimates the noise variance of a signal `x` using the Generalized Cross-Validat
 * `noisevar`: Noise variance
 
 **Reference**
+
 [1] Garcia, D. (2010). Robust smoothing of gridded data in one and higher dimensions with missing values. Computational Statistics and Data Analysis, 54(5), 1167-1178.
 """
 function varest_gcv(x)
@@ -320,6 +324,7 @@ Estimates the noise variance of a signal `x` using the L-curve method as propose
 * `noisevar`: Noise variance
 
 **Reference**
+
 [1] Hansen, P. C. (1999). The L-curve and its use in the numerical treatment of inverse problems. Computational Inverse Problems in Electrocardiology, 119-142
 """
 function varest_lcurve(x)
@@ -366,6 +371,7 @@ Estimates the noise variance of a signal `x` using the method proposed by John D
 * `noisevar`: Noise variance
 
 **Reference**
+
 [1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023.
 """
 function varest_derrico(x)
@@ -378,6 +384,7 @@ function varest_derrico(x)
 
     nd, ns = size(x)
 
+    # NOTE: The comments are those of John D'Errico in the original code.
     # The idea here is to form a linear combination of successive elements
     # of the series. If the underlying form is locally nearly linear, then
     # a [1 -2 1] combination (for equally spaced data) will leave only
@@ -385,14 +392,14 @@ function varest_derrico(x)
     # iid, N(0,σ²), then we can try to back out the noise variance.
     nfda = 6
     np = 14
-    fda = similar(x, nfda)
+    fda = [similar(x, i+1) for i in 1:nfda]
     # Normalization to unit norm
-    fda[1] = [1., -1.]./√2.
-    fda[2] = [1., -2., 1.]./√6.
-    fda[3] = [1., -3., 3., -1.]./√20.
-    fda[4] = [1., -4., 6., -4., 1.]./√70.
-    fda[5] = [1., -5., 10., -10., 5., -1.]./√252.
-    fda[6] = [1., -6., 15., -20., 15., -6., 1.]./√924.
+    fda[1] .= [1., -1.]./√2.
+    fda[2] .= [1., -2., 1.]./√6.
+    fda[3] .= [1., -3., 3., -1.]./√20.
+    fda[4] .= [1., -4., 6., -4., 1.]./√70.
+    fda[5] .= [1., -5., 10., -10., 5., -1.]./√252.
+    fda[6] .= [1., -6., 15., -20., 15., -6., 1.]./√924.
 
     # Compute an interquantile range, like the distance between the 25 and 75 points. This trims off the trash at each end, potentially corrupted if there are discontinuities in the curve. It also deals simply with a non-zero mean in this data. Actually do this for several different interquantile ranges, then take a median.
     # NOTE: While I could have used other methods for the final variance estimation, this method was chosen to avoid outlier issues when the curve may have isolated discontinuities in function value or a derivative. The following points correspond to the central 90, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, and 20 percent ranges.
@@ -405,8 +412,8 @@ function varest_derrico(x)
     @views for (i, fdai) in enumerate(fda)
         posnd = (i+1):ns
         ntrim = ns - i
-        noisedata = undefs(nd, ntrim)
-        p = undefs(ntrim)
+        noisedata = similar(x, nd, ntrim)
+        p = similar(x, ntrim)
         for (j, xj) in enumerate(eachrow(x))
             noisedata[j, :] .= conv(xj, fdai)[posnd]
         end

@@ -134,14 +134,17 @@ Structure containing the solution of the frequency response problem
 end
 
 """
-    solve(prob::DirectFRF, type = :dis; ismat = false)
-    solve(prob::ModalFRFProblem, type = :dis; ismat = false)
+    solve(prob::DirectFRF; type = :dis, ismat = false, progress = true)
+    solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)
 
 Computes the FRF matrix by direct or modal approach
 
 **Inputs**
 * `prob`: Structure containing the problem data
-* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `type`: Type of FRF to compute
+    * `:dis`: Admittance (default)
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
 * `progress`: Show progress bar (default = true)
 
@@ -149,7 +152,7 @@ Computes the FRF matrix by direct or modal approach
 * `sol`: Solution of the problem
     * `u`: FRF matrix
 """
-function solve(prob::ModalFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)
     # Initialisation
     (; ωn, ξn, freq, ϕo, ϕe) = prob
     n = length(ωn)
@@ -184,14 +187,17 @@ function solve(prob::ModalFRFProblem, type = :dis; ismat = false, progress = tru
 end
 
 """
-    solve(prob::DirectFRF, type = :dis; ismat = false)
-    solve(prob::ModalFRFProblem, type = :dis; ismat = false)
+    solve(prob::DirectFRF; type = :dis, ismat = false, progress = true)
+    solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)
 
 Computes the FRF matrix by direct or modal approach
 
 **Inputs**
 * `prob`: Structure containing the problem data
-* `type`: Type of FRF to compute (:dis, :vel, :acc)
+* `type`: Type of FRF to compute
+    * `:dis`: Admittance (default)
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 * `ismat`: Return the FRF matrix as a 3D array (default = false)
 * `progress`: Show progress bar (default = true)
 
@@ -199,7 +205,7 @@ Computes the FRF matrix by direct or modal approach
 * `sol`: Solution of the problem
     * `u`: FRF matrix
 """
-function solve(prob::DirectFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::DirectFRFProblem; type = :dis, ismat = false, progress = true)
 
     # Initialisation
     (; K, M, C, freq, So, Se) = prob
@@ -234,20 +240,24 @@ function solve(prob::DirectFRFProblem, type = :dis; ismat = false, progress = tr
 end
 
 """
-    solve(prob::DirectFreqProblem, type = :dis)
-    solve(prob::ModalFreqProblem, type = :dis)
+    solve(prob::DirectFreqProblem; type = :dis, progress = true)
+    solve(prob::ModalFreqProblem; type = :dis, progress = true)
 
 Computes the frequency response by direct or modal approach
 
 **Inputs**
 * `prob`: Structure containing the problem data
-* `type`: Type of response to compute (:dis, :vel, :acc)
+* `type`: Type of response to compute
+    * `:dis`: Displacement (default)
+    * `:vel`: Velocity
+    * `:acc`: Acceleration
+* `progress`: Show progress bar (default = true)
 
 **Output**
 * `sol`: Solution of the problem
     * `u`: Response spectrum matrix
 """
-function solve(prob::ModalFreqProblem, type = :dis; progress = true)
+function solve(prob::ModalFreqProblem; type = :dis, progress = true)
     # Initialisation
     (; ωn, ξn, Ln, freq, ϕo) = prob
     no, n = size(ϕo)
@@ -277,20 +287,24 @@ function solve(prob::ModalFreqProblem, type = :dis; progress = true)
 end
 
 """
-    solve(prob::DirectFreqProblem, type = :dis)
-    solve(prob::ModalFreqProblem, type = :dis)
+    solve(prob::DirectFreqProblem, type = :dis, progress = true)
+    solve(prob::ModalFreqProblem, type = :dis, progress = true)
 
 Computes the frequency response by direct or modal approach
 
 **Inputs**
 * `prob`: Structure containing the problem data
-* `type`: Type of response to compute (:dis, :vel, :acc)
+* `type`: Type of response to compute
+    * `:dis`: Displacement (default)
+    * `:vel`: Velocity
+    * `:acc`: Acceleration
+* `progress`: Show progress bar (default = true)
 
 **Output**
 * `sol`: Solution of the problem
     * `u`: Response spectrum matrix
 """
-function solve(prob::DirectFreqProblem, type = :dis; progress = true)
+function solve(prob::DirectFreqProblem; type = :dis, progress = true)
     # Initialisation
     (; K, M, C, F, freq, So) = prob
     Ndofs = size(K, 1)

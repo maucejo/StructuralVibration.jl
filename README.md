@@ -4,17 +4,18 @@
 [![Generic badge](https://img.shields.io/badge/Version-0.1.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+[![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
 
 This Julia package is intended to provide a set of tools for generating vibration data either to validate new numerical methods or to serve as input data for solving inverse problems such as input state estimation via Bayesian filtering, Bayesian regularization, machine learning, etc.
 
-The package is under active development and is not yet registered in the Julia General Registry. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
+The package is under active development. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
 
 ## Installation
 
-The package is not yet registered in the Julia General Registry. To install the package, you can use the following command:
+To install the package, you can use the following command:
 
 ```julia
-(Yourenv) pkg> add "git@https://github.com/maucejo/StructuralVibration.jl.git"
+(Yourenv) pkg> add SturcturalVibration
 ```
 
 ## Features
@@ -65,6 +66,8 @@ The package provides the following features:
     - Central difference scheme
     - RK4
     - Newmark-beta method
+    - Linear acceleration method
+    - Fox-Goodwin method
     - HHT
     - WBZ
     - Generalized-alpha
@@ -90,19 +93,22 @@ The package provides the following features:
         - Direct method
 
 - **Measurement noise**
-    - Addition of Gaussian white noise with a prescribed SNR
+    - Additive Gaussian white noise (agwn) with a prescribed SNR
+    - Additive Colored noise (acn)
+    - Multiplicative noise
+    - Mixed - agwn + multiplicative noise
 
 - **Signal processing**
     - Measurement noise variance estimation algorithms from noisy data
-        - Bayesian estimation
+        - Regularization-based estimation
         - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
     - SNR estimation from estimated measurement noise variance
     - Denoising algorithms
         - Regularization
         - Kalman filtering
     - Modal extraction - SDOF methods
-        - Bode diagram
-        - Nyquiste circle
+        - Peak picking method
+        - Circle fit method
     - Detrending data using polynomial fit
     - Gradient calculation using interpolation
     - Signal estimation

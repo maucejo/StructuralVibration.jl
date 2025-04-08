@@ -190,10 +190,10 @@ strings = Strings(L, S, T, ρ)
 beam = Beam(L, S, Iz, E, ρ)
 
 # Computation of the natural frequencies
-ωₙ, kₙ = modefreq(bar, fmax)
+ωn, kn = modefreq(bar, fmax)
 
 # Computation of the corresponding mode shapes
-ϕₙ = modeshape(bar, kₙ, x, :CC)
+ϕn = modeshape(bar, kn, x, :CC)
 ```
 
 ### 2D models
@@ -302,10 +302,10 @@ yp = [0.1, 0.3]
 plate = Plate(Lp, bp, hp, E, ρ, ν)
 
 # Computation of the natural frequencies
-ωₙ, kₙ = modefreq(plate, fmax)
+ωn, kn = modefreq(plate, fmax)
 
 # Computation of the corresponding mode shapes
-ϕₙ = modeshape(plate, kₙ, xp, yp)
+ϕn = modeshape(plate, kn, xp, yp)
 ```
 
 ## Discrete models
@@ -506,13 +506,13 @@ M_bc = apply_bc(M_mdof, mdof_mesh)
 C_bc = apply_bc(C_mdof, mdof_mesh)
 
 # Compute the eigenmodes of the systems
-ωₙ, Φₙ = eigenmode(K_bc, M_bc)
+ωn, Φn = eigenmode(K_bc, M_bc)
 
 # Computation of the modal matrices
-Kmodal, Mmodal, Cmodal = modal_matrices(ωₙ, 0.01)
+Kmodal, Mmodal, Cmodal = modal_matrices(ωn, 0.01)
 
 # Computation of modal effective mass
-meff = modal_effective_mass(M_bc, Φₙ, ones(2))
+meff = modal_effective_mass(M_bc, Φn, ones(2))
 ```
 
 ### FE model
@@ -776,8 +776,8 @@ css = ss_model(k_ss, m_ss, c_ss)
 Ψr = c2r_modeshape(Ψ)
 
 # Continuous-time state space from modal information
-ωₙ, ϕₙ = eigenmode(k_ss, m_ss)
-css_modal = ss_modal_model(ωₙ, 0.01, ϕₙ)
+ωn, ϕn = eigenmode(k_ss, m_ss)
+css_modal = ss_modal_model(ωn, 0.01, ϕn)
 ```
 
 ### Discrete-time models

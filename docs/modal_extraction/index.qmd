@@ -1,5 +1,5 @@
 ---
-title: Modal extraction methods
+title: Sdof methods
 format:
   html:
     toc: true
@@ -9,3 +9,255 @@ execute:
   freeze: auto
   cache: true
 ---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+The Sdof methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The Sdof methods are typically used for systems that are lightly damped and for which the modes are well separated.
+
+For these methods, it is assumed that the FRF (admittance) is given by:
+$$
+H_{pq}(\omega) = \sum_{i = 1}^N\frac{_{i}A_{pq}}{\omega_i^2 - \omega^2 + j\eta_i\omega_i^2}
+$$
+where, for a mode $i$, $_{i}A_{pq} = \Phi_i(x_p)\Phi_i(x_q)$ is the residue, $\omega_i$ is the natural frequency, $\eta_i$ is the modal damping factor, and $\Phi_i(x_p)$ is the mass-normalized mode shape at the point $x_p$.
+
+When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency $\omega$ close to the natural frequency $\omega_i$:
+$$
+H_{pq}(\omega) \approx \frac{\Phi_i(x_p)\Phi_i(x_q)}{M_i\left(\omega_i^2 - \omega^2 + j\eta_i\omega_i^2\right)}.
+$$
+
+::: {.callout-note}
+One can note that the modal damping factor $\eta_i$ is related to the damping ratio $\xi_i$ by the relation:
+$$
+\eta_i = 2\xi_i.
+$$
+:::
+
+## Natural frequencies and damping ratios extraction
+
+`StructuralDynamics.jl` provides two SDOF methods for extracting the natural frequencies and damping ratios of a system from its frequency response function (FRF):
+
+- Peak picking method
+- Circle fit method
+
+### Peak picking method
+
+The peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:
+
+1. **Identification of natural frequencies**
+
+    They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using `Peaks.jl`.
+
+2. **Estimation of modal damping factors**
+
+    To estimate the value of the damping factor for mode $i$, the half power bandwidth method is used. This procedure, valid for low damping ($\eta_i < 0.1$), first determines the frequencies $\omega_1$ and $\omega_2$ such that:
+    $$
+    \vert H_{pq}(\omega_1)\vert = \vert H_{pq}(\omega_2)\vert = \frac{\vert H_{pq}(\omega_i)\vert}{\sqrt{2}},
+    $$
+    with $\omega_i \in [\omega_1, \omega_2]$.
+
+    Knowing the values of $\omega_i$, $\omega_1$, and $\omega_2$, the damping ratio for mode $i$ is determined using the formula:
+    $$
+    \eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
+    $$
+
+::: {.callout-note}
+If we consider that the shape of a resonance peak is symmetric then $\omega_i = \frac{\omega_1 + \omega_2}{2}$.
+
+It comes that:
+$$
+\omega_2^2 - \omega_1^2 \approx 2\omega_i(\omega_2 - \omega_1).
+$$
+
+Hence, the damping ratio can be approximated as:
+$$
+\eta_i \approx \frac{\omega_2 - \omega_1}{\omega_i}.
+$$
+
+This formula is often given in textbooks when dealing with the half power bandwidth method.
+:::
+
+::: {.callout-warning}
+Thanks to its extreme simplicity, this method allows for quick analysis. However, this method generally does not provide satisfactory results, as it relies on measuring the resonance peak, which is very difficult to measure precisely. This is why this method is mainly applicable to lightly damped structures with well-separated modes, whose transfer functions have been measured with good frequency resolution.
+:::
+
+### Circle fit method
+
+The circle fit method is a more sophisticated method for extracting the natural frequencies and damping ratios of a system. It allows for more accurate results than the peak picking method. It is based on the fact that the admittance forms a circle (Nyquist circle) when plotted in the complex plane (see @fig-cfm). Indeed, assuming that the modes are mass-normalized, it can be shown that:
+$$
+Re\left[H_{pq}(\omega)\right]^2 + \left(Im\left[H_{pq}(\omega)\right] + \frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\right)^2 = \left(\frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\right)^2,
+$$
+which is the equation of a circle of radius $R = \frac{\vert\Phi_i(x_p)\Phi_i(x_q)\vert}{2\eta_i\omega_i^2}$ and center $(x_c,y_c) = \Bigl(0,-\frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\Bigr)$.
+
+::: {#fig-cfm}
+![](../assets/images/cercle_nyquist.png)
+
+Typical Nyquist circle of an admittance $H_{pq}(\omega)$
+:::
+
+The circle fit method consists of the following steps:
+
+1. **Identification of natural frequencies**
+
+    To identify the natural frequency of a mode $i$, we start by parameterizing the Nyquist circle by defining the angles $\psi$ and $\theta$ as shown in @fig-cfm. Mathematically, it can then be shown that:
+    $$
+    \omega_i^2 = \frac{\omega_1^2\tan\frac{\theta_2}{2} - \omega_2^2\tan\frac{\theta_1}{2}}{\tan\frac{\theta_2}{2} - \tan\frac{\theta_1}{2}},
+    $$
+    where $\omega_1$ and $\omega_2$ are the angular frequencies such that $\omega_1 < \omega_i < \omega_2$, while $\theta_1$ and $\theta_2$ are the corresponding angles of the Nyquist circle.
+
+2. **Estimation of modal damping factors**
+
+    The damping ratio is estimated using the following formula:
+    $$
+    \eta_i = \frac{\omega_2^2 - \omega_1^2}{\omega_i^2}\frac{1}{\tan\frac{\theta_1}{2} - \tan\frac{\theta_2}{2}}.
+    $$
+
+::: {.callout-note}
+Generally, the angles $\theta_1$ and $\theta_2$ are chosen so that:
+$$
+\theta_1 = \frac{\pi}{2} \text{ and } \theta_2 = -\frac{\pi}{2}.
+$$
+
+In doing so, we have:
+$$
+\omega_i^2 = \frac{\omega_1^2 + \omega_2^2}{2} \text{ and } \eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
+$$
+:::
+
+## Mode shapes extraction
+
+The mode shapes are extracted from the admittance matrix at the resonance frequency $\omega_i$. In this situation, the admittance matrix is defined as:
+$$
+\mathbf{H} = \frac{1}{j\eta_i\omega_i^2}
+  \begin{bmatrix}
+    \Phi_i(x_1)^2 & \Phi_i(x_1)\Phi_i(x_2) & \ldots\ & \Phi_i(x_1)\Phi_i(x_N) \\
+    \Phi_i(x_2)\Phi_i(x_1) & \Phi_i(x_2)^2 &  & \Phi_i(x_2)\Phi_i(x_N) \\
+    \vdots & & \ddots & \vdots \\
+    \Phi_i(x_N)\Phi_i(x_1) & \ldots & \ldots & \Phi_i(x_N)^2
+  \end{bmatrix},
+$$
+where $\omega_i$ and $\eta_i$ have been determined using the peak picking method or the circle fit method.
+
+To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), proceed as follows:
+
+* From the measurement of an input admittance (diagonal term of the admittance matrix), the mode shape value at point $x_q$ is obtained:
+  $$
+  \Phi_i(x_q)^2 = -\eta_i\omega_i^2 \text{Im}(H_{qq}(\omega_i)).
+  $$
+
+* From the cross-admittances (off-diagonal terms of the admittance matrix), the mode shape value at a point $x_p$ is calculated:
+  $$
+  \Phi_i(x_p)\Phi_i(x_q) = -\eta_i\omega_i^2 \text{Im}(H_{pq}(\omega_i))
+  $$
+
+## API
+
+::: {.api}
+**freq_extraction**
+
+---
+```{julia}
+#| echo: false
+@doc  freq_extraction
+```
+:::
+
+::: {.api}
+**modeshape_extraction**
+
+---
+```{julia}
+#| echo: false
+@doc  modeshape_extraction
+```
+:::
+
+## Example
+
+```{julia}
+#| output: false
+# Structure parameters of the beam
+L = 1.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+Iz = b*h^3/12 # Moment of inertia
+
+# Material parameters
+E = 2.1e11  # Young's modulus
+ρ = 7850.   # Density
+ξ = 0.01    # Damping ratio
+
+# Mesh
+xexc = 0:0.05:L
+xm = xexc[2]
+
+# Mode calculation - Simply supported boundary conditions
+beam = Beam(L, S, Iz, E, ρ)
+fmax = 500
+
+ωn, kn = modefreq(beam, 2fmax)
+ϕexc = modeshape(beam, kn, xexc)
+ϕm = modeshape(beam, kn, xm)
+
+# FRF calculation
+freq = 1.:0.1:fmax
+prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
+H = solve(prob; ismat = true).u
+
+# Natural frequencies and damping ratios extraction
+fn_pp, ξn_pp = freq_extraction(freq, H[1, 2, :], PeakPicking())
+fn_cf, ξn_cf = freq_extraction(freq, H[1, 2, :], CircleFit())
+
+# Mode shape extraction
+ϕid = modeshape_extraction(freq, H, fn_cf, ξn_cf, [1, 2])
+```
+
+```{julia}
+#| echo: false
+# Natural frequencies and damping ratios
+fig_f = Figure()
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
+
+scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f1, 1:4, fn_pp, markersize = 20, label = "Peak picking")
+scatter!(ax_f1, 1:4, fn_cf, marker = :star4, markersize = 15, label = "Circle fit")
+axislegend(ax_f1, position = :rb)
+
+scatter!(ax_f2, 1:4, 100ξ*ones(4), marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f2, 1:4, 100ξn_pp, markersize = 20, label = "Peak picking")
+scatter!(ax_f2, 1:4, 100ξn_cf, marker = :star4, markersize = 15, label = "Circle fit")
+
+display(fig_f);
+
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+
+lines!(ax_mode1, xexc, ϕexc[:, 1], label = "Reference")
+lines!(ax_mode1, xexc, ϕid[:, 1], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, xexc, ϕexc[:, 2], label = "Reference")
+lines!(ax_mode2, xexc, ϕid[:, 2], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, xexc, ϕexc[:, 3], label = "Reference")
+lines!(ax_mode3, xexc, ϕid[:, 3], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, xexc, ϕexc[:, 4], label = "Reference")
+lines!(ax_mode4, xexc, ϕid[:, 4], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
+```

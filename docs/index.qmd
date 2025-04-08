@@ -15,11 +15,12 @@ format:
 [![Generic badge](https://img.shields.io/badge/Version-0.1.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+[![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
 
 `StructuralVibration.jl` is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.
 
 ::: {.callout-warning}
-The package is under active development and is not yet registered in the Julia General Registry. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
+The package is under active development. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
 :::
 
 ## Features
@@ -70,6 +71,8 @@ The package provides the following features:
     - Central difference scheme
     - RK4
     - Newmark-beta method
+    - Linear acceleration method
+    - Fox-Goodwin method
     - HHT
     - WBZ
     - Generalized-alpha
@@ -102,15 +105,15 @@ The package provides the following features:
 
 - **Signal processing**
     - Measurement noise variance estimation algorithms from noisy data
-        - Bayesian estimation
+        - Regularization-based estimation
         - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
     - SNR estimation from estimated measurement noise variance
     - Denoising algorithms
         - Regularization
         - Kalman filtering
     - Modal extraction - SDOF methods
-        - Bode diagram
-        - Nyquiste circle
+        - Peak picking method
+        - Circle fit method
     - Detrending data using polynomial fit
     - Gradient calculation using interpolation
     - Signal estimation
@@ -133,14 +136,14 @@ The package provides the following features:
 ```python
 Project StructuralVibration v0.1.0
 Status
-  [717857b8] DSP v0.8.2
+  [717857b8] DSP v0.8.3
   [7a1cc6ca] FFTW v1.8.1
   [442a2c76] FastGaussQuadrature v1.0.2
   [a98d9a8b] Interpolations v0.15.1
-  [429524aa] Optim v1.11.0
+  [429524aa] Optim v1.12.0
   [18e31ff7] Peaks v0.5.3
-  [aea7be01] PrecompileTools v1.2.1
-  [92933f4c] ProgressMeter v1.10.2
+⌅ [aea7be01] PrecompileTools v1.2.1
+  [92933f4c] ProgressMeter v1.10.4
   [276daf66] SpecialFunctions v2.5.0
   [10745b16] Statistics v1.11.1
   [37e2e46d] LinearAlgebra v1.11.0
@@ -170,4 +173,4 @@ Environment:
 
 ## License
 
-This package is under MIT License.
+This package is under [MIT License](https://opensource.org/license/mit).

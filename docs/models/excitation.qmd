@@ -70,19 +70,18 @@ duration = 5.
 rect = Rectangle(F0, tstart, duration)
 
 # Compute the excitation
-F = excitation(rect, t)
+F_rect = excitation(rect, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "Rectangle")
-lines!(ax, t, F)
-display(fig);
+fig_rect = Figure()
+ax_rect = Axis(fig_rect[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "Rectangle")
+lines!(ax_rect, t, F_rect)
+xlims!(ax_rect, t[1], t[end])
+
+display(fig_rect);
 ```
 
 ### Triangle signal
@@ -123,19 +122,18 @@ duration = 5.
 tri = Triangle(F0, tstart, duration)
 
 # Compute the excitation
-F = excitation(tri, t)
+F_tri = excitation(tri, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "Triangle")
-lines!(ax, t, F)
-display(fig);
+fig_tri = Figure()
+ax_tri = Axis(fig_tri[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "Triangle")
+lines!(ax_tri, t, F_tri)
+xlims!(ax_tri, t[1], t[end])
+
+display(fig_tri);
 ```
 
 ### Hammer impact
@@ -176,19 +174,18 @@ k = 9.7
 hammer = Hammer(F0, tstart, k, θ)
 
 # Compute the excitation
-F = excitation(hammer, t)
+F_hammer = excitation(hammer, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "Hammer")
-lines!(ax, t, F)
-display(fig);
+fig_hammer = Figure()
+ax_hammer = Axis(fig_hammer[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "Hammer")
+lines!(ax_hammer, t, F_hammer)
+xlims!(ax_hammer, t[1], t[end])
+
+display(fig_hammer);
 ```
 
 ### Smooth rectangular signal
@@ -230,19 +227,18 @@ trise = 1.
 srect = SmoothRect(F0, tstart, duration, trise)
 
 # Compute the excitation
-F = excitation(srect, t)
+F_srect = excitation(srect, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "SmoothRect")
-lines!(ax, t, F)
-display(fig);
+fig_srect = Figure()
+ax_sret = Axis(fig_srect[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "SmoothRect")
+lines!(ax_sret, t, F_srect)
+xlims!(ax_sret, t[1], t[end])
+
+display(fig_srect);
 ```
 
 ### Sine signal
@@ -295,19 +291,18 @@ f = 2.
 sine = SineWave(F0, tstart, duration, f, zero_end = true)
 
 # Compute the excitation
-F = excitation(sine, t)
+F_sine = excitation(sine, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "SineWave")
-lines!(ax, t, F)
-display(fig);
+fig_sine = Figure()
+ax_sine = Axis(fig_sine[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "SineWave")
+lines!(ax_sine, t, F_sine)
+xlims!(ax_sine, t[1], t[end])
+
+display(fig_sine);
 ```
 
 ### Half-sine signal
@@ -347,19 +342,18 @@ duration = 5.
 hsine = HalfSine(F0, tstart, duration)
 
 # Compute the excitation
-F = excitation(hsine, t)
+F_hsine = excitation(hsine, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "HalfSine")
-lines!(ax, t, F)
-display(fig);
+fig_hsine = Figure()
+ax_hsine = Axis(fig_hsine[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "HalfSine")
+lines!(ax_hsine, t, F_hsine)
+xlims!(ax_hsine, t[1], t[end])
+
+display(fig_hsine);
 ```
 
 ### Haversine signal
@@ -399,19 +393,18 @@ duration = 5.
 haversine = HaverSine(F0, tstart, duration)
 
 # Compute the excitation
-F = excitation(haversine, t)
+F_haversine = excitation(haversine, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "HaverSine")
-lines!(ax, t, F)
-display(fig);
+fig_haversine = Figure()
+ax_haversine = Axis(fig_haversine[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "HaverSine")
+lines!(ax_haversine, t, F_haversine)
+xlims!(ax_haversine, t[1], t[end])
+
+display(fig_haversine);
 ```
 
 ### Swept sine
@@ -509,19 +502,18 @@ type_swept = :lin
 chirp = SweptSine(F0, tstart, duration, fstart, fend, type_swept, zero_end = true)
 
 # Compute the excitation
-F = excitation(chirp, t)
+F_chirp = excitation(chirp, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "SweptSine")
-lines!(ax, t, F)
-display(fig);
+fig_chirp = Figure()
+ax_chirp = Axis(fig_chirp[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "SweptSine")
+lines!(ax_chirp, t, F_chirp)
+xlims!(ax_chirp, t[1], t[end])
+
+display(fig_chirp);
 ```
 
 ### Gaussian pulse
@@ -569,19 +561,18 @@ fc = 2.
 gpulse = GaussianPulse(F0, tstart, duration, fc)
 
 # Compute the excitation
-F = excitation(gpulse, t)
+F_gpulse = excitation(gpulse, t)
 ```
 
 ```{julia}
 #| echo: false
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-          xlabel = "Time (s)",
-          ylabel = "Excitation signal",
-          title = "Gaussian Pulse")
-lines!(ax, t, F)
-display(fig);
+fig_gpulse = Figure()
+ax_gpulse = Axis(fig_gpulse[1, 1], xlabel = "Time (s)", ylabel = "Excitation signal", title = "Gaussian Pulse")
+lines!(ax_gpulse, t, F_gpulse)
+xlims!(ax_gpulse, t[1], t[end])
+
+display(fig_gpulse);
 ```
 
 ### Colored noise {#sec-colored-noise}
@@ -652,21 +643,18 @@ S_purple = rfft(excitation(exc_purple, t))
 ```{julia}
 #| echo: false
 
-fig = Figure(size = (700, 450))
-ax = Axis(fig[1, 1],
-          xscale = log10, yscale = log10,
-          xlabel = "Frequency (Hz)",
-          ylabel = "Amplitude",
-          title = "Colored noise")
-lines!(ax, freq, abs.(S_white), label = "White noise")
-lines!(ax, freq, abs.(S_pink), label = "Pink noise")
-lines!(ax, freq, abs.(S_blue), label = "Blue noise")
-lines!(ax, freq, abs.(S_brown), label = "Brown noise")
-lines!(ax, freq, abs.(S_purple), label = "Purple noise")
-axislegend(ax, position = :ct,
+fig_noise = Figure(size = (700, 450))
+ax_noise = Axis(fig_noise[1, 1], xscale = log10, yscale = log10, xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)", title = "Colored noise")
+lines!(ax_noise, freq, abs.(S_white), label = "White noise")
+lines!(ax_noise, freq, abs.(S_pink), label = "Pink noise")
+lines!(ax_noise, freq, abs.(S_blue), label = "Blue noise")
+lines!(ax_noise, freq, abs.(S_brown), label = "Brown noise")
+lines!(ax_noise, freq, abs.(S_purple), label = "Purple noise")
+axislegend(ax_noise, position = :ct,
            backgroundcolor = (:white, 0.5),
            orientation = :horizontal)
-display(fig);
+
+display(fig_noise);
 ```
 
 ## `excitation` function {#sec-exc-api}

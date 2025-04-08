@@ -101,8 +101,6 @@ lines!(ax_1, t, x_free_foh[1, :], label = "x₁ - FOH", linestyle = :dash)
 lines!(ax_1, t, x_free_blh[1, :], label = "x₁ - BLH", linestyle = :dashdot)
 lines!(ax_1, t, x_free_rk[1, :], label = "x₁ - RK4", linestyle = :dashdotdot)
 lines!(ax_1, t, x_free_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
-axislegend(ax_1, position = :ct,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_1, minimum(t), maximum(t))
 
 lines!(ax_2, t, x_free_zoh[2, :], label = "x₂ - ZOH")
@@ -110,9 +108,10 @@ lines!(ax_2, t, x_free_foh[2, :], label = "x₂ - FOH", linestyle = :dash)
 lines!(ax_2, t, x_free_blh[2, :], label = "x₁ - BLH", linestyle = :dashdot)
 lines!(ax_2, t, x_free_rk[2, :], label = "x₂ - RK4", linestyle = :dashdotdot)
 lines!(ax_2, t, x_free_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
-axislegend(ax_2, position = :cb,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
+
 xlims!(ax_2, minimum(t), maximum(t))
+
+Legend(fig[:, 2], ax_1)
 
 display(fig);
 ```
@@ -168,8 +167,6 @@ lines!(ax_forced_1, t, x_forced_foh[1, :], label = "x₁ - FOH", linestyle = :da
 lines!(ax_forced_1, t, x_forced_blh[1, :], label = "x₁ - BLH", linestyle = :dashdot)
 lines!(ax_forced_1, t, x_forced_rk[1, :], label = "x₁ - RK4", linestyle = :dashdotdot)
 lines!(ax_forced_1, t, x_forced_modal[1, :], label = "x₁ - Modal", linestyle = :dot)
-axislegend(ax_forced_1, position = :ct,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_forced_1, minimum(t), maximum(t))
 
 lines!(ax_forced_2, t, x_forced_zoh[2, :], label = "x₂ - ZOH")
@@ -177,9 +174,9 @@ lines!(ax_forced_2, t, x_forced_foh[2, :], label = "x₂ - FOH", linestyle = :da
 lines!(ax_forced_2, t, x_forced_blh[2, :], label = "x₁ - BLH", linestyle = :dashdot)
 lines!(ax_forced_2, t, x_forced_rk[2, :], label = "x₂ - RK4", linestyle = :dashdotdot)
 lines!(ax_forced_2, t, x_forced_modal[2, :], label = "x₂ - Modal", linestyle = :dot)
-axislegend(ax_forced_2, position = :cb,
-           backgroundcolor = (:white, 0.5), orientation = :horizontal)
 xlims!(ax_forced_2, minimum(t), maximum(t))
+
+Legend(fig_forced[:, 2], ax_forced_1)
 
 display(fig_forced);
 ```
@@ -424,7 +421,6 @@ axislegend(ax_y1, position = :rt, backgroundcolor = (:white, 0.5))
 lines!(ax_y2, freq, 20log10.(abs.(y_freq[2, :])), label = "y₂ - Direct")
 lines!(ax_y2, freq, 20log10.(abs.(y_freq_modal[2, :])), label = "y₂ - Modal", linestyle = :dash)
 xlims!(ax_y2, minimum(freq), maximum(freq))
-axislegend(ax_y2, position = :rt, backgroundcolor = (:white, 0.5))
 
 display(fig_y);
 ```

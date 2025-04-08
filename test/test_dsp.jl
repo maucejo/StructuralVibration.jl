@@ -1,4 +1,4 @@
-using StructuralVibration, FFTW
+using StructuralVibration, FFTW, DSP
 import DSP
 @usingany GLMakie
 
@@ -89,3 +89,36 @@ lines!(ax_pxx, freq, 10log10.(pxx_ref)[1:length(pxx)], label = "DSP.jl")
 lines!(ax_pxx, freq, 10log10.(pxx), linestyle = :dash, label = "StructuralVibration.jl")
 axislegend(ax_pxx, position = :rt, backgroundcolor = (:white, 0.5),)
 xlims!(ax_pxx, 0., freq[end])
+
+## Anti-aliasing
+# Time parameters
+Δt = 1e-4
+t = 0.:Δt:10.
+fs = 1/Δt
+
+# Signal
+nt = length(t)
+y = randn(nt)
+
+# filtered signal
+yf = anti_alias(y, 2500., fs = fs)
+
+freq = rfftfreq(nt, fs)
+
+fig_a = Figure()
+ax_a1 = Axis(fig_a[1, 1], xlabel = "Time (s)", ylabel = "Signal", title = "Original data")
+ax_a2 = Axis(fig_a[2, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
+lines!(ax_a1, t, y, label = "Original signal")
+xlims!(ax_a1, 0., t[end])
+
+lines!(ax_a2, freq, 10log10.(abs.(rfft(y)[1:length(freq)])), label = "FFT")
+xlims!(ax_a2, 0., freq[end])
+
+fig_b = Figure()
+ax_b1 = Axis(fig_b[1, 1], xlabel = "Time (s)", ylabel = "Signal", title = "Filtered data")
+ax_b2 = Axis(fig_b[2, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
+lines!(ax_b1, t, yf, label = "Filtered signal")
+xlims!(ax_b1, 0., t[end])
+
+lines!(ax_b2, freq, 10log10.(abs.(rfft(yf)[1:length(freq)])), label = "FFT")
+xlims!(ax_b2, 0., freq[end])

@@ -1,23 +1,27 @@
 """
-    gradient(f, t)
+    gradient(f::Vector{Real}, t; method = :cubic)
+    gradient(f::Matrix{Real}, t; method = :cubic, dims = 1)
 
 Compute the gradient of a function `f` at points `t`.
 
 **Inputs**
-- `f::Vector{Real}`: Function values
-- `t`: Points at which to evaluate the gradient
-- `method`: Interpolation method
+* `f`: Function values
+* `t`: Points at which to evaluate the gradient
+* `method`: Interpolation method
     - `:linear`: Linear interpolation
     - `:cubic`: Cubic spline interpolation (default)
+* `dims`: Dimension along which to compute the gradient
+    * `1`: Rows (default)
+    * `2`: Columns
 
 **Output**
-- `df`: Gradient of the vector `f` at points `t`
+* `df`: Gradient of the vector `f` at points `t`
 
 **Note**
-- If `method` is `:cubic`, `t` must be an `AbstractRange`.
+
+If `method` is `:cubic`, `t` must be an `AbstractRange`.
 """
 function gradient(f::Vector{T}, t; method = :cubic) where {T <: Real}
-
     if (method == :cubic) && (t isa AbstractRange)
         itp = cubic_spline_interpolation(t, f)
     elseif method == :linear
@@ -27,29 +31,18 @@ function gradient(f::Vector{T}, t; method = :cubic) where {T <: Real}
     return only.(Interpolations.gradient.(Ref(itp), t))
 end
 
-"""
-    gradient(f, t) where {T <: Real}
-
-Compute the gradient of a function `f` at points `t`.
-
-**Inputs**
-- `f::Matrix{Real}`: Function values
-- `t`: Points at which to evaluate the gradient
-- `method`: Interpolation method
-    - `:linear`: Linear interpolation
-    - `:cubic`: Cubic spline interpolation (default)
-
-**Output**
-- `df`: Gradient of the each row of the matrix `f` at points `t`
-
-**Note**
-- If `method` is `:cubic`, `t` must be an `AbstractRange`.
-"""
-function gradient(f::Matrix{T}, t; method = :cubic) where {T <: Real}
+function gradient(f::Matrix{T}, t; method = :cubic, dims = 1) where {T <: Real}
     nx, nt = size(f)
     df = zeros(nx, nt)
-    for i in 1:nx
-        df[i, :] = gradient(f[i, :], t, method = method)
+
+    if dims == 1
+        for i in 1:nx
+            df[i, :] = gradient(f[i, :], t, method = method)
+        end
+    else
+        for i in 1:nt
+            df[:, i] = gradient(f[:, i], t, method = method)
+        end
     end
 
     return df
