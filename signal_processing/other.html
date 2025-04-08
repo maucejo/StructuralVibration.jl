@@ -107,6 +107,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -314,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="gradient" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="gradient"><span class="header-section-number">2</span> Gradient</h2>
-<p>The gradient of a signal is the rate of change of the signal with respect to time. Julia [<img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm">] has a lot of packages for computing thegradient of a signal. The <code>gradient</code> function in <code>StructuralVibration.jl</code> is a simple helper function built around the <code>gradient</code> function in <code>Interpolations.jl</code>.</p>
+<p>The gradient of a signal is the rate of change of the signal with respect to time. Julia [<img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm">] has a lot of packages for computing the gradient of a signal. The <code>gradient</code> function in <code>StructuralVibration.jl</code> is a simple helper function built around the <code>gradient</code> function in <code>Interpolations.jl</code>.</p>
 <section id="api-1" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="api-1"><span class="header-section-number">2.1</span> API</h3>
 <div class="api">
@@ -394,7 +423,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Being based on interpolation, <code>gradient</code> is not robust against noise. In a future release, robust differentiation methods will be added to <code>StructuralVibration.jl</code>.</p>
+<p>Being based on interpolation, <code>gradient</code> is not robust against noise. For robust gradient estimation, you can compute the gradient of the signal denoised by the <code>denoising</code> function by using one of the numerous Julia differentiation packages if the signal is smooth enough (at least class <span class="math inline">\(C^\2\)</span>). If the latter condition is not satisfied, you can for instance use <a href="https://adrianhill.de/NoiseRobustDifferentiation.jl/stable/">NoiseRobustDifferentiation.jl</a>, which implements the Total variation regularized numerical differentiation method<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> .</p>
 </div>
 </div>
 
@@ -402,7 +431,13 @@ Note
 </section>
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>R. Chartrand. “Numerical differentiation of noisy, nonsmooth data”. ISRN Applied Mathematics, vol.&nbsp;2011, 164564, 2011.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

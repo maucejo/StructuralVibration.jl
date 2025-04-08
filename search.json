@@ -554,7 +554,18 @@
     "href": "signal_processing/other.html#gradient",
     "title": "Other processing",
     "section": "2 Gradient",
-    "text": "2 Gradient\nThe gradient of a signal is the rate of change of the signal with respect to time. Julia [] has a lot of packages for computing thegradient of a signal. The gradient function in StructuralVibration.jl is a simple helper function built around the gradient function in Interpolations.jl.\n\n2.1 API\n\ngradient\n\n\n\ngradient(f::Vector{Real}, t; method = :cubic)\ngradient(f::Matrix{Real}, t; method = :cubic, dims = 1)\nCompute the gradient of a function f at points t.\nInputs\n\nf: Function values\n\nt: Points at which to evaluate the gradient\n\nmethod: Interpolation method\n\n:linear: Linear interpolation\n\n:cubic: Cubic spline interpolation (default)\n\n\n\ndims: Dimension along which to compute the gradient\n\n1: Rows (default)\n\n2: Columns\n\n\n\n\nOutput\n\ndf: Gradient of the vector f at points t\n\n\nNote\nIf method is :cubic, t must be an AbstractRange.\n\n\n\n\n\n\n\n\n2.2 Example\n\n# Signal\nx = LinRange(0., 3π, 100)\ny = sin.(x)\n\n# True gradient\ndy = cos.(x)\n\n# Estimated gradient\ndy_approx = gradient(y, x)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nBeing based on interpolation, gradient is not robust against noise. In a future release, robust differentiation methods will be added to StructuralVibration.jl.",
+    "text": "2 Gradient\nThe gradient of a signal is the rate of change of the signal with respect to time. Julia [] has a lot of packages for computing the gradient of a signal. The gradient function in StructuralVibration.jl is a simple helper function built around the gradient function in Interpolations.jl.\n\n2.1 API\n\ngradient\n\n\n\ngradient(f::Vector{Real}, t; method = :cubic)\ngradient(f::Matrix{Real}, t; method = :cubic, dims = 1)\nCompute the gradient of a function f at points t.\nInputs\n\nf: Function values\n\nt: Points at which to evaluate the gradient\n\nmethod: Interpolation method\n\n:linear: Linear interpolation\n\n:cubic: Cubic spline interpolation (default)\n\n\n\ndims: Dimension along which to compute the gradient\n\n1: Rows (default)\n\n2: Columns\n\n\n\n\nOutput\n\ndf: Gradient of the vector f at points t\n\n\nNote\nIf method is :cubic, t must be an AbstractRange.\n\n\n\n\n\n\n\n\n2.2 Example\n\n# Signal\nx = LinRange(0., 3π, 100)\ny = sin.(x)\n\n# True gradient\ndy = cos.(x)\n\n# Estimated gradient\ndy_approx = gradient(y, x)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nBeing based on interpolation, gradient is not robust against noise. For robust gradient estimation, you can compute the gradient of the signal denoised by the denoising function by using one of the numerous Julia differentiation packages if the signal is smooth enough (at least class \\(C^\\2\\)). If the latter condition is not satisfied, you can for instance use NoiseRobustDifferentiation.jl, which implements the Total variation regularized numerical differentiation method1 .",
+    "crumbs": [
+      "Signal processing",
+      "Other processing"
+    ]
+  },
+  {
+    "objectID": "signal_processing/other.html#footnotes",
+    "href": "signal_processing/other.html#footnotes",
+    "title": "Other processing",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nR. Chartrand. “Numerical differentiation of noisy, nonsmooth data”. ISRN Applied Mathematics, vol. 2011, 164564, 2011.↩︎",
     "crumbs": [
       "Signal processing",
       "Other processing"
