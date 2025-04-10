@@ -237,12 +237,17 @@ Computes the eigenmodes of a system defined by its mass and stiffness matrices.
 * `ω`: Vector of natural frequencies
 * `Φ`: Mass-normalized mode shapes
 """
-function eigenmode(K, M, n = size(K, 1))
+function eigenmode(K, M, n::Int = size(K, 1))
 
     λ, Φ = eigen(K, M)
-    ω = @. √abs(λ[1:n])
 
-    return ω, Φ[:, 1:n]
+    ωn = similar(K, n)
+    Φn = similar(K, size(Φ, 1)::Int, n)
+
+    @. ωn = √abs(λ[1:n])
+    @. Φn = Φ[:, 1:n]
+
+    return ωn, Φn
 end
 
 """

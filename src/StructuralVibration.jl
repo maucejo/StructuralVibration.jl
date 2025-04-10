@@ -24,7 +24,7 @@ export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
        Newmark, HHT, WBZ, GeneralizedAlpha, MidPoint
 
 # Structs - Noise estimation
-export BayesianEst, GCVEst, LCurveEst, DerricoEst
+export BayesEst, GCVEst, LCurveEst, DerricoEst
 
 # Structs - Noise denoising
 export BayesDenoising, GCVDenoising, LCurveDenoising, KalmanDenoising

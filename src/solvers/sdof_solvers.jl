@@ -550,14 +550,15 @@ function solve(prob::SdofFRFProblem)
     (; m, ω0, ξ) = sdof
     ω = 2π*freq
 
+    x = similar(freq, Complex{Real})
     if type_exc == :force
-        x = @. 1/m/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
+        @. x =  1/m/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
     else
-        x = @. (ω0^2 + 2im*ξ*ω0*ω)/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
+        @. x = (ω0^2 + 2im*ξ*ω0*ω)/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
     end
 
     if type_resp == :vel
-        x .*= 1im*ω
+        @. x *= 1im*ω
     elseif type_resp == :acc
         @. x *= -ω^2
     end
@@ -582,14 +583,15 @@ function solve(prob::SdofFrequencyProblem)
     (; m, ω0, ξ) = sdof
     ω = 2π*freq
 
+    x = similar(freq, Complex{Real})
     if type_exc == :force
-        x = @. F/m/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
+        @. x = F/m/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
     else
-        x = @. F*(ω0^2 + 2im*ξ*ω0*ω)/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
+        @. x = F*(ω0^2 + 2im*ξ*ω0*ω)/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
     end
 
     if type_resp == :vel
-        x .*= 1im*ω
+        @. x *= 1im*ω
     elseif type_resp == :acc
         @. x *= -ω^2
     end

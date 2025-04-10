@@ -154,6 +154,18 @@ Structure containing problem solutions
     ddu::Matrix{T}
 end
 
+"""
+    ModalImpulseSolution(u)
+
+Structure containing the impulse response of a multi-degrees of freedom (Mdof) system
+
+**Fields**
+* `u`: Impulse response matrix
+"""
+@show_data struct ModalImpulseSolution{T <: Real}
+    u::Union{Array{T, 3}, Vector{Matrix{T}}}
+end
+
 
 """
     solve(prob::FreeModalTimeProblem)
@@ -172,9 +184,7 @@ function solve(prob::FreeModalTimeProblem)
 
     # Modal analysis
     if !ismodal
-        ω0, Φ = eigenmode(K, M)
-        ωn = ω0[1:n]
-        Φn = Φ[:, 1:n]
+        ωn, Φn = eigenmode(K, M, n)
         # Note: The mode shapes are mass-normalized, so Mn = I
 
         # Modal initial conditions
@@ -241,9 +251,7 @@ function solve(prob::HarmonicModalTimeProblem)
 
     if !ismodal
         # Modal analysis
-        ω0, Φ = eigenmode(K, M)
-        ωn = ω0[1:n]
-        Φn = Φ[:, 1:n]
+        ωn, Φn = eigenmode(K, M, n)
         # Note: The mode shapes are mass-normalized, so Mn = I
 
         # Modal initial conditions
@@ -316,9 +324,8 @@ function solve(prob::ForcedModalTimeProblem; method = :filt)
 
     if !ismodal
         # Modal analysis
-        ω0, Φ = eigenmode(K, M)
-        ωn = ω0[1:n]
-        Φn = Φ[:, 1:n]
+        ωn, Φn = eigenmode(K, M, n)
+
         # Note: The mode shapes are mass-normalized, so Mn = I
 
         # Modal initial conditions
@@ -403,12 +410,12 @@ Compute the impulse response of a multi-degrees of freedom (Mdof) system using t
 
 **Output**
 * `sol`: ModalImpulseSolution
+    * `u`: Impulse response matrix
 """
 function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false, ismat = false)
     if !ismodal
-        ω0, Φ = eigenmode(K, M)
-        fn = ω0[1:n]/2π
-        Φn = Φ[:, 1:n]
+        ωn, Φn = eigenmode(K, M, n)
+        fn = ωn/2π
         ndofs = size(K, 1)
     else
         if K isa Vector
@@ -442,8 +449,8 @@ function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false, ismat =
     end
 
     if ismat
-        return reshape(reduce(hcat, h), ndofs, ndofs, :)
+        return ModalImpulseSolution(reshape(reduce(hcat, h), ndofs, ndofs, :))
     end
 
-    return h
+    return ModalImpulseSolution(h)
 end

@@ -2,7 +2,7 @@ abstract type NoiseEstimation end
 abstract type OptimFamily <: NoiseEstimation end
 
 """
-    BayesianEst
+    BayesEst
 
 Bayesian noise estimation
 
@@ -11,10 +11,10 @@ Bayesian noise estimation
     * `:invgamma`: Inverse gamma distribution (default)
     * `:uniform`: Uniform distribution
 """
-@show_data struct BayesianEst <: OptimFamily
+@show_data struct BayesEst <: OptimFamily
     prior :: Symbol
 
-    BayesianEst(prior = :invgamma) = new(prior)
+    BayesEst(prior = :invgamma) = new(prior)
 end
 
 """
@@ -77,11 +77,10 @@ Estimates the noise variance of a signal `x` using a given method
     * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
     * `LCurveEst`: L-curve noise estimation
     * `DerricoEst`: D'Errico noise estimation
-* `batch_size`: Batch size for batch processing (default = 0)
+* `batch_size::Int`: Batch size for batch processing (default = 0)
 * `summary`: Summary function for batch processing (default = mean)
 """
-function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
-
+function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
     varestfun = let
         if method isa OptimFamily
             x -> varest_optim(x, method)
@@ -97,11 +96,11 @@ function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
         x isa Vector ? x = transpose(x) : nothing
 
         nr, nc = size(x)
-        batches = [x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
+        batches = Vector{typeof(x)}[x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
         nb = length(batches)
 
         noisevar = similar(x, nr, nb)
-        @views for (b, batch) in enumerate(batches)
+        for (b, batch) in enumerate(batches)
             if length(batch) < batch_size
                 continue
             end
@@ -113,7 +112,7 @@ function varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
 end
 
 # Default method
-varest(x) = varest(x, BayesianEst())
+varest(x) = varest(x, GCVEst())
 
 """
     varest_bayesian(x, method::OptimFamily)
@@ -132,7 +131,7 @@ Estimates the noise variance of a signal `x` using Bayesian denoising.
 """
 function varest_optim(x, method::OptimFamily)
     varestfun = let
-        if method isa BayesianEst
+        if method isa BayesEst
             x -> varest_bayesian(x, method.prior)
         elseif method isa GCVEst
             varest_gcv
@@ -143,7 +142,7 @@ function varest_optim(x, method::OptimFamily)
 
     ndim = ndims(x)
     if ndim == 1
-        noisevar = varestfun(x)
+        noisevar = [varestfun(x)]
     elseif ndim == 2
         nx = size(x, 1)
         noisevar = similar(x, nx)
@@ -392,7 +391,7 @@ function varest_derrico(x)
     # iid, N(0,σ²), then we can try to back out the noise variance.
     nfda = 6
     np = 14
-    fda = [similar(x, i+1) for i in 1:nfda]
+    fda = Vector{Real}[similar(x, i+1) for i in 1:nfda]
     # Normalization to unit norm
     fda[1] .= [1., -1.]./√2.
     fda[2] .= [1., -2., 1.]./√6.

@@ -98,7 +98,7 @@ xlims!(ax_forced_2, minimum(t), maximum(t))
 fig_forced
 
 ## Impulse response
-h = impulse_response(K, M, ξ, t, ismat = true)
+h = impulse_response(K, M, ξ, t, ismat = true).u
 
 fig_h = Figure()
 ax_h11 = Axis(fig_h[1, 1], ylabel = "Impulse response")

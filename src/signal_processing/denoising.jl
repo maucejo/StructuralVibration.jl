@@ -167,19 +167,16 @@ function lcurve_denoise(z, s², U)
     return U*(z./(1 .+ Λ[notnan][pos_max]*s²))
 end
 
-function denoising(y::T, alg::KalmanDenoising) where {T <: AbstractArray}
+function denoising(y, alg::KalmanDenoising)
 
-    # Conversion
-    y isa Vector ? y = transpose(y) : nothing
+    vest = varest(y)
 
-    v̂ = varest(y)
-
-    R = Diagonal(v̂)
-    ny = size(y, 1)
+    R = Diagonal(vest)
+    ny = size(vest, 1)
 
     # Optimization pass
     lb = -10.
-    ub = mean(v̂)
+    ub = mean(vest)
     objfun = λ -> kf_objfun!(λ, y, R)
     res = optimize(objfun, lb, ub)
     Q = 10^only(Optim.minimizer(res))*I(ny)
@@ -188,6 +185,11 @@ function denoising(y::T, alg::KalmanDenoising) where {T <: AbstractArray}
 end
 
 function kalman_denoise(y, Q, R, alg)
+
+    nd = ndims(y)
+    if nd == 1
+        y = reshape(y, 1, length(y))
+    end
 
     # Initialization
     nx, nt = size(y)
@@ -236,10 +238,18 @@ function kalman_denoise(y, Q, R, alg)
         xest .= x
     end
 
-    return nx == 1 ? vec(xest) : xest
+    if nd == 1
+        return vec(xest)
+    end
+
+    return xest
 end
 
 function kf_objfun!(λ, y, R)
+    if ndims(y) == 1
+        y = reshape(y, 1, length(y))
+    end
+
     # Initialisation
     nx, nt = size(y)
     x = y[:, 1]
@@ -257,7 +267,7 @@ function kf_objfun!(λ, y, R)
     Q = (10 .^λ).*I(nx)
 
     # Filtering loop
-    J = 0.
+    J = zero(λ)
     for k = 2:nt
         # Prediction
         xpred .= x

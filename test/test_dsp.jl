@@ -1,4 +1,4 @@
-using StructuralVibration, FFTW, DSP
+using StructuralVibration, FFTW
 import DSP
 @usingany GLMakie
 
@@ -65,7 +65,7 @@ xlims!(ax_u, 0., 50.)
 ylims!(ax_u, -110., -80.)
 
 ## Power spectral density
-fs = 1000                          # Sampling frequency
+fs = 1000  # Sampling frequency
 bs = 100
 # freq = rfftfreq(bs, fs)
                    # 1000 time samples

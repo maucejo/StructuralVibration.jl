@@ -20,7 +20,7 @@ The breakpoints `bp` are the points where the polynomial order changes. If `bp` 
 """
 function detrend(t, y, order = 1, bp = eltype(y)[])
     if length(bp) == 0
-        return y - polyval(polyfit(t, y, order[1]), t)
+        return y .- polyval(polyfit(t, y, order[1]), t)
     else
         idb = findall(@. bp ≥ t[1] || bp ≤ t[end])
 
@@ -63,7 +63,7 @@ Fit a polynomial of order `order` to the data `x` and `y`.
 """
 function polyfit(x, y, order::Int = 1)
     if order == 0
-        return mean(y)
+        return [mean(y)]
     else
         orders = 0:order
         A = [xi^ordj for xi in x, ordj in reverse(orders)]

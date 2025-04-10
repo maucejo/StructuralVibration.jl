@@ -190,7 +190,7 @@ function modeshape_extraction(freq, H, fn, ξn, dpi = [1, 1]; type = :dis)
     end
 
     #Initialization
-    nx = size(H, 1)
+    nx::Int = size(H, 1)
     nfreq = length(fn)
     ϕn = similar(fn, nx, nfreq)
 

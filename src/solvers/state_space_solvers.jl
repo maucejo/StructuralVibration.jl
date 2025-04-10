@@ -86,7 +86,7 @@ Structure containing the data feeding the direct solver for calculating an FRF
     Se::Ts
     n::Int
 
-    StateSpaceModalFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2)), n = 0) where {Tf, Ts} = new{Tf, Ts}(css, freq, So, Se, n)
+    StateSpaceModalFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2)), n = size(css.Ac, 2)) where {Tf, Ts} = new{Tf, Ts}(css, freq, So, Se, n)
 end
 
 """
@@ -98,7 +98,7 @@ Structure containing the solution of the state-space model
 * `u`: FRF matrix
 """
 @show_data struct StateSpaceFRFSolution{T <: Complex}
-    u::Union{AbstractArray{T}, Vector{Matrix{T}}}
+    u::Union{Array{T, 3}, Vector{Matrix{T}}}
 end
 
 """
@@ -288,13 +288,13 @@ function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress 
     (; css, freq, So, Se) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
-    Ne = size(Se, 1)
-    nstate, Nu = size(Bc)
+    ne = size(Se, 1)
+    nstate, nu = size(Bc)
     ns = Int(nstate/2)
     nf = length(freq)
 
-    FRF = [similar([], Complex{eltype(Ac)}, no, Ne) for _ in 1:nf]
-    M = similar([], Complex{eltype(Ac)}, nstate, Nu)
+    FRF = Matrix{Complex}[similar(Ac, Complex{eltype(Ac)}, no, ne) for _ in 1:nf]
+    M = similar(Ac, Complex{eltype(Ac)}, nstate, nu)
 
     if type == :acc
         C = S₀*Ac[ns+1:end, :]
@@ -318,7 +318,7 @@ function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress 
     end
 
     if ismat
-        return StateSpaceFRFSolution(reshape(reduce(hcat, FRF), no, Ne, :))
+        return StateSpaceFRFSolution(reshape(reduce(hcat, FRF), no, ne, :))
     end
 
     return StateSpaceFRFSolution(FRF)
@@ -349,29 +349,33 @@ function solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, prog
     (; css, freq, So, Se, n) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
-    Ne = size(Se, 1)
-    nstate = size(css.Ac, 1)
+    ne = size(Se, 1)
+    nstate, nu = size(css.Bc)
     ns = Int(nstate/2)
     nf = length(freq)
 
     # Compute modal information
     λ, Ψ = eigenmode(Ac, n)
-    B = Ψ\Bc
 
-    m = n == 0 ? length(λ) : 2n
+    B = similar(Ψ, n, nu)
+    B .= Ψ\Bc
 
     if type == :dis
         Ψo = So*Ψ[1:ns, :]
     elseif type == :vel
         Ψo = So*Ψ[ns+1:end, :]
     elseif type == :acc
-        C = So*Ac[ns+1:end, :]*Ψ
-        D = So*Bc[ns+1:end, :]*Se'
+        C = similar(Ψ, no, n)
+        D = similar(Bc, no, ne)
+
+        C .= So*Ac[ns+1:end, :]*Ψ
+        D .= So*Bc[ns+1:end, :]*Se'
     end
     Be = B*Se'
 
-    FRF = [similar([], Complex{eltype(Ac)}, no, Ne) for _ in 1:nf]
-    M = Diagonal(similar([], Complex{eltype(Ac)}, m))
+    # Signature for solving type instability
+    FRF = Matrix{Complex}[similar(λ, no, ne) for _ in 1:nf]
+    M = Diagonal(similar(λ, n))
     indm = diagind(M)
 
     ωf = 2π*freq
@@ -384,12 +388,12 @@ function solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, prog
         if type == :dis || type == :vel
             FRF[f] .= Ψo*M*Be
         elseif type == :acc
-            FRF[f] .*= C*M*Be + D
+            FRF[f] .= C*M*Be .+ D
         end
     end
 
     if ismat
-        return StateSpaceFRFSolution(reshape(reduce(hcat, FRF), no, Ne, :))
+        return StateSpaceFRFSolution(reshape(reduce(hcat, FRF), no, ne, :))
     end
 
     return StateSpaceFRFSolution(FRF)
@@ -418,12 +422,12 @@ function solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
     (; css, freq, F, So) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
-    nstate, Nu = size(Bc)
+    nstate, nu = size(Bc)
     ns = Int(nstate/2)
     nf = length(freq)
 
-    y = similar([], Complex{eltype(Ac)}, no, nf)
-    M = similar([], Complex{eltype(Ac)}, nstate, Nu)
+    y::Matrix{Complex} = similar(Ac, Complex{eltype(Ac)}, no, nf)
+    M = similar(Ac, Complex{eltype(Ac)}, nstate, nu)
 
     if type == :acc
         C = So*Ac[ns+1:end, :]
@@ -488,8 +492,8 @@ function solve(prob::StateSpaceModalFreqProblem, type = :dis; progress = true)
     u = Bc*F
     n = length(λ)
 
-    y = similar([], Complex{eltype(Ac)}, no, nf)
-    M = Diagonal(similar([], Complex{eltype(Ac)}, n))
+    y::Matrix{Complex} = similar(Ac, Complex{eltype(Ac)}, no, nf)
+    M = Diagonal(similar(Ac, Complex{eltype(Ac)}, n))
     indm = diagind(M)
 
     ωf = 2π*freq

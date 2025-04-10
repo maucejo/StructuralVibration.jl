@@ -50,7 +50,7 @@ Converts a continuous-time state-space model to a discrete-time state-space mode
     * `Bd`: Discrete-time state-space matrix B
     * `Bdp`: Discrete-time state-space matrix Bp (only for `:foh` and `:rk4` methods)
 """
-function c2d(css::ContinuousStateSpace, h, method = :zoh)
+function c2d(css::ContinuousStateSpace, h, method = :zoh)::DiscreteStateSpace
     (; Ac, Bc) = css
 
     if method == :zoh
@@ -126,7 +126,7 @@ Computes the eigen of a continuous-time state-space model
 
 **Inputs**
 * `Ac`: Continuous-time state-space matrix
-* `n`: Number of eigen to keep in the modal basis (default: 0)
+* `n`: Number of eigen to keep in the modal basis
 
 *Note: `n` is the number of mode pairs to keep in the basis*
 
@@ -135,15 +135,19 @@ Computes the eigen of a continuous-time state-space model
 * `Ψ`: Eigenvectors
 """
 
-function eigenmode(Ac::Matrix{T}, n::Int = 0) where {T <: Real}
+function eigenmode(Ac, n::Int = size(Ac, 1))
+
+    isodd(n) ? throw(ArgumentError("n must be even")) : nothing
 
     λ, Ψ = eigen(Ac)
 
-    if n > 0
-        return λ[1:2n], Ψ[:, 1:2n]
-    end
+    λn = similar(Ac, Complex{eltype(Ac)}, n)
+    Ψn = similar(Ac, Complex{eltype(Ac)}, size(Ψ, 1)::Int, n)
 
-    return λ, Ψ
+    λn .= λ[1:n]
+    Ψn .= Ψ[:, 1:n]
+
+    return λn, Ψn
 end
 
 """

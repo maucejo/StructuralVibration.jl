@@ -115,7 +115,7 @@ end
 Structure containing the solution of the frequency response problem
 
 **Fields**
-* u: Transfer function matrix
+* `u`: Transfer function matrix
 """
 @show_data struct FRFSolution{T <: Complex}
     u::Union{Array{T, 3}, Vector{Matrix{T}}}
@@ -127,7 +127,7 @@ end
 Structure containing the solution of the frequency response problem
 
 **Fields**
-* u: Frequency response matrix
+* `u`: Frequency response matrix
 """
 @show_data struct FrequencySolution{T <: Complex}
     u::Matrix{T}
