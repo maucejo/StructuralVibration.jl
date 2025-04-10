@@ -15,7 +15,7 @@ The package is under active development. The package is developed as part of my 
 To install the package, you can use the following command:
 
 ```julia
-(Yourenv) pkg> add SturcturalVibration
+(Yourenv) pkg> add StructuralVibration
 ```
 
 ## Features
