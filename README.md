@@ -116,8 +116,8 @@ The package provides the following features:
         - Welch method (PSD, ESD, Autopower, Autopower linear)
         - Signal spectrum estimation
 
-- **Visualization**
-    - Bode plot
-    - 2D and 3D Nyquist plot
-    - Waterfall plot
-    - General 2D plot
+### Visualization
+- Bode plot
+- 2D and 3D Nyquist plot
+- Waterfall plot
+- General 2D plot
