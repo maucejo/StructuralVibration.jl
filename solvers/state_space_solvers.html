@@ -592,8 +592,8 @@ Note
 <hr>
 <div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
-solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)</code></pre>
+<div class="markdown"><pre><code>solve(prob::StateSpaceFRFProblem; type = :dis, ismat = false, progress = true)
+solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = true)</code></pre>
 <p>Computes the FRF matrix by direct or modal method</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -731,8 +731,8 @@ solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = tr
 <hr>
 <div id="30" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
-solve(prob::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)</code></pre>
+<div class="markdown"><pre><code>solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
+solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)</code></pre>
 <p>Computes the frequency response by direct or modal method</p>
 <p><strong>Inputs</strong></p>
 <ul>
