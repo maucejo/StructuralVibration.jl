@@ -292,7 +292,7 @@ Plot Nyquist diagram
 **Output**
 * `fig`: Figure
 """
-function nyquist_plot(y::Vector{ComplexF64}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
+function nyquist_plot(y::Vector{T}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS) where {T <: Complex}
 
     set_theme!(theme_choice(theme))
 
@@ -323,7 +323,7 @@ Plot Nyquist diagram in 3D
 **Output**
 * `fig`: Figure
 """
-function nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS)
+function nyquist_plot(freq, y::Vector{T}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS) where {T <: Complex}
 
     set_theme!(theme_choice(theme))
 

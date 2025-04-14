@@ -550,7 +550,7 @@ function solve(prob::SdofFRFProblem)
     (; m, ω0, ξ) = sdof
     ω = 2π*freq
 
-    x = similar(freq, Complex{Real})
+    x = similar(ω, Complex{eltype(ω)})
     if type_exc == :force
         @. x =  1/m/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
     else
