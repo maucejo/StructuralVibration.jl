@@ -213,18 +213,7 @@
     "href": "overview/release_notes.html",
     "title": "Release Notes",
     "section": "",
-    "text": "Initial release of the package",
-    "crumbs": [
-      "Overview",
-      "Release Notes"
-    ]
-  },
-  {
-    "objectID": "overview/release_notes.html#v0.1.0",
-    "href": "overview/release_notes.html#v0.1.0",
-    "title": "Release Notes",
-    "section": "",
-    "text": "Initial release of the package",
+    "text": "Bug fixes in State space solvers",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -234,8 +223,19 @@
     "objectID": "overview/release_notes.html#v0.1.1",
     "href": "overview/release_notes.html#v0.1.1",
     "title": "Release Notes",
-    "section": "v0.1.1",
-    "text": "v0.1.1\n\nBug fixes in State space solvers",
+    "section": "",
+    "text": "Bug fixes in State space solvers",
+    "crumbs": [
+      "Overview",
+      "Release Notes"
+    ]
+  },
+  {
+    "objectID": "overview/release_notes.html#v0.1.0",
+    "href": "overview/release_notes.html#v0.1.0",
+    "title": "Release Notes",
+    "section": "v0.1.0",
+    "text": "v0.1.0\n\nInitial release of the package",
     "crumbs": [
       "Overview",
       "Release Notes"
