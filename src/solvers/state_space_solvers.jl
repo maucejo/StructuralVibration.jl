@@ -150,6 +150,7 @@ Structure containing the data feeding the modal solver for calculating the frequ
         isodd(n) || n == 0 ? throw(ArgumentError("n must be even and greater than 0")) : nothing
 
         return new{TF, Tf, Ts}(css, F, freq, So, n)
+    end
 end
 
 """
