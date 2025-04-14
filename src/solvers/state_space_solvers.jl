@@ -23,7 +23,7 @@ Structure containing data for the state-space model
 
     function StateSpaceTimeProblem(css, F::Tf, u0::Tu, t::AbstractRange) where {Tf, Tu}
 
-        h = t[2] - t[1]
+        h = step(t)
         return new{Tf, Tu, typeof(h)}(css, F, u0, h)
     end
 end
@@ -86,7 +86,12 @@ Structure containing the data feeding the direct solver for calculating an FRF
     Se::Ts
     n::Int
 
-    StateSpaceModalFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2)), n = size(css.Ac, 2)) where {Tf, Ts} = new{Tf, Ts}(css, freq, So, Se, n)
+    function StateSpaceModalFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2)), n = size(css.Ac, 2)) where {Tf, Ts}
+
+        isodd(n) || n == 0 ? throw(ArgumentError("n must be even and greater than 0")) : nothing
+
+        return new{Tf, Ts}(css, freq, So, Se, n)
+    end
 end
 
 """
@@ -140,7 +145,11 @@ Structure containing the data feeding the modal solver for calculating the frequ
     So::Ts
     n::Int
 
-    StateSpaceModalFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), n = 0) where {TF, Tf, Ts} = new{TF, Tf, Ts}(css, F, freq, So, n)
+    function StateSpaceModalFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), n = size(css.Ac, 2)) where {TF, Tf, Ts}
+
+        isodd(n) || n == 0 ? throw(ArgumentError("n must be even and greater than 0")) : nothing
+
+        return new{TF, Tf, Ts}(css, F, freq, So, n)
 end
 
 """
@@ -264,8 +273,8 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
 end
 
 """
-    solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
-    solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
+    solve(prob::StateSpaceFRFProblem; type = :dis, ismat = false, progress = true)
+    solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = true)
 
 Computes the FRF matrix by direct or modal method
 
@@ -282,7 +291,7 @@ Computes the FRF matrix by direct or modal method
 * `sol`: FRFSolution structure
     * `u`: FRF matrix
 """
-function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::StateSpaceFRFProblem; type = :dis, ismat = false, progress = true)
 
     # Initialisation
     (; css, freq, So, Se) = prob
@@ -297,8 +306,8 @@ function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress 
     M = similar(Ac, Complex{eltype(Ac)}, nstate, nu)
 
     if type == :acc
-        C = S₀*Ac[ns+1:end, :]
-        D = S₀*Bc[ns+1:end, :]
+        C = So*Ac[ns+1:end, :]
+        D = So*Bc[ns+1:end, :]
     end
 
     ωf = 2π*freq
@@ -325,8 +334,8 @@ function solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress 
 end
 
 """
-    solve(prob::StateSpaceFRFProblem, type = :dis; ismat = false, progress = true)
-    solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
+    solve(prob::StateSpaceFRFProblem; type = :dis, ismat = false, progress = true)
+    solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = true)
 
 Computes the FRF matrix by direct or modal method
 
@@ -343,14 +352,14 @@ Computes the FRF matrix by direct or modal method
 * `sol`: FRFSolution structure
     * `u`: FRF matrix
 """
-function solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, progress = true)
+function solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = true)
 
     # Initialisation
     (; css, freq, So, Se, n) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
     ne = size(Se, 1)
-    nstate, nu = size(css.Bc)
+    nstate, nu = size(Bc)
     ns = Int(nstate/2)
     nf = length(freq)
 
@@ -400,8 +409,8 @@ function solve(prob::StateSpaceModalFRFProblem, type = :dis; ismat = false, prog
 end
 
 """
-    solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
-    solve(prob::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)
+    solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
+    solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
 
 Computes the frequency response by direct or modal method
 
@@ -417,7 +426,7 @@ Computes the frequency response by direct or modal method
 `sol`: Solution of the problem
     * `u`: Response spectrum matrix
 """
-function solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
+function solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
     # Initialisation
     (; css, freq, F, So) = prob
     (; Ac, Bc) = css
@@ -454,8 +463,8 @@ function solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
 end
 
 """
-    solve(prob::StateSpaceFreqProblem, type = :dis; progress = true)
-    solve(prob::StateSpaceFreqProblem, type::Symbol = :dis; progress = true)
+    solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
+    solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
 
 Computes the frequency response by direct or modal method
 
@@ -471,41 +480,49 @@ Computes the frequency response by direct or modal method
 `sol`: Solution of the problem
     * `u`: Response spectrum matrix
 """
-function solve(prob::StateSpaceModalFreqProblem, type = :dis; progress = true)
+function solve(prob::StateSpaceModalFreqProblem; type = :dis, progress = true)
     # Initialisation
-    (; css, freq, F, So, n) = prob
+    (; css, F, freq, So, n) = prob
     (; Ac, Bc) = css
     no = size(So, 1)
-    nstate = size(Ac, 1)
+    nstate, nu = size(Bc)
     ns = Int(nstate/2)
     nf = length(freq)
 
     # Compute modal information
     λ, Ψ = eigenmode(Ac, n)
-    Bc = Ψ\css.Bc
 
-    if type == :dis || type == :acc
+    B = similar(Ψ, n, nu)
+    B .= Ψ\Bc
+
+    if type == :dis
         Ψo = So*Ψ[1:ns, :]
     elseif type == :vel
         Ψo = So*Ψ[ns+1:end, :]
+    elseif type == :acc
+        C = similar(Ψ, no, n)
+        D = similar(Bc, no, nu)
+
+        C .= So*Ac[ns+1:end, :]*Ψ
+        D .= So*Bc[ns+1:end, :]
     end
-    u = Bc*F
     n = length(λ)
 
-    y::Matrix{Complex} = similar(Ac, Complex{eltype(Ac)}, no, nf)
-    M = Diagonal(similar(Ac, Complex{eltype(Ac)}, n))
+    y = similar(λ, no, nf)
+    M = Diagonal(similar(λ, n))
     indm = diagind(M)
 
     ωf = 2π*freq
     p = Progress(nf, desc = "State Space Frequency Problem - Modal approach...", showspeed = true)
-    for (f, (ω, ue)) in enumerate(zip(ωf, eachcol(u)))
+    for (f, (ω, Fe)) in enumerate(zip(ωf, eachcol(F)))
         progress ? next!(p) : nothing
 
         @. M[indm] = 1/(1im*ω - λ)
 
-        y[:, f] .= Ψo*M*ue
-        if type == :acc
-            y[:, f] .*= -ω^2
+        if type == :dis || type == :vel
+            y[:, f] .= Ψo*M*B*Fe
+        elseif type == :acc
+            y[:, f] .= (C*M*B .+ D)*Fe
         end
     end
 

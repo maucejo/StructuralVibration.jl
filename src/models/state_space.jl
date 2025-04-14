@@ -137,8 +137,6 @@ Computes the eigen of a continuous-time state-space model
 
 function eigenmode(Ac, n::Int = size(Ac, 1))
 
-    isodd(n) ? throw(ArgumentError("n must be even")) : nothing
-
     λ, Ψ = eigen(Ac)
 
     λn = similar(Ac, Complex{eltype(Ac)}, n)

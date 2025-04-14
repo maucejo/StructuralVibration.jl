@@ -12,12 +12,13 @@ C = modal_damping_matrix(M, ω, ξ, Φ)
 # Frequency vector
 freq = 0.01:0.001:1.
 
+type = :acc
 prob_frf = DirectFRFProblem(K, M, C, freq)
-H_direct = solve(prob_frf, ismat = true).u
+H_direct = solve(prob_frf, type = type, ismat = true).u
 
 # Problem definition - Case 2 - Modal
 prob_frf_modal = ModalFRFProblem(ω, ξ, freq, Φ, Φ)
-H_modal = solve(prob_frf_modal, ismat = true).u
+H_modal = solve(prob_frf_modal, type = type, ismat = true).u
 
 fig_frf = Figure()
 ax_frf11 = Axis(fig_frf[1, 1], ylabel = "FRF (dB)", title = "H₁₁")
@@ -42,17 +43,20 @@ lines!(ax_frf22, freq, 20log10.(abs.(H_direct[2, 2, :])), label = "Direct")
 lines!(ax_frf22, freq, 20log10.(abs.(H_modal[2, 2, :])), label = "Modal", linestyle = :dash)
 xlims!(ax_frf22, minimum(freq), maximum(freq))
 
+display(GLMakie.Screen(), fig_frf)
+
 ## Frequency spectrum
 F = zeros(2, length(freq))
 F[1, :] .= 10.
+type = :acc
 
 # Problem definition - Case 1 - Direct
 prob_freq = DirectFreqProblem(K, M, C, F, freq)
-y_freq = solve(prob_freq).u
+y_freq = solve(prob_freq, type = type).u
 
 # Problem definition - Case 2 - Modal
 prob_freq_modal = ModalFreqProblem(ω, ξ, Φ'*F, freq, Φ)
-y_freq_modal = solve(prob_freq_modal).u
+y_freq_modal = solve(prob_freq_modal, type = type).u
 
 fig_y = Figure()
 ax_y1 = Axis(fig_y[1, 1], ylabel = "Displacement (dB)")
@@ -67,3 +71,5 @@ lines!(ax_y2, freq, 20log10.(abs.(y_freq[2, :])), label = "y₂ - Direct")
 lines!(ax_y2, freq, 20log10.(abs.(y_freq_modal[2, :])), label = "y₂ - Modal", linestyle = :dash)
 xlims!(ax_y2, minimum(freq), maximum(freq))
 axislegend(ax_y2, position = :rt, backgroundcolor = (:white, 0.5))
+
+display(GLMakie.Screen(), fig_y)

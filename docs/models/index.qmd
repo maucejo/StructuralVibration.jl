@@ -20,7 +20,7 @@ using StructuralVibration
 
 ### 1D models {#sec-1d-models}
 
-#### Bars, Rods and strings
+#### Bars, Rods and Strings
 
 Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form:
 $$

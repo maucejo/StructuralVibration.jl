@@ -35,6 +35,8 @@ Structure containing data for the modal time solver
             error("The number of damping ratios must be equal to n")
         end
 
+        n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
+
         new{Tk, Tm, Tx, Tu, Tt}(K, M, ξn, u0, t, n, ismodal)
     end
 end
@@ -92,6 +94,8 @@ Structure containing data for the modal time solver for computing the forced res
             error("The number of damping ratios must be equal to n")
         end
 
+        n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
+
         new{Tk, Tm, Tx, TF, Tf, Tu, Tt}(K, M, ξn, F, 2π*freq, u0, t, n, ismodal)
     end
 end
@@ -133,6 +137,8 @@ Structure containing data for modal time solver for computing the forced respons
         elseif length(ξn) != n
             error("The number of damping ratios must be equal to n")
         end
+
+        n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
 
         new{Tk, Tm, Tx, Tu, Tt}(K, M, ξn, F, u0, t, n, ismodal)
     end

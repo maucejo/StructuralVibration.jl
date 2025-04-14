@@ -1,0 +1,15 @@
+---
+title: Release Notes
+format:
+  html:
+    toc: true
+    number-sections: false
+---
+
+## v0.1.0
+
+- Initial release of the package
+
+## v0.1.1
+
+- Bug fixes in State space solvers

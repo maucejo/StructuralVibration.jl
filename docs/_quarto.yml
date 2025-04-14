@@ -30,6 +30,7 @@ website:
       contents:
         - index.qmd
         - overview/installation.qmd
+        - overview/release_notes.qmd
 
     - title: "Models"
       contents:
