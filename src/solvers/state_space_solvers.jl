@@ -509,7 +509,7 @@ function solve(prob::StateSpaceModalFreqProblem; type = :dis, progress = true)
     end
     n = length(λ)
 
-    y = similar(λ, no, nf)
+    y::Matrix{Complex} = similar(λ, no, nf)
     M = Diagonal(similar(λ, n))
     indm = diagind(M)
 

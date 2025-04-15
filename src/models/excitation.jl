@@ -303,7 +303,7 @@ function excitation(type::SmoothRect, t)
 
     # Check duration
     Trect = duration - 2trise
-    Trect < 0. ? error("duration must >= 2trise") : nothing
+    Trect < 0. ? throw(DomainError("duration must >= 2trise")) : nothing
 
     pos_rect_start = argmin(@. (t - tstart - trise)^2.)
     pos_rect_end = argmin(@. (t - tstart - duration + trise).^2.)
@@ -429,7 +429,7 @@ function excitation(type::SweptSine, t)
 
         elseif type_swept == :log
             # Check frequency condition
-            fstart*fend ≤ 0. ? error("fstart and fend must have the same sign and be different from 0.") : nothing
+            fstart*fend ≤ 0. ? throw(DomainError("fstart and fend must have the same sign and be different from 0.")) : nothing
 
             if zero_end
                 n = round((fend - fstart)*duration/log(fend/fstart))
@@ -446,7 +446,7 @@ function excitation(type::SweptSine, t)
 
             ϕ = @. 2π*fstart*(β^(t[pos_exc_t] - tstart) - 1)/log(β)
         else
-            error("The type of swept sine is not defined.")
+            throw(ArgumentError("The type of swept sine is not defined."))
         end
     end
 
