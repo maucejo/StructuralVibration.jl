@@ -1,7 +1,7 @@
 name = "StructuralVibration"
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
 authors = ["Mathieu Aucejo <79322171+maucejo@users.noreply.github.com> and contributors"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"

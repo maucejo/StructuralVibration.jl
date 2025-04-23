@@ -6,6 +6,10 @@ format:
     number-sections: false
 ---
 
+## v0.1.2
+
+- Bug fix in `OneDMesh` (solved [issue #2](https://github.com/maucejo/StructuralVibration.jl/issues/2))
+
 ## v0.1.1
 
 - Bug fixes in State space solvers

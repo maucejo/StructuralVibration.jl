@@ -37,8 +37,8 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 
     function OneDMesh(model::OneDStructure, xmin::T, Nelt::Int, bc::Symbol = :CC) where T
         Nnodes = Nelt + 1
-        Nodes = undefs(Nnodes, 2)
-        Elt = undefs(Nelt, 3)
+        Nodes = similar(Int[], Nnodes, 2)
+        Elt = similar(Int[], Nelt, 3)
         elem_size = model.L/Nelt
 
         for i = 1:Nnodes
