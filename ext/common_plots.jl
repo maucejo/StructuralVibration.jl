@@ -1,32 +1,35 @@
-const DEFAULT_MAKIE_FONTS = Makie.theme(:fonts)
-
 """
-    theme_choice(name::Symbol)
+    theme_choice(name::Symbol; fonts = Makie.theme(:fonts),
+                 titlesize = 20., labelsize = 18., ticklabelsize = 14.)
 
 Choose the theme for the plots.
 
-# Inputs
+**Inputs**
 * `name`: Name of the theme
-    * :makie
-    * :article
+    * `:makie`
+    * `:sv`
+* `fonts`: Fonts of the figure (default: Makie.theme(:fonts))
+* `titlesize`: Title size (default: 20.)
+* `labelsize`: Label size (default: 18.)
+* `ticklabelsize`: Tick label size (default: 14.)
 
-# Output
+**Output**
 * `theme`: Theme
 """
-function theme_choice(name::Symbol)
-    labelsize = 18.
-    ticklabelsize = 14.
+function theme_choice(name::Symbol; fonts = Makie.theme(:fonts), titlesize = 20., labelsize = 18., ticklabelsize = 14.)
     linestyle = [:solid, :dash, :dashdot, :dashdotdot, :dot]
     if name == :makie
         colorline = Makie.wong_colors()
-    else name == :article
+    else name == :sv
         colorline = [:blue, :red, :green, :magenta, :orange, :cyan, :black]
     end
 
     theme = Theme(
+        fonts = fonts,
         palette = (color = colorline, linestyle = linestyle),
         Lines = (cycle = Cycle([:color, :linestyle], covary = true), ),
         Axis = (
+            titlesize = titlesize,
             xlabelsize = labelsize,
             xlabelfont = :bold,
             ylabelsize = labelsize,
@@ -51,10 +54,9 @@ function theme_choice(name::Symbol)
 end
 
 """
-    sv_plot(x, y...; lw = 1., theme = :makie, xscale = identity, yscale = identity,
-    axis_tight = true, xlabel = "x", ylabel = "y",
-    legend = (active = false, position = :rt, orientation = :vertical, entry = " "),
-    fonts = DEFAULT_MAKIE_FONTS)
+    sv_plot(x, y...; lw = 1., xscale = identity, yscale = identity,
+            axis_tight = true, title = " ", xlabel = "x", ylabel = "y",
+            legend = (active = false, position = :right, orientation = :vertical, entry = " "))
 
 Plot a 2D plot.
 
@@ -62,24 +64,21 @@ Plot a 2D plot.
 * `x`: x-axis values
 * `y`: y-axis values
 * `lw`: linewidth
-* `theme`: Theme (default: :makie)
 * `xscale`: x-axis scale (default: identity)
 * `yscale`: y-axis scale (default: identity)
 * `axis_tight`: Tight axis (default: true)
+* `title`: Title of the plot (default: " ")
 * `xlabel`: x-axis label
 * `ylabel`: y-axis label
 * `legend`: Legend parameters
     * active : Bool
     * position : Symbol
     * entry : String
-* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
 **Output**
 * `fig`: Figure
 """
-function sv_plot(x, y...; lw = 1., theme = :makie, xscale = identity, yscale = identity, axis_tight = true, xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, orientation = :vertical, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
-
-    set_theme!(theme_choice(theme))
+function sv_plot(x, y...; lw = 1., xscale = identity, yscale = identity, axis_tight = true, title = " ",  xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, orientation = :vertical, entry = " "))
 
     # Some checks
     t = typeof(legend)
@@ -125,8 +124,8 @@ function sv_plot(x, y...; lw = 1., theme = :makie, xscale = identity, yscale = i
     end
 
 
-    fig = Figure(fonts = fonts)
-    ax = Axis(fig[1,1], xlabel = xlabel, ylabel = ylabel, xscale = xscale, yscale = yscale)
+    fig = Figure()
+    ax = Axis(fig[1,1], xlabel = xlabel, ylabel = ylabel, xscale = xscale, yscale = yscale, title = title)
 
     if ny == 1
         lines!(ax, x, y[1], linewidth = lw, label = leg.entry)
@@ -151,8 +150,7 @@ end
     bode_plot(freq, y...; lw = 1., xlab = "Frequency (Hz)",
               ylab = "Magnitude (dB)", xscale = identity,
               axis_tight = true, isdeg = false, layout = :vertical,
-              ref_dB = 1., legend = (active = false, position = :rt, entry = " "),
-              fonts = DEFAULT_MAKIE_FONTS)
+              ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
 
 Plot Bode diagram of a frequency response or a FRF.
 
@@ -160,7 +158,6 @@ Plot Bode diagram of a frequency response or a FRF.
 * `freq`: Frequency range of interest
 * `y`: Frequency response or FRF
 * `lw`: Line width
-* `theme`: Theme (default: :makie)
 * `xlab`: x-axis label
 * `xscale`: x-axis scale (default: :log)
 * `axis_tight`: Tight axis (default: false)
@@ -168,14 +165,11 @@ Plot Bode diagram of a frequency response or a FRF.
 * `layout`: Layout of the plot (default: :vertical)
 * `ref_dB`: Reference value for magnitude (default: 1.)
 * `legend`: Legend parameters (default: (active = false, position = :rt, entry = " "))
-* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
 **Output**
 * `fig`: Figure
 """
-function bode_plot(freq, y...; lw = 1., theme = :makie, xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "), fonts = DEFAULT_MAKIE_FONTS)
-
-    set_theme!(theme_choice(theme))
+function bode_plot(freq, y...; lw = 1., xlabel = "Frequency (Hz)", xscale = identity, axis_tight = true, isdeg = false, layout = :vert, ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
 
     # Some checks
     ny = length(y)
@@ -220,7 +214,7 @@ function bode_plot(freq, y...; lw = 1., theme = :makie, xlabel = "Frequency (Hz)
         ylab2 = "Phase (rad)"
     end
 
-    fig = Figure(fonts = fonts)
+    fig = Figure()
     if layout == :vert
         ax1 = Axis(fig[1,1], xscale = xscale)
         ax2 = Axis(fig[2,1], xscale = xscale)
@@ -280,23 +274,18 @@ function bode_plot(freq, y...; lw = 1., theme = :makie, xlabel = "Frequency (Hz)
 end
 
 """
-    nyquist_plot(y; theme = :makie fonts = DEFAULT_MAKIE_FONTS)
+    nyquist_plot(y)
 
 Plot Nyquist diagram
 
 **Inputs**
 * `y`: Complex data vector
-* `theme`: Theme (default: :makie)
-* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
 **Output**
 * `fig`: Figure
 """
-function nyquist_plot(y::Vector{T}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS) where {T <: Complex}
-
-    set_theme!(theme_choice(theme))
-
-    fig = Figure(fonts = fonts)
+function nyquist_plot(y::Vector{T}) where {T <: Complex}
+    fig = Figure()
     ax = Axis(fig[1,1], xlabel = "Real part", ylabel = "Imaginary part", aspect = DataAspect())
     lines!(ax, real.(y), imag.(y))
 
@@ -304,8 +293,8 @@ function nyquist_plot(y::Vector{T}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
 end
 
 """
-    nyquist_plot(freq, y, xlab = "Frequency (Hz)"; theme = :makie,
-                 projection = false, fonts = DEFAULT_MAKIE_FONTS)
+    nyquist_plot(freq, y, xlab = "Frequency (Hz)";
+                 projection = false)
 
 Plot Nyquist diagram in 3D
 
@@ -313,21 +302,18 @@ Plot Nyquist diagram in 3D
 * `freq`: Frequency range
 * `y`: Complex vector
 * `ylabel`: y-axis label
-* `theme`: Theme (default: :makie)
 * `projection`: Projection of the curve on the xy, yz, and xz planes (default: false)
     * on the xy plane: (freq, real(y))
     * on the yz plane: (imag(y), freq)
     * on the xz plane: (real(y), imag(y))
-* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
 **Output**
 * `fig`: Figure
 """
-function nyquist_plot(freq, y::Vector{T}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS) where {T <: Complex}
+function nyquist_plot(freq, y::Vector{T}, ylabel = "Frequency (Hz)"; projection = false) where {T <: Complex}
 
-    set_theme!(theme_choice(theme))
 
-    fig = Figure(fonts = fonts)
+    fig = Figure()
     ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part", aspect = (1, 2, 1))
 
     yr = real.(y)
@@ -384,8 +370,7 @@ end
                    colorline = :auto, colmap = :viridis, colorband = (:white, 1.),
                    xlabel = "x", ylabel = "y", zlabel = "z", edge = true,
                    axis_tight = false, xlim = [minimum(x), maximum(x)],
-                   ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)],
-                   fonts = DEFAULT_MAKIE_FONTS)
+                   ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)])
 
 Plot a waterfall plot.
 
@@ -408,20 +393,17 @@ Plot a waterfall plot.
 * `xlim`: x-axis limits
 * `ylim`: y-axis limits
 * `zlim`: z-axis limits
-* `fonts`: Fonts of the figure (default: DEFAULT\\_MAKIE\\_FONTS)
 
 **Output**
 * `fig`: Figure
 """
-function waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)], fonts = DEFAULT_MAKIE_FONTS)
-
-    set_theme!(theme_choice(:makie))
+function waterfall_plot(x, y, z; zmin = minimum(z), lw = 1., colorline = :auto, colmap = :viridis, colorband = (:white, 1.), xlabel = "x", ylabel = "y", zlabel = "z", edge = true, axis_tight = false, xlim = [minimum(x), maximum(x)], ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)])
 
     # Initialization
     ny = length(y)
     I₂ = ones(2)
 
-    fig = Figure(fonts = fonts)
+    fig = Figure()
     ax = Axis3(fig[1,1], xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
     for (j, yv) in enumerate(reverse(y))
         idz = ny - j + 1

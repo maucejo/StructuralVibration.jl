@@ -45,8 +45,8 @@ juliaup add release
 
 ## Install VibrationData.jl ![](/assets/logo/doclogo.svg){width=5%}
 
-The package is not yet registered in the Julia General Registry. To install the package, you can use the following command:
+The package is registered in the Julia General Registry. So, to install the package, you can use the following command:
 
 ```julia
-(Yourenv) pkg> add "git@https://github.com/maucejo/VibrationData.jl.git"
+(Yourenv) pkg> add "StructuralVibration"
 ```

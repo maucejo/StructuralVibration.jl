@@ -54,7 +54,7 @@ export tfestimate, welch, spectrum, rect, hanning, hamming, tukey, cosine,
 export gradient, detrend
 
 # Functions for plotting
-export sv_plot, bode_plot, nyquist_plot, waterfall_plot
+export sv_plot, bode_plot, nyquist_plot, waterfall_plot, theme_choice
 
 # Include files - Utils
 include("utils/macro_utils.jl")

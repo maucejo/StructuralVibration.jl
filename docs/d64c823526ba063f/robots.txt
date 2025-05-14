@@ -1,1 +1,0 @@
-Sitemap: https://maucejo.github.io/StructuralVibration.jl/sitemap.xml

@@ -17,7 +17,7 @@ using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
-`StructuralVibration.jl` is accompanied by two extensions `CairoMakieExt.jl` and `GLMakieExt.jl` providing visualization capabilities. The extensions provide a set of functions to visualize the results of the structural dynamics analysis.
+`StructuralVibration.jl` is accompanied by an extension `SVMakieExt.jl` providing visualization capabilities. The extension provides a set of functions to visualize the results of the structural dynamics analysis.
 
 To use one of these extensions, you need to import the desired plotting package by running the following command:
 ```julia
@@ -72,7 +72,7 @@ The Nyquist plot is either a 2D or 3D plot. In 2D, it is a graph of the imaginar
 ---
 ```{julia}
 #| echo: false
-@doc nyquist_plot(y::Vector{ComplexF64}, theme = :makie; fonts = DEFAULT_MAKIE_FONTS)
+@doc nyquist_plot(y::Vector{ComplexF64})
 ```
 :::
 
@@ -88,7 +88,7 @@ nyquist_plot(H)
 ---
 ```{julia}
 #| echo: false
-@doc nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)", theme = :makie; projection = false, fonts = DEFAULT_MAKIE_FONTS)
+@doc nyquist_plot(freq, y::Vector{ComplexF64}, ylabel = "Frequency (Hz)"; projection = false)
 ```
 :::
 
@@ -147,4 +147,31 @@ z_sv = ntuple(i -> sin.(i*x/2), 5)
 
 # SV plot
 sv_plot(x, z_sv..., lw = 2., legend = (active = true,))
+```
+
+## Theming
+
+`StructuralVibration.jl` provides a set of themes for the plotting functions. The themes are defined in the `theme_choice` function.
+
+::: {.api}
+**theme_choice**
+
+---
+
+```{julia}
+#| echo: false
+@doc theme_choice
+```
+:::
+
+```{julia}
+with_theme(theme_choice(:makie)) do
+    sv_plot(x, z_sv..., lw = 2., legend = (active = true,), title = ":makie theme")
+end
+```
+
+```{julia}
+with_theme(theme_choice(:makie)) do
+    sv_plot(x, z_sv..., lw = 2., legend = (active = true,), title = ":sv theme")
+end
 ```

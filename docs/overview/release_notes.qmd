@@ -6,6 +6,12 @@ format:
     number-sections: false
 ---
 
+## v0.2.0
+
+**Breaking change**
+
+- Refactor of the visualization extension following [issue #3](https://github.com/maucejo/StructuralVibration.jl/issues/3). Theming has been removed from the plotting functions (function `theme_choice` is now exported).
+
 ## v0.1.2
 
 - Bug fix in `OneDMesh` (solved [issue #2](https://github.com/maucejo/StructuralVibration.jl/issues/2))
