@@ -213,7 +213,18 @@
     "href": "overview/release_notes.html",
     "title": "Release Notes",
     "section": "",
-    "text": "Bug fix in OneDMesh (solved issue #2)",
+    "text": "Breaking change\n\nRefactor of the visualization extension following issue #3. Theming has been removed from the plotting functions (function theme_choice is now exported).",
+    "crumbs": [
+      "Overview",
+      "Release Notes"
+    ]
+  },
+  {
+    "objectID": "overview/release_notes.html#v0.2.0",
+    "href": "overview/release_notes.html#v0.2.0",
+    "title": "Release Notes",
+    "section": "",
+    "text": "Breaking change\n\nRefactor of the visualization extension following issue #3. Theming has been removed from the plotting functions (function theme_choice is now exported).",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -223,8 +234,8 @@
     "objectID": "overview/release_notes.html#v0.1.2",
     "href": "overview/release_notes.html#v0.1.2",
     "title": "Release Notes",
-    "section": "",
-    "text": "Bug fix in OneDMesh (solved issue #2)",
+    "section": "v0.1.2",
+    "text": "v0.1.2\n\nBug fix in OneDMesh (solved issue #2)",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -510,7 +521,7 @@
     "href": "overview/installation.html#install-vibrationdata.jl",
     "title": "Installation",
     "section": "Install VibrationData.jl ",
-    "text": "Install VibrationData.jl \nThe package is not yet registered in the Julia General Registry. To install the package, you can use the following command:\n(Yourenv) pkg&gt; add \"git@https://github.com/maucejo/VibrationData.jl.git\"",
+    "text": "Install VibrationData.jl \nThe package is registered in the Julia General Registry. So, to install the package, you can use the following command:\n(Yourenv) pkg&gt; add \"StructuralVibration\"",
     "crumbs": [
       "Overview",
       "Installation"
@@ -708,7 +719,7 @@
     "href": "visualization/index.html",
     "title": "Visualization extensions",
     "section": "",
-    "text": "StructuralVibration.jl is accompanied by two extensions CairoMakieExt.jl and GLMakieExt.jl providing visualization capabilities. The extensions provide a set of functions to visualize the results of the structural dynamics analysis.\nTo use one of these extensions, you need to import the desired plotting package by running the following command:",
+    "text": "StructuralVibration.jl is accompanied by an extension SVMakieExt.jl providing visualization capabilities. The extension provides a set of functions to visualize the results of the structural dynamics analysis.\nTo use one of these extensions, you need to import the desired plotting package by running the following command:",
     "crumbs": [
       "Visualization",
       "Visualization extensions"
@@ -719,7 +730,7 @@
     "href": "visualization/index.html#bode-plot",
     "title": "Visualization extensions",
     "section": "1 Bode plot",
-    "text": "1 Bode plot\nA Bode plot is a graph of the magnitude and phase of a transfer function versus frequency.\n\nbode_plot\n\n\n\nbode_plot(freq, y...; lw = 1., xlab = \"Frequency (Hz)\",\n          ylab = \"Magnitude (dB)\", xscale = identity,\n          axis_tight = true, isdeg = false, layout = :vertical,\n          ref_dB = 1., legend = (active = false, position = :rt, entry = \" \"),\n          fonts = DEFAULT_MAKIE_FONTS)\nPlot Bode diagram of a frequency response or a FRF.\nInputs\n\nfreq: Frequency range of interest\n\ny: Frequency response or FRF\n\nlw: Line width\n\ntheme: Theme (default: :makie)\n\nxlab: x-axis label\n\nxscale: x-axis scale (default: :log)\n\naxis_tight: Tight axis (default: false)\n\nisdeg: Phase in degrees (default: false)\n\nlayout: Layout of the plot (default: :vertical)\n\nref_dB: Reference value for magnitude (default: 1.)\n\nlegend: Legend parameters (default: (active = false, position = :rt, entry = \" \"))\n\nfonts: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\n# Initialize a Sdof type\nm = 1.\nf₀ = 10.\nξ = 0.01\nsdof = Sdof(m, f₀, ξ)\n\n# Computation parameters\nfreq = 1.:0.01:30.\n\n# Compute the FRF\nprob_frf = SdofFRFProblem(sdof, freq)\nH = solve(prob_frf).u\n\n# Bode plot\nbode_plot(freq, H)",
+    "text": "1 Bode plot\nA Bode plot is a graph of the magnitude and phase of a transfer function versus frequency.\n\nbode_plot\n\n\n\nbode_plot(freq, y...; lw = 1., xlab = \"Frequency (Hz)\",\n          ylab = \"Magnitude (dB)\", xscale = identity,\n          axis_tight = true, isdeg = false, layout = :vertical,\n          ref_dB = 1., legend = (active = false, position = :rt, entry = \" \"))\nPlot Bode diagram of a frequency response or a FRF.\nInputs\n\nfreq: Frequency range of interest\n\ny: Frequency response or FRF\n\nlw: Line width\n\nxlab: x-axis label\n\nxscale: x-axis scale (default: :log)\n\naxis_tight: Tight axis (default: false)\n\nisdeg: Phase in degrees (default: false)\n\nlayout: Layout of the plot (default: :vertical)\n\nref_dB: Reference value for magnitude (default: 1.)\n\nlegend: Legend parameters (default: (active = false, position = :rt, entry = \" \"))\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\n# Initialize a Sdof type\nm = 1.\nf₀ = 10.\nξ = 0.01\nsdof = Sdof(m, f₀, ξ)\n\n# Computation parameters\nfreq = 1.:0.01:30.\n\n# Compute the FRF\nprob_frf = SdofFRFProblem(sdof, freq)\nH = solve(prob_frf).u\n\n# Bode plot\nbode_plot(freq, H)",
     "crumbs": [
       "Visualization",
       "Visualization extensions"
@@ -730,7 +741,7 @@
     "href": "visualization/index.html#nyquist-plot",
     "title": "Visualization extensions",
     "section": "2 Nyquist plot",
-    "text": "2 Nyquist plot\nThe Nyquist plot is either a 2D or 3D plot. In 2D, it is a graph of the imaginary part versus the real part of the transfer function. In 3D, it is a graph of the imaginary part versus the real part of the transfer function and the frequency.\n\n2.1 2D plot\n\nnyquist_plot\n\n\n\nnyquist_plot(y; theme = :makie fonts = DEFAULT_MAKIE_FONTS)\nPlot Nyquist diagram\nInputs\n\ny: Complex data vector\n\ntheme: Theme (default: :makie)\n\nfonts: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\nnyquist_plot(H)\n\n\n\n\n\n\n\n\n\n\n2.2 3D plot\n\nnyquist_plot\n\n\n\nnyquist_plot(freq, y, xlab = \"Frequency (Hz)\"; theme = :makie,\n             projection = false, fonts = DEFAULT_MAKIE_FONTS)\nPlot Nyquist diagram in 3D\nInputs\n\nfreq: Frequency range\n\ny: Complex vector\n\nylabel: y-axis label\n\ntheme: Theme (default: :makie)\n\nprojection: Projection of the curve on the xy, yz, and xz planes (default: false)\n\non the xy plane: (freq, real(y))\n\non the yz plane: (imag(y), freq)\n\non the xz plane: (real(y), imag(y))\n\n\n\nfonts: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\nnyquist_plot(freq, H, projection = true)",
+    "text": "2 Nyquist plot\nThe Nyquist plot is either a 2D or 3D plot. In 2D, it is a graph of the imaginary part versus the real part of the transfer function. In 3D, it is a graph of the imaginary part versus the real part of the transfer function and the frequency.\n\n2.1 2D plot\n\nnyquist_plot\n\n\n\nnyquist_plot(y)\nPlot Nyquist diagram\nInputs\n\ny: Complex data vector\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\nnyquist_plot(H)\n\n\n\n\n\n\n2.2 3D plot\n\nnyquist_plot\n\n\n\nnyquist_plot(freq, y, xlab = \"Frequency (Hz)\";\n             projection = false)\nPlot Nyquist diagram in 3D\nInputs\n\nfreq: Frequency range\n\ny: Complex vector\n\nylabel: y-axis label\n\nprojection: Projection of the curve on the xy, yz, and xz planes (default: false)\n\non the xy plane: (freq, real(y))\n\non the yz plane: (imag(y), freq)\n\non the xz plane: (real(y), imag(y))\n\n\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\nnyquist_plot(freq, H, projection = true)",
     "crumbs": [
       "Visualization",
       "Visualization extensions"
@@ -741,7 +752,7 @@
     "href": "visualization/index.html#waterfall-plot",
     "title": "Visualization extensions",
     "section": "3 Waterfall plot",
-    "text": "3 Waterfall plot\nA waterfall plot is a 3D plot with a partial curtain along the y-axis.\n\nwaterfall_plot\n\n\n\nwaterfall_plot(x, y, z; zmin = minimum(z), lw = 1.,\n               colorline = :auto, colmap = :viridis, colorband = (:white, 1.),\n               xlabel = \"x\", ylabel = \"y\", zlabel = \"z\", edge = true,\n               axis_tight = false, xlim = [minimum(x), maximum(x)],\n               ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)],\n               fonts = DEFAULT_MAKIE_FONTS)\nPlot a waterfall plot.\nInputs\n\nx: x-axis values\n\ny: y-axis values\n\nz: z-axis values\n\nzmin: minimum value of z-axis\n\nlw::Real: linewidth\n\ncolorline: color of the lines\n\ncolmap: Name of the colormap\n\ncolorband: Tuple defining the color of the band\n\ncolor : Color\n\nalpha : Alpha value for transparency\n\n\n\nxlabel: x-axis label\n\nylabel: y-axis label\n\nzlabel: z-axis label\n\nedge: Display edges (default: true)\n\naxis_tight: Tight axis (default: false)\n\nxlim: x-axis limits\n\nylim: y-axis limits\n\nzlim: z-axis limits\n\nfonts: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\nx = range(0., 2π, 100)\ny = range(0., 1., 5)\n\nnx = length(x)\nny = length(y)\nz = zeros(ny, nx)\n\nfor i in eachindex(y)\n    z[i, :] = sin.(i*x/2.)\nend\n\nwaterfall_plot(x, y, z, xlim = [-0.1, 2π + 0.1], ylim = [-0.1, 1.1])",
+    "text": "3 Waterfall plot\nA waterfall plot is a 3D plot with a partial curtain along the y-axis.\n\nwaterfall_plot\n\n\n\nwaterfall_plot(x, y, z; zmin = minimum(z), lw = 1.,\n               colorline = :auto, colmap = :viridis, colorband = (:white, 1.),\n               xlabel = \"x\", ylabel = \"y\", zlabel = \"z\", edge = true,\n               axis_tight = false, xlim = [minimum(x), maximum(x)],\n               ylim = [minimum(y), maximum(y)], zlim = [zmin, maximum(z)])\nPlot a waterfall plot.\nInputs\n\nx: x-axis values\n\ny: y-axis values\n\nz: z-axis values\n\nzmin: minimum value of z-axis\n\nlw::Real: linewidth\n\ncolorline: color of the lines\n\ncolmap: Name of the colormap\n\ncolorband: Tuple defining the color of the band\n\ncolor : Color\n\nalpha : Alpha value for transparency\n\n\n\nxlabel: x-axis label\n\nylabel: y-axis label\n\nzlabel: z-axis label\n\nedge: Display edges (default: true)\n\naxis_tight: Tight axis (default: false)\n\nxlim: x-axis limits\n\nylim: y-axis limits\n\nzlim: z-axis limits\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\nx = range(0., 2π, 100)\ny = range(0., 1., 5)\n\nnx = length(x)\nny = length(y)\nz = zeros(ny, nx)\n\nfor i in eachindex(y)\n    z[i, :] = sin.(i*x/2.)\nend\n\nwaterfall_plot(x, y, z, xlim = [-0.1, 2π + 0.1], ylim = [-0.1, 1.1])",
     "crumbs": [
       "Visualization",
       "Visualization extensions"
@@ -752,7 +763,18 @@
     "href": "visualization/index.html#sv-plot",
     "title": "Visualization extensions",
     "section": "4 SV plot",
-    "text": "4 SV plot\nThe SV plot (for StructuralVibration plot) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.\n\nsv_plot\n\n\n\nsv_plot(x, y...; lw = 1., theme = :makie, xscale = identity, yscale = identity,\naxis_tight = true, xlabel = \"x\", ylabel = \"y\",\nlegend = (active = false, position = :rt, orientation = :vertical, entry = \" \"),\nfonts = DEFAULT_MAKIE_FONTS)\nPlot a 2D plot.\nInputs\n\nx: x-axis values\n\ny: y-axis values\n\nlw: linewidth\n\ntheme: Theme (default: :makie)\n\nxscale: x-axis scale (default: identity)\n\nyscale: y-axis scale (default: identity)\n\naxis_tight: Tight axis (default: true)\n\nxlabel: x-axis label\n\nylabel: y-axis label\n\nlegend: Legend parameters\n\nactive : Bool\n\nposition : Symbol\n\nentry : String\n\n\n\nfonts: Fonts of the figure (default: DEFAULT_MAKIE_FONTS)\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\nx = range(0., 2π, 100)\nz_sv = ntuple(i -&gt; sin.(i*x/2), 5)\n\n# SV plot\nsv_plot(x, z_sv..., lw = 2., legend = (active = true,))",
+    "text": "4 SV plot\nThe SV plot (for StructuralVibration plot) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.\n\nsv_plot\n\n\n\nsv_plot(x, y...; lw = 1., xscale = identity, yscale = identity,\n        axis_tight = true, title = \" \", xlabel = \"x\", ylabel = \"y\",\n        legend = (active = false, position = :right, orientation = :vertical, entry = \" \"))\nPlot a 2D plot.\nInputs\n\nx: x-axis values\n\ny: y-axis values\n\nlw: linewidth\n\nxscale: x-axis scale (default: identity)\n\nyscale: y-axis scale (default: identity)\n\naxis_tight: Tight axis (default: true)\n\ntitle: Title of the plot (default: \" \")\n\nxlabel: x-axis label\n\nylabel: y-axis label\n\nlegend: Legend parameters\n\nactive : Bool\n\nposition : Symbol\n\nentry : String\n\n\n\n\nOutput\n\nfig: Figure\n\n\n\n\n\n\n\n\n\nx = range(0., 2π, 100)\nz_sv = ntuple(i -&gt; sin.(i*x/2), 5)\n\n# SV plot\nsv_plot(x, z_sv..., lw = 2., legend = (active = true,))",
+    "crumbs": [
+      "Visualization",
+      "Visualization extensions"
+    ]
+  },
+  {
+    "objectID": "visualization/index.html#theming",
+    "href": "visualization/index.html#theming",
+    "title": "Visualization extensions",
+    "section": "5 Theming",
+    "text": "5 Theming\nStructuralVibration.jl provides a set of themes for the plotting functions. The themes are defined in the theme_choice function.\n\ntheme_choice\n\n\n\ntheme_choice(name::Symbol; fonts = Makie.theme(:fonts),\n             titlesize = 20., labelsize = 18., ticklabelsize = 14.)\nChoose the theme for the plots.\nInputs\n\nname: Name of the theme\n\n:makie\n\n:sv\n\n\n\nfonts: Fonts of the figure (default: Makie.theme(:fonts))\n\ntitlesize: Title size (default: 20.)\n\nlabelsize: Label size (default: 18.)\n\nticklabelsize: Tick label size (default: 14.)\n\n\nOutput\n\ntheme: Theme\n\n\n\n\n\n\n\n\n\nwith_theme(theme_choice(:makie)) do\n    sv_plot(x, z_sv..., lw = 2., legend = (active = true,))\nend\n\n\n\n\n\nwith_theme(theme_choice(:makie)) do\n    sv_plot(x, z_sv..., lw = 2., legend = (active = true,))\nend",
     "crumbs": [
       "Visualization",
       "Visualization extensions"

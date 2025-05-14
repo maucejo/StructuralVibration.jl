@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/index.html</loc>
-    <lastmod>2025-04-23T17:00:14.000Z</lastmod>
+    <lastmod>2025-05-14T10:30:15.000Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/state_space_solvers.html</loc>
@@ -22,7 +22,7 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/overview/release_notes.html</loc>
-    <lastmod>2025-04-23T16:55:29.000Z</lastmod>
+    <lastmod>2025-05-14T10:35:15.000Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/models/noise.html</loc>
@@ -54,7 +54,7 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/overview/installation.html</loc>
-    <lastmod>2025-04-02T12:58:42.000Z</lastmod>
+    <lastmod>2025-05-14T08:36:07.000Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/index.html</loc>
@@ -74,6 +74,6 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/visualization/index.html</loc>
-    <lastmod>2025-04-14T14:51:21.000Z</lastmod>
+    <lastmod>2025-05-14T12:54:10.000Z</lastmod>
   </url>
 </urlset>
