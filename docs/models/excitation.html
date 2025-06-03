@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Excitation models – StructuralVibration.jl</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../models/noise.html" rel="next">
+<link href="../models/index.html" rel="prev">
+<link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-4d04b275c36bd460889107e331013233.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-585a77d67552b4a34eb0de6c9603dd02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">StructuralVibration.jl</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../models/index.html" aria-current="page"> 
+<span class="menu-text">Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../solvers/index.html"> 
+<span class="menu-text">Solvers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modal_extraction/index.html"> 
+<span class="menu-text">Modal extraction</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../signal_processing/index.html"> 
+<span class="menu-text">Signal processing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../visualization/index.html"> 
+<span class="menu-text">Visualization</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/maucejo/StructuralVibration.jl"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../models/excitation.html">Excitation models</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mechanical models</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/excitation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Excitation models</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../models/noise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Noise models</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#available-models" id="toc-available-models" class="nav-link active" data-scroll-target="#available-models"><span class="header-section-number">1</span> Available models</a>
+  <ul class="collapse">
+  <li><a href="#rectangular-signal" id="toc-rectangular-signal" class="nav-link" data-scroll-target="#rectangular-signal"><span class="header-section-number">1.1</span> Rectangular signal</a></li>
+  <li><a href="#triangle-signal" id="toc-triangle-signal" class="nav-link" data-scroll-target="#triangle-signal"><span class="header-section-number">1.2</span> Triangle signal</a></li>
+  <li><a href="#hammer-impact" id="toc-hammer-impact" class="nav-link" data-scroll-target="#hammer-impact"><span class="header-section-number">1.3</span> Hammer impact</a></li>
+  <li><a href="#smooth-rectangular-signal" id="toc-smooth-rectangular-signal" class="nav-link" data-scroll-target="#smooth-rectangular-signal"><span class="header-section-number">1.4</span> Smooth rectangular signal</a></li>
+  <li><a href="#sine-signal" id="toc-sine-signal" class="nav-link" data-scroll-target="#sine-signal"><span class="header-section-number">1.5</span> Sine signal</a></li>
+  <li><a href="#half-sine-signal" id="toc-half-sine-signal" class="nav-link" data-scroll-target="#half-sine-signal"><span class="header-section-number">1.6</span> Half-sine signal</a></li>
+  <li><a href="#haversine-signal" id="toc-haversine-signal" class="nav-link" data-scroll-target="#haversine-signal"><span class="header-section-number">1.7</span> Haversine signal</a></li>
+  <li><a href="#swept-sine" id="toc-swept-sine" class="nav-link" data-scroll-target="#swept-sine"><span class="header-section-number">1.8</span> Swept sine</a></li>
+  <li><a href="#gaussian-pulse" id="toc-gaussian-pulse" class="nav-link" data-scroll-target="#gaussian-pulse"><span class="header-section-number">1.9</span> Gaussian pulse</a></li>
+  <li><a href="#sec-colored-noise" id="toc-sec-colored-noise" class="nav-link" data-scroll-target="#sec-colored-noise"><span class="header-section-number">1.10</span> Colored noise</a></li>
+  </ul></li>
+  <li><a href="#sec-exc-api" id="toc-sec-exc-api" class="nav-link" data-scroll-target="#sec-exc-api"><span class="header-section-number">2</span> <code>excitation</code> function</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Excitation models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="available-models" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="available-models"><span class="header-section-number">1</span> Available models</h2>
+<p>To define an excitation, two steps must be followed:</p>
+<ol type="1">
+<li><p>Initialize an excitation type:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>exc_type <span class="op">=</span> <span class="fu">MyExcitation</span>(params<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Compute the excitation signal corresponding to the given excitation type over a given duration <code>t</code> (See <a href="#sec-exc-api" class="quarto-xref">Section&nbsp;2</a> for details):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(exc_type, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<section id="rectangular-signal" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="rectangular-signal"><span class="header-section-number">1.1</span> Rectangular signal</h3>
+<p>The rectangular signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+F_0 &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, and <span class="math inline">\(T\)</span> is the duration of the signal.</p>
+<div class="api">
+<p><strong>Rectangle</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Rectangle(F, tstart, duration)</code></pre>
+<p>Struct to define a rectangular excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="6" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize Rectangle type</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>rect <span class="op">=</span> <span class="fu">Rectangle</span>(F0, tstart, duration)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(rect, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="triangle-signal" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="triangle-signal"><span class="header-section-number">1.2</span> Triangle signal</h3>
+<p>The triangle signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+\frac{2F_0}{T}\left(t - t_\text{start}\right) &amp; \text{if } t \in [t_\text{start}, t_m] \\
+F_0 - \frac{2F_0}{T}(t - t_m) &amp; \text{if } t \in [t_m, t_\text{start} + T] \\
+0 &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, <span class="math inline">\(T\)</span> is the duration of the signal and <span class="math inline">\(t_m = t_\text{start} + T/2\)</span> is the time at which the signal reaches its maximum value.</p>
+<div class="api">
+<p><strong>Triangle</strong></p>
+<hr>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Triangle(F, tstart, duration)</code></pre>
+<p>Struct to define a triangular excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="12" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize Triangle type</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>tri <span class="op">=</span> <span class="fu">Triangle</span>(F0, tstart, duration)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(tri, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="hammer-impact" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="hammer-impact"><span class="header-section-number">1.3</span> Hammer impact</h3>
+<p>The hammer impact signal is supposed to have the shape of a Gamma distribution <span class="math display">\[
+F(t) = \begin{cases}
+F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\right), &amp; \text{if } t \geq t_\text{start} \\
+0, &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_h = t - t_\text{start}\)</span> is the time since the impact, <span class="math inline">\(p\)</span> is the shape parameter, and <span class="math inline">\(\theta\)</span> is the scale parameter.</p>
+<div class="api">
+<p><strong>Hammer</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>Hammer(F, tstart, k, θ)</code></pre>
+<p>Struct to define a hammer impact excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>p::Real</code>: Shape parameter</p>
+</li>
+<li><p><code>θ::Real</code>: Intensity parameter [s]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="18" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-5</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">0.05</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="fl">9.7</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>θ <span class="op">=</span> <span class="fl">6e-4</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize Hammer type</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>hammer <span class="op">=</span> <span class="fu">Hammer</span>(F0, tstart, k, θ)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(hammer, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-11-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="smooth-rectangular-signal" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="smooth-rectangular-signal"><span class="header-section-number">1.4</span> Smooth rectangular signal</h3>
+<p>The smooth rectangular signal (custom Tukey window) is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+\frac{F_0}{2}\left[1 - \cos\left(\frac{2\pi (t - t_\text{start})}{\alpha T}\right)\right] &amp; \text{if } t \in [t_\text{start}, t_\text{start} + t_\text{rise}] \\
+F_0 &amp; \text{if } t \in [t_\text{start} + t_\text{rise}, t_\text{start} + t_\text{rise} + T_\text{rect}] \\
+\frac{F_0}{2}\left[1 - \cos\left(\frac{2\pi (t - t_\text{start} - t_\text{rise} - T_\text{rect})}{\alpha T}\right)\right] &amp; \text{if } t \in [t_\text{start} + t_\text{rise} + T_\text{rect}, t_\text{start} + T] \\
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, <span class="math inline">\(T\)</span> is the duration of the signal, <span class="math inline">\(t_\text{rise}\)</span> is the duration to reach <span class="math inline">\(F_0\)</span> and <span class="math inline">\(\alpha = \frac{2t_\text{rise}}{T}\)</span> and <span class="math inline">\(T_\text{rect} = T - 2t_\text{rise}\)</span> is the duration of the rectangular part of the signal.</p>
+<div class="api">
+<p><strong>SmoothRect</strong></p>
+<hr>
+<div id="22" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>SmoothRect(F, tstart, tr, duration)</code></pre>
+<p>Struct to define a smooth rectangular excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+<li><p><code>trise::Real</code>: Rise time from 0 to F [s]</p>
+</li>
+</ul>
+<p><em>Note: <code>SmoothRect</code> is actually a custom Tukey window for which the coefficient α is computed to satisfy the <code>trise</code> given by the user</em></p>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="24" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>trise <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize SmoothRect type</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>srect <span class="op">=</span> <span class="fu">SmoothRect</span>(F0, tstart, duration, trise)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(srect, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="26" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sine-signal" class="level3" data-number="1.5">
+<h3 data-number="1.5" class="anchored" data-anchor-id="sine-signal"><span class="header-section-number">1.5</span> Sine signal</h3>
+<p>The sine signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+F_0 \sin\left(\omega (t - t_\text{start}) + \theta\right), &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0, &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(\omega\)</span> is the angular frequency of the signal, and <span class="math inline">\(\theta\)</span> is the phase of the signal.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Zero-end signal">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Zero-end signal
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sometimes it is necessary to have a signal that ends at zero. In this case, the duration of the signal must be adjusted to ensure that the signal ends at zero. To do so, one have to find the smallest integer <span class="math inline">\(n\)</span> such that at <span class="math inline">\(t = t_\text{start} + T\)</span>: <span class="math display">\[
+\sin(\omega T + \theta) = 0 \Rightarrow \omega T + \theta = 2\pi n \Rightarrow n = \frac{\omega T + \theta}{2\pi}.
+\]</span></p>
+<p>Once <span class="math inline">\(n\)</span> is found, the duration of the signal must be adjusted to: <span class="math display">\[
+T_\text{new} = \frac{2\pi n - \theta}{\omega}.
+\]</span></p>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>SineWave</strong></p>
+<hr>
+<div id="28" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>SineWave(F, tstart, duration, freq; zero_end = true)</code></pre>
+<p>Struct to define a sine wave excitation signal</p>
+<p><strong>Constructor parameters</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+<li><p><code>freq::Real</code>: Frequency of the excitation [Hz]</p>
+</li>
+<li><p><code>zero_end::Bool</code>: Boolean to set the excitation to 0 at the end of the duration (default = true)</p>
+</li>
+</ul>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+<li><p><code>ω::Real</code>: Frequency of the excitation [Hz]</p>
+</li>
+<li><p><code>zero_end::Bool</code>: Boolean to set the excitation to 0 at the end of the duration (default = true)</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="30" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fl">2</span>.</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize HaverSine type</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>sine <span class="op">=</span> <span class="fu">SineWave</span>(F0, tstart, duration, f, zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(sine, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="32" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-17-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="half-sine-signal" class="level3" data-number="1.6">
+<h3 data-number="1.6" class="anchored" data-anchor-id="half-sine-signal"><span class="header-section-number">1.6</span> Half-sine signal</h3>
+<p>The half-sine signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+F_0 \sin(\frac{\pi (t - t_\text{start}}{T}) &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, and <span class="math inline">\(T\)</span> is the duration of the signal.</p>
+<div class="api">
+<p><strong>HalfSine</strong></p>
+<hr>
+<div id="34" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>HalfSine(F, tstart, duration)</code></pre>
+<p>Struct to define a half sine excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="36" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize HalfSine type</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>hsine <span class="op">=</span> <span class="fu">HalfSine</span>(F0, tstart, duration)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(hsine, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="38" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-20-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="haversine-signal" class="level3" data-number="1.7">
+<h3 data-number="1.7" class="anchored" data-anchor-id="haversine-signal"><span class="header-section-number">1.7</span> Haversine signal</h3>
+<p>The haversine (or versed sine) signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+F_0\left(1 - cos(\frac{2\pi t}{T}\right) &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, and <span class="math inline">\(T\)</span> is the duration of the signal.</p>
+<div class="api">
+<p><strong>HaverSine</strong></p>
+<hr>
+<div id="40" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>HaverSine(F, tstart, duration)</code></pre>
+<p>Struct to define a Haversine (or versed sine) excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="42" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize HaverSine type</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>haversine <span class="op">=</span> <span class="fu">HaverSine</span>(F0, tstart, duration)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(haversine, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="44" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-23-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="swept-sine" class="level3" data-number="1.8">
+<h3 data-number="1.8" class="anchored" data-anchor-id="swept-sine"><span class="header-section-number">1.8</span> Swept sine</h3>
+<p>The swept sine signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+F_0 \sin(\theta(t)) &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
+0 &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, <span class="math inline">\(T\)</span> is the duration of the signal and <span class="math inline">\(\theta(t)\)</span> is the instantaneous phase.</p>
+<p>The instantaneous phase is given by: <span class="math display">\[
+\theta(t) = \theta_0 + 2\pi\int_0^t f(\tau) d\tau,
+\]</span> where <span class="math inline">\(f(\tau)\)</span> is the instantaneous frequency of the signal at time <span class="math inline">\(\tau\)</span> and <span class="math inline">\(\theta_0\)</span> is the initial phase (set to 0 here).</p>
+<p>In this package, three possible types of swept sine signals are available:</p>
+<ul>
+<li><p>Linear swept sine: <span class="math display">\[
+f(t) = f_\text{start} + \beta(t - t_\text{start}) \Rightarrow \theta(t) = 2\pi\left(f_\text{start}(t - t_\text{start}) + \frac{\beta (t - t_\text{start})^2}{2}\right),
+\]</span> where:</p>
+<ul>
+<li><span class="math inline">\(\beta = \frac{f_\text{end} - f_\text{start}}{T}\)</span></li>
+<li><span class="math inline">\(f_\text{start}\)</span>: Initial frequency of the signal at <span class="math inline">\(t_\text{start}\)</span></li>
+<li><span class="math inline">\(f_\text{end}\)</span>: Final frequency of the signal at <span class="math inline">\(t_\text{start} + T\)</span></li>
+</ul></li>
+<li><p>Quadratic swept sine: <span class="math display">\[
+f(t) = f_\text{start} + \beta (t - t_\text{start})^2 \Rightarrow \theta(t) = 2\pi\left(f_\text{start}(t - t_\text{start}) + \frac{\beta (t - t_\text{start})^3}{3}\right),
+\]</span> where <span class="math inline">\(\beta = \frac{f_\text{end} - f_\text{start}}{T^2}\)</span>.</p></li>
+<li><p>Logarithmic swept sine: <span class="math display">\[
+f(t) = f_\text{start}\beta^{t - t_\text{start}} \Rightarrow \theta(t) = \frac{2\pi f_\text{start}}{\log(\beta)}\left(\beta^{t - t_\text{start}} - 1\right),
+\]</span> where <span class="math inline">\(\beta = \left(\frac{f_\text{end}}{f_\text{start}}\right)^{1/T}\)</span>.</p></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="Zero-end signal">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Zero-end signal
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Similarly to the sine signal, the duration of the signal must be adjusted to ensure that the signal ends at zero. To do so, one have to find the smallest integer <span class="math inline">\(n\)</span> such that at <span class="math inline">\(t = t_\text{start} + T\)</span>: <span class="math display">\[
+  \theta(t) = 2\pi n.
+\]</span></p>
+<p>In doing so, we have for:</p>
+<ul>
+<li><p>Linear swept sine: <span class="math display">\[
+n = (f_\text{start} + f_\text{end})\frac{T}{2} \Rightarrow T_\text{new} = \frac{2n}{f_\text{start} + f_\text{end}}.
+\]</span></p></li>
+<li><p>Quadratic swept sine: <span class="math display">\[
+n = (2f_\text{start} + f_\text{end})\frac{T}{3} \Rightarrow T_\text{new} = \frac{3n}{2f_\text{start} + f_\text{end}}.
+\]</span></p></li>
+<li><p>Logarithmic swept sine: <span class="math display">\[
+n = \frac{f_\text{end} - f_\text{start}}{\log(f_\text{end}/f_\text{start})}T \Rightarrow T_\text{new} = \frac{n\log(f_\text{end}/f_\text{start})}{f_\text{end} - f_\text{start}}.
+\]</span></p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>SweptSine</strong></p>
+<hr>
+<div id="46" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>SweptSine(F, tstart, duration, fstart, fend, type)</code></pre>
+<p>Struct to define a swept sine excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+<li><p><code>fstart::Real</code>: Starting frequency [Hz]</p>
+</li>
+<li><p><code>fend::Real</code>: Ending frequency [Hz]</p>
+</li>
+<li><p><code>type::Symbol</code>: Type of sweep</p>
+<ul>
+<li><p><code>:lin</code> - linear (default)</p>
+</li>
+<li><p><code>:quad</code> - quadratic</p>
+</li>
+<li><p><code>:log</code> - logarithmic</p>
+</li>
+</ul>
+</li>
+<li><p><code>zero_end::Bool</code>: Boolean to set the excitation to 0 at the end of the duration (default = true)</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="48" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>fstart <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>fend <span class="op">=</span> <span class="fl">6</span>.</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>type_swept <span class="op">=</span> <span class="op">:</span>lin</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize SweptSine type</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, tstart, duration, fstart, fend, type_swept, zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(chirp, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="50" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-26-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gaussian-pulse" class="level3" data-number="1.9">
+<h3 data-number="1.9" class="anchored" data-anchor-id="gaussian-pulse"><span class="header-section-number">1.9</span> Gaussian pulse</h3>
+<p>The Gaussian pulse signal is defined by the following equation: <span class="math display">\[
+F(t) = \begin{cases}
+F_0 \exp\left(-\frac{t_p^2}{2\sigma^2}\right) \cos(2\pi f_c t_p), &amp; \text{if } t \geq t_\text{start} \\
+0, &amp; \text{otherwise}
+\end{cases},
+\]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, <span class="math inline">\(\sigma\)</span> is the standard deviation of the signal, and <span class="math inline">\(f_c\)</span> is the carrier frequency. Here <span class="math inline">\(t_p = t - t_\text{start} - T/2\)</span> so that the Gaussian pulse reaches its maximum value at <span class="math inline">\(t = t_\text{start} + T/2\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Variance calibration">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Variance calibration
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The design of the Gaussian pulse assumes that it tends to zero when <span class="math inline">\(t = t_\text{start} + T\)</span>. This requirement implies that the standard deviation <span class="math inline">\(\sigma\)</span> must be chosen such that the Gaussian pulse is zero at <span class="math inline">\(t = t_\text{start} + T\)</span>. This condition can only be satisfied within some precision. More precisely, the idea is to find the quantile <span class="math inline">\(n\)</span> such that <span class="math inline">\(T = n\sigma\)</span>. Consequently, if we assume that <span class="math inline">\(F(t_\text{start} + T) = 10^{-p}\)</span> (with <span class="math inline">\(p\)</span> a given precision), we have: <span class="math display">\[
+n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
+\]</span></p>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>GaussianPulse</strong></p>
+<hr>
+<div id="52" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>GaussianPulse(F, tstart, duration, fc)</code></pre>
+<p>Struct to define a Gaussian pulse excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+<li><p><code>fc::Real</code>: Center frequency of the pulse [Hz]</p>
+</li>
+<li><p><code>precision::Real</code>: Precision of the pulse (default = 4.)</p>
+</li>
+</ul>
+<p><em>Note on the parameter <code>precision</code></em></p>
+<p>The precision parameter calibrates the standard deviation of the pulse, so that the duration = n x σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n x σ , the amplitude of F<em>exp(-0.5</em>(t - duration/2)^2/sigma^2) = 10^(-precision)</p>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="54" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">5</span>.</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>fc <span class="op">=</span> <span class="fl">2</span>.</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize GaussianPulse type</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>gpulse <span class="op">=</span> <span class="fu">GaussianPulse</span>(F0, tstart, duration, fc)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(gpulse, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="56" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-29-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-colored-noise" class="level3" data-number="1.10">
+<h3 data-number="1.10" class="anchored" data-anchor-id="sec-colored-noise"><span class="header-section-number">1.10</span> Colored noise</h3>
+<p>Colored noise is a random signal that has a power spectral density that is not (necessarily) flat over a given frequency range. In practice, colored noise is also refered to as “power-law noise” since its power spectral density is proportional to <span class="math inline">\(f^{-\alpha}\)</span> (<span class="math inline">\(f\)</span>: frequency) and its spectrum is proportional to <span class="math inline">\(f^{-\alpha/2}\)</span>.</p>
+<p>In this package, five types of colored noise are available:</p>
+<ul>
+<li>White noise: <span class="math inline">\(\alpha = 0\)</span></li>
+<li>Pink noise: <span class="math inline">\(\alpha = 1\)</span></li>
+<li>Blue noise: <span class="math inline">\(\alpha = -1\)</span></li>
+<li>Brown noise: <span class="math inline">\(\alpha = 2\)</span></li>
+<li>Purple noise: <span class="math inline">\(\alpha = -2\)</span></li>
+</ul>
+<p>The general procedure to generate a colored noise signal is as follows:</p>
+<ol type="1">
+<li>Generate a white noise signal and compute its FFT</li>
+<li>Multiply the FFT by <span class="math inline">\(f^{-\alpha/2}\)</span> to obtain the colored noise</li>
+<li>Compute the inverse FFT to obtain the colored noise signal</li>
+</ol>
+<p>Additional steps can be added such as:</p>
+<ul>
+<li><p>Normalization: Ensure that the colored noise has the desired variance and preserves the energy of the white noise</p></li>
+<li><p>Filtering: Obtain a band-limited colored noise</p></li>
+</ul>
+<div class="api">
+<p><strong>ColoredNoise</strong></p>
+<hr>
+<div id="58" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>ColoredNoise(F, color)</code></pre>
+<p>Struct to define a colored noise excitation signal</p>
+<p><strong>Fields</strong></p>
+<ul>
+<li><p><code>F::Real</code>: Mean amplitude of the force [N]</p>
+</li>
+<li><p><code>tstart::Real</code>: Starting time of the excitation [s]</p>
+</li>
+<li><p><code>duration::Real</code>: Duration of the excitation [s]</p>
+</li>
+<li><p><code>σ::Real</code>: Target standard deviation of the colored noise</p>
+</li>
+<li><p><code>color::Symbol</code>: Color of the noise</p>
+<ul>
+<li><p><code>:white</code> (default)</p>
+</li>
+<li><p><code>:pink</code></p>
+</li>
+<li><p><code>:blue</code></p>
+</li>
+<li><p><code>:brown</code></p>
+</li>
+<li><p><code>:purple</code></p>
+</li>
+</ul>
+</li>
+<li><p><code>band_freq::AbstractVector</code>: Frequencies used to defined the bandpass filter applied to the colored noise</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div id="60" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-4</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fu">length</span>(t)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>Δt</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Excitation parameters</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>F0 <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>tstart <span class="op">=</span> <span class="fl">0</span>.</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>duration <span class="op">=</span> <span class="fl">10</span>.</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>σ <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize ColoredNoise type</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>exc_white <span class="op">=</span> <span class="fu">ColoredNoise</span>(F0, tstart, duration, σ, color <span class="op">=</span> <span class="op">:</span>white)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>exc_pink <span class="op">=</span> <span class="fu">ColoredNoise</span>(F0, tstart, duration, σ, color <span class="op">=</span> <span class="op">:</span>pink)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>exc_blue <span class="op">=</span> <span class="fu">ColoredNoise</span>(F0, tstart, duration, σ, color <span class="op">=</span> <span class="op">:</span>blue)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>exc_brown <span class="op">=</span> <span class="fu">ColoredNoise</span>(F0, tstart, duration, σ, color <span class="op">=</span> <span class="op">:</span>brown)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>exc_purple <span class="op">=</span> <span class="fu">ColoredNoise</span>(F0, tstart, duration, σ, color <span class="op">=</span> <span class="op">:</span>purple)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the spectrum of the colored noise</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fu">rfftfreq</span>(nt, fs)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>S_white <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_white, t))</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>S_pink <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_pink, t))</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>S_blue <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_blue, t))</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>S_brown <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_brown, t))</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>S_purple <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_purple, t))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="62" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="excitation_files/figure-html/cell-32-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-exc-api" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="sec-exc-api"><span class="header-section-number">2</span> <code>excitation</code> function</h2>
+<div class="api">
+<p><strong>excitation</strong></p>
+<hr>
+<div id="64" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code>excitation(type, t)</code></pre>
+<p>Computes different types of excitation signals</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p>type : Excitation type</p>
+<ol>
+<li><p><code>Triangle</code></p>
+</li>
+<li><p><code>Rectangle</code></p>
+</li>
+<li><p><code>Hammer</code></p>
+</li>
+<li><p><code>SmoothRect</code></p>
+</li>
+<li><p><code>SineWave</code></p>
+</li>
+<li><p><code>HalfSine</code></p>
+</li>
+<li><p><code>HaverSine</code></p>
+</li>
+<li><p><code>SweptSine</code></p>
+</li>
+<li><p><code>GaussianPulse</code></p>
+</li>
+<li><p><code>ColoredNoise</code></p>
+</li>
+</ol>
+</li>
+<li><p><code>t</code>: Time vector</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>F</code>: Excitation signal</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../models/index.html" class="pagination-link" aria-label="Mechanical models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Mechanical models</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../models/noise.html" class="pagination-link" aria-label="Noise models">
+        <span class="nav-page-text">Noise models</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>2025 Mathieu Aucejo ∙ Powered by <a href="https://quarto.org"><img src="..\assets/logo/quarto.png" class="img-fluid" style="width:4mm"></a> and <a href="https://julialang.org"><img src="..\assets/logo/julia.svg" class="img-fluid" style="width:4mm"></a></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
