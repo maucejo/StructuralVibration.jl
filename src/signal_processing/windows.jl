@@ -135,45 +135,61 @@ dpss = DSP.dpss
 """
     exponential(N, exponential_end = 0.01)
 
-Create an exponential window
+Create an exponential window. exponential_end = 1 is a uniform window.
 
 **Inputs**
 * `N`: Number of points
-* `exponential_end`: End value of the exponential window (between 0 and 1)
+* `exponential_end`: End value of the exponential window (0 < exponential_end <= 1)
 
 **Output**
 * `w`: Exponential window
 """
 function exponential(N, exponential_end = 0.01)
-    if exponential_end <= 0 || exponential_end >= 1
-        throw(DomainError("exponential_end must bein ]0, 1]"))
+    if exponential_end <= 0 || exponential_end > 1
+        throw(DomainError("exponential_end must be > 0 and ≤ 1"))
     end
 
     return exp.(log(exponential_end)*(0:N-1)/(N-1))
 end
 
 """
+    force(N, width = 0.1, exponential_end = 0.01)
+    or 
     force(N, width = 0.1)
 
-Create a force window
+Create a force window, which includes the exponential window when called with three
+arguments.  There is not exponential window when called with two arguements.  For 
+modal testing the exponential_end should be the same in the force and in the exponential
+window.
+
+exponential_end = 1 does not apply any exponential decay.
 
 **Inputs**
 * `N`: Number of points
-* `width`: Width of the force window (between 0 and 1)
+* `width`: Width (fraction) of the force window (between 0 and 1)
+* `exponential_end`: End value of the exponential window (0 < exponential_end <= 1)
 
 **Output**
 * `w`: Force window
 """
-function force(N, width = 0.1)
+function force(N, width = 0.1, exponential_end=0.01)
     if width < 0 || width > 1
         throw(DomainError("width must be between 0 and 1"))
     end
 
-    w = zeros(typeof(width), N)
-    w[1:round(Int, width*N)] .= 1
+    # start - start of cosine descent
+    # finish - finish of cosine descent
+    start = round(Int, N * width)
+    finish = min(N, round(Int,  start + 0.04*N))
+    w = exponential(N,exponential_end) .* vcat(
+        ones(Float64, start),
+        cospi.(1/(2*(finish-start)) .* ((start+1:finish) .- start)),
+        zeros(Float64, N-finish))
 
     return w
 end
+
+force(N, width = 0.1) = force(N, width, 1)
 
 """
     flattop(N)
