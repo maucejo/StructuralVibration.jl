@@ -550,14 +550,21 @@ display(fig_exponential);
 
 #### Force window
 
-The force window is a window function a rectangular window over a given width. It is defined as:
+The force window is a window function particularly useful in impact testing, where the input signal is a short impulse. The force window is the product of two distinct windows. The first one, denoted $w_1[n]$, is a rectangular window whose end is tapered by a cosine function, namely:
 $$
-w[n] = \begin{cases}
+w_1[n] = \begin{cases}
 1, & 0 \leq n < L \\
-0, & L \leq n < N
+\cos\left(\frac{\pi}{2}\left(\frac{n - L}{M - L}\right)\right), & L \leq n < M \\
+0, & M \leq n < N
 \end{cases},
 $$
-where $n \in [0, N-1]$, $L = pN$ is the width of the window, and $p$ is the percentage of the length of the data acquisition block.
+where $n \in [0, N-1]$, $L = pN$ is the width of the window, $M = N\text{min}(1, L/N + 0.04)$ is the index of the end of the cosine tapering part of the window, and $p$ is the percentage of the length of the data acquisition block.
+
+The second one, denoted $w_2[n]$, is the exponentital window defined above. Hence, the force window is defined as:
+$$
+w[n] = w_1[n] \cdot w_2[n],
+$$
+where $w_2[n] = \text{exp}\left(-\frac{\tau n}{N-1}\right)$, with $\tau = -\log(p)$.
 
 ##### API
 
@@ -575,14 +582,17 @@ where $n \in [0, N-1]$, $L = pN$ is the width of the window, and $p$ is the perc
 
 ```{julia}
 #| output: false
-forcewin = force(1024, 0.2)
+forcewin = force(1024, 0.2, 1.)
+force_expwin = force(1024, 0.2, 0.01)
 ```
 
 ```{julia}
 #| echo: false
 fig_force = Figure()
 ax_force = Axis(fig_force[1, 1], title = "Force window")
-lines!(ax_force, 0:1023, forcewin)
+lines!(ax_force, 0:1023, forcewin, label = "exponential_end = 1")
+lines!(ax_force, 0:1023, force_expwin, label = "exponential_end = 0.01")
+axislegend(ax_force, position = :rt, backgroundcolor = (:white, 0.5),)
 xlims!(ax_force, 0, 1023)
 
 display(fig_force);

@@ -6,6 +6,12 @@ format:
     number-sections: false
 ---
 
+## v0.3.0
+
+**Breaking change**
+
+- Modify the implementation of the `force` window following [PR #5](https://github.com/maucejo/StructuralVibration.jl/pull/5). Thanks to [@JakeZw](https://github.com/JakeZw) for proposing this PR.
+
 ## v0.2.0
 
 **Breaking change**
