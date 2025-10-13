@@ -987,7 +987,7 @@ chirp = SweptSine(F0, t[1], 0.8t[end], freq[1], freq[end], zero_end = true)
 x = excitation(chirp, t)
 
 # Reference signal
-prob = SdofForcedTimeProblem(sdof, x, [0., 0.], t)
+prob = SdofForcedTimeProblem(sdof, [0., 0.], t, x)
 y = solve(prob).u
 
 # Frequency domain
@@ -995,7 +995,7 @@ Fx = Fx = rfft(x)[1:length(freq)]/block_size
 Fx[2:end] .*= 2.
 
 # Response spectrum
-prob_y = SdofFrequencyProblem(sdof, Fx, freq)
+prob_y = SdofFrequencyProblem(sdof, freq, Fx)
 u = solve(prob_y).u
 
 # Spectrum stimation
@@ -1171,7 +1171,7 @@ chirp = SweptSine(F0, tb[1], 0.8tb[end], freq[1], freq[end], zero_end = true)
 x = repeat(excitation(chirp, tb), outer = nblocks)
 
 # Signal generation - Output signal
-prob = SdofForcedTimeProblem(sdof, x, [0., 0.], t)
+prob = SdofForcedTimeProblem(sdof, [0., 0.], t, x)
 y = solve(prob).u
 
 # FRF estimation

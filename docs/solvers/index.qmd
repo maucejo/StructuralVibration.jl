@@ -232,7 +232,7 @@ f = 2.
 # Instantiation of the problem
 t = 0.:0.01:10.
 u0 = [1., -2.]
-prob = SdofHarmonicTimeProblem(sdof, F0, f, u0, t, :force)
+prob = SdofHarmonicTimeProblem(sdof, u0, t, F0, f, :force)
 
 # Solve the problem
 x_harmo = solve(prob).u
@@ -242,7 +242,7 @@ x_harmo = solve(prob).u
 #| echo: false
 
 fig = Figure()
-ax = Axis(fig[1, 1], xlabel="Time (s)", ylabel="Displacement (m)", title = "Harmonic excitation")
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "Harmonic excitation")
 lines!(ax, t, x_harmo)
 xlims!(ax, minimum(t), maximum(t))
 
@@ -305,7 +305,7 @@ F = excitation(haversine, t)
 
 # Instantiation of the problem
 u0 = [1, -2]
-prob = SdofForcedTimeProblem(sdof, F, u0, t, :force)
+prob = SdofForcedTimeProblem(sdof, u0, t, F, :force)
 
 # Solve the problem
 x_arb_filt = solve(prob, method = :filt).u
@@ -317,7 +317,7 @@ x_arb_conv = solve(prob, method = :conv).u;
 #| echo: false
 
 fig = Figure()
-ax = Axis(fig[1, 1], xlabel="Time (s)", ylabel="Displacement (m)", title = "Arbitrary excitation - Haversine")
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "Arbitrary excitation - Haversine")
 lines!(ax, t, x_arb_filt, label = "Filtering")
 lines!(ax, t, x_arb_interp, linestyle = :dash, label = "Interp. + Quad.")
 lines!(ax, t, x_arb_conv, linestyle = :dashdot , label = "Convolution")
@@ -602,7 +602,7 @@ f = 1.:0.1:30.
 
 # Instantiation of the problem - Force excitation
 F = fill(10., length(f))
-prob = SdofFrequencyProblem(sdof, F, f)
+prob = SdofFrequencyProblem(sdof, f, F)
 
 # Solve the problem
 y = solve(prob).u

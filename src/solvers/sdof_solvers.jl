@@ -47,15 +47,15 @@ Structure containing the data of a time problem for a sdof system subject to a h
     * `:force`: External force (default)
     * `:base`: Base motion
 """
-@show_data struct SdofHarmonicTimeProblem{T <: Real, Tu <: AbstractVector, Tt <: AbstractRange}
+@show_data struct SdofHarmonicTimeProblem{Tu <: AbstractVector, Tt <: AbstractRange, T <: Real}
     sdof::Sdof
-    F::T
-    ω::T
     u0::Tu
     t::Tt
+    F::T
+    ω::T
     type_exc::Symbol
 
-    SdofHarmonicTimeProblem(sdof, F::T, f::T, u0::Tu, t::Tt, type_exc = :force) where {T, Tu, Tt} = new{T, Tu, Tt}(sdof, F, 2π*f, u0, t, type_exc)
+    SdofHarmonicTimeProblem(sdof, u0::Tu, t::Tt, F::T, f::T, type_exc = :force) where {Tu, Tt, T} = new{Tu, Tt, T}(sdof, u0, t, F, 2π*f, type_exc)
 end
 
 """
@@ -74,14 +74,14 @@ Structure containing the data of a time problem for a sdof system subject to an 
     * `:force`: External force (default)
     * `:base`: Base motion
 """
-@show_data struct SdofForcedTimeProblem{Tf <: AbstractVector, Tu <: AbstractVector, Tt <: AbstractRange}
+@show_data struct SdofForcedTimeProblem{Tu <: AbstractVector, Tt <: AbstractRange, Tf <: AbstractVector}
     sdof::Sdof
-    F::Tf
     u0::Tu
     t::Tt
+    F::Tf
     type_exc::Symbol
 
-    SdofForcedTimeProblem(sdof, F::Tf, u0::Tu, t::Tt, type_exc = :force) where {Tf, Tu, Tt} = new{Tf, Tu, Tt}(sdof, F, u0, t, type_exc)
+    SdofForcedTimeProblem(sdof, u0::Tu, t::Tt, F::Tf, type_exc = :force) where {Tu, Tt, Tf} = new{Tu, Tt, Tf}(sdof, u0, t, F, type_exc)
 end
 
 """
@@ -132,8 +132,8 @@ Structure containing the data for computing the frequency response of a sdof sys
 
 **Fields**
 * `sdof::Sdof`: Sdof structure
-* `F::AbstractVector`: Vector of the force excitation [N] or base motion [m]
 * `freq::AbstractRange`: Vector of frequencies [Hz]
+* `F::AbstractVector`: Vector of the force excitation [N] or base motion [m]
 * `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
@@ -142,14 +142,14 @@ Structure containing the data for computing the frequency response of a sdof sys
     * `:vel`: Velocity spectrum
     * `:acc`: Acceleration spectrum
 """
-@show_data struct SdofFrequencyProblem{TF <: AbstractVector, Tf <: AbstractRange}
+@show_data struct SdofFrequencyProblem{Tf <: AbstractRange, TF <: AbstractVector}
     sdof::Sdof
-    F::TF
     freq::Tf
+    F::TF
     type_exc::Symbol
     type_resp::Symbol
 
-    SdofFrequencyProblem(sdof, F::TF, freq::Tf; type_exc = :force, type_resp = :dis) where {TF, Tf} = new{TF, Tf}(sdof, F, freq, type_exc, type_resp)
+    SdofFrequencyProblem(sdof, freq::Tf, F::TF; type_exc = :force, type_resp = :dis) where {Tf, TF} = new{Tf, TF}(sdof, freq, F, type_exc, type_resp)
 end
 
 """
@@ -259,7 +259,7 @@ Computes the forced response of a single degree of freedom (Sdof) system due to 
     * `ddu`: Acceleration solution
 """
 function solve(prob::SdofHarmonicTimeProblem)
-    (; sdof, F, ω, u0, t, type_exc) = prob
+    (; sdof, u0, t, F, ω, type_exc) = prob
     (; m, ω0, ξ) = sdof
     x0, v0 = u0
 
@@ -378,7 +378,7 @@ Computes the forced response of a single degree of freedom (Sdof) system due to 
 """
 function solve(prob::SdofForcedTimeProblem; method = :filt)
 
-    (; sdof, F, u0, t, type_exc) = prob
+    (; sdof, u0, t, F, type_exc) = prob
     (; m, ω0, ξ) = sdof
     x0, v0 = u0
 
@@ -579,7 +579,7 @@ Compute the frequency response function of a single degree of freedom (Sdof) sys
     * `u`: Response spectrum of the system
 """
 function solve(prob::SdofFrequencyProblem)
-    (; sdof, F, freq, type_exc, type_resp) = prob
+    (; sdof, freq, F, type_exc, type_resp) = prob
     (; m, ω0, ξ) = sdof
     ω = 2π*freq
 

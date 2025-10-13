@@ -1,7 +1,7 @@
 # StructuralVibration.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://maucejo.github.io/StructuralVibration.jl/)
-[![Generic badge](https://img.shields.io/badge/Version-0.3.0-cornflowerblue.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-1.0.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
@@ -115,6 +115,35 @@ The package provides the following features:
         - Transfer functions estimation (H1, H2, H3, Hv)
         - Welch method (PSD, ESD, Autopower, Autopower linear)
         - Signal spectrum estimation
+
+### Modal analysis
+- **Modal extraction - SDOF methods**
+    - Peak picking method
+    - Circle fit method
+    - Least-squares fit method
+
+- **Modal extraction - MDOF methods**
+    - Least-squares complex exponential (LSCE)
+    - Least-squares complex frequency (LSCF)
+    - Polyreference least-squares complex frequency (PLSCF)
+    - Stabilization diagram
+
+- **Analysis indicators**
+    - Modal Overlap Factor (MOF)
+    - Mode overcomplexity value (MOV)
+    - Mode Phase Collinearity (MPC)
+    - Mode Complexity Factor (MCF)
+    - Mean Phase Deviation (MPD)
+    - Modal Assurance Criterion (MAC)
+    - Coordinate Modal Assurance Criterion (COMAC)
+    - Enhanced Coordinate Modal Assurance Criterion (ECOMAC)
+    - Frequency Response Assurance Criterion (FRAC)
+    - Complex Mode Indicator Function (CMIF)
+    - Power Spectrum indicator function (PSIF)
+
+- **Modal synthesis**
+    - Estimation of the FRF residuals
+    - Reconstruct FRF from modal parameters
 
 ### Visualization
 - Bode plot

@@ -27,7 +27,7 @@ where, for a mode $i$, $_{i}A_{pq} = \Phi_i(x_p)\Phi_i(x_q)$ is the residue, $\o
 
 When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency $\omega$ close to the natural frequency $\omega_i$:
 $$
-H_{pq}(\omega) \approx \frac{\Phi_i(x_p)\Phi_i(x_q)}{M_i\left(\omega_i^2 - \omega^2 + j\eta_i\omega_i^2\right)}.
+H_{pq}(\omega) \approx \frac{\Phi_i(x_p)\Phi_i(x_q)}{\omega_i^2 - \omega^2 + j\eta_i\omega_i^2}.
 $$
 
 ::: {.callout-note}
@@ -41,8 +41,9 @@ $$
 
 `StructuralDynamics.jl` provides two SDOF methods for extracting the natural frequencies and damping ratios of a system from its frequency response function (FRF):
 
-- Peak picking method
-- Circle fit method
+- Peak picking method,
+- Circle fit method,
+- Least squares fit method.
 
 ### Peak picking method
 
@@ -128,6 +129,74 @@ $$
 $$
 :::
 
+### Least squares fit method
+
+The least squares fit method is based on the idea of fitting the frequency response function (FRF) around the resonance peaks using a least squares approach[^1].
+
+[^1]: A. Brandt. "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
+
+When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency $\omega$ close to the natural frequency $f_i$:
+$$
+H_{pq}(f) \approx \frac{_{i}A_{pq}}{f_i^2 - f^2 + 2j\xi_i f_i f}.
+$$
+
+The least squares fit method consists of the following steps:
+
+1. **Definition of the system matrices**
+
+    To construct the system matrices, we start by rewriting the previous equation as:
+    $$
+    H_{pq}(f) \left(f_i^2 - f^2 + 2j\xi_i f_i f\right) - _{i}A_{pq} = 0.
+    $$
+
+    This equation can be rewritten as:
+    $$
+    \begin{bmatrix}
+    H_{pq}(f) & 2jfH_{pq}(f) & -1
+    \end{bmatrix} \begin{bmatrix}
+    f_i^2 \\
+    \xi_i f_i \\
+    _{i}A_{pq}
+    \end{bmatrix} = f^2 H_{pq}(f).
+    $$
+
+    If we consider $M$ frequency points around the resonance peak, we can construct the following system of equations:
+    $$
+    \begin{bmatrix}
+    H_{pq}(f_1) & 2jf_1H_{pq}(f_1) & -1 \\
+    H_{pq}(f_2) & 2jf_2H_{pq}(f_2) & -1 \\
+    \vdots & \vdots & \vdots \\
+    H_{pq}(f_M) & 2jf_MH_{pq}(f_M) & -1
+    \end{bmatrix} \begin{bmatrix}
+    f_i^2 \\
+    \xi_i f_i \\
+    _{i}A_{pq}
+    \end{bmatrix} = \begin{bmatrix}
+    f_1^2 H_{pq}(f_1) \\
+    f_2^2 H_{pq}(f_2) \\
+    \vdots \\
+    f_M^2 H_{pq}(f_M)
+    \end{bmatrix}.
+    $$
+
+2. **Least squares solution**
+
+    The least squares solution of the previous system of equations is given by:
+    $$
+    \begin{bmatrix}
+    f_i^2 \\
+    \xi_i f_i \\
+    _{i}A_{pq}
+    \end{bmatrix} = \left(\mathbf{A}^H\mathbf{A}\right)^{-1}\mathbf{A}^H\mathbf{b},
+    $$
+    where $\mathbf{A}$ is the matrix on the left-hand side of the system of equations, $\mathbf{b}$ is the vector on the right-hand side, and $\mathbf{A}^H$ is the conjugate transpose of $\mathbf{A}$.
+
+::: {.callout-note}
+
+In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the real and imaginary parts are separated to solve a real system of double size.
+
+:::
+
 ## Mode shapes extraction
 
 The mode shapes are extracted from the admittance matrix at the resonance frequency $\omega_i$. In this situation, the admittance matrix is defined as:
@@ -156,6 +225,30 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 
 ## API
 
+**Data types**
+
+::: {.api}
+**AutoEMASdofProblem**
+
+---
+```{julia}
+#| echo: false
+@doc AutoEMASdofProblem
+```
+:::
+
+::: {.api}
+**EMASdofSolution**
+
+---
+```{julia}
+#| echo: false
+@doc EMASdofSolution
+```
+:::
+
+**Related unctions**
+
 ::: {.api}
 **freq_extraction**
 
@@ -173,6 +266,16 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ```{julia}
 #| echo: false
 @doc  modeshape_extraction
+```
+:::
+
+::: {.api}
+**solve**
+
+---
+```{julia}
+#| echo: false
+@doc solve(prob::AutoEMASdofProblem)
 ```
 :::
 
@@ -212,9 +315,18 @@ H = solve(prob; ismat = true).u
 # Natural frequencies and damping ratios extraction
 fn_pp, ξn_pp = freq_extraction(freq, H[1, 2, :], PeakPicking())
 fn_cf, ξn_cf = freq_extraction(freq, H[1, 2, :], CircleFit())
+fn_lsf, ξn_lsf = freq_extraction(freq, H[1, 2, :], LSFit())
 
 # Mode shape extraction
-ϕid = modeshape_extraction(freq, H, fn_cf, ξn_cf, [1, 2])
+dpi = [1, 2]
+ϕid = modeshape_extraction(freq, H, fn_cf, ξn_cf, dpi)
+
+# Automatic EMA
+prob_ema = AutoEMASdofProblem(H, freq, dpi = dpi, method = LSFit())
+sol_ema = solve(prob_ema)
+fn_ema = sol_ema.f
+ξn_ema = sol_ema.xi
+ϕn_ema = sol_ema.ms
 ```
 
 ```{julia}
@@ -227,11 +339,13 @@ ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel =
 scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
 scatter!(ax_f1, 1:4, fn_pp, markersize = 20, label = "Peak picking")
 scatter!(ax_f1, 1:4, fn_cf, marker = :star4, markersize = 15, label = "Circle fit")
-axislegend(ax_f1, position = :rb)
+scatter!(ax_f1, 1:4, fn_lsf, marker = :circle, markersize = 10, label = "Least squares fit")
+axislegend(ax_f1, position = :lt)
 
 scatter!(ax_f2, 1:4, 100ξ*ones(4), marker = :rect, markersize = 25, label = "Reference")
 scatter!(ax_f2, 1:4, 100ξn_pp, markersize = 20, label = "Peak picking")
 scatter!(ax_f2, 1:4, 100ξn_cf, marker = :star4, markersize = 15, label = "Circle fit")
+scatter!(ax_f2, 1:4, 100ξn_lsf, marker = :circle, markersize = 10, label = "Least squares fit")
 
 display(fig_f);
 

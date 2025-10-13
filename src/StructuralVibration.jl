@@ -1,6 +1,6 @@
 module StructuralVibration
 
-using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics
+using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, Polynomials, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics, ToeplitzMatrices
 
 using DSP: conv, filt, remez, filtfilt, rms
 
@@ -30,7 +30,7 @@ export BayesEst, GCVEst, LCurveEst, DerricoEst
 export BayesDenoising, GCVDenoising, LCurveDenoising, KalmanDenoising
 
 # Structs - Modal extraction
-export PeakPicking, CircleFit
+export PeakPicking, CircleFit, LSFit, AutoEMASdofProblem, EMASdofSolution
 
 # Structs - Signal processing
 export FFTParameters
@@ -47,6 +47,8 @@ export agwn, acn, mgwn, mixed_noise, varest, estimated_SNR, denoising,
 export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
 
 export freq_extraction, modeshape_extraction
+
+export mof, mov, mpc, mcf, mpd, cmif, psif, msf, comac, ecomac, mac, frac, modal2poles, poles2modal, impulse_response, lsce, lscf, plscf
 
 export tfestimate, welch, spectrum, rect, hanning, hamming, tukey, cosine,
        lanczos, triang, bartlett, gaussian, bartlett_hann, blackman, kaiser, dpss, exponential, force, flattop, nuttall, blackman_nuttall, blackman_harris, parzen, planck
@@ -74,7 +76,10 @@ include("signal_processing/windows.jl")
 include("signal_processing/signal.jl")
 
 # Include files - Modal extraction
-include("modal_extraction/ame_sdof.jl")
+include("modal_extraction/ema_sdof.jl")
+include("modal_extraction/ema_indicators.jl")
+include("modal_extraction/ema_mdof_poles.jl")
+include("modal_extraction/ema_mdof_utils.jl")
 
 # Include files - Sdof
 include("models/sdof_mdof.jl")

@@ -12,7 +12,7 @@ format:
 
 <br/>
 
-[![Generic badge](https://img.shields.io/badge/Version-0.3.0-cornflowerblue.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-1.0.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
@@ -121,11 +121,42 @@ The package provides the following features:
         - Welch method (PSD, ESD, Autopower, Autopower linear)
         - Signal spectrum estimation
 
-- **Visualization**
-    - Bode plot
-    - 2D and 3D Nyquist plot
-    - Waterfall plot
-    - General 2D plot
+### Modal analysis
+
+- **Modal extraction - SDOF methods**
+    - Peak picking method
+    - Circle fit method
+    - Least-squares fit method
+
+- **Modal extraction - MDOF methods**
+    - Least-squares complex exponential (LSCE)
+    - Least-squares complex frequency (LSCF)
+    - Polyreference least-squares complex frequency (PLSCF)
+    - Stabilization diagram
+
+- **Analysis indicators**
+    - Modal Overlap Factor (MOF)
+    - Mode overcomplexity value (MOV)
+    - Mode Phase Collinearity (MPC)
+    - Mode Complexity Factor (MCF)
+    - Mean Phase Deviation (MPD)
+    - Modal Assurance Criterion (MAC)
+    - Coordinate Modal Assurance Criterion (COMAC)
+    - Enhanced Coordinate Modal Assurance Criterion (ECOMAC)
+    - Frequency Response Assurance Criterion (FRAC)
+    - Complex Mode Indicator Function (CMIF)
+    - Power Spectrum indicator function (PSIF)
+
+- **Modal synthesis**
+    - Estimation of the FRF residuals
+    - Reconstruct FRF from modal parameters
+
+### Visualization
+
+- Bode plot
+- 2D and 3D Nyquist plot
+- Waterfall plot
+- General 2D plot
 
 ## Reproducibility
 
@@ -134,20 +165,22 @@ The package provides the following features:
 # Project direct dependencies
 
 ```python
-Project StructuralVibration v0.1.2
+Project StructuralVibration v1.0.0
 Status
-  [717857b8] DSP v0.8.3
-  [7a1cc6ca] FFTW v1.8.1
+  [717857b8] DSP v0.8.4
+  [7a1cc6ca] FFTW v1.10.0
   [442a2c76] FastGaussQuadrature v1.0.2
   [a98d9a8b] Interpolations v0.15.1
-  [429524aa] Optim v1.12.0
+  [37e2e46d] LinearAlgebra v1.12.0
+  [429524aa] Optim v1.13.2
   [18e31ff7] Peaks v0.5.3
-⌅ [aea7be01] PrecompileTools v1.2.1
-  [92933f4c] ProgressMeter v1.10.4
-  [276daf66] SpecialFunctions v2.5.0
-  [10745b16] Statistics v1.11.1
-  [37e2e46d] LinearAlgebra v1.11.0
+  [f27b6e38] Polynomials v4.1.0
+  [aea7be01] PrecompileTools v1.3.3
+  [92933f4c] ProgressMeter v1.11.0
   [9a3f8284] Random v1.11.0
+  [276daf66] SpecialFunctions v2.6.1
+  [10745b16] Statistics v1.11.1
+  [c751599d] ToeplitzMatrices v0.8.5
 ```
 :::
 
@@ -156,18 +189,21 @@ Status
 # Julia version and machine information
 
 ```julia
-Julia Version 1.11.4
-Commit 8561cc3d68 (2025-03-10 11:36 UTC)
+Julia Version 1.12.0
+Commit b907bd0600f (2025-10-07 15:42 UTC)
 Build Info:
-  Official https://julialang.org/ release
+  Official https://julialang.org release
 Platform Info:
-  OS: Windows (x86_64-w64-mingw32)
-  CPU: 8 × Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz
+  OS: macOS (arm64-apple-darwin22.4.0)
+  CPU: 16 × Apple M4 Max
   WORD_SIZE: 64
-  LLVM: libLLVM-16.0.6 (ORCJIT, skylake)
-Threads: 8 default, 0 interactive, 4 GC (on 8 virtual cores)
+  LLVM: libLLVM-18.1.7 (ORCJIT, apple-m4)
+  GC: Built with stock GC
+Threads: 1 default, 1 interactive, 1 GC (on 12 virtual cores)
 Environment:
   JULIA_EDITOR = code
+  JULIA_VSCODE_REPL = 1
+  JULIA_PKG_SERVER = https://juliahub.com
 ```
 :::
 

@@ -6,6 +6,31 @@ format:
     number-sections: false
 ---
 
+## v0.4.0
+
+**Breaking changes**
+
+- Sdof solvers
+  - Refactor `SdofHarmonicTimeProblem`, `SdofForcedTimeProblem` and `SdofFrequencyProblem` to comply with `DifferentialEquations.jl` conventions.
+- Modal extraction
+  - Add `LSFit()` method for modal parameter extraction using least squares fitting of the frequency response function around the resonance peaks.
+  - Add `AutoEMASdofProblem` structure and `solve` function to perform automatic modal extraction based on Sdof approximations.
+  - Add modal extraction indicators:
+    - Modal Overlap Factor (MOF)
+    - Mode Overcomplexity Value (MOV)
+    - Mode Phase Collinearity (MPC)
+    - Mode Complexity Factor (MCF)
+    - Mode Phase Deviation (MPD)
+    - Modal Scale Factor (MSF)
+    - Modal Assurance Criterion (MAC)
+    - Coordinate Modal Assurance Criterion (COMAC)
+    - Enhanced Coordinate Modal Assurance Criterion (ECOMAC)
+    - Frequency Response Assurance Criterion (FRAC)
+    - Complex Mode Indicator Function (CMIF)
+    - Power Spectrum Indicator Function (PSIF)
+- Utils
+  - Add `modal2poles` and `poles2modal` functions to convert between modal parameters and system poles.
+
 ## v0.3.0
 
 **Breaking change**

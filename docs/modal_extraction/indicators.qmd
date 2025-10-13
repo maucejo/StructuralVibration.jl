@@ -10,4 +10,246 @@ execute:
   cache: true
 ---
 
-To be implemented.
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+## Mode complexity indicators
+
+The following indicators can be used to assess the complexity of the identified modes.
+
+### Mode Overcomplexity Value
+
+The Mode Overcomplexity Value (MOV) of a mode $i$ is defined as:
+$$
+MOV_i = \frac{\sum_{n = 1}^N s_{ni} \vert\phi_{ni}\vert^2}{\sum_{n = 1}^N \vert\phi_{ni}\vert^2},
+$$
+where $\phi_{ni}$ is the mode shape value at degree of freedom $n$ for mode $i$, and $s_{ni}$ is a weighted factor. The latter is given by:
+$$
+s_{ni} = \begin{cases}
+0 & \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 Q_i) > 0 \\
+1 & \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 Q_i) \leq 0
+\end{cases},
+$$
+where $\lambda_i$ is the complex eigenvalue for mode $i$, and $Q_i$ is the corresponding scaling factor.
+
+A value close to 1 indicates physical modes, while a value close to 0 indicates spurious modes (or computational modes).
+
+::: {.api}
+**mov**
+
+---
+```{julia}
+#| echo: false
+@doc mov
+```
+:::
+
+### Mode Phase Collinearity
+
+The Mode Phase Collinearity (MPC)aims at determining whether a mode is real or complex. It is an indicator defined in $[0, 1]$. For a mode $i$, it is given by:
+$$
+  MPC_i = \left[2\left(\frac{\vert\lambda_1\vert}{\vert\lambda_1\vert + \vert\lambda_2\vert} - 0.5\right)\right]^2,
+$$
+where $\lambda_1 = \frac{S_{xx} + S_{yy}}{2} + \sqrt{\left(\frac{S_{xx} - S_{yy}}{2}\right)^2 + S_{xy}^2}$ and $\lambda_2 = \frac{S_{xx} + S_{yy}}{2} - \sqrt{\left(\frac{S_{xx} - S_{yy}}{2}\right)^2 + S_{xy}^2}$ are the eigenvalues of the covariance matrix $\mathbf{S}$:
+$$
+\mathbf{S} = \begin{bmatrix}
+S_{xx} & S_{xy} \\
+S_{xy} & S_{yy}
+\end{bmatrix} \text{ with } \begin{cases}
+S_{xx} = \text{Re}(\tilde{\phi}_i)^T\text{Re}(\tilde{\phi}_i) \\
+S_{yy} = \text{Im}(\tilde{\phi}_i)^T\text{Im}(\tilde{\phi}_i) \\
+S_{xy} = \text{Re}(\tilde{\phi}_i)^T\text{Im}(\tilde{\phi}_i)
+\end{cases}
+$$
+Here, $\tilde{\phi}_i$ is the corrected mode shape vector for the mode $i$ such that:
+$$
+\tilde{\phi}_{ni} = \phi_{ni} - \frac{\sum_{m = 1}^N \phi_{mi}}{N}.
+$$
+
+A value close to 1 indicates a real mode, while a value close to 0 indicates a complex mode.
+
+::: {.api}
+**mpc**
+
+---
+```{julia}
+#| echo: false
+@doc mpc
+```
+:::
+
+### Mode Complexity Factor
+
+The Mode Complexity Factor (MCF) for a mode $i$ is defined as:
+$$
+MCF_i = 1 - \frac{(S_{xx} - S_{yy})^2 + 4S_{xy}^2}{(S_{xx} + S_{yy})^2}
+$$
+
+A value close to 0 indicates a real mode, while a value close to 1 indicates a complex mode.
+
+### Mean Phase Deviation
+
+The Mean Phase Deviation (MPD) indicator aims to measure the complexity of a mode. Its value is close to 0 for real modes, and increases as the mode becomes more complex. It is defined as:
+$$
+MPD_i = \frac{\sum_{n = 1}^N\vert\phi_{ni}\vert\; \text{acos}\left\vert\frac{\text{Re}(\phi_{ni})V_{22} - \text{Im}(\phi_{ni})V_{12}}{\sqrt{V_{12}^2 + V_{22}^2}\;\vert\phi_{ni}\vert}\right\vert}{\sum_{n = 1}^N \vert\phi_{ni}\vert},
+$$
+where $V_{12}$ and $V_{22}$ are the components of the right singular vector associated to the singular value decomposition of the 2 $\times$ 2 matrix $\mathbf{P}$ expressed as:
+$$
+\mathbf{P} = \begin{bmatrix}
+\text{Re}(\tilde{\phi}_i) &
+\text{Im}(\tilde{\phi}_i)
+\end{bmatrix}.
+$$
+
+For real modes, the indicator is close to 0, while it increases for complex modes.
+
+::: {.api}
+**mpd**
+
+---
+```{julia}
+#| echo: false
+@doc mpd
+```
+:::
+
+## Correlation indicators
+
+The following indicators can be used to assess the correlation between measured and reconstructed quantities.
+
+### Modal Assurance Criterion
+
+The Modal Assurance Criterion (MAC) is a widely used indicator to quantify the correlation between two sets mode shapes. For two mode shapes $\phi_i$ and $\psi_j$ (column vectors), it is defined as:
+$$
+MAC_{ij} = \frac{\vert\psi_j^H\phi_i\vert^2}{(\phi_i^H\phi_i) (\psi_j^H\psi_j)},
+$$
+where the superscript $H$ denotes the Hermitian transpose.
+
+A value close to 1 indicates a strong correlation between the two mode shapes, while a value close to 0 indicates no correlation.
+
+::: {.api}
+**mac**
+
+---
+```{julia}
+#| echo: false
+@doc mac
+```
+:::
+
+### Coordinate Modal Assurance Criterion
+
+The Coordinate Modal Assurance Criterion (COMAC) is a variant of the MAC that considers the correlation between the coordinates of two mode shapes. For a coordinate $p$ of two mode shapes $\phi_p$ and $\psi_p$ (row vectors), it is defined as:
+$$
+COMAC_p = \frac{\vert\phi_{pi}\psi_{pi}^H\vert^2}{(\phi_{pi}\phi_{pi}^H) (\psi_{pi}
+\psi_{pi}^H)},
+$$
+where the superscript $H$ denotes the Hermitian transpose.
+
+::: {.callout-note}
+The computation of the COMAC indicator requires that the two mode shapes have the same number of coordinates and similar scaling. For the the latter, one of the mode shapes is multiplied by the modal scaling factor:
+$$
+MSF_i = \frac{\phi_i^H\psi_i}{\phi_i^H\phi_i}.
+$$
+The previous equation assumes that $\phi_i$ is the reference mode shape to which $\psi_i$ is scaled.
+:::
+
+A value close to 1 indicates a strong correlation between the two mode shapes, while a value close to 0 indicates no correlation.
+
+::: {.api}
+**comac**
+
+---
+```{julia}
+#| echo: false
+@doc comac
+```
+:::
+
+### Enhanced Coordinate Modal Assurance Criterion
+
+The Enhanced Coordinate Modal Assurance Criterion (ECOMAC) extends the COMAC to take into account potential calibration scaling errors and/or sensor orientation errors by compouting the mean deviations of mode amplitudes of each coordinate. It is defined as:
+$$
+ECOMAC_p = \frac{\sum_{i=1}^N \vert \phi_{pi} - \psi_{pi} \vert}{2 N},
+$$
+where $N$ is the number of modes.
+
+::: {.callout-note}
+As for the COMAC indicator, the computation of the ECOMAC indicator requires that the two mode shapes have the same number of coordinates and similar scaling.
+:::
+
+Low values of the indicator indicates a strong correlation between the two mode shapes, while high values indicate very little correlation.
+
+::: {.api}
+**ecomac**
+
+---
+```{julia}
+#| echo: false
+@doc ecomac
+```
+:::
+
+### Frequency response assurance criterion
+
+The Frequency Response Assurance Criterion (FRAC) is an indicator that quantifies the correlation between two frequency response functions (FRFs) over a given frequency range for a given measurement point $p$ and a given excitation point $q$. For two FRFs $H_{pq}(\omega)$ and $G_{pq}(\omega)$, it is defined as:
+$$
+FRAC_{pq} = \frac{\vert \sum_{\omega = \omega_1}^{\omega_2} H_{pq}(\omega) G_{pq}^\ast(\omega) \, \vert^2}{\left( \sum_{\omega = \omega_1}^{\omega_2} \vert H_{pq}(\omega) \vert^2\right) \left( \sum_{\omega = \omega_1}^{\omega_2} \vert G_{pq}(\omega) \vert^2 \right)},
+$$
+$G_{pq}^\ast(\omega)$ is the complex conjugate of $G_{pq}(\omega)$, and $\omega_1$ and $\omega_2$ define the frequency range of interest.
+
+::: {.api}
+**frac**
+
+---
+```{julia}
+#| echo: false
+@doc frac
+```
+:::
+
+## Indicator functions
+
+The following indicator functions can be used to estimate the number of modes of a structure.
+
+### Complex Mode Indicator Function
+
+The Complex Mode Indicator Function (CMIF) is a global indicator that helps identify the number of modes in a system. It is defined as the singular values of the frequency response function (FRF) matrix $\mathbf{H}(\omega)$ over a frequency range of interest. The FRF matrix is constructed by stacking the FRFs for all measurement points and excitation points.
+
+When admittance or accelerance are used, the CMIF is computed as the singular values of the imaginary part of the FRF matrix, while for mobility, the real part is used. From a general standpoint, the CMIF is given by:
+$$
+CMIF(\omega) = \mathbf{\Sigma}(\omega),
+$$
+where $\mathbf{\Sigma}(\omega)$ is the vector of singular values obtained from the singular value decomposition of the FRF matrix.
+
+::: {.api}
+**cmif**
+
+---
+```{julia}
+#| echo: false
+@doc cmif
+```
+:::
+
+### Power spectrum indicator function
+
+The Power Spectrum Indicator Function (PSIF) is another global indicator that helps identify the number of modes in a system. It is defined as the sum of the squared magnitudes of the FRFs over all measurement points and excitation points. The PSIF is given by:
+$$
+PSIF(\omega) = \sum_{p=1}^{N_p} \sum_{q=1}^{N_q} \vert H_{pq}(\omega) \vert^2,
+$$
+where $N_p$ is the number of measurement points, $N_q$ is the number of excitation points, and $H_{pq}(\omega)$ is the FRF between measurement point $p$ and excitation point $q$.
+
+::: {.api}
+**psif**
+
+---
+```{julia}
+#| echo: false
+@doc psif
+```
+:::

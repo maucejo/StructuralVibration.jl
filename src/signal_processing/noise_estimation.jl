@@ -112,7 +112,7 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
 end
 
 # Default method
-varest(x) = varest(x, GCVEst())
+varest(x) = varest(x, BayesEst())
 
 """
     varest_bayesian(x, method::OptimFamily)
