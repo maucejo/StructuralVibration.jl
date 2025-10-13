@@ -360,7 +360,7 @@ function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [fre
         end
 
         fne, dre = poles2modal(p)
-        Nmodes = length(fn)
+        Nmodes = length(fne)
         poles[ee] .= p[1:Nmodes]
         fn[ee] .= fne[1:Nmodes]
         dr[ee] .= dre[1:Nmodes]
