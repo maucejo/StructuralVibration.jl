@@ -4,7 +4,7 @@ struct LSCF end
 struct PLSCF end
 
 """
-    EMAStabilizationResult(poles, modefn, mode_stabfn, mode_stabdr)
+    EMAMdofStabilization(poles, modefn, mode_stabfn, mode_stabdr)
 
 Data structure to hold the results of the stabilization analysis.
 
@@ -14,7 +14,7 @@ Data structure to hold the results of the stabilization analysis.
 - `mode_stabfn::Matrix{Bool}`: Matrix indicating the stability of natural frequencies
 - `mode_stabdr::Matrix{Bool}`: Matrix indicating the stability of damping ratios
 """
-@show_data struct EMAStabilizationResult{T <: Complex}
+@show_data struct EMAMdofStabilization{T <: Complex}
     poles::Vector{Vector{T}}   # Extracted poles at each model order
     modefn::Matrix{T}          # Natural frequencies (used for plotting)
     mode_stabfn::Matrix{Bool}  # Stability of natural frequencies
@@ -319,7 +319,7 @@ function plscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = 
     return stabdiag ? [poles; fill(NaN, Nmodes - length(poles))] : poles
 end
 
-## Function for stabilization diagram
+## Function for stabilization diagram analysis
 """
     stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [freq[1], freq[end]], weighting = true, stabcrit = [0.01, 0.05])
 
@@ -373,5 +373,5 @@ function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [fre
     end
 
     maxorder -= 1
-    return EMAStabilizationResult(poles, modefn, mode_stabfn[:, 1:maxorder, end-1], mode_stabdr[:, 1:maxorder, end-1])
+    return EMAMdofStabilization(poles, modefn, mode_stabfn[:, 1:maxorder, end-1], mode_stabdr[:, 1:maxorder, end-1])
 end

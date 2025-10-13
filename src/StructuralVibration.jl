@@ -30,7 +30,8 @@ export BayesEst, GCVEst, LCurveEst, DerricoEst
 export BayesDenoising, GCVDenoising, LCurveDenoising, KalmanDenoising
 
 # Structs - Modal extraction
-export PeakPicking, CircleFit, LSFit, AutoEMASdofProblem, EMASdofSolution
+export PeakPicking, CircleFit, LSFit, AutoEMASdofProblem, EMASdofSolution,
+       LSCE, LSCF, PLSCF, EMAMdofStabilization
 
 # Structs - Signal processing
 export FFTParameters
@@ -48,7 +49,7 @@ export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
 
 export freq_extraction, modeshape_extraction
 
-export mof, mov, mpc, mcf, mpd, cmif, psif, msf, comac, ecomac, mac, frac, modal2poles, poles2modal, impulse_response, lsce, lscf, plscf
+export mof, mov, mpc, mcf, mpd, cmif, psif, msf, comac, ecomac, mac, frac, modal2poles, poles2modal, impulse_response, lsce, lscf, plscf, stabilization
 
 export tfestimate, welch, spectrum, rect, hanning, hamming, tukey, cosine,
        lanczos, triang, bartlett, gaussian, bartlett_hann, blackman, kaiser, dpss, exponential, force, flattop, nuttall, blackman_nuttall, blackman_harris, parzen, planck
