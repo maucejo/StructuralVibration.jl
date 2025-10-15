@@ -286,6 +286,7 @@ function plscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = 
     # Computation of the coefficients of the denominator
     A = -M[1:order*ne, 1:order*ne]
     b = M[1:order*ne, (order*ne + 1):nmodel*ne]
+
     # Solve A * α = b in stable way using SVD and filtering
     UA, ΣA, VA = svd(A)
     tolA = maximum(ΣA) * eps(eltype(ΣA)) * length(ΣA)
@@ -340,7 +341,7 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [freq[1], freq[end]], weighting = true, stabcrit = [0.01, 0.05])
 
     # Initialization
-    max_order += 1
+    max_order += 1 # For having stability information from order 1 to max_order
     poles = [similar(freq, i) for i in 1:max_order]
     fn = [similar(freq, i) for i in 1:max_order]
     dr = [similar(freq, i) for i in 1:max_order]
@@ -356,22 +357,27 @@ function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [fre
         elseif method isa PLSCF
             p = plscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
         else
-            throw(ArgumentError("Unknown modal extractionmethod"))
+            throw(ArgumentError("Unknown modal extraction method"))
         end
 
         fne, dre = poles2modal(p)
-        Nmodes = length(fne)
-        poles[ee] .= p[1:Nmodes]
-        fn[ee] .= fne[1:Nmodes]
-        dr[ee] .= dre[1:Nmodes]
-        modefn[1:Nmodes, order] .= fn[ee]
+        poles[order] .= p
+        fn[order] .= fne
+        dr[order] .= dre
+        modefn[1:order, order] .= fn[order]
+        # Nmodes = length(fne)
+        # poles[order] .= p[1:Nmodes]
+        # fn[order] .= fne[1:Nmodes]
+        # dr[order] .= dre[1:Nmodes]
+        # modefn[1:Nmodes, order] .= fn[order]
 
-        if ee > 1
-            Nm = length(fn[ee-1])
-            mode_stabfn[1: Nm, ee-1], mode_stabdr[1:Nm, ee-1] = check_stability(fn[ee], fn[ee-1], dr[ee], dr[ee-1], stabcrit)
+        if order > 1
+            Nm = length(fn[order-1])
+            mode_stabfn[1: Nm, order-1], mode_stabdr[1:Nm, order-1] = check_stability(fn[order], fn[order-1], dr[order], dr[order-1], stabcrit)
         end
     end
 
+    # Remove last order (not used for stability check)
     maxorder -= 1
     return EMAMdofStabilization(poles, modefn, mode_stabfn[:, 1:maxorder, end-1], mode_stabdr[:, 1:maxorder, end-1])
 end

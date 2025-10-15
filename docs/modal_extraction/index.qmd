@@ -301,7 +301,7 @@ xm = xexc[2]
 
 # Mode calculation - Simply supported boundary conditions
 beam = Beam(L, S, Iz, E, ρ)
-fmax = 500
+fmax = 500.
 
 ωn, kn = modefreq(beam, 2fmax)
 ϕexc = modeshape(beam, kn, xexc)
@@ -313,13 +313,13 @@ prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
 # Natural frequencies and damping ratios extraction
-fn_pp, ξn_pp = freq_extraction(freq, H[1, 2, :], PeakPicking())
-fn_cf, ξn_cf = freq_extraction(freq, H[1, 2, :], CircleFit())
-fn_lsf, ξn_lsf = freq_extraction(freq, H[1, 2, :], LSFit())
+fn_pp, ξn_pp = freq_extraction(H, freq, PeakPicking())
+fn_cf, ξn_cf = freq_extraction(H, freq, CircleFit())
+fn_lsf, ξn_lsf = freq_extraction(H, freq, LSFit())
 
 # Mode shape extraction
 dpi = [1, 2]
-ϕid = modeshape_extraction(freq, H, fn_cf, ξn_cf, dpi)
+ϕid = modeshape_extraction(H, freq, fn_cf, ξn_cf, dpi)
 
 # Automatic EMA
 prob_ema = AutoEMASdofProblem(H, freq, dpi = dpi, method = LSFit())

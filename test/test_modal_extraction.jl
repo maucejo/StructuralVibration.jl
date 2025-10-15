@@ -31,11 +31,11 @@ prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
 # Natural frequencies and damping ratios extraction
-fn_pp, ξn_pp = freq_extraction(freq, H[1, 2, :], PeakPicking())
-fn_cf, ξn_cf = freq_extraction(freq, H[1, 2, :], CircleFit())
+fn_pp, ξn_pp = freq_extraction(H, freq, PeakPicking())
+fn_cf, ξn_cf = freq_extraction(H, freq, CircleFit())
 
 # Mode shape extraction
-ϕid = modeshape_extraction(freq, H, fn_pp, ξn_pp, [1, 2])
+ϕid = modeshape_extraction(H, freq, fn_pp, ξn_pp, [1, 2])
 
 # Plotting
 fig_f = Figure()

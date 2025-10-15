@@ -34,7 +34,7 @@ Structure containing the input data for automatic experimental modal analysis us
 end
 
 """
-    EMASolution(fn, ξn, ϕn)
+    EMASdofSolution(fn, ξn, ϕn)
 
 Structure containing the solution of the automatic experimental modal analysis using Sdof methods
 
@@ -50,17 +50,20 @@ Structure containing the solution of the automatic experimental modal analysis u
 end
 
 """
-    freq_extraction(freq, H, method::SdofModalExtraction; type = :dis)
+    freq_extraction(H::AbstractArray, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
+
+    freq_extraction(H::AbstractVector, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
 
 Extract natural frequencies and damping ratios from the Bode diagram fitting method
 
 **Inputs**
+* `H`: Frequency response function (either a matrix of size (nm, ne, nf) or a vector of size (nf))
 * `freq`: Frequency vector
-* `H`: Frequency response function
 * `method`: Method to extract the natural frequencies and damping ratios
     * `PeakPicking`: Peak picking method (default)
     * `CircleFit`: Circle fitting method
     * `LSFit`: Least squares fitting method
+* `frange`: Frequency range to consider for the extraction - default = [freq[1], freq[end]]
 * `type`: Type of FRF used to extract the natural frequencies and damping ratios
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
@@ -71,29 +74,80 @@ Extract natural frequencies and damping ratios from the Bode diagram fitting met
 * `ξn`: Damping ratios
 
 **Note**
-It is supposed that `H` is a row or a column of the FRF, meaning that H is a Vector
+When `H` is a matrix, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function freq_extraction(freq, H::AbstractVector, method::SdofModalExtraction = PeakPicking(); type = :dis)
+function freq_extraction(H::AbstractArray, freq, method::SdofModalExtraction = PeakPicking(); frange = [freq[1], freq[end]], type = :dis)
+    fidx = @. frange[1] ≤ freq ≤ frange[2]
+    Hred = H[:, :, fidx]
+    freq_red = freq[fidx]
+
+    nm, ne, nf = size(Hred)
+    Hr = reshape(Hred, nm*ne, nf)
+
+    # Estimate the number of peaks in the FRF
+    npeak = 0
+    np = zeros(Int, nm*ne)
+    for (k, Hv) in enumerate(eachrow(Hr))
+        np[k] = length(findmaxima(abs.(Hv)).indices)
+        npeak = max(npeak, np[k])
+    end
+
+    # Initialization
+    fnk = similar(freq, nm*ne, npeak)
+    drk = similar(fnk)
+    fn = similar(freq, npeak)
+    dr = similar(freq, npeak)
+    for (k, Hv) in enumerate(eachrow(Hr))
+        if method isa PeakPicking
+            p = freq_ppm_extract(Hv, freq_red, type = type)
+        elseif method isa CircleFit
+            p = freq_cfm_extract(Hv, freq_red, type = type)
+        elseif method isa LSFit
+            p = freq_lsf_extract(Hv, freq_red, type = type)
+        else
+            throw(ArgumentError("Unknown modal extraction method"))
+        end
+
+        nk = length(p[1])
+        fnk[k, :] .= [p[1]; fill(NaN, npeak - nk)]
+        drk[k, :] .= [p[2]; fill(NaN, npeak - nk)]
+    end
+
+    # Average the results from different FRFs
+    keeprow = np .== npeak
+    for i in 1:npeak
+        fn[i] = mean(skipnan(fnk[keeprow, i]))
+        dr[i] = mean(skipnan(drk[keeprow, i]))
+    end
+
+    return fn, dr
+end
+
+function freq_extraction(H::AbstractVector, freq, method::SdofModalExtraction = PeakPicking(); frange = [freq[1], freq[end]], type = :dis)
+    fidx = @. frange[1] ≤ freq ≤ frange[2]
+    Hred = H[fidx]
+    freq_red = freq[fidx]
+
     if method isa PeakPicking
-        return freq_ppm_extract(freq, H, type = type)
+        return freq_ppm_extract(Hred, freq_red, type = type)
     elseif method isa CircleFit
-        return freq_cfm_extract(freq, H, type = type)
+        return freq_cfm_extract(Hred, freq_red, type = type)
     elseif method isa LSFit
-        return freq_lsf_extract(freq, H, type = type)
+        return freq_lsf_extract(Hred, freq_red, type = type)
     else
-        throw(ArgumentError("Unknown method"))
+        throw(ArgumentError("Unknown modal extraction method"))
     end
 end
 
 
 """
-    freq_ppm_extract(freq, H; type = :dis)
+    freq_ppm_extract(H, freq; type = :dis)
 
 Extract natural frequencies and damping ratios from the Bode diagram peak picking method
 
 **Inputs**
-* `freq`: Frequency vector
 * `H`: Frequency response function
+* `freq`: Frequency vector
 * `type`: Type of FRF used to extract the natural frequencies and damping ratios
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
@@ -103,11 +157,16 @@ Extract natural frequencies and damping ratios from the Bode diagram peak pickin
 * `fn`: Natural frequencies
 * `ξn`: Damping ratios
 """
-function freq_ppm_extract(freq, H; type = :dis)
+function freq_ppm_extract(H, freq; type = :dis)
     ω = 2π*freq
 
     Habs = abs.(H)
-    pks = findmaxima(Habs) |> peakproms! |> peakwidths!
+    pks = findmaxima(Habs)
+    # Peaks not found
+    if isempty(pks.indices)
+        return eltype(freq)[], eltype(freq)[]
+    end
+    pks = peakproms!(pks) |> peakwidths!
 
     # Natural frequencies
     ftemp = freq[pks.indices]
@@ -155,13 +214,13 @@ function freq_ppm_extract(freq, H; type = :dis)
 end
 
 """
-    freq_cfm_extract(freq, H; type = :dis)
+    freq_cfm_extract(H, freq; type = :dis)
 
 Extract natural frequencies and damping ratios from the Bode diagram circle fitting method
 
 **Inputs**
-* `freq`: Frequency vector
 * `H`: Frequency response function
+* `freq`: Frequency vector
 * `type`: Type of FRF used to extract the natural frequencies and damping ratios
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
@@ -171,10 +230,15 @@ Extract natural frequencies and damping ratios from the Bode diagram circle fitt
 * `fn`: Natural frequencies
 * `ξn`: Damping ratios
 """
-function freq_cfm_extract(freq, H; type = :dis)
+function freq_cfm_extract(H, freq; type = :dis)
     ω = 2π*freq
 
-    pks = findmaxima(abs.(H)) |> peakproms! |> peakwidths!
+    pks = findmaxima(abs.(H))
+    # Peaks not found
+    if isempty(pks.indices)
+        return [NaN], [NaN]
+    end
+    pks = peakproms!(pks) |> peakwidths!
 
     # Convert to displacement
     if type == :vel
@@ -233,13 +297,13 @@ function freq_cfm_extract(freq, H; type = :dis)
 end
 
 """
-    freq_lsf_extract(freq, H; type = :dis)
+    freq_lsf_extract(H, freq; type = :dis)
 
 Extract natural frequencies and damping ratios from the Bode diagram least squares fitting method
 
 **Inputs**
-* `freq`: Frequency vector
 * `H`: Frequency response function
+* `freq`: Frequency vector
 * `type`: Type of FRF used to extract the natural frequencies and damping ratios
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
@@ -254,10 +318,15 @@ Extract natural frequencies and damping ratios from the Bode diagram least squar
 [2] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 
 """
-function freq_lsf_extract(freq, H; type = :dis)
+function freq_lsf_extract(H, freq; type = :dis)
     ω = 2π*freq
 
-    pks = findmaxima(abs.(H)) |> peakproms! |> peakwidths!
+    pks = findmaxima(abs.(H))
+    # Peaks not found
+    if isempty(pks.indices)
+        return [NaN], [NaN]
+    end
+    pks = peakproms!(pks) |> peakwidths!
 
     # Natural frequencies
     fn = freq[pks.indices]
@@ -324,8 +393,8 @@ end
 Extract mode shapes using Sdof approximation
 
 **Inputs**
+* `H`: Frequency response function matrix of size (nm, ne, nf)
 * `freq`: Frequency vector
-* `H`: Frequency response function
 * `fn`: Natural frequencies
 * `ξn`: Damping ratios
 * `dpi`: Driving point indices - default = [1, 1]
@@ -342,7 +411,7 @@ Extract mode shapes using Sdof approximation
 **Note**
 If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
 """
-function modeshape_extraction(freq, H, fn, ξn, dpi = [1, 1]; type = :dis)
+function modeshape_extraction(H, freq, fn, ξn, dpi = [1, 1]; type = :dis)
     ω = 2π*freq
     ωn = 2π*fn
 
@@ -444,11 +513,10 @@ function solve(prob::AutoEMASdofProblem)
     (; H, freq, type, dpi, method) = prob
 
     # Extraction of natural frequencies and damping ratios
-    H_dpi = H[dpi[1], dpi[2], :]
-    fn, ξn = freq_extraction(freq, H_dpi, method, type = type)
+    fn, ξn = freq_extraction(H, freq, method, type = type)
 
     # Extraction of mode shapes
-    ϕn = modeshape_extraction(freq, H, fn, ξn, dpi, type = type)
+    ϕn = modeshape_extraction(H, freq, fn, ξn, dpi, type = type)
 
     return EMASdofSolution(fn, ξn, ϕn)
 end

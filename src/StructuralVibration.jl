@@ -1,6 +1,6 @@
 module StructuralVibration
 
-using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, Polynomials, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics, ToeplitzMatrices
+using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, Polynomials, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
 
 using DSP: conv, filt, remez, filtfilt, rms
 
