@@ -388,7 +388,7 @@ function freq_lsf_extract(H, freq; type = :dis)
 end
 
 """
-    modeshape_extraction(freq, H, fn, ξn, dpi; type = :dis)
+    modeshape_extraction(H, freq, fn, ξn, dpi; type = :dis)
 
 Extract mode shapes using Sdof approximation
 

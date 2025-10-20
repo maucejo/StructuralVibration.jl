@@ -11,16 +11,23 @@ format:
 **Breaking changes**
 
 - Sdof solvers
-  - Refactor `SdofHarmonicTimeProblem`, `SdofForcedTimeProblem` and `SdofFrequencyProblem` to comply with `DifferentialEquations.jl` conventions.
+  - Refactor `SdofHarmonicTimeProblem`, `SdofForcedTimeProblem` and `SdofFrequencyProblem` to comply with `DifferentialEquations.jl` conventions
+
+- Signal processing
+  - Add `csd` function to compute the Cross Spectral Density (CSD) between two signals
+  - Refactor `tfestimate`, `welch`, `csd` and `spectrum` functions to accept window functions instead of pre-computed window vectors
+  - Add `nfft` parameter to `tfestimate`, `welch`, `csd` and `spectrum` functions to specify the number of FFT points to be used
+
 - Modal extraction
-  - Add `LSFit()` method for modal parameter extraction using least squares fitting of the frequency response function around the resonance peaks.
-  - Add `AutoEMASdofProblem` structure and `solve` function to perform automatic modal extraction based on Sdof approximations.
-  - Add Mdof methods for modal parameter extraction:
-    - Least-Squares Complex Exponential (LSCE) method
-    - Least-Squares Complex Frequency-domain (LSCF) method
-    - Polyreference Least-Squares Complex Frequency-domain (pLSCF) method
-    - `stabilization` function to perform stabilization diagram analysis using Mdof methods
-    - Stabilization results are now stored in the `EMAMdofStabilization` structure for plotting and further analysis
+  - Add `LSFit()` method for modal parameter extraction using least squares fitting of the frequency response function around the resonance peak
+  - Add `AutoEMASdofProblem` structure and `solve` function to perform automatic modal extraction based on Sdof approximations
+  - Add `poles_extraction` function to extract system poles using different Mdof methods:
+      - Least-Squares Complex Exponential (LSCE) method
+      - Least-Squares Complex Frequency-domain (LSCF) method
+      - Polyreference Least-Squares Complex Frequency-domain (pLSCF) method
+  - Add `stabilization` function to perform stabilization diagram analysis using Mdof methods
+  - Add `stabilization_plot` function to visualize stabilization diagrams
+  - Stabilization results are now stored in the `EMAMdofStabilization` structure for plotting and further analysis
   - Add modal extraction indicators:
     - Modal Overlap Factor (MOF)
     - Mode Overcomplexity Value (MOV)
@@ -35,7 +42,7 @@ format:
     - Complex Mode Indicator Function (CMIF)
     - Power Spectrum Indicator Function (PSIF)
   - Utils
-    - Add `modal2poles` and `poles2modal` functions to convert between modal parameters and system poles.
+    - Add `modal2poles` and `poles2modal` functions to convert between modal parameters and system poles
 
 ## v0.3.0
 

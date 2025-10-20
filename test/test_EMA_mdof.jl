@@ -1,4 +1,5 @@
 using StructuralVibration
+@usingany CairoMakie
 
 # Structure parameters of the beam
 L = 1.        # Length
@@ -39,3 +40,6 @@ p_plscf = plscf(H, freq, 20)
 
 # EMA-MDOF pole stability analysis
 sol_stab = stabilization(H, freq, 15, LSCE())
+
+# Plot stabilization diagram
+stabilization_plot(sol_stab)

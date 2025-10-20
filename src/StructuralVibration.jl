@@ -2,64 +2,64 @@ module StructuralVibration
 
 using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
 
-using DSP: conv, filt, remez, filtfilt, rms
+using DSP: conv, filt, filtfilt, remez, rms
 
 # Structs - Models
-export Sdof, Mdof, Bar, Rod, Strings, Beam, Plate, Membrane,
-       ContinuousStateSpace, DiscreteStateSpace
+export Bar, Beam, ContinuousStateSpace, DiscreteStateSpace, Mdof, Membrane,
+       Plate, Rod, Sdof, Strings
 
 # Structs - FE and discrete models
-export OneDMesh, MdofMesh
+export MdofMesh, OneDMesh
 
 # Structs - Excitations
-export Rectangle, Triangle, Hammer, SmoothRect, SineWave,
-       HalfSine, HaverSine,SweptSine, GaussianPulse, ColoredNoise
+export ColoredNoise, GaussianPulse, HalfSine, Hammer, HaverSine, Rectangle,
+       SineWave, SmoothRect, SweptSine, Triangle
 
 # Structs - Problems
-export SdofFreeTimeProblem, SdofHarmonicTimeProblem, SdofForcedTimeProblem,
-       SdofFRFProblem, SdofFrequencyProblem, StateSpaceTimeProblem, StateSpaceFRFProblem, StateSpaceModalFRFProblem, StateSpaceFreqProblem, StateSpaceModalFreqProblem, FreeModalTimeProblem,HarmonicModalTimeProblem, ForcedModalTimeProblem, ModalFRFProblem, DirectFRFProblem, ModalFreqProblem, DirectFreqProblem, DirectTimeProblem
+export DirectFRFProblem, DirectFreqProblem, DirectTimeProblem,
+       ForcedModalTimeProblem, FreeModalTimeProblem, HarmonicModalTimeProblem,ModalFRFProblem, ModalFreqProblem, SdofForcedTimeProblem, SdofFreeTimeProblem, SdofFrequencyProblem, SdofFRFProblem, SdofHarmonicTimeProblem, StateSpaceFreqProblem, StateSpaceFRFProblem, StateSpaceModalFRFProblem, StateSpaceModalFreqProblem, StateSpaceTimeProblem
 
 # Structs - Time solvers
-export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
-       Newmark, HHT, WBZ, GeneralizedAlpha, MidPoint
+export CentralDiff, FoxGoodwin, GeneralizedAlpha, HHT, LinearAcceleration,
+       MidPoint, Newmark, RK4, WBZ
 
 # Structs - Noise estimation
-export BayesEst, GCVEst, LCurveEst, DerricoEst
+export BayesEst, DerricoEst, GCVEst, LCurveEst
 
 # Structs - Noise denoising
-export BayesDenoising, GCVDenoising, LCurveDenoising, KalmanDenoising
+export BayesDenoising, GCVDenoising, KalmanDenoising, LCurveDenoising
 
 # Structs - Modal extraction
-export PeakPicking, CircleFit, LSFit, AutoEMASdofProblem, EMASdofSolution,
-       LSCE, LSCF, PLSCF, EMAMdofStabilization
+export AutoEMASdofProblem, CircleFit, EMAMdofStabilization, EMASdofSolution,
+       LSCE, LSCF, LSFit, PeakPicking, PLSCF
 
 # Structs - Signal processing
 export FFTParameters
 
 # Functions
-export excitation, solve, impulse_response, srs
+export excitation, impulse_response, solve, srs
 
-export modefreq, modeshape, eigenmode, modal_matrices, modal_effective_mass,
-       assembly, apply_bc, selection_matrix, rayleigh_damping_matrix, modal_damping_matrix
+export apply_bc, assembly, eigenmode, modefreq, modeshape, modal_damping_matrix,
+       modal_effective_mass, modal_matrices, rayleigh_damping_matrix, selection_matrix
 
-export agwn, acn, mgwn, mixed_noise, varest, estimated_SNR, denoising,
-       anti_alias
+export acn, agwn, anti_alias, denoising, estimated_SNR, mgwn, mixed_noise,
+       varest
 
-export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
+export c2d, c2r_modeshape, modal_parameters, ss_model, ss_modal_model
 
 export freq_extraction, modeshape_extraction
 
-export mof, mov, mpc, mcf, mpd, cmif, psif, msf, comac, ecomac, mac, frac,
-       modal2poles, poles2modal, impulse_response, lsce, lscf, plscf, stabilization
+export cmif, comac, ecomac, frac, impulse_response, mac, mcf,
+       modal2poles, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization
 
-export tfestimate, welch, spectrum, rect, hanning, hamming, tukey, cosine,
-       lanczos, triang, bartlett, gaussian, bartlett_hann, blackman, kaiser, dpss, exponential, force, flattop, nuttall, blackman_nuttall, blackman_harris, parzen, planck
+export bartlett, bartlett_hann, blackman, blackman_harris, blackman_nuttall,
+       cosine, csd, dpss, exponential, flattop, force, gaussian, hamming, hanning, kaiser, lanczos, nuttall, parzen, planck, rect, spectrum, tfestimate, triang, tukey, welch
 
-export gradient, detrend
+export detrend, gradient
 
 # Functions for plotting
-export sv_plot, bode_plot, nyquist_plot, stabilization_plot, waterfall_plot,
-       theme_choice
+export bode_plot, nyquist_plot, stabilization_plot, sv_plot, theme_choice,
+       waterfall_plot
 
 # Include files - Utils
 include("utils/macro_utils.jl")

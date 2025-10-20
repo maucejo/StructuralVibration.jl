@@ -265,7 +265,7 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ---
 ```{julia}
 #| echo: false
-@doc  modeshape_extraction
+@doc  modeshape_extraction(H::AbstractArray, freq::AbstractVector, fn::AbstractVector, ξn::AbstractVector, dpi::AbstractVector)
 ```
 :::
 

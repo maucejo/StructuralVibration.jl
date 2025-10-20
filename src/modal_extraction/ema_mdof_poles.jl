@@ -28,9 +28,41 @@ Data structure to hold the results of the stabilization analysis.
     mode_stabdr::BitMatrix      # Stability of damping ratios
 end
 
-## Function for modal extraction
+## Functions for modal extraction
 """
-    lsce(frf, freq, order, fs; frange, stabdiag = false)
+    poles_extraction(frf, freq, order, method::MdofModalExtraction = LSCF(); frange, stabdiag = false)
+
+Extract complex poles from Frequency Response Function (FRF) data using the specified modal extraction method.
+
+**Inputs**
+- `frf`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
+- `freq`: Vector of frequency values (Hz)
+- `order::Int`: Model order (number of poles to extract)
+- `method::MdofModalExtraction`: Modal extraction method
+    - `LSCE()`: Least Squares Complex Exponential method
+    - `LSCF()`: Least Squares Complex Frequency method (default)
+    - `PLSCF()`: Polyreference Least Squares Complex Frequency method
+- `frange`: Frequency range for analysis (default: [freq[1], freq[end]])
+- `stabdiag`: Boolean to indicate the function is used to build a stability diagram (default: false)
+
+**Output**
+- `poles`: Vector of extracted complex poles
+"""
+function poles_extraction(frf, freq, order, method::MdofModalExtraction = LSCF(); frange, stabdiag = false)
+    if method isa LSCE
+        return lsce(frf, freq, order; frange = frange, stabdiag = stabdiag)
+    elseif method isa LSCF
+        return lscf(frf, freq, order; frange = frange, stabdiag = stabdiag)
+    elseif method isa PLSCF
+        return plscf(frf, freq, order; frange = frange, stabdiag = stabdiag)
+    else
+        error("Unknown modal extraction method.")
+    end
+end
+
+
+"""
+    lsce(frf, freq, order; frange, stabdiag = false)
 
 Perform Least Squares Complex Exponential (LSCE) method to extract complex poles from Frequency Response Function (FRF) data.
 
@@ -347,7 +379,10 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 - `frf`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
 - `freq`: Vector of frequency values (Hz)
 - `max_order::Int`: Maximum model order for the stabilization analysis
-- `method`: Modal extraction method to use (default: LSCF)
+- `method`: Modal extraction method to use
+    - `LSCE()`: Least Squares Complex Exponential method
+    - `LSCF()`: Least Squares Complex Frequency method (default)
+    - `PLSCF()`: Polyreference Least Squares Complex Frequency method
 - `frange`: Frequency range for analysis (default: [freq[1], freq[end]])
 - `weighting`: Boolean to indicate if the weighting based on the variance of each FRF is applied (default: true)
 - `stabcrit`: Vector containing the stability criteria for natural frequencies and damping ratios (default: [0.01, 0.05])
@@ -355,7 +390,7 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 **Output**
 - `sol`: Data structure containing the results of the stabilization analysis
 """
-function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [freq[1], freq[end]], weighting = true, stabcrit = [0.01, 0.05])
+function stabilization(frf, freq, max_order::Int, method::MdofModalExtraction = LSCF(); frange = [freq[1], freq[end]], weighting = true, stabcrit = [0.01, 0.05])
 
     # Initialization
     max_order += 1 # For having stability information from order 1 to max_order
@@ -374,18 +409,11 @@ function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [fre
         while !estimation_success && (stop ≤ 10)
             try
                 # Modal extraction
-                if method isa LSCE
-                    poles[order] .= lsce(frf, freq, order, frange = frange, stabdiag = true)
-                elseif method isa LSCF
-                    poles[order] .= lscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
-                elseif method isa PLSCF
-                    poles[order] .= plscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
-                else
-                    throw(ArgumentError("Unknown modal extraction method"))
-                end
+                poles[order] .= poles_extraction(frf, freq, order, method; frange = frange, stabdiag = true)
 
+                # Estimation successful
                 estimation_success = true
-            catch e
+            catch e # Estimation failed
                 @warn "Modal extraction failed at order $order with error: $e. Retrying..."
                 stop += 1
             end

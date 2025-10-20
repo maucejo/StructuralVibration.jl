@@ -57,30 +57,7 @@ function impulse_response(H, freq, fs)
 
     # Data preparation
     nd = ndims(H)
-    nh = size(H)
-
-    # The frequency dimension is the last one
-    if N > nh[nd]
-        if N%2 == 0
-            M = Int(round(N/2 + 1))
-        else
-            M = Int(round((N + 1)/2))
-        end
-
-        if nd == 1
-            zero_pad = zeros(eltype(H), NM - nh[1])
-            H_padded = [H; zero_pad]
-        else
-            zero_pad = zeros(eltype(H), nh[1], M - nh[2])
-            H_padded = [H zero_pad]
-        end
-    else
-        if nd == 1
-            H_padded = H[1:N]
-        else
-            H_padded = H[:, 1:N]
-        end
-    end
+    H_padded = zpad(H, N, :inv)
 
     return irfft(H_padded, N, nd)
 end

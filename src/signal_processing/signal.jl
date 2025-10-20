@@ -28,7 +28,7 @@ Structure to store the time and frequency parameters for the FFT analysis
     fs::Int
     bs::Int
 
-    function FFTParameters(fs::Int, bs::Int; pow2 = true)
+    function FFTParameters(fs::Int, bs::Int; pow2 = false)
         # Sample rate & block size
         if pow2
             fs = nextpow(2, fs)
@@ -54,7 +54,7 @@ Structure to store the time and frequency parameters for the FFT analysis
 end
 
 """
-    tfestimate(input_signal, output_signal, bs::Int, window_input = hanning(bs),
+    tfestimate(input_signal, output_signal, bs::Int, window_input = hanning,
                window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
 
 Estimation of the one-sided transfer function between two signals
@@ -63,10 +63,11 @@ Estimation of the one-sided transfer function between two signals
 * `input_signal::Vector{Real}`: Input signal
 * `output_signal::Vector{Real}`: Output signal
 * `bs::Int` Block size
-* `window_input`: Window function for the input signal
-* `window_output`: Window function for the output signal
-* `fs::Int`: Sampling rate
-* `overlap::Real`: Overlap ratio between the segments
+* `window_input`: Window function for the input signal (default: hanning)
+* `window_output`: Window function for the output signal (default: same as window_input)
+* `fs::Int`: Sampling rate (default: 1)
+* `overlap::Real`: Overlap ratio between the segments (default: 0.)
+* `nfft::Int`: Number of FFT points (default: bs)
 * `type::Symbol`: Type of transfer function to estimate
     * `:h1` (default)
     * `:h2`
@@ -105,35 +106,42 @@ Estimation of the one-sided transfer function between two signals
 * `parzen`
 * `planck`
 """
-function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, window_input = hanning(bs), window_output = window_input; fs::Int = 1, overlap = 0., type = :h1) where {T <: Real}
+function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, window_input = hanning, window_output = window_input; fs::Int = 1, overlap = 0., nfft::Int = bs, type = :h1) where {T <: Real}
 
     # FFT Parameters
-    (; freq, fs, bs) = FFTParameters(fs, bs, pow2 = false)
-
-    # Initialization
+    (; freq) = FFTParameters(fs, bs)
 
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
-    # Check if the block size is even or odd
-    n = iseven(bs) ? bs ÷ 2 + 1 : bs ÷ 2
+    m = nfft > bs ? nfft : bs
+
+    # Check if the number of fft points is even or odd
+    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
 
     Gxx = zeros(Complex{eltype(freq)}, n)
     Gyy = zeros(Complex{eltype(freq)}, n)
     Gxy = zeros(Complex{eltype(freq)}, n)
+    X = similar(Gxx)
+    Y = similar(Gxx)
     H = similar(Gxx)
     coh = similar(real(Gxx))
 
     # Signal segmentation
-    input_segments, n_segments = signal_segmentation(input_signal, bs, window_input, overlap)
-    output_segments = signal_segmentation(output_signal, bs, window_output, overlap)[1]
+    input_segments, n_segments = signal_segmentation(input_signal, bs, window_input(bs), overlap)
+    output_segments = signal_segmentation(output_signal, bs, window_output(bs), overlap)[1]
 
     # Auto and Cross-spectral densities estimation
     for (iseg, oseg) in zip(input_segments, output_segments)
 
         # FFT of the segments
-        X = rfft(iseg)
-        Y = rfft(oseg)
+        if nfft > bs
+            X .= rfft(zpad(iseg, nfft))
+            Y .= rfft(zpad(oseg, nfft))
+        else
+            X .= rfft(iseg)
+            Y .= rfft(oseg)
+        end
 
         # Spectral densities
         @. Gxx += abs2(X)
@@ -147,8 +155,8 @@ function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, 
     Gxy ./= n_segments
 
     # Correcting factors for energy due to windowing
-    energy_correction_input = 1/rms(window_input)
-    energy_correction_output = 1/rms(window_output)
+    energy_correction_input = 1/rms(window_input(bs))
+    energy_correction_output = 1/rms(window_output(bs))
 
     # Energy correction
     Gxx .*= energy_correction_input^2
@@ -173,7 +181,7 @@ function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, 
 
     # Convert full-spectrum to one-sided spectrum
     # Extracting the positive frequencies
-    freqs = rfftfreq(bs, fs)
+    freqs = rfftfreq(m, fs)
 
     useful_freqs = findall(freqs .<= freq[end])
 
@@ -181,17 +189,18 @@ function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, 
 end
 
 """
-    welch(input_signal, bs::Int, window = hanning(bs); fs::Int = 1,
-          overlap = 0.5, scaling = :psd)
+    welch(input_signal, bs, window = hanning; fs = 1,
+          overlap = 0.5, nfft = bs, scaling = :psd)
 
 Estimation of one-sided Autopower functions of a signal using the Welch method
 
 **Inputs**
 * `input_signal::Vector{Real}`: Input signal
 * `bs::Int`: Block size
-* `window`: Window function
-* `fs::Int`: Sampling rate
-* `overlap`: Overlap ratio between the segments
+* `window`: Window function (default: hanning)
+* `fs::Int`: Sampling rate (default: 1)
+* `overlap`: Overlap ratio between the segments (default: 0.5)
+* `nfft::Int`: Number of FFT points (default: bs)
 * `scaling`: Scale of the PSD - see https://community.sw.siemens.com/s/article/the-autopower-function-demystified for more information
     * `:psd` (default) - Power Spectral Density
     * `:esd` - Autopower Energy Spectral Density
@@ -229,25 +238,32 @@ Estimation of one-sided Autopower functions of a signal using the Welch method
 * `parzen`
 * `planck`
 
-**Note**
-The welch function is already implemented in `DSP.jl` under the name `welch_pgram`. The function `welch` is implemented here for pedagogical purposes.
+**Notes**
+- The `welch`` function is already implemented in `DSP.jl` under the name `welch_pgram`. The function `welch` is implemented here for pedagogical purposes.
+- The `welch` function is equivalent to calling `csd(x, x, ...)`.
 """
-function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::Int = 1, overlap = 0.5, scaling = :psd) where {T <: Real}
+function welch(input_signal::Vector{T}, bs::Int, window = hanning; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd) where {T <: Real}
     # FFT Parameters
     (; tspan, freq) = FFTParameters(fs, bs, pow2 = false)
 
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
-    # Signal segmentation
-    signal, n_segments = signal_segmentation(input_signal, bs, window, overlap)
+    m = nfft > bs ? nfft : bs
 
-    # Check if the block size is even or odd
-    n = iseven(bs) ? bs ÷ 2 + 1 : bs ÷ 2
+    # Check if the number of fft points is even or odd
+    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
+
+    # Signal segmentation
+    signal, n_segments = signal_segmentation(input_signal, bs, window(bs), overlap)
 
     Pxx = zeros(eltype(input_signal), n)
     for segment in signal
-        Pxx .+= abs2.(rfft(segment))
+        if nfft > bs
+            Pxx .+= abs2.(rfft(zpad(segment, nfft)))
+        else
+            Pxx .+= abs2.(rfft(segment))
+        end
     end
 
     # Window energy - see https://community.sw.siemens.com/s/article/window-correction-factors
@@ -255,7 +271,7 @@ function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::
     if scaling == :psd || scaling == :esd
         # Explanation: By definition, the double-sided PSD is PSD = Pxx/Δf, where Pxx = abs2.(fft(x))/n^2, where n is the bs and Δf = fs/n. So, PSD = abs2.(fft(x))/(fs*n). Finally, this result must take into account the energy correction factor (ECF) to compensate for the windowing effect and preserve the signal energy. By definition, ECF = 1/rms(window) = sqrt(n/sum(abs2, window)). Therefore, PSD_corrected = PSD*ECF^2 = abs2.(fft(x))/(fs*sum(abs2, window)). Hence, the value of win_corr and scale...
 
-        win_corr = sum(abs2, window)
+        win_corr = sum(abs2, window(bs))
         scale *= win_corr*fs
 
         # Explanation - ESD = T*PSD where T is the the acquisition block time
@@ -263,7 +279,7 @@ function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::
 
     elseif scaling == :spectrum || scaling == :linear
         # Explanation: By definition, the double-sided autopower is Pxx = abs2.(fft(x))/n^2, where n is the bs. This result must take into account the amplitude correction factor (ACF) to compensate for the windowing effect and preserve the signal amplitude. By definition, ACF = 1/mean(window) = n/sum(window)). Therefore, Pxx_corrected = Pxx*ACF^2 = abs2.(fft(x))/sum(window)^2. Hence, the value of scale...
-        scale = sum(window)^2
+        scale = sum(window(bs))^2
     end
 
     # normalize the periodograms by the window energy and the sampling rate
@@ -271,10 +287,10 @@ function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::
 
     # Convert full-spectrum to one-sided spectrum
     # Extracting the positive frequencies
-    freqs = rfftfreq(bs, fs)
+    freqs = rfftfreq(m, fs)
 
     # Correcting the amplitude of the spectrum
-    pxx = iseven(bs) ? [Pxx[1]; 2Pxx[2:end-1]; Pxx[end]] : [Pxx[1]; 2Pxx[2:end]]
+    pxx = iseven(m) ? [Pxx[1]; 2Pxx[2:end-1]; Pxx[end]] : [Pxx[1]; 2Pxx[2:end]]
 
     useful_freqs = findall(freqs .<= freq[end])
 
@@ -287,17 +303,144 @@ function welch(input_signal::Vector{T}, bs::Int, window = hanning(Int(bs)); fs::
 end
 
 """
-    spectrum(input_signal, bs::Int, window = hanning(bs); fs::Int = 1, 
-             overlap = 0.5)
+    csd(x, y, bs, window_x = hanning, window_y = window_x; fs = 1,
+        overlap = 0.5, nfft = bs, scaling = :psd)
+
+Estimation of the one-sided Cross-spectral density between two signals
+
+**Inputs**
+* `x::Vector{Real}`: First signal
+* `y::Vector{Real}`: Second signal
+* `bs::Int`: Block size
+* `window_x`: Window function for the first signal (default: hanning)
+* `window_y`: Window function for the second signal (default: same as window_x)
+* `fs::Int`: Sampling rate (default: 1)
+* `overlap`: Overlap ratio between the segments
+* `nfft::Int`: Number of FFT points (default: bs)
+* `scaling`: Scale of the CSD
+    * `:psd` (default) - Power Spectral Density
+    * `:esd` - Energy Spectral Density
+    * `:spectrum` - Spectrum
+    * `:linear` - Linear
+
+**Outputs**
+* `pxy`: Cross-spectral density
+* `freq`: Frequency range
+
+**Available window functions**
+
+**From DSP.jl**
+* `rect`
+* `hann` (default)
+* `hamming`
+* `tukey`
+* `cosine`
+* `lanczos`
+* `triang`
+* `bartlett`
+* `gaussian`
+* `bartlett_hann`
+* `blackman`
+* `kaiser`
+* `dpss`
+
+**From StructuralVibration.jl**
+* `exponential`
+* `force`
+* `flattop`
+* `nutall`
+* `blackman_nutall`
+* `blackman_harris`
+* `parzen`
+* `planck`
+
+**Notes**
+- The `csd(x, x, ...) = welch(x, ...)`.
+"""
+function csd(x::Vector{T}, y::Vector{T}, bs::Int, window_x = hanning, window_y = window_x; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd) where {T <: Real}
+    # FFT Parameters
+    (; tspan, freq) = FFTParameters(fs, bs)
+
+    # Check if the overlap ratio is between 0 and 1
+    0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
+
+    m = nfft > bs ? nfft : bs
+
+    # Check if the block size is even or odd
+    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
+
+    # Signal segmentation
+    xsig, n_segments = signal_segmentation(x, bs, window_x(bs), overlap)
+    ysig = signal_segmentation(y, bs, window_y(bs), overlap)[1]
+
+    Pxy = zeros(Complex{eltype(freq)}, n)
+    X = similar(Pxy)
+    Y = similar(Pxy)
+    # Auto and Cross-spectral densities estimation
+    for (xs, ys) in zip(xsig, ysig)
+
+        # FFT of the segments
+        if nfft > bs
+            X .= rfft(zpad(xs, nfft))
+            Y .= rfft(zpad(ys, nfft))
+        else
+            X .= rfft(xs)
+            Y .= rfft(ys)
+        end
+
+        # Spectral densities
+        @. Pxy += X*conj(Y)
+    end
+
+    # Window energy - see https://community.sw.siemens.com/s/article/window-correction-factors
+    scale = 1.
+    if scaling == :psd || scaling == :esd
+        # Explanation: By definition, the double-sided PSD is PSD = Pxx/Δf, where Pxx = abs2.(fft(x))/n^2, where n is the bs and Δf = fs/n. So, PSD = abs2.(fft(x))/(fs*n). Finally, this result must take into account the energy correction factor (ECF) to compensate for the windowing effect and preserve the signal energy. By definition, ECF = 1/rms(window) = sqrt(n/sum(abs2, window)). Therefore, PSD_corrected = PSD*ECF^2 = abs2.(fft(x))/(fs*sum(abs2, window)). Hence, the value of win_corr and scale...
+
+        win_corr = bs*rms(window_x(bs))*rms(window_y(bs))
+        scale *= win_corr*fs
+
+        # Explanation - ESD = T*PSD where T is the the acquisition block time
+        scaling == :esd ? scale /= tspan[2] : nothing
+
+    elseif scaling == :spectrum || scaling == :linear
+        # Explanation: By definition, the double-sided autopower is Pxx = abs2.(fft(x))/n^2, where n is the bs. This result must take into account the amplitude correction factor (ACF) to compensate for the windowing effect and preserve the signal amplitude. By definition, ACF = 1/mean(window) = n/sum(window)). Therefore, Pxx_corrected = Pxx*ACF^2 = abs2.(fft(x))/sum(window)^2. Hence, the value of scale...
+        scale = sum(window_x(bs))*sum(window_y(bs))
+    end
+
+    # normalize the periodograms by the window energy and the sampling rate
+    Pxy ./= (scale*n_segments)
+
+    # Convert full-spectrum to one-sided spectrum
+    # Extracting the positive frequencies
+    freqs = rfftfreq(m, fs)
+
+    # Correcting the amplitude of the spectrum
+    pxy = iseven(m) ? [Pxy[1]; 2Pxy[2:end-1]; Pxy[end]] : [Pxy[1]; 2Pxy[2:end]]
+
+    useful_freqs = findall(freqs .<= freq[end])
+
+    # Linear scaling
+    if scaling == :linear
+        @. pxy = sqrt(pxy)
+    end
+
+    return pxy[useful_freqs], freqs[useful_freqs]
+end
+
+"""
+    spectrum(input_signal, bs, window = hanning; fs = 1, overlap = 0.5,
+             nfft = bs)
 
 Estimation of the spectrum of a signal
 
 **Inputs**
 * `input_signal::Vector{Real}`: Input signal
 * `bs::Int`: Block size
-* `window`: Window function
+* `window`: Window function (default: hanning)
 * `fs::Int`: Sampling rate
 * `overlap`: Overlap ratio between the segments
+* `nfft::Int`: Number of FFT points (default: bs)
 
 **Outputs**
 * `y`: Signal spectrum
@@ -330,7 +473,7 @@ Estimation of the spectrum of a signal
 * `parzen`
 * `planck`
 """
-function spectrum(input_signal::Vector{T}, bs::Int, window = hanning(bs); fs::Int = 1, overlap = 0.5) where {T <: Real}
+function spectrum(input_signal::Vector{T}, bs::Int, window = hanning; fs::Int = 1, overlap = 0.5, nfft::Int = bs) where {T <: Real}
 
     # FFT Parameters
     (; freq) = FFTParameters(fs, bs, pow2 = false)
@@ -339,25 +482,31 @@ function spectrum(input_signal::Vector{T}, bs::Int, window = hanning(bs); fs::In
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
     # Signal segmentation
-    signal, n_segments = signal_segmentation(input_signal, bs, window, overlap)
+    signal, n_segments = signal_segmentation(input_signal, bs, window(bs), overlap)
+
+    m = nfft > bs ? nfft : bs
 
     # Check if the block size is even or odd
-    n = iseven(bs) ? bs ÷ 2 + 1 : bs ÷ 2
+    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
 
     y = zeros(Complex{eltype(input_signal)}, n)
     for segment in signal
-        y .+= rfft(segment)
+        if nfft > bs
+            y .+= rfft(zpad(segment, nfft))
+        else
+            y .+= rfft(segment)
+        end
     end
 
     # Averaging + Amplitude normalization + Amplitude correction factor (ACF) due to windowing - ACF = 1/mean(window)
-    y ./= n_segments*bs*mean(window)
+    y ./= n_segments*bs*mean(window(bs))
 
     # Convert full-spectrum to one-sided spectrum
     # Extracting the positive frequencies
-    freqs = rfftfreq(bs, fs)
+    freqs = rfftfreq(m, fs)
 
     # Correcting the amplitude of the spectrum
-    y .= iseven(bs) ? [y[1]; 2y[2:end-1]; y[end]] : [y[1]; 2y[2:end]]
+    y .= iseven(m) ? [y[1]; 2y[2:end-1]; y[end]] : [y[1]; 2y[2:end]]
 
     useful_freqs = findall(freqs .<= freq[end])
 
@@ -417,4 +566,68 @@ function anti_alias(signal, fc; fs = 2fc)
     filt_coeff = remez(order, freq_filt, Hz = fs, maxiter = 50)
 
     return filtfilt(filt_coeff, signal)
+end
+
+"""
+    zpad(x::AbstractVector, N)
+    zpad(x::AbstractMatrix, N)
+
+Zero-pad a vector to a specified length N for usage in RFFT/IRFFT
+
+**Inputs**
+- `x`: Input vector or matrix
+- `N`: Desired length after zero-padding
+- `type`: Padding type
+    * `:dir` (default): Zero-padding for direct RFFT
+    * `:inv`: Zero-padding for inverse RFFT
+
+**Output**
+- `xpad`: Zero-padded vector or matrix
+
+**Notes**
+- If the length of `x` is already greater than or equal to `N`, the original `x` is returned.
+- The function supports both vectors and matrices, padding along the last dimension.
+"""
+function zpad(x::AbstractVector, N, type = :dir)
+    nx = length(x)
+
+    if N > nx
+        if type == :inv
+            if N%2 == 0
+                M = Int(round(N/2 + 1))
+            else
+                M = Int(round((N + 1)/2))
+            end
+
+            xpad = [x; zeros(eltype(x), M - nx)]
+        else
+            xpad = [x; zeros(eltype(x), N - nx)]
+        end
+    else
+        return x
+    end
+
+    return xpad
+end
+
+function zpad(x::AbstractMatrix, N, type = :dir)
+    nx, ny = size(x)
+
+    if N > ny
+        if type == :inv
+            if N%2 == 0
+                M = Int(round(N/2 + 1))
+            else
+                M = Int(round((N+1)/2))
+            end
+
+            xpad = [x zeros(eltype(x), nx, M - ny)]
+        else
+            xpad = [x zeros(eltype(x), nx, N - ny)]
+        end
+    else
+        return x
+    end
+
+    return xpad
 end

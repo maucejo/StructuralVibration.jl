@@ -999,7 +999,7 @@ prob_y = SdofFrequencyProblem(sdof, freq, Fx)
 u = solve(prob_y).u
 
 # Spectrum stimation
-uest = spectrum(y, block_size, rect(block_size), fs = sample_rate)[1]
+uest = spectrum(y, block_size, rect, fs = sample_rate)[1]
 ```
 
 ```{julia}
@@ -1015,7 +1015,7 @@ ylims!(ax_u, -110., -80.)
 display(fig_u);
 ```
 
-### Autopower functions
+### Autopower & Cross Spectral Density functions
 
 Autopower functions are used to estimate the power of a signal in the frequency domain. ``StructuralVibration.jl`` allows to compute the following autopower functions:
 
@@ -1023,6 +1023,14 @@ Autopower functions are used to estimate the power of a signal in the frequency 
 - Autopower Linear
 - Autopower Power Spectral Density (PSD)
 - Autopower Energy Spectral Density (ESD)
+
+Cross Spectral Density (CSD) functions are used to estimate the relationship between two signals in the frequency domain. ``StructuralVibration.jl`` allows to compute the following CSD functions using various scaling options:
+
+- Cross Spectral Density (CSD)
+- Cross Linear
+- Cross Power Spectral Density (CPSD)
+- Cross Energy Spectral Density (CESD)
+
 
 ::: {.callout-note}
 For a detailed discussion on the differences between these functions, please refer to this excellent blogpost [The Autopower function... Demystified!](https://community.sw.siemens.com/s/article/the-autopower-function-demystified).
@@ -1040,6 +1048,17 @@ For a detailed discussion on the differences between these functions, please ref
 ```
 :::
 
+
+::: {.api}
+**csd**
+
+---
+```{julia}
+#| echo: false
+@doc csd
+```
+:::
+
 #### Example
 
 This example is based on the one provided in the `DSP.jl` documentation. It generates a signal composed of two sine waves at 100 Hz and 150 Hz with amplitudes equal to 1 and 2 respectively, and then estimates the power spectral density using the Welch method.
@@ -1050,7 +1069,7 @@ This example is based on the one provided in the `DSP.jl` documentation. It gene
 fs = 1000
 bs = 100
 
-fft_params = FFTParameters(fs, bs, pow2 = false)
+fft_params = FFTParameters(fs, bs)
 freq = fft_params.freq
 t = (1:fs)/fs
 
@@ -1064,7 +1083,8 @@ psd = DSP.welch_pgram(x, bs; fs = fs, window = hamming)
 pxx_ref = DSP.power(psd)
 
 # PSD estimation from StructuralVibration.jl
-pxx = welch(x, bs, hamming(bs), fs = fs)[1]
+pxx = welch(x, bs, hamming, fs = fs)[1]
+pxx_csd = csd(x, x, bs, hamming, fs = fs)[1]
 ```
 
 ```{julia}
@@ -1072,7 +1092,8 @@ pxx = welch(x, bs, hamming(bs), fs = fs)[1]
 fig_pxx = Figure()
 ax_pxx = Axis(fig_pxx[1, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
 lines!(ax_pxx, freq, 10log10.(pxx_ref)[1:length(pxx)], label = "DSP.jl")
-lines!(ax_pxx, freq, 10log10.(pxx), linestyle = :dash, label = "StructuralVibration.jl")
+lines!(ax_pxx, freq, 10log10.(pxx), linestyle = :dash, label = "welch - StructuralVibration.jl")
+lines!(ax_pxx, freq, 10log10.(abs.(pxx_csd)), linestyle = :dot, label = "csd - StructuralVibration.jl")
 axislegend(ax_pxx, position = :rt, backgroundcolor = (:white, 0.5),)
 xlims!(ax_pxx, 0., freq[end])
 
@@ -1175,8 +1196,8 @@ prob = SdofForcedTimeProblem(sdof, [0., 0.], t, x)
 y = solve(prob).u
 
 # FRF estimation
-win = tukey(block_size, 0.25)
-H1 = tfestimate(x, y, block_size, win, fs = sample_rate, overlap = 0.)[1]
+win(x) = tukey(x, 0.25)
+H1 = tfestimate(x, y, block_size, win, fs = sample_rate)[1]
 ```
 
 ```{julia}

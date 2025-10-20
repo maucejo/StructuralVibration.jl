@@ -20,11 +20,61 @@ Compute residues and lower and upper residuals of a frequency response function 
 - `ur`: Upper residual
 """
 function residues(frf, freq, poles; frange = [freq[1], freq[end]], type = :dis)
+
+    # Correct frange to avoid division by zero
+    frange[1] = frange[1] < 1. ? 1. : frange[1]
+
     # FRF post-processing - Frequency range reduction
     fidx = @. frange[1] ≤ freq ≤ frange[2]
-    frf_red = frf[:, :, fidx]
+    frf_red = permutedims(frf[:, :, fidx], (3, 1, 2)) # Put the last dimension first for subsequent calculations
     freq_red = freq[fidx]
+    nm, ne = size(frf_red)[2:3]
 
-    
-    return res, lr, ur
+    # Convert frf to admittance if needed
+    om = 2π*freq_red
+    if type != :dis
+        for (f, omega) in enumerate(om)
+            if type == :vel
+                frf_red[f, :, :] ./= 1im*omega
+            elseif type == :acc
+                frf_red[f, :, :] ./= -omega^2
+            end
+        end
+    end
+
+    # Residue calculation
+    valid_poles = !isnan.(poles)
+    p = [poles[valid_poles]; conj.(poles[valid_poles])]
+    np = length(p)
+
+    res = similar(frf, np + 2, nm, ne)
+    P = [(1 ./(1im*om .- transpose(p))) (-1 ./om.^2) ones(length(om))]
+    for i in 1:ne
+        res[:, :, i] .= P\frf_red[:, :, i]
+    end
+
+    # Return residues, lower and upper residuals
+    return res[1:Int(np/2), : , :], res[end - 1, : , :], res[end, : , :]
+end
+
+"""
+    modeshape_extraction(residues, poles, di = [1, 1]; type = :complex)
+
+Extract mode shapes using MDOF approximation
+
+**Inputs**
+- `residues`: Residues matrix of size (np, nm, ne)
+- `poles`: Vector of complex poles
+- `di`: Vector indicating the location of the driving point on the measurement and excitation meshes (default: [1, 1])
+- `type`: Type of mode shape
+    * `:complex`: Complex mode shapes (default)
+    * `:real`: Real mode shapes
+
+**Outputs**
+- `ϕ`: Mode shapes matrix
+- `Q`: Scaling factors vector
+"""
+function modeshape_extraction(residues, poles, di = [1, 1]; type = :complex)
+
+
 end

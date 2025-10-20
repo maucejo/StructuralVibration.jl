@@ -29,12 +29,12 @@ chirp = SweptSine(F0, tb[1], 0.8tb[end], freq[1], freq[end], zero_end = true)
 
 x = repeat(excitation(chirp, tb), outer = nblocks)
 # x = excitation(chirp, t)
-prob = SdofForcedTimeProblem(sdof, x, [0., 0.], t)
+prob = SdofForcedTimeProblem(sdof, [0., 0.], t, x)
 y = solve(prob).u
 
 # FRF estimation
-win = tukey(block_size, 0.25)
-H1 = tfestimate(x, y, block_size, win, fs = sample_rate, overlap = 0)[1]
+win(x) = tukey(x, 0.25)
+H1, freqH = tfestimate(x, y, block_size, win, fs = sample_rate, overlap = 0.)[1:2]
 
 fig_h = Figure()
 ax_h = Axis(fig_h[1, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
@@ -48,13 +48,13 @@ ylims!(ax_h, -100., -70.)
 xs = excitation(chirp, tb)
 Fx = rfft(xs)[1:length(freq)]/block_size
 Fx[2:end] .*= 2.
-prob_y = SdofFrequencyProblem(sdof, Fx, freq)
+prob_y = SdofFrequencyProblem(sdof, freq, Fx)
 u = solve(prob_y).u
 
 # Estimation
-prob_spec = SdofForcedTimeProblem(sdof, xs, [0., 0.], tb)
+prob_spec = SdofForcedTimeProblem(sdof, [0., 0.], tb, xs)
 ys = solve(prob_spec).u
-uest = spectrum(ys, block_size, rect(block_size), fs = sample_rate)[1]
+uest = spectrum(ys, block_size, rect, fs = sample_rate)[1]
 
 fig_u = Figure()
 ax_u = Axis(fig_u[1, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
@@ -81,12 +81,12 @@ x = sin.(2π*f.*t)*A + randn(1000); # Noise corrupted x signal
 psd = DSP.welch_pgram(x, bs; fs = fs, window = hamming)
 pxx_ref = DSP.power(psd)
 
-pxx = welch(x, bs, hamming(bs), fs = fs)[1]
+pxx, freqxx = welch(x, bs, hamming, fs = fs)
 
 fig_pxx = Figure()
 ax_pxx = Axis(fig_pxx[1, 1], xlabel = "Frequency (Hz)", ylabel = "Amplitude (dB)")
-lines!(ax_pxx, freq, 10log10.(pxx_ref)[1:length(pxx)], label = "DSP.jl")
-lines!(ax_pxx, freq, 10log10.(pxx), linestyle = :dash, label = "StructuralVibration.jl")
+lines!(ax_pxx, freq, 10log10.(pxx_ref)[1:length(freq)], label = "DSP.jl")
+lines!(ax_pxx, freqxx, 10log10.(pxx), linestyle = :dash, label = "StructuralVibration.jl")
 axislegend(ax_pxx, position = :rt, backgroundcolor = (:white, 0.5),)
 xlims!(ax_pxx, 0., freq[end])
 
