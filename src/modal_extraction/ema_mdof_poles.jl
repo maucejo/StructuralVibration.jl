@@ -1,7 +1,8 @@
 ## Structure definition for method selection
-struct LSCE end
-struct LSCF end
-struct PLSCF end
+abstract type MdofModalExtraction end
+struct LSCE <: MdofModalExtraction end
+struct LSCF <: MdofModalExtraction end
+struct PLSCF <: MdofModalExtraction end
 
 """
     EMAMdofStabilization(poles, modefn, mode_stabfn, mode_stabdr)
@@ -9,16 +10,22 @@ struct PLSCF end
 Data structure to hold the results of the stabilization analysis.
 
 **Fields**
+- `frf::Array{Complex,3}`: FRF data used for the stabilization analysis
+- `freq::AbstractArray{Real}`: Frequency vector
+- `frange::Vector{Real}`: Frequency range used for the stabilization analysis
 - `poles::Vector{Vector{Complex}}`: Vector of vectors containing extracted poles at each model order
 - `modefn::Matrix{Real}`: Matrix containing the natural frequencies (useful for plotting)
 - `mode_stabfn::Matrix{Bool}`: Matrix indicating the stability of natural frequencies
 - `mode_stabdr::Matrix{Bool}`: Matrix indicating the stability of damping ratios
 """
-@show_data struct EMAMdofStabilization{T <: Complex}
-    poles::Vector{Vector{T}}   # Extracted poles at each model order
-    modefn::Matrix{T}          # Natural frequencies (used for plotting)
-    mode_stabfn::Matrix{Bool}  # Stability of natural frequencies
-    mode_stabdr::Matrix{Bool}  # Stability of damping ratios
+@show_data struct EMAMdofStabilization{Tp <: Complex, Tf <: Real}
+    frf::Array{Tp,3}            # FRF data used for the stabilization analysis
+    freq::AbstractArray{Tf}    # Frequency vector
+    frange::Vector{Tf}  # Frequency range used for the stabilization analysis
+    poles::Vector{Vector{Tp}}   # Extracted poles at each model order
+    modefn::Matrix{Tf}          # Natural frequencies (used for plotting)
+    mode_stabfn::BitMatrix      # Stability of natural frequencies
+    mode_stabdr::BitMatrix      # Stability of damping ratios
 end
 
 ## Function for modal extraction
@@ -90,7 +97,7 @@ function lsce(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = f
     poles = modal2poles(fn[fidx], ξn[fidx])
 
     # If Stability diagram
-    return stabdiag ? [poles; fill(NaN, Nmodes - length(poles))] : poles
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
 end
 
 """
@@ -113,7 +120,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-function lscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = false, weighting = true)
+function lscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = false, weighting = true) :: Vector{eltype(frf)}
     # FRF post-processing - Frequency range reduction
     fidx = @. frange[1] ≤ freq ≤ frange[2]
     frf_red = frf[:, :, fidx]
@@ -181,7 +188,12 @@ function lscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = f
 
     # Compute poles from polynomial roots
     V = roots(Polynomial(α))
-    p = -log.(V) / Δt
+    p = similar(frf, order)
+    try
+        p .= -log.(V)/Δt
+    catch e
+        return fill(complex(NaN, NaN), order)
+    end
 
     # Poles filtering (keep negative real part and negative imag to pick one of conjugates)
     valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
@@ -189,19 +201,19 @@ function lscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = f
     sort!(poles, by = abs)
 
     # Frequency offset correction (restore original frequency offset)
-    if freq_red[1] != 0.0 && !isempty(poles)
+    if freq_red[1] != 0. && !isempty(poles)
         fn, ξn = poles2modal(poles)
         poles .= modal2poles(fn .+ freq_red[1], @. ξn * fn / (fn + freq_red[1]))
     end
 
     # Return format based on stabdiag flag
-    return stabdiag ? [poles; fill(NaN, Nmodes - length(poles))] : poles
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
 end
 
 """
     plscf(frf, freq, order; frange, stabdiag)
 
-Perform Polyreference Least Squares Complex Frequency (pÒLSCF) method to extract complex poles from Frequency Response Function (FRF) data.
+Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract complex poles from Frequency Response Function (FRF) data.
 
 **Inputs**
 - `frf`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
@@ -218,7 +230,7 @@ Perform Polyreference Least Squares Complex Frequency (pÒLSCF) method to extrac
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-function plscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = false, weighting = true)
+function plscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = false, weighting = true) :: Vector{eltype(frf)}
     # FRF post-processing - Frequency range reduction
     fidx = @. frange[1] ≤ freq ≤ frange[2]
     frf_red = frf[:, :, fidx]
@@ -303,7 +315,12 @@ function plscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = 
     C = vcat(hcat(Ze, Id), -α')
 
     # Pole calculation
-    p = -log.(eigvals(C))/Δt
+    p = similar(frf, ne*order)
+    try
+        p .= -log.(eigvals(C))/Δt
+    catch e
+        return fill(complex(NaN, NaN), order)
+    end
 
     # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
     valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
@@ -317,7 +334,7 @@ function plscf(frf, freq, order::Int; frange = [freq[1], freq[end]], stabdiag = 
     sort!(poles, by = abs)
 
     # If Stability diagram
-    return stabdiag ? [poles; fill(NaN, Nmodes - length(poles))] : poles
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
 end
 
 ## Function for stabilization diagram analysis
@@ -342,42 +359,81 @@ function stabilization(frf, freq, max_order::Int, method = LSCF(); frange = [fre
 
     # Initialization
     max_order += 1 # For having stability information from order 1 to max_order
-    poles = [similar(freq, i) for i in 1:max_order]
+    poles = [similar(frf, i) for i in 1:max_order]
     fn = [similar(freq, i) for i in 1:max_order]
     dr = [similar(freq, i) for i in 1:max_order]
     modefn = fill(NaN, max_order, max_order)
-    mode_stabfn = fill(false, max_order, max_order)
-    mode_stabdr = fill(false, max_order, max_order)
+    mode_stabfn = falses(max_order, max_order)
+    mode_stabdr = falses(max_order, max_order)
 
     for order in 1:max_order
-        if method isa LSCE
-            p = lsce(frf, freq, order, frange = frange, stabdiag = true)
-        elseif method isa LSCF
-            p = lscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
-        elseif method isa PLSCF
-            p = plscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
-        else
-            throw(ArgumentError("Unknown modal extraction method"))
+        estimation_success = false
+        stop = 0
+
+        # Retry mechanism for modal extraction, since it can fail due to numerical issues
+        while !estimation_success && (stop ≤ 10)
+            try
+                # Modal extraction
+                if method isa LSCE
+                    poles[order] .= lsce(frf, freq, order, frange = frange, stabdiag = true)
+                elseif method isa LSCF
+                    poles[order] .= lscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
+                elseif method isa PLSCF
+                    poles[order] .= plscf(frf, freq, order, frange = frange, stabdiag = true, weighting = weighting)
+                else
+                    throw(ArgumentError("Unknown modal extraction method"))
+                end
+
+                estimation_success = true
+            catch e
+                @warn "Modal extraction failed at order $order with error: $e. Retrying..."
+                stop += 1
+            end
         end
 
-        fne, dre = poles2modal(p)
-        poles[order] .= p
+        if stop == 10
+            error("Modal extraction failed after 10 attempts at order $order.")
+        end
+
+        fne, dre = poles2modal(poles[order])
         fn[order] .= fne
         dr[order] .= dre
         modefn[1:order, order] .= fn[order]
-        # Nmodes = length(fne)
-        # poles[order] .= p[1:Nmodes]
-        # fn[order] .= fne[1:Nmodes]
-        # dr[order] .= dre[1:Nmodes]
-        # modefn[1:Nmodes, order] .= fn[order]
 
         if order > 1
             Nm = length(fn[order-1])
-            mode_stabfn[1: Nm, order-1], mode_stabdr[1:Nm, order-1] = check_stability(fn[order], fn[order-1], dr[order], dr[order-1], stabcrit)
+            mode_stabfn[1:Nm, order-1], mode_stabdr[1:Nm, order-1] = check_stability(fn[order], fn[order-1], dr[order], dr[order-1], stabcrit)
         end
     end
 
     # Remove last order (not used for stability check)
-    maxorder -= 1
-    return EMAMdofStabilization(poles, modefn, mode_stabfn[:, 1:maxorder, end-1], mode_stabdr[:, 1:maxorder, end-1])
+    max_order -= 1
+    return EMAMdofStabilization(frf, freq, frange, poles[1:max_order], modefn[1:max_order, 1:max_order], mode_stabfn[1:max_order, 1:max_order], mode_stabdr[1:max_order, 1:max_order])
+end
+
+function check_stability(fn_new, fn_old, dr_new, dr_old, stabcrit)
+    Nmodes_old = length(fn_old)
+    stabfn = falses(Nmodes_old)
+    stabdr = falses(Nmodes_old)
+
+    for i in 1:Nmodes_old
+        if isnan(fn_old[i])
+            continue
+        end
+
+        # Find closest mode in new order
+        idx = argmin(skipnan(abs.(fn_new .- fn_old[i])))
+
+        # Compute differences
+        dfn = abs(fn_new[idx] - fn_old[i])
+        drn = abs(dr_new[idx] - dr_old[i])
+
+        # Check frequency stability
+        stabfn[i] = dfn ≤ stabcrit[1]*fn_old[i]
+
+        # Check damping ratio stability
+        stabdr[i] = drn ≤ stabcrit[2]*dr_old[i]
+    end
+
+    return stabfn, stabdr
 end

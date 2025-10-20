@@ -31,7 +31,7 @@ end
 """
     acn(x, snr_dB, freq, color = :pink; rst = true)
 
-Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR
+Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR in the frequency domain
 
 **Inputs**
 * `x::VecOrMat{Real}`: Signal
@@ -85,9 +85,9 @@ function acn(x::VecOrMat{T}, snr_dB, freq::AbstractVector, color = :pink; rst = 
 end
 
 """
-    acn(x, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
+    acn(x, snr_dB, fs, color = :pink; frange = Float64[], rst = true)
 
-Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
+Adds a Colored Noise (ACN) to a signal `x` with a given SNR in the time domain
 
 **Inputs**
 * `x`: Signal
@@ -99,13 +99,13 @@ Adds a complex Colored Noise (ACN) to a signal `x` with a given SNR
     * `:blue`
     * `:brown`
     * `:purple`
-* `band_freq`: Frequencies used to defined the bandpass filter applied to the colored noise
+* `frange`: Frequencies used to defined the bandpass filter applied to the colored noise
 * `rst`: Reset the random number generator
 
 **Output**
 * `y`: Noisy signal
 """
-function acn(x::VecOrMat{T}, snr_dB, fs, color = :pink; band_freq = T[], rst = true) where {T <: Real}
+function acn(x::VecOrMat{T}, snr_dB, fs, color = :pink; frange = T[], rst = true) where {T <: Real}
 
     # Reset the RNG if required
     if rst
@@ -146,17 +146,17 @@ function acn(x::VecOrMat{T}, snr_dB, fs, color = :pink; band_freq = T[], rst = t
     colored_noise = irfft(colored_fft, L, ndx)
     colored_noise .*= σ./std(colored_noise, dims = ndx)
 
-    if length(band_freq) > 0
+    if length(frange) > 0
         flag = true
-        if band_freq[1] > freq[1] && band_freq[2] < freq[end]
+        if frange[1] > freq[1] && frange[2] < freq[end]
             # Band-pass filter
-            filter_type = DSP.Bandpass(band_freq[1], band_freq[2])
-        elseif band_freq[1] < freq[1] && band_freq[2] < freq[end]
+            filter_type = DSP.Bandpass(frange[1], frange[2])
+        elseif frange[1] < freq[1] && frange[2] < freq[end]
             # Low-pass filter
-            filter_type = DSP.Lowpass(band_freq[2])
-        elseif band_freq[1] > freq[1] && band_freq[2] > freq[end]
+            filter_type = DSP.Lowpass(frange[2])
+        elseif frange[1] > freq[1] && frange[2] > freq[end]
             # High-pass filter
-            filter_type = DSP.Highpass(band_freq[1])
+            filter_type = DSP.Highpass(frange[1])
         else
             flag = false
         end

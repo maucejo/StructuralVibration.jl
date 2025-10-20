@@ -36,3 +36,6 @@ H = solve(prob; ismat = true).u
 p_lsce = lsce(H, freq, 20)
 p_lscf = lscf(H, freq, 20)
 p_plscf = plscf(H, freq, 20)
+
+# EMA-MDOF pole stability analysis
+sol_stab = stabilization(H, freq, 15, LSCE())

@@ -203,7 +203,7 @@ Struct to define a colored noise excitation signal
     * `:blue`
     * `:brown`
     * `:purple`
-* `band_freq::AbstractVector`: Frequencies used to defined the bandpass filter applied to the colored noise
+* `frange::AbstractVector`: Frequencies used to defined the bandpass filter applied to the colored noise
 """
 @show_data struct ColoredNoise{Tf <: Real, Tt <: Real, Td <: Real, Ts <: Real, Tb <: AbstractVector} <: ArbitraryExc
     F::Tf
@@ -211,9 +211,9 @@ Struct to define a colored noise excitation signal
     duration::Td
     σ::Ts
     color::Symbol
-    band_freq::Tb
+    frange::Tb
 
-    ColoredNoise(F::Tf, tstart::Tt, duration::Td, σ::Ts = 1.; color::Symbol = :white, band_freq::Tb = Tf[]) where {Tf, Tt, Td, Ts, Tb} = new{Tf, Tt, Td, Ts, Tb}(F, tstart, duration, σ, color, band_freq)
+    ColoredNoise(F::Tf, tstart::Tt, duration::Td, σ::Ts = 1.; color::Symbol = :white, frange::Tb = Tf[]) where {Tf, Tt, Td, Ts, Tb} = new{Tf, Tt, Td, Ts, Tb}(F, tstart, duration, σ, color, frange)
 end
 
 """
@@ -476,7 +476,7 @@ end
 # Colored noise excitation
 function excitation(type::ColoredNoise, t)
 
-    (; F, tstart, duration, σ, color, band_freq) = type
+    (; F, tstart, duration, σ, color, frange) = type
     N = length(t)
     Ft = zeros(N)
 
@@ -513,16 +513,16 @@ function excitation(type::ColoredNoise, t)
         @. Ft = F + colored_noise
     end
 
-    if length(band_freq) > 0
-        if band_freq[1] > freq[1] && band_freq[2] < freq[end]
+    if length(frange) > 0
+        if frange[1] > freq[1] && frange[2] < freq[end]
             # Band-pass filter
-            filter_type = DSP.Bandpass(band_freq[1], band_freq[2])
-        elseif band_freq[1] < freq[1] && band_freq[2] < freq[end]
+            filter_type = DSP.Bandpass(frange[1], frange[2])
+        elseif frange[1] < freq[1] && frange[2] < freq[end]
             # Low-pass filter
-            filter_type = DSP.Lowpass(band_freq[2])
-        elseif band_freq[1] > freq[1] && band_freq[2] > freq[end]
+            filter_type = DSP.Lowpass(frange[2])
+        elseif frange[1] > freq[1] && frange[2] > freq[end]
             # High-pass filter
-            filter_type = DSP.Highpass(band_freq[1])
+            filter_type = DSP.Highpass(frange[1])
         else
             return x .+ colored_noise
         end

@@ -147,6 +147,103 @@ function sv_plot(x, y...; lw = 1., xscale = identity, yscale = identity, axis_ti
 end
 
 """
+    stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type = :dis)
+
+Plot stabilization diagram for EMA-MDOF pole stability analysis.
+
+**Inputs**
+* `stab`: EMA-MDOF stabilization data
+* `indicator`: Indicator to plot
+    * `:psif` : Power spectrum indicator function
+    * `:cmif` : Complex mode indicator function
+* `type`: Type of FRF (for CMIF calculation)
+    * `:dis` : Displacement (default)
+    * `:vel` : Velocity
+    * `:acc` : Acceleration
+**Output**
+* `fig`: Figure
+"""
+function stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type = :dis)
+    # Extract data for the selected indicator
+    (; frf, freq, frange, poles, modefn, mode_stabfn, mode_stabdr) = stab
+
+    # FRF post-processing - Frequency range reduction
+    fidx = @. frange[1] ≤ freq ≤ frange[2]
+    frf_red = frf[:, :, fidx]
+    freq_red = freq[fidx]
+
+    # Indicator calculation
+    if indicator == :psif
+        indicator_data = psif(frf_red)
+        indicator_name = "PSIF"
+    elseif indicator == :cmif
+        indicator_data = cmif(frf_red, type = type)
+        indicator_name = "CMIF"
+    else
+        throw(ArgumentError("Indicator not available. Available indicators are :psif and :cmif"))
+    end
+
+    # Stabilization diagram data
+    Nmodes = length(poles[end])
+    max_orders = 1:Nmodes
+    model_orders = one.(max_orders)*max_orders'
+
+    # Stable in frequency but not stable in damping
+    isstabf = @. (mode_stabfn[:] && !mode_stabdr[:])
+
+    # Stable in frequency and damping
+    isstab = (mode_stabfn[:] .&& mode_stabdr[:])
+
+    # Not stable in frequency
+    isnotstab = .!mode_stabfn[:]
+
+    fn = modefn[:]
+    orders = model_orders[:]
+
+    # Poles
+    fig = Figure()
+    ax_poles = Axis(
+        fig[2,1],
+        yticklabelcolor = :blue,
+        ylabelcolor = :blue,
+        ytickcolor = :blue,
+        xgridvisible = false,
+        ygridvisible = false,
+        xlabel = "Frequency (Hz)",
+        ylabel = "Model order"
+    )
+    # scatter!(ax_poles, poles_scatter)
+    scatter!(ax_poles, Point2f.(fn[isstab], orders[isstab]), color = :green, marker = :star4, label = "Stable freq. & damp.")
+    scatter!(ax_poles, Point2f.(fn[isstabf], orders[isstabf]), color = :blue, label = "Stable freq.")
+    scatter!(ax_poles, Point2f.(fn[isnotstab], orders[isnotstab]), color = :red, marker = :xcross, label = "Not stable")
+    xlims!(ax_poles, minimum(freq_red), maximum(freq_red))
+
+    # Indicator
+    ax_indicator = Axis(
+        fig[2,1],
+        leftspinecolor = :blue,
+        rightspinecolor = :red,
+        yticklabelcolor = :red,
+        ylabelcolor = :red,
+        ytickcolor = :red,
+        ylabel = indicator_name,
+        yaxisposition = :right,
+        yscale = log10
+    )
+    if indicator == :psif
+        lines!(ax_indicator, freq_red, indicator_data, color = (:gray, 0.5))
+    else
+        for cmifk in eachrow(indicator_data)
+            lines!(ax_indicator, freq_red, cmifk, color = (:gray, 0.25))
+        end
+    end
+    xlims!(ax_indicator, minimum(freq_red), maximum(freq_red))
+
+    Legend(fig[1, 1], ax_poles, orientation = :horizontal)
+    return fig
+end
+
+"""
     bode_plot(freq, y...; lw = 1., xlab = "Frequency (Hz)",
               ylab = "Magnitude (dB)", xscale = identity,
               axis_tight = true, isdeg = false, layout = :vertical,
@@ -311,7 +408,6 @@ Plot Nyquist diagram in 3D
 * `fig`: Figure
 """
 function nyquist_plot(freq, y::Vector{T}, ylabel = "Frequency (Hz)"; projection = false) where {T <: Complex}
-
 
     fig = Figure()
     ax = Axis3(fig[1,1], xlabel = "Real part", ylabel = ylabel, zlabel = "Imaginary part", aspect = (1, 2, 1))

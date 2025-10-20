@@ -1,0 +1,1821 @@
+{
+    "cells": [
+        {
+            "id": "1",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                "---\n",
+                "title: Mechanical models\n",
+                "format:\n",
+                "  html:\n",
+                "    toc: true\n",
+                "    number-sections: true\n",
+                "engine: julia\n",
+                "execute:\n",
+                "  freeze: auto\n",
+                "  cache: true\n",
+                "---"
+            ]
+        },
+        {
+            "id": "2",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "#| output: false\n",
+                "using StructuralVibration"
+            ],
+            "outputs": [
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "3",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                "\n",
+                "## Continuous models\n",
+                "\n",
+                "### 1D models {#sec-1d-models}\n",
+                "\n",
+                "#### Bars, Rods and Strings\n",
+                "\n",
+                "Longitudinal bars, torsional rods and strings are governed by the wave equation, which can be written under the following form:\n",
+                "$$\n",
+                "m \\ddot y(x, t) - D \\frac{\\partial^2 y(x,t)}{\\partial x^2} = p(x, t),\n",
+                "$$\n",
+                "where:\n",
+                "\n",
+                "- $y(x, t)$: Kinematic data at location $x$ and time $t$\n",
+                "\n",
+                "- $p(x, t)$: External excitation term\n",
+                "\n",
+                "- $m$: Linear inertia of the type\n",
+                "\n",
+                "- $D$: Stiffness of the type\n",
+                "\n",
+                "*For a longitudinal bar:*\n",
+                "\n",
+                "  - $y(x, t) = u(x, t)$\n",
+                "      - $u(x, t)$: Longitudinal displacement [m]\n",
+                "\n",
+                "  - $p(x, t)$: Distributed longitudinal force [N/m]\n",
+                "\n",
+                "  - $m = \\rho S$: Linear mass density [kg/m^2^]\n",
+                "      - $\\rho$: Mass density [kg/m^3^]\n",
+                "      - $S$: Cross-section area [m^2^]\n",
+                "\n",
+                "  - $D = E S$: Longitudinal stiffness [N]\n",
+                "      - $E$: Young's modulus [Pa]\n",
+                "\n",
+                "*For a torsional rod:*\n",
+                "\n",
+                "  - $y(x, t) = \\theta(x, t)$\n",
+                "      - $\\theta$: Torsion angle [rad]\n",
+                "\n",
+                "  - $p(x, t)$: Distributed moment [N.m/m]\n",
+                "\n",
+                "  - $m = \\rho I_G$: Linear rotational inertia [kg.m^4^]\n",
+                "    - $I_G$: Polar moment of area [m^4^]\n",
+                "\n",
+                "  - $D = G J_T$: Rotational stiffness [N.m^2^]\n",
+                "    - $G$: Shear modulus [Pa]\n",
+                "    - $J_T$: Torsion constant [m^4^]\n",
+                "\n",
+                "*For a string:*\n",
+                "\n",
+                "  - $y(x, y)$: Transverse displacement [m]\n",
+                "\n",
+                "  - $m$: Linear mass density [kg/m]\n",
+                "\n",
+                "  - $D$: Tension force [N]\n",
+                "\n",
+                "#### Euler-Bernoulli beams\n",
+                "\n",
+                "Euler-Bernoulli beams are governed by the following equation of motion:\n",
+                "$$\n",
+                "m\\ddot v(x, t) + D\\frac{\\partial^4 v(x, t)}{\\partial x^4} = p(x, t),\n",
+                "$$\n",
+                "where:\n",
+                "\n",
+                "- $v(x, t)$: Transverse displacement [m]\n",
+                "\n",
+                "- $p(x, t)$: External excitation term [N/m]\n",
+                "\n",
+                "- $m = \\rho S$: Linear mass density [kg/m]\n",
+                "\n",
+                "- $D = E I_z$: Bending stiffness [N.m^2^]\n",
+                "  - $I_z$: Second moment of area [m^4^]\n",
+                "\n",
+                "#### API\n",
+                "\n",
+                "**Data types**\n",
+                "\n",
+                "All the following data types are a subtype of the super type `OneDtype`.\n",
+                "\n",
+                "::: {.api}\n",
+                "**Bar**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "4",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Bar"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mBar(L, S, E, ρ)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic longitudinal bar\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mS\u001b[39m: Cross-section area [m²]\n    \u001b[34m• \u001b[39m \u001b[36mE\u001b[39m: Young's modulus [Pa]\n    \u001b[34m• \u001b[39m \u001b[36mρ\u001b[39m: Mass density [kg/m³]\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Line mass [kg/m]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Stiffness coefficient [Pa]",
+                        "text/markdown": "```julia\nBar(L, S, E, ρ)\n```\n\nStructure containing the data of a homogeneous and isotropic longitudinal bar\n\n**Constructor parameters**\n\n  * `L`: Length [m]\n  * `S`: Cross-section area [m²]\n  * `E`: Young's modulus [Pa]\n  * `ρ`: Mass density [kg/m³]\n\n**Fields**\n\n  * `L`: Length [m]\n  * `m`: Line mass [kg/m]\n  * `D`: Stiffness coefficient [Pa]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Bar&#40;L, S, E, ρ&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic longitudinal bar</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>S</code>: Cross-section area &#91;m²&#93;</p>\n</li>\n<li><p><code>E</code>: Young&#39;s modulus &#91;Pa&#93;</p>\n</li>\n<li><p><code>ρ</code>: Mass density &#91;kg/m³&#93;</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Line mass &#91;kg/m&#93;</p>\n</li>\n<li><p><code>D</code>: Stiffness coefficient &#91;Pa&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nBar(L, S, E, ρ)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic longitudinal bar\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{S}: Cross-section area [m²]\n\n\n\\item \\texttt{E}: Young's modulus [Pa]\n\n\n\\item \\texttt{ρ}: Mass density [kg/m³]\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{m}: Line mass [kg/m]\n\n\n\\item \\texttt{D}: Stiffness coefficient [Pa]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "5",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**Rod**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "6",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Rod"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mRod(L, I, J, G, ρ)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic torsional bar\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m L: Length [m]\n    \u001b[34m• \u001b[39m I: Second-moment of area [m⁴]\n    \u001b[34m• \u001b[39m J: Torsion constant [m⁴]\n    \u001b[34m• \u001b[39m G: Shear modulus [Pa]\n    \u001b[34m• \u001b[39m ρ: Mass density [kg/m³]\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Line mass [kg/m]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Stiffness coefficient [Pa]",
+                        "text/markdown": "```julia\nRod(L, I, J, G, ρ)\n```\n\nStructure containing the data of a homogeneous and isotropic torsional bar\n\n**Constructor parameters**\n\n  * L: Length [m]\n  * I: Second-moment of area [m⁴]\n  * J: Torsion constant [m⁴]\n  * G: Shear modulus [Pa]\n  * ρ: Mass density [kg/m³]\n\n**Fields**\n\n  * `L`: Length [m]\n  * `m`: Line mass [kg/m]\n  * `D`: Stiffness coefficient [Pa]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Rod&#40;L, I, J, G, ρ&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic torsional bar</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p>L: Length &#91;m&#93;</p>\n</li>\n<li><p>I: Second-moment of area &#91;m⁴&#93;</p>\n</li>\n<li><p>J: Torsion constant &#91;m⁴&#93;</p>\n</li>\n<li><p>G: Shear modulus &#91;Pa&#93;</p>\n</li>\n<li><p>ρ: Mass density &#91;kg/m³&#93;</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Line mass &#91;kg/m&#93;</p>\n</li>\n<li><p><code>D</code>: Stiffness coefficient &#91;Pa&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nRod(L, I, J, G, ρ)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic torsional bar\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item L: Length [m]\n\n\n\\item I: Second-moment of area [m⁴]\n\n\n\\item J: Torsion constant [m⁴]\n\n\n\\item G: Shear modulus [Pa]\n\n\n\\item ρ: Mass density [kg/m³]\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{m}: Line mass [kg/m]\n\n\n\\item \\texttt{D}: Stiffness coefficient [Pa]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "7",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**Strings**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "8",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Strings"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mStrings(L, S, D, ρ)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic string\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mS\u001b[39m: Cross-section area [m²]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Tension [N]\n    \u001b[34m• \u001b[39m \u001b[36mρ\u001b[39m: Mass density [kg/m³]\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Linear mass density [kg/m]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Tension [N]",
+                        "text/markdown": "```julia\nStrings(L, S, D, ρ)\n```\n\nStructure containing the data of a homogeneous and isotropic string\n\n**Constructor parameters**\n\n  * `L`: Length [m]\n  * `S`: Cross-section area [m²]\n  * `D`: Tension [N]\n  * `ρ`: Mass density [kg/m³]\n\n**Fields**\n\n  * `L`: Length [m]\n  * `m`: Linear mass density [kg/m]\n  * `D`: Tension [N]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Strings&#40;L, S, D, ρ&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic string</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>S</code>: Cross-section area &#91;m²&#93;</p>\n</li>\n<li><p><code>D</code>: Tension &#91;N&#93;</p>\n</li>\n<li><p><code>ρ</code>: Mass density &#91;kg/m³&#93;</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Linear mass density &#91;kg/m&#93;</p>\n</li>\n<li><p><code>D</code>: Tension &#91;N&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nStrings(L, S, D, ρ)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic string\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{S}: Cross-section area [m²]\n\n\n\\item \\texttt{D}: Tension [N]\n\n\n\\item \\texttt{ρ}: Mass density [kg/m³]\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{m}: Linear mass density [kg/m]\n\n\n\\item \\texttt{D}: Tension [N]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "9",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**Beam**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "10",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Beam"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mBeam(L, S, I, E, ρ)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic bending beam\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mS\u001b[39m: Cross-section area [m²]\n    \u001b[34m• \u001b[39m \u001b[36mI\u001b[39m: Second moment of area [m⁴]\n    \u001b[34m• \u001b[39m \u001b[36mE\u001b[39m: Young's modulus [Pa]\n    \u001b[34m• \u001b[39m \u001b[36mρ\u001b[39m: Density [kg/m³]\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Linear mass density [kg/m]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Bending stiffness [N.m²]",
+                        "text/markdown": "```julia\nBeam(L, S, I, E, ρ)\n```\n\nStructure containing the data of a homogeneous and isotropic bending beam\n\n**Constructor parameters**\n\n  * `L`: Length [m]\n  * `S`: Cross-section area [m²]\n  * `I`: Second moment of area [m⁴]\n  * `E`: Young's modulus [Pa]\n  * `ρ`: Density [kg/m³]\n\n**Fields**\n\n  * `L`: Length [m]\n  * `M`: Linear mass density [kg/m]\n  * `D`: Bending stiffness [N.m²]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Beam&#40;L, S, I, E, ρ&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic bending beam</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>S</code>: Cross-section area &#91;m²&#93;</p>\n</li>\n<li><p><code>I</code>: Second moment of area &#91;m⁴&#93;</p>\n</li>\n<li><p><code>E</code>: Young&#39;s modulus &#91;Pa&#93;</p>\n</li>\n<li><p><code>ρ</code>: Density &#91;kg/m³&#93;</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>M</code>: Linear mass density &#91;kg/m&#93;</p>\n</li>\n<li><p><code>D</code>: Bending stiffness &#91;N.m²&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nBeam(L, S, I, E, ρ)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic bending beam\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{S}: Cross-section area [m²]\n\n\n\\item \\texttt{I}: Second moment of area [m⁴]\n\n\n\\item \\texttt{E}: Young's modulus [Pa]\n\n\n\\item \\texttt{ρ}: Density [kg/m³]\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{M}: Linear mass density [kg/m]\n\n\n\\item \\texttt{D}: Bending stiffness [N.m²]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "11",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "**Related functions**\n",
+                "\n",
+                "::: {.api}\n",
+                "**modefreq**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "12",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modefreq(b::Bar, fmax, bc = :CC)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodefreq(model::Bar, fmax, bc = :CC)\u001b[39m\n  \u001b[36mmodefreq(model::Rod, fmax, bc = :CC)\u001b[39m\n  \u001b[36mmodefreq(model::Strings, fmax, bc = :CC)\u001b[39m\n  \u001b[36mmodefreq(model::Beam, fmax, bc = :SS)\u001b[39m\n\n  Computes the natural frequencies of a longitudinal or torsional bar up to\n  fmax\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the bar data\n    \u001b[34m• \u001b[39m \u001b[36mfmax\u001b[39m: Maximum frequency for calculating the mode shapes [Hz]\n    \u001b[34m• \u001b[39m \u001b[36mbc\u001b[39m: Boundary conditions\n       \n       \u001b[34m• \u001b[39m For all OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36m:CC\u001b[39m: Clamped - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:CF\u001b[39m: Clamped - Free\n       \u001b[34m• \u001b[39m \u001b[36m:FF\u001b[39m: Free - Free\n       \u001b[34m• \u001b[39m For beams\n       \n       \u001b[34m• \u001b[39m \u001b[36m:SS\u001b[39m: Simply Supported - Simply Supported\n       \u001b[34m• \u001b[39m \u001b[36m:SC\u001b[39m: Simply Supported - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:SF\u001b[39m: Simply Supported - Free\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωn\u001b[39m: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n    \u001b[34m• \u001b[39m \u001b[36mkn\u001b[39m: Vector of modal wavenumbers",
+                        "text/markdown": "```julia\nmodefreq(model::Bar, fmax, bc = :CC)\nmodefreq(model::Rod, fmax, bc = :CC)\nmodefreq(model::Strings, fmax, bc = :CC)\nmodefreq(model::Beam, fmax, bc = :SS)\n```\n\nComputes the natural frequencies of a longitudinal or torsional bar up to fmax\n\n**Inputs**\n\n  * `model`: Structure containing the bar data\n  * `fmax`: Maximum frequency for calculating the mode shapes [Hz]\n  * `bc`: Boundary conditions\n\n      * For all OneDStructure\n\n          * `:CC`: Clamped - Clamped\n          * `:CF`: Clamped - Free\n          * `:FF`: Free - Free\n      * For beams\n\n          * `:SS`: Simply Supported - Simply Supported\n          * `:SC`: Simply Supported - Clamped\n          * `:SF`: Simply Supported - Free\n\n**Outputs**\n\n  * `ωn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n  * `kn`: Vector of modal wavenumbers\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modefreq&#40;model::Bar, fmax, bc &#61; :CC&#41;\nmodefreq&#40;model::Rod, fmax, bc &#61; :CC&#41;\nmodefreq&#40;model::Strings, fmax, bc &#61; :CC&#41;\nmodefreq&#40;model::Beam, fmax, bc &#61; :SS&#41;</code></pre>\n<p>Computes the natural frequencies of a longitudinal or torsional bar up to fmax</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the bar data</p>\n</li>\n<li><p><code>fmax</code>: Maximum frequency for calculating the mode shapes &#91;Hz&#93;</p>\n</li>\n<li><p><code>bc</code>: Boundary conditions</p>\n<ul>\n<li><p>For all OneDStructure</p>\n<ul>\n<li><p><code>:CC</code>: Clamped - Clamped</p>\n</li>\n<li><p><code>:CF</code>: Clamped - Free</p>\n</li>\n<li><p><code>:FF</code>: Free - Free</p>\n</li>\n</ul>\n</li>\n<li><p>For beams</p>\n<ul>\n<li><p><code>:SS</code>: Simply Supported - Simply Supported</p>\n</li>\n<li><p><code>:SC</code>: Simply Supported - Clamped</p>\n</li>\n<li><p><code>:SF</code>: Simply Supported - Free</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ωn</code>: Natural frequencies calculated up to ωmax &#61; 2π*fmax &#91;Hz&#93;</p>\n</li>\n<li><p><code>kn</code>: Vector of modal wavenumbers</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodefreq(model::Bar, fmax, bc = :CC)\nmodefreq(model::Rod, fmax, bc = :CC)\nmodefreq(model::Strings, fmax, bc = :CC)\nmodefreq(model::Beam, fmax, bc = :SS)\n\\end{verbatim}\nComputes the natural frequencies of a longitudinal or torsional bar up to fmax\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the bar data\n\n\n\\item \\texttt{fmax}: Maximum frequency for calculating the mode shapes [Hz]\n\n\n\\item \\texttt{bc}: Boundary conditions\n\n\\begin{itemize}\n\\item For all OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{:CC}: Clamped - Clamped\n\n\n\\item \\texttt{:CF}: Clamped - Free\n\n\n\\item \\texttt{:FF}: Free - Free\n\n\\end{itemize}\n\n\\item For beams\n\n\\begin{itemize}\n\\item \\texttt{:SS}: Simply Supported - Simply Supported\n\n\n\\item \\texttt{:SC}: Simply Supported - Clamped\n\n\n\\item \\texttt{:SF}: Simply Supported - Free\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ωn}: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n\n\n\\item \\texttt{kn}: Vector of modal wavenumbers\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "13",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modeshape**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "14",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modeshape(b::Bar, kn::Vector{Float64}, x, bc = :CC)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodeshape(model::Bar, kn, x, bc = :CC)\u001b[39m\n  \u001b[36mmodeshape(model::Rod, kn, x, bc = :CC)\u001b[39m\n  \u001b[36mmodeshape(model::Strings, kn, x, bc = :CC)\u001b[39m\n  \u001b[36mmodeshape(model::Beam, kn, x, bc = :SS)\u001b[39m\n\n  Computes the mass-normalized mode shapes of a longitudinal or torsional bar\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the bar data\n    \u001b[34m• \u001b[39m \u001b[36mkn\u001b[39m: Array of modal wavenumbers\n    \u001b[34m• \u001b[39m \u001b[36mx\u001b[39m: Coordinates of calculation points of the mode shapes\n    \u001b[34m• \u001b[39m \u001b[36mbc\u001b[39m: Boundary conditions\n       \n       \u001b[34m• \u001b[39m For all OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36m:CC\u001b[39m: Clamped - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:CF\u001b[39m: Clamped - Free\n       \u001b[34m• \u001b[39m \u001b[36m:FF\u001b[39m: Free - Free\n       \u001b[34m• \u001b[39m For beams\n       \n       \u001b[34m• \u001b[39m \u001b[36m:SS\u001b[39m: Simply Supported - Simply Supported\n       \u001b[34m• \u001b[39m \u001b[36m:SC\u001b[39m: Simply Supported - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:SF\u001b[39m: Simply Supported - Free\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mϕ\u001b[39m: Mass-normalized mode shapes",
+                        "text/markdown": "```julia\nmodeshape(model::Bar, kn, x, bc = :CC)\nmodeshape(model::Rod, kn, x, bc = :CC)\nmodeshape(model::Strings, kn, x, bc = :CC)\nmodeshape(model::Beam, kn, x, bc = :SS)\n```\n\nComputes the mass-normalized mode shapes of a longitudinal or torsional bar\n\n**Inputs**\n\n  * `model`: Structure containing the bar data\n  * `kn`: Array of modal wavenumbers\n  * `x`: Coordinates of calculation points of the mode shapes\n  * `bc`: Boundary conditions\n\n      * For all OneDStructure\n\n          * `:CC`: Clamped - Clamped\n          * `:CF`: Clamped - Free\n          * `:FF`: Free - Free\n      * For beams\n\n          * `:SS`: Simply Supported - Simply Supported\n          * `:SC`: Simply Supported - Clamped\n          * `:SF`: Simply Supported - Free\n\n**Output**\n\n  * `ϕ`: Mass-normalized mode shapes\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modeshape&#40;model::Bar, kn, x, bc &#61; :CC&#41;\nmodeshape&#40;model::Rod, kn, x, bc &#61; :CC&#41;\nmodeshape&#40;model::Strings, kn, x, bc &#61; :CC&#41;\nmodeshape&#40;model::Beam, kn, x, bc &#61; :SS&#41;</code></pre>\n<p>Computes the mass-normalized mode shapes of a longitudinal or torsional bar</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the bar data</p>\n</li>\n<li><p><code>kn</code>: Array of modal wavenumbers</p>\n</li>\n<li><p><code>x</code>: Coordinates of calculation points of the mode shapes</p>\n</li>\n<li><p><code>bc</code>: Boundary conditions</p>\n<ul>\n<li><p>For all OneDStructure</p>\n<ul>\n<li><p><code>:CC</code>: Clamped - Clamped</p>\n</li>\n<li><p><code>:CF</code>: Clamped - Free</p>\n</li>\n<li><p><code>:FF</code>: Free - Free</p>\n</li>\n</ul>\n</li>\n<li><p>For beams</p>\n<ul>\n<li><p><code>:SS</code>: Simply Supported - Simply Supported</p>\n</li>\n<li><p><code>:SC</code>: Simply Supported - Clamped</p>\n</li>\n<li><p><code>:SF</code>: Simply Supported - Free</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>ϕ</code>: Mass-normalized mode shapes</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodeshape(model::Bar, kn, x, bc = :CC)\nmodeshape(model::Rod, kn, x, bc = :CC)\nmodeshape(model::Strings, kn, x, bc = :CC)\nmodeshape(model::Beam, kn, x, bc = :SS)\n\\end{verbatim}\nComputes the mass-normalized mode shapes of a longitudinal or torsional bar\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the bar data\n\n\n\\item \\texttt{kn}: Array of modal wavenumbers\n\n\n\\item \\texttt{x}: Coordinates of calculation points of the mode shapes\n\n\n\\item \\texttt{bc}: Boundary conditions\n\n\\begin{itemize}\n\\item For all OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{:CC}: Clamped - Clamped\n\n\n\\item \\texttt{:CF}: Clamped - Free\n\n\n\\item \\texttt{:FF}: Free - Free\n\n\\end{itemize}\n\n\\item For beams\n\n\\begin{itemize}\n\\item \\texttt{:SS}: Simply Supported - Simply Supported\n\n\n\\item \\texttt{:SC}: Simply Supported - Clamped\n\n\n\\item \\texttt{:SF}: Simply Supported - Free\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{ϕ}: Mass-normalized mode shapes\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "15",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "# Dimensions\n",
+                "L = 1.\n",
+                "d = 3e-2\n",
+                "\n",
+                "# Section features\n",
+                "S = π*d^2/4\n",
+                "Iz = π*d^4/64\n",
+                "IG = 2Iz\n",
+                "J = IG\n",
+                "\n",
+                "# Tension for string\n",
+                "T = 100.\n",
+                "\n",
+                "# Material\n",
+                "E = 2.1e11\n",
+                "ν = 0.33\n",
+                "G = E/(1 - 2*ν)\n",
+                "ρ = 7800.\n",
+                "\n",
+                "# Computation parameters\n",
+                "fmax = 2000.\n",
+                "x = [0.1, 0.9]\n",
+                "\n",
+                "# Initialization of the data types\n",
+                "bar = Bar(L, S, E, ρ)\n",
+                "rod = Rod(L, IG, J, G, ρ)\n",
+                "strings = Strings(L, S, T, ρ)\n",
+                "beam = Beam(L, S, Iz, E, ρ)\n",
+                "\n",
+                "# Computation of the natural frequencies\n",
+                "ωn, kn = modefreq(bar, fmax)\n",
+                "\n",
+                "# Computation of the corresponding mode shapes\n",
+                "ϕn = modeshape(bar, kn, x, :CC)\n",
+                "```\n",
+                "\n",
+                "### 2D models\n",
+                "\n",
+                "#### Rectangular membranes\n",
+                "\n",
+                "Rectangular membranes are governed by the following equation of motion:\n",
+                "$$\n",
+                "m \\ddot w(x, y ,t) + D\\Delta w(x, y, t) = p(x, y, t),\n",
+                "$$\n",
+                "where:\n",
+                "\n",
+                "- $w(x, y, t)$: Transverse displacement [m] at point $(x, y)$ and time $t$\n",
+                "\n",
+                "- $m$: Surface mass [kg/m]\n",
+                "\n",
+                "- $D = \\tau$: Linear tension [N/m]\n",
+                "\n",
+                "- $\\Delta = \\frac{\\partial^2}{\\partial x^2} + \\frac{\\partial^2}{\\partial y^2}$: Laplacian operator\n",
+                "\n",
+                "#### Rectangular Kirchhoff-Love plates\n",
+                "\n",
+                "Rectangular Kirchhoff-Love plates are governed by the following equation of motion:\n",
+                "$$\n",
+                "m \\ddot w(x, y, t) + D \\Delta^2 w(x, y, t) = p(x, y, t),\n",
+                "$$\n",
+                "where:\n",
+                "\n",
+                "- $w(x, y, t)$: Transverse displacement [m] at point $(x, y)$ and time $t$\n",
+                "\n",
+                "- $m = \\rho h$: Surface mass [kg/m^2^]\n",
+                "    - $h$: Thickness [m]\n",
+                "\n",
+                "- $D = \\frac{Eh^3}{12(1 - \\nu^2)}$: Bending stiffness [N.m]\n",
+                "    - $\\nu$: Poisson's coefficient\n",
+                "\n",
+                "- $\\Delta^2 = \\frac{\\partial^4}{\\partial x^4} + 2\\frac{\\partial^4}{\\partial x^2 \\partial y^2} + \\frac{\\partial^4}{\\partial y^4}$: Bilaplacian operator\n",
+                "\n",
+                "#### API\n",
+                "\n",
+                "**Data type**\n",
+                "\n",
+                "All the following data types are a subtype of the super type `TwoDStructure`.\n",
+                "\n",
+                "::: {.api}\n",
+                "**Membrane**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "16",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Membrane"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mMembrane(L, b, m, D)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic rectangular\n  membrane\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mb\u001b[39m: Width [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Surface mass [kg/m²]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Tension per unit length [N/m]",
+                        "text/markdown": "```julia\nMembrane(L, b, m, D)\n```\n\nStructure containing the data of a homogeneous and isotropic rectangular membrane\n\n**Fields**\n\n  * `L`: Length [m]\n  * `b`: Width [m]\n  * `m`: Surface mass [kg/m²]\n  * `D`: Tension per unit length [N/m]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Membrane&#40;L, b, m, D&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic rectangular membrane</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>b</code>: Width &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Surface mass &#91;kg/m²&#93;</p>\n</li>\n<li><p><code>D</code>: Tension per unit length &#91;N/m&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nMembrane(L, b, m, D)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic rectangular membrane\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{b}: Width [m]\n\n\n\\item \\texttt{m}: Surface mass [kg/m²]\n\n\n\\item \\texttt{D}: Tension per unit length [N/m]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "17",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**Plate**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "18",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Plate"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mPlate(L, b, h, E, ρ, ν)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic bending plate\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mb\u001b[39m: Width [m]\n    \u001b[34m• \u001b[39m \u001b[36mE\u001b[39m: Young's modulus [Pa]\n    \u001b[34m• \u001b[39m \u001b[36mρ\u001b[39m: Density [kg/m³]\n    \u001b[34m• \u001b[39m \u001b[36mν\u001b[39m: Poisson's ratio\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mb\u001b[39m: Width [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Surface mass [kg/m²]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Bending stiffness [N.m]",
+                        "text/markdown": "```julia\nPlate(L, b, h, E, ρ, ν)\n```\n\nStructure containing the data of a homogeneous and isotropic bending plate\n\n**Constructor parameters**\n\n  * `L`: Length [m]\n  * `b`: Width [m]\n  * `E`: Young's modulus [Pa]\n  * `ρ`: Density [kg/m³]\n  * `ν`: Poisson's ratio\n\n**Fields**\n\n  * `L`: Length [m]\n  * `b`: Width [m]\n  * `m`: Surface mass [kg/m²]\n  * `D`: Bending stiffness [N.m]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Plate&#40;L, b, h, E, ρ, ν&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic bending plate</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>b</code>: Width &#91;m&#93;</p>\n</li>\n<li><p><code>E</code>: Young&#39;s modulus &#91;Pa&#93;</p>\n</li>\n<li><p><code>ρ</code>: Density &#91;kg/m³&#93;</p>\n</li>\n<li><p><code>ν</code>: Poisson&#39;s ratio</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>b</code>: Width &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Surface mass &#91;kg/m²&#93;</p>\n</li>\n<li><p><code>D</code>: Bending stiffness &#91;N.m&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nPlate(L, b, h, E, ρ, ν)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic bending plate\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{b}: Width [m]\n\n\n\\item \\texttt{E}: Young's modulus [Pa]\n\n\n\\item \\texttt{ρ}: Density [kg/m³]\n\n\n\\item \\texttt{ν}: Poisson's ratio\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{b}: Width [m]\n\n\n\\item \\texttt{m}: Surface mass [kg/m²]\n\n\n\\item \\texttt{D}: Bending stiffness [N.m]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "19",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "**Related functions**\n",
+                "\n",
+                "::: {.api}\n",
+                "**modefreq**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "20",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modefreq(p::Plate, fmax)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodefreq(model::Plate, fmax)\u001b[39m\n  \u001b[36mmodefreq(model::Membrane, fmax)\u001b[39m\n\n  Computes the natural frequencies of a simply supported rectangular plate or\n  a clamped rectangular membrane up to fmax\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the plate\n    \u001b[34m• \u001b[39m \u001b[36mfmax\u001b[39m: Maximum frequency for calculating the modal shapes [Hz]\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωmn\u001b[39m: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n    \u001b[34m• \u001b[39m \u001b[36mkmn\u001b[39m: Matrix of modal wave numbers",
+                        "text/markdown": "```julia\nmodefreq(model::Plate, fmax)\nmodefreq(model::Membrane, fmax)\n```\n\nComputes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax\n\n**Inputs**\n\n  * `model`: Structure containing the data related to the plate\n  * `fmax`: Maximum frequency for calculating the modal shapes [Hz]\n\n**Outputs**\n\n  * `ωmn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n  * `kmn`: Matrix of modal wave numbers\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modefreq&#40;model::Plate, fmax&#41;\nmodefreq&#40;model::Membrane, fmax&#41;</code></pre>\n<p>Computes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the plate</p>\n</li>\n<li><p><code>fmax</code>: Maximum frequency for calculating the modal shapes &#91;Hz&#93;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ωmn</code>: Natural frequencies calculated up to ωmax &#61; 2π*fmax &#91;Hz&#93;</p>\n</li>\n<li><p><code>kmn</code>: Matrix of modal wave numbers</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodefreq(model::Plate, fmax)\nmodefreq(model::Membrane, fmax)\n\\end{verbatim}\nComputes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the plate\n\n\n\\item \\texttt{fmax}: Maximum frequency for calculating the modal shapes [Hz]\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ωmn}: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n\n\n\\item \\texttt{kmn}: Matrix of modal wave numbers\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "21",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modeshape**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "22",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modeshape(p::Plate, kn, x, y)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodeshape(model::Plate, kpq, x, y)\u001b[39m\n  \u001b[36mmodeshape(model::Membrane, kpq, x, y)\u001b[39m\n\n  Computes the mass-normalized mode shapes of a simply supported rectangular\n  plate or a clamped rectangular membrane\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the structure\n    \u001b[34m• \u001b[39m \u001b[36mkmn\u001b[39m: Matrix of modal wave numbers\n    \u001b[34m• \u001b[39m \u001b[36m(x, y)\u001b[39m: Coordinates of the points where the mode shapes are\n       calculated\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mϕ\u001b[39m: Mass-normalized mode shapes",
+                        "text/markdown": "```julia\nmodeshape(model::Plate, kpq, x, y)\nmodeshape(model::Membrane, kpq, x, y)\n```\n\nComputes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane\n\n**Inputs**\n\n  * `model`: Structure containing the data related to the structure\n  * `kmn`: Matrix of modal wave numbers\n  * `(x, y)`: Coordinates of the points where the mode shapes are calculated\n\n**Output**\n\n  * `ϕ`: Mass-normalized mode shapes\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modeshape&#40;model::Plate, kpq, x, y&#41;\nmodeshape&#40;model::Membrane, kpq, x, y&#41;</code></pre>\n<p>Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the structure</p>\n</li>\n<li><p><code>kmn</code>: Matrix of modal wave numbers</p>\n</li>\n<li><p><code>&#40;x, y&#41;</code>: Coordinates of the points where the mode shapes are calculated</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>ϕ</code>: Mass-normalized mode shapes</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodeshape(model::Plate, kpq, x, y)\nmodeshape(model::Membrane, kpq, x, y)\n\\end{verbatim}\nComputes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the structure\n\n\n\\item \\texttt{kmn}: Matrix of modal wave numbers\n\n\n\\item \\texttt{(x, y)}: Coordinates of the points where the mode shapes are calculated\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{ϕ}: Mass-normalized mode shapes\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "23",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "# Dimensions\n",
+                "Lp = 0.6\n",
+                "bp = 0.4\n",
+                "hp = 1e-3\n",
+                "\n",
+                "# Material parameters\n",
+                "E = 2.1e11\n",
+                "ρ = 7800.\n",
+                "ν = 0.33\n",
+                "\n",
+                "# Computation parameters\n",
+                "fmax = 1000.\n",
+                "xp = [0.1, 0.5]\n",
+                "yp = [0.1, 0.3]\n",
+                "\n",
+                "# Initialization of the data types\n",
+                "plate = Plate(Lp, bp, hp, E, ρ, ν)\n",
+                "\n",
+                "# Computation of the natural frequencies\n",
+                "ωn, kn = modefreq(plate, fmax)\n",
+                "\n",
+                "# Computation of the corresponding mode shapes\n",
+                "ϕn = modeshape(plate, kn, xp, yp)\n",
+                "```\n",
+                "\n",
+                "## Discrete models\n",
+                "\n",
+                "### Sdof systems\n",
+                "\n",
+                "Single degree of freedom (Sdof) systems are classically composed of a mass $m$, a stiffness $k$ and a viscous damper $c$ (see @fig-1dof).\n",
+                "\n",
+                "::: {#fig-1dof}\n",
+                "![](../assets/images/1dof.svg)\n",
+                "\n",
+                "Classical representation of an Sdof system\n",
+                ":::\n",
+                "\n",
+                "Mathematically, their dynamic behavior is governed by the following normalized equation of motion :\n",
+                "$$\n",
+                "\\ddot x(t) + 2\\xi\\,\\omega_0\\, \\dot x(t) + \\omega_0^2 x(t) = \\frac{F(t)}{m}.\n",
+                "$$\n",
+                "where $F(t)$ can be either a base or an external excitation applied to the system.\n",
+                "\n",
+                "The Sdof system can thus be defined by:\n",
+                "\n",
+                "- its mass $m$\n",
+                "- its natural angular frequency $\\omega_0$ (or its natural frequency $f_0$)\n",
+                "- its damping ratio $\\xi$\n",
+                "\n",
+                "#### API\n",
+                "\n",
+                ":::::: {.api}\n",
+                "**Sdof**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "24",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Sdof"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mSdof(m, ω0, ξ)\u001b[39m\n\n  Structure containing the data of a sdof system\n\n  \u001b[1mConstructor\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Mass [kg]\n    \u001b[34m• \u001b[39m \u001b[36mf0\u001b[39m: Natural frequency [Hz]\n    \u001b[34m• \u001b[39m \u001b[36mξ\u001b[39m: Damping ratio\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Mass [kg]\n    \u001b[34m• \u001b[39m \u001b[36mω0\u001b[39m: Natural frequency [rad/s]\n    \u001b[34m• \u001b[39m \u001b[36mξ\u001b[39m: Damping ratio",
+                        "text/markdown": "```julia\nSdof(m, ω0, ξ)\n```\n\nStructure containing the data of a sdof system\n\n**Constructor**\n\n  * `m`: Mass [kg]\n  * `f0`: Natural frequency [Hz]\n  * `ξ`: Damping ratio\n\n**Fields**\n\n  * `m`: Mass [kg]\n  * `ω0`: Natural frequency [rad/s]\n  * `ξ`: Damping ratio\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Sdof&#40;m, ω0, ξ&#41;</code></pre>\n<p>Structure containing the data of a sdof system</p>\n<p><strong>Constructor</strong></p>\n<ul>\n<li><p><code>m</code>: Mass &#91;kg&#93;</p>\n</li>\n<li><p><code>f0</code>: Natural frequency &#91;Hz&#93;</p>\n</li>\n<li><p><code>ξ</code>: Damping ratio</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>m</code>: Mass &#91;kg&#93;</p>\n</li>\n<li><p><code>ω0</code>: Natural frequency &#91;rad/s&#93;</p>\n</li>\n<li><p><code>ξ</code>: Damping ratio</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nSdof(m, ω0, ξ)\n\\end{verbatim}\nStructure containing the data of a sdof system\n\n\\textbf{Constructor}\n\n\\begin{itemize}\n\\item \\texttt{m}: Mass [kg]\n\n\n\\item \\texttt{f0}: Natural frequency [Hz]\n\n\n\\item \\texttt{ξ}: Damping ratio\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{m}: Mass [kg]\n\n\n\\item \\texttt{ω0}: Natural frequency [rad/s]\n\n\n\\item \\texttt{ξ}: Damping ratio\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "25",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "# Definition of the structural parameters\n",
+                "m = 1.\n",
+                "f₀ = 10.\n",
+                "ξ = 0.01\n",
+                "\n",
+                "# Initialization of Sdof\n",
+                "sdof = Sdof(m, f₀, ξ)\n",
+                "```\n",
+                "\n",
+                "### Mdof systems\n",
+                "\n",
+                "`StructuralVibration.jl` considers Multi-degrees of freedom (Mdof) systems, which topology is presented in @fig-mdof. This choice has been made, because it allows modeling a large variety of possible configurations.\n",
+                "\n",
+                "::: {#fig-mdof}\n",
+                "![](../assets/images/mdof.svg)\n",
+                "\n",
+                "General topology of an Mdof system\n",
+                ":::\n",
+                "\n",
+                "The dynamic behavior of such a system is governed by the following matrix system:\n",
+                "$$\n",
+                "\\mathbf{M} \\ddot{\\mathbf{x}}(t) + \\mathbf{K}\\mathbf{x}(t) = \\mathbf{f}(t),\n",
+                "$$\n",
+                "where:\n",
+                "\n",
+                "- $\\mathbf{M} = \\text{diag}(m_1, \\dots, m_j, \\dots, m_N)$ is the mass matrix.\n",
+                "\n",
+                "- $\\mathbf{K}$ is the stiffness matrix such that:\n",
+                "$$\n",
+                "\\mathbf{K} = \\begin{bmatrix}\n",
+                "k_1 & -k_1 & 0 & \\ldots & 0 & 0 \\\\\n",
+                "-k_1 & k_1 + k_2 & -k_2 & \\ddots & \\vdots & \\vdots \\\\\n",
+                "0 & -k_2 & \\ddots & \\ddots & 0 & \\vdots \\\\\n",
+                "\\vdots & 0 & \\ddots & \\ddots & -k_{N-1} & 0 \\\\\n",
+                "\\vdots & \\vdots & \\ddots & -k_{N-1} & k_{N-1} + k_N & -k_N \\\\\n",
+                "0 & 0 & \\ldots & 0 & -k_N & k_N\n",
+                "\\end{bmatrix}.\n",
+                "$$\n",
+                "\n",
+                "- $\\mathbf{x}(t) = \\left[x_1(t), \\dots, x_j(t), \\dots, x_N(t)\\right]^\\mathsf{T}$ is the displacement vector.\n",
+                "\n",
+                "- $\\mathbf{f}(t) = \\left[F_1(t), \\dots, F_j(t), \\dots, F_N(t)\\right]^\\mathsf{T}$ is the external force vector.\n",
+                "\n",
+                "#### API {#sec-api-mdof}\n",
+                "\n",
+                "**Data types**\n",
+                "\n",
+                ":::: {.api}\n",
+                "**Mdof**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "26",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc Mdof"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mMdof(k, m, c = Float64[])\u001b[39m\n\n  Structure containing the data for building a mdof system\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mk\u001b[39m: Stiffness coefficients of the spring elements\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Masses of the mdof system\n    \u001b[34m• \u001b[39m \u001b[36mc\u001b[39m: Damping coefficients of the viscous dampers",
+                        "text/markdown": "```julia\nMdof(k, m, c = Float64[])\n```\n\nStructure containing the data for building a mdof system\n\n**Fields**\n\n  * `k`: Stiffness coefficients of the spring elements\n  * `m`: Masses of the mdof system\n  * `c`: Damping coefficients of the viscous dampers\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Mdof&#40;k, m, c &#61; Float64&#91;&#93;&#41;</code></pre>\n<p>Structure containing the data for building a mdof system</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>k</code>: Stiffness coefficients of the spring elements</p>\n</li>\n<li><p><code>m</code>: Masses of the mdof system</p>\n</li>\n<li><p><code>c</code>: Damping coefficients of the viscous dampers</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nMdof(k, m, c = Float64[])\n\\end{verbatim}\nStructure containing the data for building a mdof system\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{k}: Stiffness coefficients of the spring elements\n\n\n\\item \\texttt{m}: Masses of the mdof system\n\n\n\\item \\texttt{c}: Damping coefficients of the viscous dampers\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "27",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                "\n",
+                "::: {.callout-note title=\"About the damping matrix C\" collapse=\"true\"}\n",
+                "If viscous dampers are defined, the damping matrix $\\mathbf{C}$ is consistent with the stiffness matrix $\\mathbf{K}$, meaning that:\n",
+                "$$\n",
+                "\\mathbf{C} = \\begin{bmatrix}\n",
+                "c_1 & -c_1 & 0 & \\ldots & 0 & 0 \\\\\n",
+                "-c_1 & c_1 + c_2 & -c_2 & \\ddots & \\vdots & \\vdots \\\\\n",
+                "0 & -k_2 & \\ddots & \\ddots & 0 & \\vdots \\\\\n",
+                "\\vdots & 0 & \\ddots & \\ddots & -c_{N-1} & 0 \\\\\n",
+                "\\vdots & \\vdots & \\ddots & -c_{N-1} & c_{N-1} + c_N & -c_N \\\\\n",
+                "0 & 0 & \\ldots & 0 & -c_N & c_N\n",
+                "\\end{bmatrix}.\n",
+                "$$\n",
+                ":::\n",
+                "::::\n",
+                "\n",
+                "::: {.api}\n",
+                "**MdofMesh**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "28",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc MdofMesh"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mMdofMesh(Elt, constrained_dofs, free_dofs)\u001b[39m\n\n  Structure containing the data for building a mdof mesh\n\n  \u001b[1mConstructor\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Mdof model\n    \u001b[34m• \u001b[39m \u001b[36mbc\u001b[39m: Boundary conditions\n       \n       \u001b[34m• \u001b[39m \u001b[36m:CC\u001b[39m: Clamped - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:CF\u001b[39m: Clamped - Free\n       \u001b[34m• \u001b[39m \u001b[36m:FF\u001b[39m: Free - Free\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mElt\u001b[39m: Element connectivity matrix\n    \u001b[34m• \u001b[39m \u001b[36mconstrained_dofs\u001b[39m: Constrained degrees of freedom\n    \u001b[34m• \u001b[39m \u001b[36mfree_dofs\u001b[39m: Free degrees of freedom",
+                        "text/markdown": "```julia\nMdofMesh(Elt, constrained_dofs, free_dofs)\n```\n\nStructure containing the data for building a mdof mesh\n\n**Constructor**\n\n  * `model`: Mdof model\n  * `bc`: Boundary conditions\n\n      * `:CC`: Clamped - Clamped\n      * `:CF`: Clamped - Free\n      * `:FF`: Free - Free\n\n**Fields**\n\n  * `Elt`: Element connectivity matrix\n  * `constrained_dofs`: Constrained degrees of freedom\n  * `free_dofs`: Free degrees of freedom\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">MdofMesh&#40;Elt, constrained_dofs, free_dofs&#41;</code></pre>\n<p>Structure containing the data for building a mdof mesh</p>\n<p><strong>Constructor</strong></p>\n<ul>\n<li><p><code>model</code>: Mdof model</p>\n</li>\n<li><p><code>bc</code>: Boundary conditions</p>\n<ul>\n<li><p><code>:CC</code>: Clamped - Clamped</p>\n</li>\n<li><p><code>:CF</code>: Clamped - Free</p>\n</li>\n<li><p><code>:FF</code>: Free - Free</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>Elt</code>: Element connectivity matrix</p>\n</li>\n<li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>\n</li>\n<li><p><code>free_dofs</code>: Free degrees of freedom</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nMdofMesh(Elt, constrained_dofs, free_dofs)\n\\end{verbatim}\nStructure containing the data for building a mdof mesh\n\n\\textbf{Constructor}\n\n\\begin{itemize}\n\\item \\texttt{model}: Mdof model\n\n\n\\item \\texttt{bc}: Boundary conditions\n\n\\begin{itemize}\n\\item \\texttt{:CC}: Clamped - Clamped\n\n\n\\item \\texttt{:CF}: Clamped - Free\n\n\n\\item \\texttt{:FF}: Free - Free\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{Elt}: Element connectivity matrix\n\n\n\\item \\texttt{constrained\\_dofs}: Constrained degrees of freedom\n\n\n\\item \\texttt{free\\_dofs}: Free degrees of freedom\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "29",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "**Related functions**\n",
+                "\n",
+                "::: {.api}\n",
+                "**assembly**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "30",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc assembly(model::Mdof)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36massembly(model::Mdof)\u001b[39m\n\n  Assembly of the mass, stiffness and damping matrices of a mdof system\n\n  \u001b[1mInput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Mdof model\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Damping matrix (if viscous dampers are defined in \u001b[36mmodel\u001b[39m)",
+                        "text/markdown": "```julia\nassembly(model::Mdof)\n```\n\nAssembly of the mass, stiffness and damping matrices of a mdof system\n\n**Input**\n\n  * `model`: Mdof model\n\n**Outputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * `C`: Damping matrix (if viscous dampers are defined in `model`)\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">assembly&#40;model::Mdof&#41;</code></pre>\n<p>Assembly of the mass, stiffness and damping matrices of a mdof system</p>\n<p><strong>Input</strong></p>\n<ul>\n<li><p><code>model</code>: Mdof model</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>C</code>: Damping matrix &#40;if viscous dampers are defined in <code>model</code>&#41;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nassembly(model::Mdof)\n\\end{verbatim}\nAssembly of the mass, stiffness and damping matrices of a mdof system\n\n\\textbf{Input}\n\n\\begin{itemize}\n\\item \\texttt{model}: Mdof model\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{C}: Damping matrix (if viscous dampers are defined in \\texttt{model})\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "31",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**apply_bc**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "32",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc apply_bc"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mapply_bc(A, mesh)\u001b[39m\n\n  Apply boundary conditions to a given matrix\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mA\u001b[39m: Matrix to apply the boundary conditions\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: Mesh of the system\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mA_bc\u001b[39m: Matrix with boundary conditions applied",
+                        "text/markdown": "```julia\napply_bc(A, mesh)\n```\n\nApply boundary conditions to a given matrix\n\n**Inputs**\n\n  * `A`: Matrix to apply the boundary conditions\n  * `mesh`: Mesh of the system\n\n**Output**\n\n  * `A_bc`: Matrix with boundary conditions applied\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">apply_bc&#40;A, mesh&#41;</code></pre>\n<p>Apply boundary conditions to a given matrix</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>A</code>: Matrix to apply the boundary conditions</p>\n</li>\n<li><p><code>mesh</code>: Mesh of the system</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>A_bc</code>: Matrix with boundary conditions applied</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\napply_bc(A, mesh)\n\\end{verbatim}\nApply boundary conditions to a given matrix\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{A}: Matrix to apply the boundary conditions\n\n\n\\item \\texttt{mesh}: Mesh of the system\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{A\\_bc}: Matrix with boundary conditions applied\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "33",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**eigenmode**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "34",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc eigenmode(K::Matrix{Float64}, M::Matrix{Float64})"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36meigenmode(K, M, n = size(K, 1))\u001b[39m\n\n  Computes the eigenmodes of a system defined by its mass and stiffness\n  matrices.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mn\u001b[39m: Number of modes to be keep in the modal basis\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mω\u001b[39m: Vector of natural frequencies\n    \u001b[34m• \u001b[39m \u001b[36mΦ\u001b[39m: Mass-normalized mode shapes",
+                        "text/markdown": "```julia\neigenmode(K, M, n = size(K, 1))\n```\n\nComputes the eigenmodes of a system defined by its mass and stiffness matrices.\n\n**Inputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * `n`: Number of modes to be keep in the modal basis\n\n**Outputs**\n\n  * `ω`: Vector of natural frequencies\n  * `Φ`: Mass-normalized mode shapes\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">eigenmode&#40;K, M, n &#61; size&#40;K, 1&#41;&#41;</code></pre>\n<p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>n</code>: Number of modes to be keep in the modal basis</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ω</code>: Vector of natural frequencies</p>\n</li>\n<li><p><code>Φ</code>: Mass-normalized mode shapes</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\neigenmode(K, M, n = size(K, 1))\n\\end{verbatim}\nComputes the eigenmodes of a system defined by its mass and stiffness matrices.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{n}: Number of modes to be keep in the modal basis\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ω}: Vector of natural frequencies\n\n\n\\item \\texttt{Φ}: Mass-normalized mode shapes\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "35",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_matrices**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "36",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modal_matrices"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodal_matrices(ωn, ξn)\u001b[39m\n\n  Computes the modal mass, stiffness, and damping matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωn\u001b[39m: Vector of natural frequencies\n    \u001b[34m• \u001b[39m \u001b[36mξn\u001b[39m: Modal damping\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mKn\u001b[39m: Generalized stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mMn\u001b[39m: Generalized mass matrix (identity matrix, due to mass\n       normalization)\n    \u001b[34m• \u001b[39m \u001b[36mCn\u001b[39m: Generalized damping matrix",
+                        "text/markdown": "```julia\nmodal_matrices(ωn, ξn)\n```\n\nComputes the modal mass, stiffness, and damping matrices\n\n**Inputs**\n\n  * `ωn`: Vector of natural frequencies\n  * `ξn`: Modal damping\n\n**Outputs**\n\n  * `Kn`: Generalized stiffness matrix\n  * `Mn`: Generalized mass matrix (identity matrix, due to mass normalization)\n  * `Cn`: Generalized damping matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modal_matrices&#40;ωn, ξn&#41;</code></pre>\n<p>Computes the modal mass, stiffness, and damping matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>ωn</code>: Vector of natural frequencies</p>\n</li>\n<li><p><code>ξn</code>: Modal damping</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>Kn</code>: Generalized stiffness matrix</p>\n</li>\n<li><p><code>Mn</code>: Generalized mass matrix &#40;identity matrix, due to mass normalization&#41;</p>\n</li>\n<li><p><code>Cn</code>: Generalized damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodal_matrices(ωn, ξn)\n\\end{verbatim}\nComputes the modal mass, stiffness, and damping matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{ωn}: Vector of natural frequencies\n\n\n\\item \\texttt{ξn}: Modal damping\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{Kn}: Generalized stiffness matrix\n\n\n\\item \\texttt{Mn}: Generalized mass matrix (identity matrix, due to mass normalization)\n\n\n\\item \\texttt{Cn}: Generalized damping matrix\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "37",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_effective_mass**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "38",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modal_effective_mass"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodal_effective_mass(M, ϕn, r)\u001b[39m\n\n  Computes the effective mass of a mode\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mϕn\u001b[39m: Mode shape\n    \u001b[34m• \u001b[39m \u001b[36mr\u001b[39m: Influence vector (rigid body mode)\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmeff\u001b[39m: Modal effective mass\n\n  \u001b[3mNote: The modeshapes are supposed to be mass-normalized\u001b[23m",
+                        "text/markdown": "```julia\nmodal_effective_mass(M, ϕn, r)\n```\n\nComputes the effective mass of a mode\n\n**Inputs**\n\n  * `M`: Mass matrix\n  * `ϕn`: Mode shape\n  * `r`: Influence vector (rigid body mode)\n\n**Outputs**\n\n  * `meff`: Modal effective mass\n\n*Note: The modeshapes are supposed to be mass-normalized*\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modal_effective_mass&#40;M, ϕn, r&#41;</code></pre>\n<p>Computes the effective mass of a mode</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>ϕn</code>: Mode shape</p>\n</li>\n<li><p><code>r</code>: Influence vector &#40;rigid body mode&#41;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>meff</code>: Modal effective mass</p>\n</li>\n</ul>\n<p><em>Note: The modeshapes are supposed to be mass-normalized</em></p>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodal_effective_mass(M, ϕn, r)\n\\end{verbatim}\nComputes the effective mass of a mode\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{ϕn}: Mode shape\n\n\n\\item \\texttt{r}: Influence vector (rigid body mode)\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{meff}: Modal effective mass\n\n\\end{itemize}\n\\emph{Note: The modeshapes are supposed to be mass-normalized}\n\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "39",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "# Definition of the structural parameters\n",
+                "k_mdof = [1., 1.]\n",
+                "m_mdof = ones(3)\n",
+                "c_mdof = [0.1, 0.1]\n",
+                "\n",
+                "# Initialization of Mdof\n",
+                "mdof = Mdof(k_mdof, m_mdof, c_mdof)\n",
+                "\n",
+                "# Definition of a MdofMesh\n",
+                "mdof_mesh = MdofMesh(mdof, bc = :CF)\n",
+                "\n",
+                "# System assembly\n",
+                "K_mdof, M_mdof, C_mdof = assembly(mdof)\n",
+                "\n",
+                "# Apply boundary conditions (if any)\n",
+                "K_bc = apply_bc(K_mdof, mdof_mesh)\n",
+                "M_bc = apply_bc(M_mdof, mdof_mesh)\n",
+                "C_bc = apply_bc(C_mdof, mdof_mesh)\n",
+                "\n",
+                "# Compute the eigenmodes of the systems\n",
+                "ωn, Φn = eigenmode(K_bc, M_bc)\n",
+                "\n",
+                "# Computation of the modal matrices\n",
+                "Kmodal, Mmodal, Cmodal = modal_matrices(ωn, 0.01)\n",
+                "\n",
+                "# Computation of modal effective mass\n",
+                "meff = modal_effective_mass(M_bc, Φn, ones(2))\n",
+                "```\n",
+                "\n",
+                "### FE model\n",
+                "\n",
+                "Finite element models are available for the 1D continuous systems defined in @sec-1d-models.\n",
+                "\n",
+                "#### API\n",
+                "**Data type**\n",
+                "\n",
+                "::: {.api}\n",
+                "**OneDMesh**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "40",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc OneDMesh"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mOneDMesh(model, xmin, Nelt, bc)\u001b[39m\n\n  Construct a mesh for a beam with Nelt elements, length L and starting at\n  xmin.\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the 1D system\n    \u001b[34m• \u001b[39m \u001b[36mxmin\u001b[39m: starting position of the beam\n    \u001b[34m• \u001b[39m \u001b[36mNelt\u001b[39m: number of elements\n    \u001b[34m• \u001b[39m \u001b[36mbc\u001b[39m: Boundary conditions type\n       \n       \u001b[34m• \u001b[39m \u001b[36m:CC\u001b[39m: Clamped - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:FF\u001b[39m: Free - Free\n       \u001b[34m• \u001b[39m \u001b[36m:CF\u001b[39m: Clamped - Free\n       \u001b[34m• \u001b[39m \u001b[36m:SS\u001b[39m: Simply Supported - Simply Supported (specific to\n       beam)\n       \u001b[34m• \u001b[39m \u001b[36m:CS\u001b[39m: Clamped - Simply Supported (specific to beam)\n       \u001b[34m• \u001b[39m \u001b[36m:SF\u001b[39m: Simply Supported - Free (specific to beam)\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mxmin\u001b[39m: Starting position of the beam\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length of the beam\n    \u001b[34m• \u001b[39m \u001b[36mNodes\u001b[39m: Nodes of the mesh\n    \u001b[34m• \u001b[39m \u001b[36mElt\u001b[39m: Elements of the mesh\n    \u001b[34m• \u001b[39m \u001b[36mNdof_per_node\u001b[39m`: Number of degrees of freedom per node\n    \u001b[34m• \u001b[39m \u001b[36melem_size\u001b[39m: Size of the elements\n    \u001b[34m• \u001b[39m \u001b[36mconstrained_dofs\u001b[39m: Constrained degrees of freedom\n    \u001b[34m• \u001b[39m \u001b[36mfree_dofs\u001b[39m: Free degrees of freedom",
+                        "text/markdown": "```julia\nOneDMesh(model, xmin, Nelt, bc)\n```\n\nConstruct a mesh for a beam with Nelt elements, length L and starting at xmin.\n\n**Constructor parameters**\n\n  * `model`: Structure containing the data related to the 1D system\n  * `xmin`: starting position of the beam\n  * `Nelt`: number of elements\n  * `bc`: Boundary conditions type\n\n      * `:CC`: Clamped - Clamped\n      * `:FF`: Free - Free\n      * `:CF`: Clamped - Free\n      * `:SS`: Simply Supported - Simply Supported (specific to beam)\n      * `:CS`: Clamped - Simply Supported (specific to beam)\n      * `:SF`: Simply Supported - Free (specific to beam)\n\n**Fields**\n\n  * `xmin`: Starting position of the beam\n  * `L`: Length of the beam\n  * `Nodes`: Nodes of the mesh\n  * `Elt`: Elements of the mesh\n  * `Ndof_per_node``: Number of degrees of freedom per node\n  * `elem_size`: Size of the elements\n  * `constrained_dofs`: Constrained degrees of freedom\n  * `free_dofs`: Free degrees of freedom\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">OneDMesh&#40;model, xmin, Nelt, bc&#41;</code></pre>\n<p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the 1D system</p>\n</li>\n<li><p><code>xmin</code>: starting position of the beam</p>\n</li>\n<li><p><code>Nelt</code>: number of elements</p>\n</li>\n<li><p><code>bc</code>: Boundary conditions type</p>\n<ul>\n<li><p><code>:CC</code>: Clamped - Clamped</p>\n</li>\n<li><p><code>:FF</code>: Free - Free</p>\n</li>\n<li><p><code>:CF</code>: Clamped - Free</p>\n</li>\n<li><p><code>:SS</code>: Simply Supported - Simply Supported &#40;specific to beam&#41;</p>\n</li>\n<li><p><code>:CS</code>: Clamped - Simply Supported &#40;specific to beam&#41;</p>\n</li>\n<li><p><code>:SF</code>: Simply Supported - Free &#40;specific to beam&#41;</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>xmin</code>: Starting position of the beam</p>\n</li>\n<li><p><code>L</code>: Length of the beam</p>\n</li>\n<li><p><code>Nodes</code>: Nodes of the mesh</p>\n</li>\n<li><p><code>Elt</code>: Elements of the mesh</p>\n</li>\n<li><p><code>Ndof_per_node</code>&#96;: Number of degrees of freedom per node</p>\n</li>\n<li><p><code>elem_size</code>: Size of the elements</p>\n</li>\n<li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>\n</li>\n<li><p><code>free_dofs</code>: Free degrees of freedom</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nOneDMesh(model, xmin, Nelt, bc)\n\\end{verbatim}\nConstruct a mesh for a beam with Nelt elements, length L and starting at xmin.\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the 1D system\n\n\n\\item \\texttt{xmin}: starting position of the beam\n\n\n\\item \\texttt{Nelt}: number of elements\n\n\n\\item \\texttt{bc}: Boundary conditions type\n\n\\begin{itemize}\n\\item \\texttt{:CC}: Clamped - Clamped\n\n\n\\item \\texttt{:FF}: Free - Free\n\n\n\\item \\texttt{:CF}: Clamped - Free\n\n\n\\item \\texttt{:SS}: Simply Supported - Simply Supported (specific to beam)\n\n\n\\item \\texttt{:CS}: Clamped - Simply Supported (specific to beam)\n\n\n\\item \\texttt{:SF}: Simply Supported - Free (specific to beam)\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{xmin}: Starting position of the beam\n\n\n\\item \\texttt{L}: Length of the beam\n\n\n\\item \\texttt{Nodes}: Nodes of the mesh\n\n\n\\item \\texttt{Elt}: Elements of the mesh\n\n\n\\item \\texttt{Ndof\\_per\\_node}`: Number of degrees of freedom per node\n\n\n\\item \\texttt{elem\\_size}: Size of the elements\n\n\n\\item \\texttt{constrained\\_dofs}: Constrained degrees of freedom\n\n\n\\item \\texttt{free\\_dofs}: Free degrees of freedom\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "41",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "**Related functions**\n",
+                "\n",
+                "::: {.api}\n",
+                "**assemby**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "42",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc assembly(model::Beam, mesh::OneDMesh)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36massembly(model::OneDstructure, mesh::OneDMesh)\u001b[39m\n\n  Compute the global stiffness and mass matrices for a 1D structure with a\n  given mesh.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36mBeam\u001b[39m: Beam model\n       \u001b[34m• \u001b[39m \u001b[36mWaveEquation\u001b[39m: Bar, Rod or String model\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: OneDMesh\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: global stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: global mass matrix",
+                        "text/markdown": "```julia\nassembly(model::OneDstructure, mesh::OneDMesh)\n```\n\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n**Inputs**\n\n  * `model`: OneDStructure\n\n      * `Beam`: Beam model\n      * `WaveEquation`: Bar, Rod or String model\n  * `mesh`: OneDMesh\n\n**Outputs**\n\n  * `K`: global stiffness matrix\n  * `M`: global mass matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">assembly&#40;model::OneDstructure, mesh::OneDMesh&#41;</code></pre>\n<p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: OneDStructure</p>\n<ul>\n<li><p><code>Beam</code>: Beam model</p>\n</li>\n<li><p><code>WaveEquation</code>: Bar, Rod or String model</p>\n</li>\n</ul>\n</li>\n<li><p><code>mesh</code>: OneDMesh</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>K</code>: global stiffness matrix</p>\n</li>\n<li><p><code>M</code>: global mass matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nassembly(model::OneDstructure, mesh::OneDMesh)\n\\end{verbatim}\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{Beam}: Beam model\n\n\n\\item \\texttt{WaveEquation}: Bar, Rod or String model\n\n\\end{itemize}\n\n\\item \\texttt{mesh}: OneDMesh\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: global stiffness matrix\n\n\n\\item \\texttt{M}: global mass matrix\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "43",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**rayleigh_damping_matrix**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "44",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mrayleigh_damping_matrix(K, M, α, β)\u001b[39m\n  \u001b[36mrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\u001b[39m\n\n  Compute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m Construction parameters\n       \n       \u001b[34m• \u001b[39m Method 1\n       \n       \u001b[34m• \u001b[39m \u001b[36mα\u001b[39m: Mass proportional damping coefficient\n       \u001b[34m• \u001b[39m \u001b[36mβ\u001b[39m: Stiffness proportional damping coefficient\n       \u001b[34m• \u001b[39m Method 2\n       \n       \u001b[34m• \u001b[39m \u001b[36mω1\u001b[39m: First natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mω2\u001b[39m: Second natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ1\u001b[39m: Damping ratio for the first natural\n       frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ2\u001b[39m: Damping ratio for the second natural\n       frequency\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Rayleigh damping matrix",
+                        "text/markdown": "```julia\nrayleigh_damping_matrix(K, M, α, β)\nrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\n```\n\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n**Inputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * Construction parameters\n\n      * Method 1\n\n          * `α`: Mass proportional damping coefficient\n          * `β`: Stiffness proportional damping coefficient\n      * Method 2\n\n          * `ω1`: First natural frequency\n          * `ω2`: Second natural frequency\n          * `ξ1`: Damping ratio for the first natural frequency\n          * `ξ2`: Damping ratio for the second natural frequency\n\n**Output**\n\n  * `C`: Rayleigh damping matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">rayleigh_damping_matrix&#40;K, M, α, β&#41;\nrayleigh_damping_matrix&#40;K, M, ω1, ω2, ξ1, ξ2&#41;</code></pre>\n<p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p>Construction parameters</p>\n<ul>\n<li><p>Method 1</p>\n<ul>\n<li><p><code>α</code>: Mass proportional damping coefficient</p>\n</li>\n<li><p><code>β</code>: Stiffness proportional damping coefficient</p>\n</li>\n</ul>\n</li>\n<li><p>Method 2</p>\n<ul>\n<li><p><code>ω1</code>: First natural frequency</p>\n</li>\n<li><p><code>ω2</code>: Second natural frequency</p>\n</li>\n<li><p><code>ξ1</code>: Damping ratio for the first natural frequency</p>\n</li>\n<li><p><code>ξ2</code>: Damping ratio for the second natural frequency</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>C</code>: Rayleigh damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nrayleigh_damping_matrix(K, M, α, β)\nrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\n\\end{verbatim}\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item Construction parameters\n\n\\begin{itemize}\n\\item Method 1\n\n\\begin{itemize}\n\\item \\texttt{α}: Mass proportional damping coefficient\n\n\n\\item \\texttt{β}: Stiffness proportional damping coefficient\n\n\\end{itemize}\n\n\\item Method 2\n\n\\begin{itemize}\n\\item \\texttt{ω1}: First natural frequency\n\n\n\\item \\texttt{ω2}: Second natural frequency\n\n\n\\item \\texttt{ξ1}: Damping ratio for the first natural frequency\n\n\n\\item \\texttt{ξ2}: Damping ratio for the second natural frequency\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{C}: Rayleigh damping matrix\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "45",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_damping_matrix**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "46",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc modal_damping_matrix"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodal_damping_matrix(M, ωn, ξn, Φn)\u001b[39m\n\n  Compute the damping matrix C from modal parameters\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mωn\u001b[39m: Natural angular frequencies\n    \u001b[34m• \u001b[39m \u001b[36mξn\u001b[39m: Damping ratios\n    \u001b[34m• \u001b[39m \u001b[36mΦn\u001b[39m: Mass-normalized mode shapes\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Damping matrix",
+                        "text/markdown": "```julia\nmodal_damping_matrix(M, ωn, ξn, Φn)\n```\n\nCompute the damping matrix C from modal parameters\n\n**Inputs**\n\n  * `M`: Mass matrix\n  * `ωn`: Natural angular frequencies\n  * `ξn`: Damping ratios\n  * `Φn`: Mass-normalized mode shapes\n\n**Output**\n\n  * `C`: Damping matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modal_damping_matrix&#40;M, ωn, ξn, Φn&#41;</code></pre>\n<p>Compute the damping matrix C from modal parameters</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>ωn</code>: Natural angular frequencies</p>\n</li>\n<li><p><code>ξn</code>: Damping ratios</p>\n</li>\n<li><p><code>Φn</code>: Mass-normalized mode shapes</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>C</code>: Damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodal_damping_matrix(M, ωn, ξn, Φn)\n\\end{verbatim}\nCompute the damping matrix C from modal parameters\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{ωn}: Natural angular frequencies\n\n\n\\item \\texttt{ξn}: Damping ratios\n\n\n\\item \\texttt{Φn}: Mass-normalized mode shapes\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{C}: Damping matrix\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "47",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**Selection matrix**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "48",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc selection_matrix"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mselection_matrix(mesh, selected_dofs)\u001b[39m\n\n  Compute the selection matrix for the selected dofs.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: OneDmesh\n    \u001b[34m• \u001b[39m \u001b[36mselected_dofs\u001b[39m: Selected dofs\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mS\u001b[39m: Selection matrix",
+                        "text/markdown": "```julia\nselection_matrix(mesh, selected_dofs)\n```\n\nCompute the selection matrix for the selected dofs.\n\n**Inputs**\n\n  * `mesh`: OneDmesh\n  * `selected_dofs`: Selected dofs\n\n**Output**\n\n  * `S`: Selection matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">selection_matrix&#40;mesh, selected_dofs&#41;</code></pre>\n<p>Compute the selection matrix for the selected dofs.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>mesh</code>: OneDmesh</p>\n</li>\n<li><p><code>selected_dofs</code>: Selected dofs</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>S</code>: Selection matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nselection_matrix(mesh, selected_dofs)\n\\end{verbatim}\nCompute the selection matrix for the selected dofs.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{mesh}: OneDmesh\n\n\n\\item \\texttt{selected\\_dofs}: Selected dofs\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{S}: Selection matrix\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "49",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**apply_bc** - See @sec-api-mdof.\n",
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**eigenmode** - See @sec-api-mdof.\n",
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_matrices** - See @sec-api-mdof.\n",
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_effective_mass** - See @sec-api-mdof.\n",
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "# Dimensions\n",
+                "L = 1.\n",
+                "d = 3e-2\n",
+                "\n",
+                "# Section features\n",
+                "S = π*d^2/4\n",
+                "Iz = π*d^4/64\n",
+                "\n",
+                "# Material\n",
+                "E = 2.1e11\n",
+                "ρ = 7800.\n",
+                "\n",
+                "# Computation parameters\n",
+                "fmax = 2000.\n",
+                "\n",
+                "# Initialization of the data types\n",
+                "beam = Beam(L, S, Iz, E, ρ)\n",
+                "\n",
+                "# Mesh definition\n",
+                "oned_mesh = OneDMesh(beam, 0., 20, :SS)\n",
+                "\n",
+                "# Construction of K and M\n",
+                "Kfe, Mfe = assembly(beam, oned_mesh)\n",
+                "\n",
+                "# Application of the BCs\n",
+                "Kbc = apply_bc(Kfe, oned_mesh)\n",
+                "Mbc = apply_bc(Mfe, oned_mesh)\n",
+                "\n",
+                "# Computation ofthe eigenmodes of the structure\n",
+                "ωfe, Φfe = eigenmode(Kbc, Mbc)\n",
+                "\n",
+                "# Calculation of the damping matrix\n",
+                "Cray = rayleigh_damping_matrix(Kbc, Mbc, 1., 1.)\n",
+                "Cmodal = modal_damping_matrix(Mbc, ωfe, 0.01, Φfe)\n",
+                "```\n",
+                "\n",
+                "## State space representation\n",
+                "\n",
+                "The state space representation of a mechanical system is expressed as:\n",
+                "$$\n",
+                "\\dot{\\mathbf{z}}(t) = \\mathbf{A}_c \\mathbf{z}(t) + \\mathbf{B}_c \\mathbf{u}(t),\n",
+                "$$\n",
+                "where:\n",
+                "\n",
+                "- $\\mathbf{z}(t)$: State vector\n",
+                "\n",
+                "- $\\mathbf{u}(t)$: Input vector\n",
+                "\n",
+                "- $\\mathbf{A}_c$: System matrix\n",
+                "\n",
+                "- $\\mathbf{B}_c$: Input matrix\n",
+                "\n",
+                "### Continuous-time models\n",
+                "\n",
+                "For a mechanical system, whose equation of motion is:\n",
+                "$$\n",
+                "\\mathbf{M}\\ddot{\\mathbf{x}}(t) + \\mathbf{C}\\dot{\\mathbf{x}}(t) + \\mathbf{K x}(t) = \\mathbf{u}(t),\n",
+                "$$\n",
+                "the corresponding continuous-time state equation is given by:\n",
+                "$$\n",
+                "\\begin{bmatrix}\n",
+                "\\dot{\\mathbf{x}}(t) \\\\\n",
+                "\\ddot{\\mathbf{x}}(t)\n",
+                "\\end{bmatrix} = \\begin{bmatrix}\n",
+                "\\mathbf{0} & \\mathbf{I} \\\\\n",
+                "-\\mathbf{M}^{-1}\\mathbf{K} & -\\mathbf{M}^{-1}\\mathbf{C}\n",
+                "\\end{bmatrix}\\begin{bmatrix}\n",
+                "\\mathbf{x}(t) \\\\\n",
+                "\\dot{\\mathbf{x}}(t)\n",
+                "\\end{bmatrix}+ \\begin{bmatrix}\n",
+                "\\mathbf{0} \\\\\n",
+                "\\mathbf{M}^{-1}\n",
+                "\\end{bmatrix}\\mathbf{u}(t).\n",
+                "$$\n",
+                "\n",
+                "When using a modal expansion such that\n",
+                "$$\n",
+                "\\mathbf{x}(t) = \\mathbf{\\Phi}\\mathbf{q}(t),\n",
+                "$$\n",
+                "where $\\mathbf{\\Phi}$ is the mode shapes matrix and $\\mathbf{q}(t)$ is the modal coordinate vector, a modal state space equation can be obtained. The latter is written:\n",
+                "$$\n",
+                "\\begin{bmatrix}\n",
+                "\\dot{\\mathbf{q}}(t) \\\\\n",
+                "\\ddot{\\mathbf{q}}(t)\n",
+                "\\end{bmatrix} = \\begin{bmatrix}\n",
+                "\\mathbf{0} & \\mathbf{I} \\\\\n",
+                "-\\mathbf{\\Omega}^2 & -\\mathbf{\\Xi}\n",
+                "\\end{bmatrix}\\begin{bmatrix}\n",
+                "\\mathbf{q}(t) \\\\\n",
+                "\\dot{\\mathbf{q}}(t)\n",
+                "\\end{bmatrix}+ \\begin{bmatrix}\n",
+                "\\mathbf{0} \\\\\n",
+                "\\mathbf{\\Phi}^\\mathsf{T}\n",
+                "\\end{bmatrix}\\mathbf{u}(t),\n",
+                "$$\n",
+                "where $\\mathbf{\\Omega}^2 = \\text{diag}(\\omega_1^2, \\dots, \\omega_N^2)$ and $\\mathbf{\\Xi} = \\text{diag}(2\\xi_1\\omega_1, \\dots, 2\\xi_N\\omega_N)$.\n",
+                "\n",
+                "#### API\n",
+                "\n",
+                "**Data type**\n",
+                "\n",
+                "::: {.api}\n",
+                "**ContinuousStateSpace**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "50",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc ContinuousStateSpace"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mContinuousStateSpace(Ac, Bc)\u001b[39m\n\n  Continuous-time state-space model\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mAc\u001b[39m: Continuous-time state matrix A\n    \u001b[34m• \u001b[39m \u001b[36mBc\u001b[39m: Continuous-time input matrix B",
+                        "text/markdown": "```julia\nContinuousStateSpace(Ac, Bc)\n```\n\nContinuous-time state-space model\n\n**Fields**\n\n  * `Ac`: Continuous-time state matrix A\n  * `Bc`: Continuous-time input matrix B\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">ContinuousStateSpace&#40;Ac, Bc&#41;</code></pre>\n<p>Continuous-time state-space model</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>Ac</code>: Continuous-time state matrix A</p>\n</li>\n<li><p><code>Bc</code>: Continuous-time input matrix B</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nContinuousStateSpace(Ac, Bc)\n\\end{verbatim}\nContinuous-time state-space model\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{Ac}: Continuous-time state matrix A\n\n\n\\item \\texttt{Bc}: Continuous-time input matrix B\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "51",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "**Related functions**\n",
+                "\n",
+                "::: {.api}\n",
+                "**ss_model**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "52",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc ss_model"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mss_model(K, M, C)\u001b[39m\n\n  Generates a continuous-time state-space model from the mass, damping, and\n  stiffness matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Damping matrix\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mcss\u001b[39m: ContinuousStateSpace",
+                        "text/markdown": "```julia\nss_model(K, M, C)\n```\n\nGenerates a continuous-time state-space model from the mass, damping, and stiffness matrices\n\n**Inputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * `C`: Damping matrix\n\n**Output**\n\n  * `css`: ContinuousStateSpace\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">ss_model&#40;K, M, C&#41;</code></pre>\n<p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>C</code>: Damping matrix</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>css</code>: ContinuousStateSpace</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nss_model(K, M, C)\n\\end{verbatim}\nGenerates a continuous-time state-space model from the mass, damping, and stiffness matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{C}: Damping matrix\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{css}: ContinuousStateSpace\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "53",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**ss_modal_model**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "54",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc ss_modal_model"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mss_modal_model(ωn, ξn, ϕn)\u001b[39m\n\n  Generates a continuous-time state-space model from the mass, damping, and\n  stiffness matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωn\u001b[39m: Natural angular frequencies\n    \u001b[34m• \u001b[39m \u001b[36mξn\u001b[39m: Damping ratios\n    \u001b[34m• \u001b[39m \u001b[36mϕn\u001b[39m: Mass-normalized mode shapes\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mcss\u001b[39m: ContinuousStateSpace",
+                        "text/markdown": "```julia\nss_modal_model(ωn, ξn, ϕn)\n```\n\nGenerates a continuous-time state-space model from the mass, damping, and stiffness matrices\n\n**Inputs**\n\n  * `ωn`: Natural angular frequencies\n  * `ξn`: Damping ratios\n  * `ϕn`: Mass-normalized mode shapes\n\n**Output**\n\n  * `css`: ContinuousStateSpace\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">ss_modal_model&#40;ωn, ξn, ϕn&#41;</code></pre>\n<p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>ωn</code>: Natural angular frequencies</p>\n</li>\n<li><p><code>ξn</code>: Damping ratios</p>\n</li>\n<li><p><code>ϕn</code>: Mass-normalized mode shapes</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>css</code>: ContinuousStateSpace</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nss_modal_model(ωn, ξn, ϕn)\n\\end{verbatim}\nGenerates a continuous-time state-space model from the mass, damping, and stiffness matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{ωn}: Natural angular frequencies\n\n\n\\item \\texttt{ξn}: Damping ratios\n\n\n\\item \\texttt{ϕn}: Mass-normalized mode shapes\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{css}: ContinuousStateSpace\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "55",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**eigenmode**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "56",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc eigenmode(Ac::Matrix{Float64}, Nₘ::Int = 0)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36meigenmode(K, M, n = size(K, 1))\u001b[39m\n\n  Computes the eigenmodes of a system defined by its mass and stiffness\n  matrices.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mn\u001b[39m: Number of modes to be keep in the modal basis\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mω\u001b[39m: Vector of natural frequencies\n    \u001b[34m• \u001b[39m \u001b[36mΦ\u001b[39m: Mass-normalized mode shapes",
+                        "text/markdown": "```julia\neigenmode(K, M, n = size(K, 1))\n```\n\nComputes the eigenmodes of a system defined by its mass and stiffness matrices.\n\n**Inputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * `n`: Number of modes to be keep in the modal basis\n\n**Outputs**\n\n  * `ω`: Vector of natural frequencies\n  * `Φ`: Mass-normalized mode shapes\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">eigenmode&#40;K, M, n &#61; size&#40;K, 1&#41;&#41;</code></pre>\n<p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>n</code>: Number of modes to be keep in the modal basis</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ω</code>: Vector of natural frequencies</p>\n</li>\n<li><p><code>Φ</code>: Mass-normalized mode shapes</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\neigenmode(K, M, n = size(K, 1))\n\\end{verbatim}\nComputes the eigenmodes of a system defined by its mass and stiffness matrices.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{n}: Number of modes to be keep in the modal basis\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ω}: Vector of natural frequencies\n\n\n\\item \\texttt{Φ}: Mass-normalized mode shapes\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "57",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_parameters**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "58",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modal_parameters"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodal_parameters(λ)\u001b[39m\n\n  Computes the natural angular frequencies and damping ratios from the complex\n  eigenvalues\n\n  \u001b[1mInput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mλ\u001b[39m: Complex eigenvalues\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωn\u001b[39m: Natural angular frequencies\n    \u001b[34m• \u001b[39m \u001b[36mξn\u001b[39m: Damping ratios",
+                        "text/markdown": "```julia\nmodal_parameters(λ)\n```\n\nComputes the natural angular frequencies and damping ratios from the complex eigenvalues\n\n**Input**\n\n  * `λ`: Complex eigenvalues\n\n**Outputs**\n\n  * `ωn`: Natural angular frequencies\n  * `ξn`: Damping ratios\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modal_parameters&#40;λ&#41;</code></pre>\n<p>Computes the natural angular frequencies and damping ratios from the complex eigenvalues</p>\n<p><strong>Input</strong></p>\n<ul>\n<li><p><code>λ</code>: Complex eigenvalues</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ωn</code>: Natural angular frequencies</p>\n</li>\n<li><p><code>ξn</code>: Damping ratios</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodal_parameters(λ)\n\\end{verbatim}\nComputes the natural angular frequencies and damping ratios from the complex eigenvalues\n\n\\textbf{Input}\n\n\\begin{itemize}\n\\item \\texttt{λ}: Complex eigenvalues\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ωn}: Natural angular frequencies\n\n\n\\item \\texttt{ξn}: Damping ratios\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "59",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**c2r_modeshape**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "60",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc c2r_modeshape"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mc2r_modeshape(Ψ)\u001b[39m\n\n  Converts the complex modes to real modes\n\n  \u001b[1mInput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mΨ\u001b[39m: Complex modes\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mϕn\u001b[39m: Real modes",
+                        "text/markdown": "```julia\nc2r_modeshape(Ψ)\n```\n\nConverts the complex modes to real modes\n\n**Input**\n\n  * `Ψ`: Complex modes\n\n**Output**\n\n  * `ϕn`: Real modes\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">c2r_modeshape&#40;Ψ&#41;</code></pre>\n<p>Converts the complex modes to real modes</p>\n<p><strong>Input</strong></p>\n<ul>\n<li><p><code>Ψ</code>: Complex modes</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>ϕn</code>: Real modes</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nc2r_modeshape(Ψ)\n\\end{verbatim}\nConverts the complex modes to real modes\n\n\\textbf{Input}\n\n\\begin{itemize}\n\\item \\texttt{Ψ}: Complex modes\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{ϕn}: Real modes\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "61",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "# System matrices\n",
+                "m_ss = Diagonal([2., 1.])\n",
+                "k_ss = [6. -2.; -2. 4.]\n",
+                "c_ss = [0.67 -0.11; -0.11 0.39]\n",
+                "\n",
+                "# Continuous-time state space from system matrices\n",
+                "css = ss_model(k_ss, m_ss, c_ss)\n",
+                "λ, Ψ = eigenmode(css.Ac)\n",
+                "ω, ξ = modal_parameters(λss)\n",
+                "Ψr = c2r_modeshape(Ψ)\n",
+                "\n",
+                "# Continuous-time state space from modal information\n",
+                "ωn, ϕn = eigenmode(k_ss, m_ss)\n",
+                "css_modal = ss_modal_model(ωn, 0.01, ϕn)\n",
+                "```\n",
+                "\n",
+                "### Discrete-time models\n",
+                "\n",
+                "Discrete-time models can be either be obtained using sampled strategies from direct-time integration methods (e.g. Newmark's scheme). However, both approaches lead to a discrete-time state equation of the form:\n",
+                "$$\n",
+                "\t\\mathbf{z}_{k+1} = \\mathbf{A}\\, \\mathbf{z}_k + \\mathbf{B}_f\\, \\mathbf{u}_k + \\mathbf{B}_g\\, \\mathbf{u}_{k+1},\n",
+                "$$\n",
+                "\n",
+                "The previous formulation is rather non-standard, since the state vector at frequency step $k + 1$ requires the knowledge of the input vector at time steps $k$ and $k + 1$. To reduce the state-space representation to its standard form, a reduced state $\\mathbf{\\overline{z}}_{k+1}$ is introduced:\n",
+                "$$\n",
+                "\t\\mathbf{z}_{k+1} = \\mathbf{A}\\, \\mathbf{x}_k + \\mathbf{B}_f\\, \\mathbf{u}_k,\n",
+                "$$\n",
+                "\n",
+                "In doing so, the discretized state equation becomes:\n",
+                "$$\n",
+                "\t\\mathbf{\\overline{z}}_{k+1} = \\mathbf{A}\\, \\mathbf{\\overline{z}}_k + \\mathbf{B}\\, \\mathbf{u}_k\n",
+                "$$\n",
+                "where $\\mathbf{B} = \\mathbf{B}_f + \\mathbf{A\\, B}_g$.\n",
+                "\n",
+                "#### Sampling methods\n",
+                "\n",
+                "Sampling methods are based on the discretization of the solution of the continuous-time state equation. Once discretized, the state equation can be written as:\n",
+                "$$\n",
+                "\\mathbf{z}_{k+1} = \\mathbf{A} \\, \\mathbf{z}_k + \\mathbf{A}\\, \\int_{0}^{h} e^{-\\mathbf{A_c}\\tau}\\, \\mathbf{B_c}\\,\\mathbf{u}(\\tau + kh)\\, d\\tau,\n",
+                "$$\n",
+                "where $\\mathbf{A} = e^{\\mathbf{A_c} h}$ is the the discretized system matrix and $h$ is the discretization timestep.\n",
+                "\n",
+                "To cover a wide range of situations, the input vector is assumed to be parameterized as follows:\n",
+                "$$\n",
+                "\\mathbf{u}(\\tau + kh) = f(\\tau)\\, \\mathbf{u}_k + g(\\tau)\\, \\mathbf{u}_{k+1},\n",
+                "$$\n",
+                "where the basis function $f(\\tau)$ and $g(\\tau)$ control the evolution of the input vector between two time steps.\n",
+                "\n",
+                "Introducing the parameterization of the input vector into the convolution integral, one obtains the following state equation:\n",
+                "$$\n",
+                "\t\\mathbf{z}_{k+1} = \\mathbf{A}\\, \\mathbf{z}_k + \\mathbf{B}_f\\, \\mathbf{u}_k + \\mathbf{B}_g\\, \\mathbf{u}_{k+1},\n",
+                "$$\n",
+                "where $\\mathbf{B}_f$ and $\\mathbf{B}_g$ are the discretized input matrices defined such that:\n",
+                "$$\n",
+                "\t\\mathbf{B}_f = \\mathbf{A}\\, \\int_{0}^{h} e^{-\\mathbf{A_c}\\tau}\\, \\mathbf{B_c}\\,f(\\tau)\\, d\\tau \\; \\text{ and } \\; \\mathbf{B}_g = \\mathbf{A}\\, \\int_{0}^{h} e^{-\\mathbf{A_c}\\tau}\\, \\mathbf{B_c}\\,g(\\tau)\\, d\\tau.\n",
+                "$$\n",
+                "\n",
+                "In the literature, the most commonly used sampling methods are the following[^1]:\n",
+                "\n",
+                "[^1]: D. Bernal. \"Optimal discrete to continuous transfer for band limited inputs\", *Journal of Engineering Mechanics*, vol. 133 (12), pp. 1370-1377, 2007.\n",
+                "\n",
+                "-  The Zero-Order Hold (ZOH) strategy, which assumes that the input vector is constant between two samples. This assumption is satisfied for $f(\\tau) = 1$ and $g(\\tau) = 0$ and leads to:\n",
+                "$$\n",
+                "\t\t\\mathbf{B} = \\mathbf{B}_f = (\\mathbf{A} - \\mathbf{I})\\, \\mathbf{A}_\\mathbf{c}^{-1}\\, \\mathbf{B_c}.\n",
+                "$$\n",
+                "\n",
+                "- The First-Order Hold (FOH) sampling method, which assumes that the input vector varies linearly between two samples. This assumption is satisfied for $f(\\tau) = 1 - \\tau/h$ and $g(\\tau) = \\tau/h$ and leads to:\n",
+                "$$\n",
+                "\t\t\\begin{split}\n",
+                "\t\t\t&\\mathbf{B}_f + \\mathbf{B}_g = (\\mathbf{A} - \\mathbf{I})\\, \\mathbf{A}_\\mathbf{c}^{-1}\\, \\mathbf{B_c}, \\\\\n",
+                "\t\t\t&\\mathbf{B}_g = (\\mathbf{A} - \\mathbf{A_c}h - \\mathbf{I})\\mathbf{A}_\\mathbf{c}^{-2}\\, \\mathbf{B_c}/h.\n",
+                "\t\t\\end{split}\n",
+                "$$\n",
+                "\n",
+                "- The Band-Limited Hold (BLH) sampling method, which assumes that the input signal can be approximated as a band-limited signal (i.e. the energy of the signal is concentrated in a defined frequency range). This assumption is satisfied for $f(\\tau) = h\\, \\delta(\\tau)$ and $g(\\tau) = 0$, where $\\delta(\\tau)$ is the Dirac delta function and leads to:\n",
+                "$$\n",
+                "\t\t\\mathbf{B} = \\mathbf{B}_f = \\mathbf{A}\\, \\mathbf{B_c}\\, h.\n",
+                "$$\n",
+                "\n",
+                "#### Direct-time integration based methods\n",
+                "\n",
+                "Despite several methods can be found in the literature, such as the Newmark's family schemes, this package only provides the Runge-Kutta approach, because it is an explicit method (i.e. does not require any matrix inversion). After some calculation not detailed here[^2], the discrete system and input matrices are expressed as:\n",
+                "$$\n",
+                "\t\\begin{split}\n",
+                "\t&\\mathbf{A} = \\frac{1}{24}\\left[24\\,(\\mathbf{I} + \\mathbf{A_c}\\, h) + 12\\, \\mathbf{A}_\\mathbf{c}^2\\, h^2 + 4\\, \\mathbf{A}_\\mathbf{c}^3\\, h^3 + \\mathbf{A}_\\mathbf{c}^4\\, h^4\\right], \\\\\n",
+                "\t&\\mathbf{B}_f = \\frac{h}{24}\\left[12\\, \\mathbf{I} + 8\\, \\mathbf{A_c}\\, h + 3 \\mathbf{A}_\\mathbf{c}^2\\, h^2 + \\mathbf{A}_\\mathbf{c}^3\\, h^3\\right]\\mathbf{B_c}, \\\\\n",
+                "\t&\\mathbf{B}_g = \\frac{h}{24}\\left[12\\, \\mathbf{I} + 4\\, \\mathbf{A_c}\\, h + \\mathbf{A}_\\mathbf{c}^2\\, h^2\\right]\\mathbf{B_c}.\n",
+                "\t\\end{split}\n",
+                "$$\n",
+                "\n",
+                "[^2]: For further details, see: J. Ghibaudo. \"Inverse estimation of sparse mechanical excitation sources by Bayesian filtering\", *PhD thesis*, Conservatoire national des arts et métiers, 2024.\n",
+                "\n",
+                "#### API\n",
+                "\n",
+                "**Data type**\n",
+                "\n",
+                "::: {.api}\n",
+                "**DiscreteStateSpace**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "62",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc DiscreteStateSpace"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mDiscreteStateSpace(Ad, Bd, Bdp)\u001b[39m\n\n  Discrete-time state-space model\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mAd\u001b[39m: Discrete-time state matrix A\n    \u001b[34m• \u001b[39m \u001b[36mBd\u001b[39m: Discrete-time input matrix B\n    \u001b[34m• \u001b[39m \u001b[36mBdp\u001b[39m: Discrete-time input matrix Bp (only for \u001b[36m:foh\u001b[39m method)",
+                        "text/markdown": "```julia\nDiscreteStateSpace(Ad, Bd, Bdp)\n```\n\nDiscrete-time state-space model\n\n**Fields**\n\n  * `Ad`: Discrete-time state matrix A\n  * `Bd`: Discrete-time input matrix B\n  * `Bdp`: Discrete-time input matrix Bp (only for `:foh` method)\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">DiscreteStateSpace&#40;Ad, Bd, Bdp&#41;</code></pre>\n<p>Discrete-time state-space model</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>Ad</code>: Discrete-time state matrix A</p>\n</li>\n<li><p><code>Bd</code>: Discrete-time input matrix B</p>\n</li>\n<li><p><code>Bdp</code>: Discrete-time input matrix Bp &#40;only for <code>:foh</code> method&#41;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nDiscreteStateSpace(Ad, Bd, Bdp)\n\\end{verbatim}\nDiscrete-time state-space model\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{Ad}: Discrete-time state matrix A\n\n\n\\item \\texttt{Bd}: Discrete-time input matrix B\n\n\n\\item \\texttt{Bdp}: Discrete-time input matrix Bp (only for \\texttt{:foh} method)\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "63",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "**Related function**\n",
+                "\n",
+                "::: {.api}\n",
+                "**c2d**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "64",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "\n",
+                "@doc c2d"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mc2d(css::ContinuouStateSpace, h::Float64, method::Symbol)\u001b[39m\n\n  Converts a continuous-time state-space model to a discrete-time state-space\n  model.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mcss\u001b[39m: Continuous-time state-space model\n    \u001b[34m• \u001b[39m \u001b[36mh\u001b[39m: Sampling time.\n    \u001b[34m• \u001b[39m \u001b[36mmethod\u001b[39m: Discretization method\n       \n       \u001b[34m• \u001b[39m \u001b[36m:zoh\u001b[39m: Zero-order Hold method\n       \u001b[34m• \u001b[39m \u001b[36m:foh\u001b[39m: First-order Hold method\n       \u001b[34m• \u001b[39m \u001b[36m:blh\u001b[39m: Band-limited Hold method\n       \u001b[34m• \u001b[39m \u001b[36m:rk4\u001b[39m: 4th order Runge-Kutta method\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mDiscreteStateSpace\u001b[39m: Discrete-time state-space model\n       \n       \u001b[34m• \u001b[39m \u001b[36mAd\u001b[39m: Discrete-time state-space matrix A\n       \u001b[34m• \u001b[39m \u001b[36mBd\u001b[39m: Discrete-time state-space matrix B\n       \u001b[34m• \u001b[39m \u001b[36mBdp\u001b[39m: Discrete-time state-space matrix Bp (only for \u001b[36m:foh\u001b[39m\n       and \u001b[36m:rk4\u001b[39m methods)",
+                        "text/markdown": "```julia\nc2d(css::ContinuouStateSpace, h::Float64, method::Symbol)\n```\n\nConverts a continuous-time state-space model to a discrete-time state-space model.\n\n**Inputs**\n\n  * `css`: Continuous-time state-space model\n  * `h`: Sampling time.\n  * `method`: Discretization method\n\n      * `:zoh`: Zero-order Hold method\n      * `:foh`: First-order Hold method\n      * `:blh`: Band-limited Hold method\n      * `:rk4`: 4th order Runge-Kutta method\n\n**Output**\n\n  * `DiscreteStateSpace`: Discrete-time state-space model\n\n      * `Ad`: Discrete-time state-space matrix A\n      * `Bd`: Discrete-time state-space matrix B\n      * `Bdp`: Discrete-time state-space matrix Bp (only for `:foh` and `:rk4` methods)\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">c2d&#40;css::ContinuouStateSpace, h::Float64, method::Symbol&#41;</code></pre>\n<p>Converts a continuous-time state-space model to a discrete-time state-space model.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>css</code>: Continuous-time state-space model</p>\n</li>\n<li><p><code>h</code>: Sampling time.</p>\n</li>\n<li><p><code>method</code>: Discretization method</p>\n<ul>\n<li><p><code>:zoh</code>: Zero-order Hold method</p>\n</li>\n<li><p><code>:foh</code>: First-order Hold method</p>\n</li>\n<li><p><code>:blh</code>: Band-limited Hold method</p>\n</li>\n<li><p><code>:rk4</code>: 4th order Runge-Kutta method</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>DiscreteStateSpace</code>: Discrete-time state-space model</p>\n<ul>\n<li><p><code>Ad</code>: Discrete-time state-space matrix A</p>\n</li>\n<li><p><code>Bd</code>: Discrete-time state-space matrix B</p>\n</li>\n<li><p><code>Bdp</code>: Discrete-time state-space matrix Bp &#40;only for <code>:foh</code> and <code>:rk4</code> methods&#41;</p>\n</li>\n</ul>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nc2d(css::ContinuouStateSpace, h::Float64, method::Symbol)\n\\end{verbatim}\nConverts a continuous-time state-space model to a discrete-time state-space model.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{css}: Continuous-time state-space model\n\n\n\\item \\texttt{h}: Sampling time.\n\n\n\\item \\texttt{method}: Discretization method\n\n\\begin{itemize}\n\\item \\texttt{:zoh}: Zero-order Hold method\n\n\n\\item \\texttt{:foh}: First-order Hold method\n\n\n\\item \\texttt{:blh}: Band-limited Hold method\n\n\n\\item \\texttt{:rk4}: 4th order Runge-Kutta method\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{DiscreteStateSpace}: Discrete-time state-space model\n\n\\begin{itemize}\n\\item \\texttt{Ad}: Discrete-time state-space matrix A\n\n\n\\item \\texttt{Bd}: Discrete-time state-space matrix B\n\n\n\\item \\texttt{Bdp}: Discrete-time state-space matrix Bp (only for \\texttt{:foh} and \\texttt{:rk4} methods)\n\n\\end{itemize}\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "65",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "#### Example\n",
+                "\n",
+                "```julia\n",
+                "dss = c2d(css, 0.01, :zoh)\n",
+                "```"
+            ]
+        }
+    ],
+    "timestamp": "2025-10-17T16:47:35.014",
+    "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/models/index.qmd",
+    "qnr_schema_version": "1.0.0"
+}

@@ -299,5 +299,5 @@ Compute the damping matrix C from modal parameters
 function modal_damping_matrix(M, ωn, ξn, Φn)
     Cn = Diagonal(2ξn.*ωn)
 
-    return M*Φn*Cn*Φn'*M
+    return M*Φn*Cn*Φn'M
 end

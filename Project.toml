@@ -1,6 +1,6 @@
 name = "StructuralVibration"
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "0.3.0"
+version = "1.0.0"
 authors = ["Mathieu Aucejo <79322171+maucejo@users.noreply.github.com> and contributors"]
 
 [deps]
@@ -12,7 +12,6 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Peaks = "18e31ff7-3703-566c-8e60-38913d67486b"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SkipNan = "aed68c70-c8b0-4309-8cd1-d392a74f991a"
@@ -36,7 +35,6 @@ Makie = "0.22"
 Optim = "1.10.0"
 Peaks = "0.5.3"
 Polynomials = "4.1.0"
-PrecompileTools = "1.2.1"
 ProgressMeter = "1.10.2"
 Random = "1.11.0"
 SkipNan = "0.2.0"

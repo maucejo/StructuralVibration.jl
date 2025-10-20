@@ -50,7 +50,6 @@ Compute the impulse response from a frequency response function (FRF) using IFFT
 **Notes**
 - The function enforces conjugate symmetry to ensure a real-valued impulse response.
 """
-
 function impulse_response(H, freq, fs)
     # N points IFFT
     df = freq[2] - freq[1]
@@ -58,20 +57,21 @@ function impulse_response(H, freq, fs)
 
     # Data preparation
     nd = ndims(H)
-    if nd > 1
-        np, nf = size(H)
-        h = similar(freq, np, N)
-    else
-        nf = length(H)
-        h = similar(freq, N)
-    end
+    nh = size(H)
 
-    if N > nf
+    # The frequency dimension is the last one
+    if N > nh[nd]
+        if N%2 == 0
+            M = Int(round(N/2 + 1))
+        else
+            M = Int(round((N + 1)/2))
+        end
+
         if nd == 1
-            zero_pad = zeros(eltype(H), N - nf)
+            zero_pad = zeros(eltype(H), NM - nh[1])
             H_padded = [H; zero_pad]
         else
-            zero_pad = zeros(eltype(H), np, N - nf)
+            zero_pad = zeros(eltype(H), nh[1], M - nh[2])
             H_padded = [H zero_pad]
         end
     else
@@ -82,20 +82,5 @@ function impulse_response(H, freq, fs)
         end
     end
 
-    # IFFT - Enforce conjugate symmetry
-    if N%2 == 0
-        if nd == 1
-            Hsym = [H_padded[1]; H_padded[2:Int(N/2 + 1) ]; conj.(reverse(H_padded[2:Int(N/2)]))]
-        else
-            Hsym = [H_padded[:, 1] H_padded[:, 2:Int(N/2 + 1)] conj.(reverse(H_padded[:, 2:Int(N/2)], dims = 2))]
-        end
-    else
-        if nd == 1
-            Hsym = [H_padded[1]; H_padded[2:Int((N+1)/2)]; conj.(reverse(H_padded[2:Int((N+1)/2)]))]
-        else
-            Hsym = [H_padded[:, 1] H_padded[:, 2:Int((N+1)/2)] conj.(reverse(H_padded[:, 2:Int((N+1)/2)], dims = 2))]
-        end
-    end
-
-    return real(ifft(Hsym, nd))
+    return irfft(H_padded, N, nd)
 end

@@ -1,6 +1,6 @@
 module StructuralVibration
 
-using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, Polynomials, PrecompileTools, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
+using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim, Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
 
 using DSP: conv, filt, remez, filtfilt, rms
 
@@ -49,7 +49,8 @@ export c2d, ss_model, ss_modal_model, modal_parameters, c2r_modeshape
 
 export freq_extraction, modeshape_extraction
 
-export mof, mov, mpc, mcf, mpd, cmif, psif, msf, comac, ecomac, mac, frac, modal2poles, poles2modal, impulse_response, lsce, lscf, plscf, stabilization
+export mof, mov, mpc, mcf, mpd, cmif, psif, msf, comac, ecomac, mac, frac,
+       modal2poles, poles2modal, impulse_response, lsce, lscf, plscf, stabilization
 
 export tfestimate, welch, spectrum, rect, hanning, hamming, tukey, cosine,
        lanczos, triang, bartlett, gaussian, bartlett_hann, blackman, kaiser, dpss, exponential, force, flattop, nuttall, blackman_nuttall, blackman_harris, parzen, planck
@@ -57,7 +58,8 @@ export tfestimate, welch, spectrum, rect, hanning, hamming, tukey, cosine,
 export gradient, detrend
 
 # Functions for plotting
-export sv_plot, bode_plot, nyquist_plot, waterfall_plot, theme_choice
+export sv_plot, bode_plot, nyquist_plot, stabilization_plot, waterfall_plot,
+       theme_choice
 
 # Include files - Utils
 include("utils/macro_utils.jl")
@@ -79,6 +81,7 @@ include("signal_processing/signal.jl")
 # Include files - Modal extraction
 include("modal_extraction/ema_sdof.jl")
 include("modal_extraction/ema_indicators.jl")
+include("modal_extraction/ema_mdof_ms.jl")
 include("modal_extraction/ema_mdof_poles.jl")
 include("modal_extraction/ema_mdof_utils.jl")
 

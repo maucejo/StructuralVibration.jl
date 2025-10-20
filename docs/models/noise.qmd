@@ -80,7 +80,7 @@ where $n$ is a colored noise defined as in [Excitation models - Colored noise](h
 ---
 ```{julia}
 #| echo: false
-@doc acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; band_freq = Float64[], rst = true)
+@doc acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; frange = Float64[], rst = true)
 ```
 :::
 
