@@ -49,6 +49,7 @@ website:
     - title: "Modal extraction"
       contents:
         - modal_extraction/index.qmd
+        - modal_extraction/sdof_methods.qmd
         - modal_extraction/mdof_methods.qmd
         - modal_extraction/frf_reconstruction.qmd
         - modal_extraction/indicators.qmd

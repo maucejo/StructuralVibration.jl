@@ -12,6 +12,7 @@ Convert natural frequencies and damping ratios to complex poles.
 """
 function modal2poles(fn, ξn)
     ωn = 2π*fn
+
     return @. -ξn*ωn + 1im*ωn*√(1 - ξn^2)
 end
 

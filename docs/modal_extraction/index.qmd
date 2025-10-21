@@ -1,5 +1,5 @@
 ---
-title: Sdof methods
+title: Primer on EMA
 format:
   html:
     toc: true
@@ -10,368 +10,49 @@ execute:
   cache: true
 ---
 
-```{julia}
-#| echo: false
-#| output: false
-using StructuralVibration, ShareAdd
-@usingany CairoMakie
-```
+The modal approach enables the dynamic behavior of a structure to be predicted based on knowledge of its natural modes of vibration, which are intrinsic to the system. From a practical point of view, this information can be used to determine the frequencies at which the structure is most likely to vibrate. For industry, this information is invaluable, as vibrations can cause discomfort, noise, premature wear and tear, or even damage to a system. This is where **Experimental Modal Analysis** (EMA) comes in. Experimental identification of vibration modes can also be used to calibrate a finite element model or certify a product (e.g. ground vibration testing or regulations related to the modal behavior of the structure).
 
-The Sdof methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The Sdof methods are typically used for systems that are lightly damped and for which the modes are well separated.
+EMA aims to estimate the natural frequencies of the system and other characteristic parameters (e.g. damping ratios and mode shapes) from the vibration measurements in order to obtain a modal model of the system under consideration. This model can then be used to determine the structure's dynamic behaviour for a given excitation.
 
-For these methods, it is assumed that the FRF (admittance) is given by:
+To reach these goals, it is supposed that:
+
+* the system is **linear and time-invariant** ;
+* the modal damping is of **viscous** type.
+
+EMA is a family of **inverse methods** attempting to determine the modal characteristics of a structure from the responses measured at each point of the mesh.
+
+## General principles
+
+To identify the modal parameters of a structure or mechanical system, EMA relies on the measurement of the structure's transfer function matrix. By definition, the transfer function $H_{pq}(\omega)$ can be seen as the frequency response of the system at a point $x_p$ to an excitation of unit amplitude at a point $x_q$. Classically, the transfer function matrix (here the admittance) is given by the relation
+
 $$
-H_{pq}(\omega) = \sum_{i = 1}^N\frac{_{i}A_{pq}}{\omega_i^2 - \omega^2 + j\eta_i\omega_i^2}
+H_{pq}(\omega) = \sum_{i = 1}^{+\infty} \frac{\phi_i(x_p)\, \phi_i(x_q)}{M_i(\omega_i^2 - \omega^2 + 2j\xi_i\omega_i\omega)} = \sum_{i = 1}^{+\infty} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
 $$
-where, for a mode $i$, $_{i}A_{pq} = \Phi_i(x_p)\Phi_i(x_q)$ is the residue, $\omega_i$ is the natural frequency, $\eta_i$ is the modal damping factor, and $\Phi_i(x_p)$ is the mass-normalized mode shape at the point $x_p$.
+where:
 
-When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency $\omega$ close to the natural frequency $\omega_i$:
-$$
-H_{pq}(\omega) \approx \frac{\Phi_i(x_p)\Phi_i(x_q)}{\omega_i^2 - \omega^2 + j\eta_i\omega_i^2}.
-$$
+* $\lambda_i = -\xi_i + j\,\Omega_i$ is the pole related to the mode $i$, with:
+    * $\Omega_i = \omega_i\sqrt{1 - \xi_i^2}$ is the damped natural frequency of the mode $i$, with $\omega_i = \vert \lambda_i\vert$.
+    * $\xi_i = -\frac{\text{Re}(\lambda_i)}{\omega_i}$ the modal damping factor of the mode $i$ <br></br>
 
-::: {.callout-note}
-One can note that the modal damping factor $\eta_i$ is related to the damping ratio $\xi_i$ by the relation:
-$$
-\eta_i = 2\xi_i.
-$$
-:::
+* ${}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q)$ is the residue of the mode $i$, with:
+    * $\phi_i(x_p)$ the mode shape of the mode $i$ at point $x_p$
+    * $c_i = \frac{1}{2jM_i\Omega_i}$ the normalization constant of the mode shape of the mode $i$
 
-## Natural frequencies and damping ratios extraction
+The objective of an EMA is therefore to identify the residuals ${}_i R_{pq}$ and the poles $\lambda_i$ of the transfer function $H_{pq}(\omega)$ in order to extract, in a second step, the modal parameters of the system under study (natural angular frequencies $\omega_i$, modal damping factors $\xi_i$ and mode shapes $\phi_i$).
 
-`StructuralDynamics.jl` provides two SDOF methods for extracting the natural frequencies and damping ratios of a system from its frequency response function (FRF):
+## Modal parameters extraction methods
 
-- Peak picking method,
-- Circle fit method,
-- Least squares fit method.
+In this `StructuralVibration.jl`, two families of modal extraction methods are implemented:
 
-### Peak picking method
+* methods based on the use of single degree of freedom (sdof) models, known as **Sdof methods**. These methods seek to adjust ideal transfer functions of Sdof systems to experimental curves around their resonances. These methods therefore consist of identifying the modal parameters mode by mode. To do this, the operator must select a frequency band around each resonance to perform the extraction. Currently, three Sdof methods are implemented in this package:
 
-The peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:
+    * Peak Picking method
+    * Circle Fit method
+    * Least Squares Fit method
 
-1. **Identification of natural frequencies**
+* methods based on the use of multiple degree of freedom (mdof) models, known as **Mdof methods**. These methods consider that the system can be represented as a multiple degree of freedom system. They are generally based on the construction of a high-order polynomial matrix whose coefficients are estimated from the measured transfer functions.Three Mdof methods are implemented in this package:
 
-    They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using `Peaks.jl`.
+    * Least-Squares Complex Exponential method
+    * Least-Squares Complex Frequency-domain method
+    * Polyreference Least-Squares Complex Frequency-domain method
 
-2. **Estimation of modal damping factors**
-
-    To estimate the value of the damping factor for mode $i$, the half power bandwidth method is used. This procedure, valid for low damping ($\eta_i < 0.1$), first determines the frequencies $\omega_1$ and $\omega_2$ such that:
-    $$
-    \vert H_{pq}(\omega_1)\vert = \vert H_{pq}(\omega_2)\vert = \frac{\vert H_{pq}(\omega_i)\vert}{\sqrt{2}},
-    $$
-    with $\omega_i \in [\omega_1, \omega_2]$.
-
-    Knowing the values of $\omega_i$, $\omega_1$, and $\omega_2$, the damping ratio for mode $i$ is determined using the formula:
-    $$
-    \eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
-    $$
-
-::: {.callout-note}
-If we consider that the shape of a resonance peak is symmetric then $\omega_i = \frac{\omega_1 + \omega_2}{2}$.
-
-It comes that:
-$$
-\omega_2^2 - \omega_1^2 \approx 2\omega_i(\omega_2 - \omega_1).
-$$
-
-Hence, the damping ratio can be approximated as:
-$$
-\eta_i \approx \frac{\omega_2 - \omega_1}{\omega_i}.
-$$
-
-This formula is often given in textbooks when dealing with the half power bandwidth method.
-:::
-
-::: {.callout-warning}
-Thanks to its extreme simplicity, this method allows for quick analysis. However, this method generally does not provide satisfactory results, as it relies on measuring the resonance peak, which is very difficult to measure precisely. This is why this method is mainly applicable to lightly damped structures with well-separated modes, whose transfer functions have been measured with good frequency resolution.
-:::
-
-### Circle fit method
-
-The circle fit method is a more sophisticated method for extracting the natural frequencies and damping ratios of a system. It allows for more accurate results than the peak picking method. It is based on the fact that the admittance forms a circle (Nyquist circle) when plotted in the complex plane (see @fig-cfm). Indeed, assuming that the modes are mass-normalized, it can be shown that:
-$$
-Re\left[H_{pq}(\omega)\right]^2 + \left(Im\left[H_{pq}(\omega)\right] + \frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\right)^2 = \left(\frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\right)^2,
-$$
-which is the equation of a circle of radius $R = \frac{\vert\Phi_i(x_p)\Phi_i(x_q)\vert}{2\eta_i\omega_i^2}$ and center $(x_c,y_c) = \Bigl(0,-\frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\Bigr)$.
-
-::: {#fig-cfm}
-![](../assets/images/cercle_nyquist.png)
-
-Typical Nyquist circle of an admittance $H_{pq}(\omega)$
-:::
-
-The circle fit method consists of the following steps:
-
-1. **Identification of natural frequencies**
-
-    To identify the natural frequency of a mode $i$, we start by parameterizing the Nyquist circle by defining the angles $\psi$ and $\theta$ as shown in @fig-cfm. Mathematically, it can then be shown that:
-    $$
-    \omega_i^2 = \frac{\omega_1^2\tan\frac{\theta_2}{2} - \omega_2^2\tan\frac{\theta_1}{2}}{\tan\frac{\theta_2}{2} - \tan\frac{\theta_1}{2}},
-    $$
-    where $\omega_1$ and $\omega_2$ are the angular frequencies such that $\omega_1 < \omega_i < \omega_2$, while $\theta_1$ and $\theta_2$ are the corresponding angles of the Nyquist circle.
-
-2. **Estimation of modal damping factors**
-
-    The damping ratio is estimated using the following formula:
-    $$
-    \eta_i = \frac{\omega_2^2 - \omega_1^2}{\omega_i^2}\frac{1}{\tan\frac{\theta_1}{2} - \tan\frac{\theta_2}{2}}.
-    $$
-
-::: {.callout-note}
-Generally, the angles $\theta_1$ and $\theta_2$ are chosen so that:
-$$
-\theta_1 = \frac{\pi}{2} \text{ and } \theta_2 = -\frac{\pi}{2}.
-$$
-
-In doing so, we have:
-$$
-\omega_i^2 = \frac{\omega_1^2 + \omega_2^2}{2} \text{ and } \eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
-$$
-:::
-
-### Least squares fit method
-
-The least squares fit method is based on the idea of fitting the frequency response function (FRF) around the resonance peaks using a least squares approach[^1].
-
-[^1]: A. Brandt. "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
-
-When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency $\omega$ close to the natural frequency $f_i$:
-$$
-H_{pq}(f) \approx \frac{_{i}A_{pq}}{f_i^2 - f^2 + 2j\xi_i f_i f}.
-$$
-
-The least squares fit method consists of the following steps:
-
-1. **Definition of the system matrices**
-
-    To construct the system matrices, we start by rewriting the previous equation as:
-    $$
-    H_{pq}(f) \left(f_i^2 - f^2 + 2j\xi_i f_i f\right) - _{i}A_{pq} = 0.
-    $$
-
-    This equation can be rewritten as:
-    $$
-    \begin{bmatrix}
-    H_{pq}(f) & 2jfH_{pq}(f) & -1
-    \end{bmatrix} \begin{bmatrix}
-    f_i^2 \\
-    \xi_i f_i \\
-    _{i}A_{pq}
-    \end{bmatrix} = f^2 H_{pq}(f).
-    $$
-
-    If we consider $M$ frequency points around the resonance peak, we can construct the following system of equations:
-    $$
-    \begin{bmatrix}
-    H_{pq}(f_1) & 2jf_1H_{pq}(f_1) & -1 \\
-    H_{pq}(f_2) & 2jf_2H_{pq}(f_2) & -1 \\
-    \vdots & \vdots & \vdots \\
-    H_{pq}(f_M) & 2jf_MH_{pq}(f_M) & -1
-    \end{bmatrix} \begin{bmatrix}
-    f_i^2 \\
-    \xi_i f_i \\
-    _{i}A_{pq}
-    \end{bmatrix} = \begin{bmatrix}
-    f_1^2 H_{pq}(f_1) \\
-    f_2^2 H_{pq}(f_2) \\
-    \vdots \\
-    f_M^2 H_{pq}(f_M)
-    \end{bmatrix}.
-    $$
-
-2. **Least squares solution**
-
-    The least squares solution of the previous system of equations is given by:
-    $$
-    \begin{bmatrix}
-    f_i^2 \\
-    \xi_i f_i \\
-    _{i}A_{pq}
-    \end{bmatrix} = \left(\mathbf{A}^H\mathbf{A}\right)^{-1}\mathbf{A}^H\mathbf{b},
-    $$
-    where $\mathbf{A}$ is the matrix on the left-hand side of the system of equations, $\mathbf{b}$ is the vector on the right-hand side, and $\mathbf{A}^H$ is the conjugate transpose of $\mathbf{A}$.
-
-::: {.callout-note}
-
-In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the real and imaginary parts are separated to solve a real system of double size.
-
-:::
-
-## Mode shapes extraction
-
-The mode shapes are extracted from the admittance matrix at the resonance frequency $\omega_i$. In this situation, the admittance matrix is defined as:
-$$
-\mathbf{H} = \frac{1}{j\eta_i\omega_i^2}
-  \begin{bmatrix}
-    \Phi_i(x_1)^2 & \Phi_i(x_1)\Phi_i(x_2) & \ldots\ & \Phi_i(x_1)\Phi_i(x_N) \\
-    \Phi_i(x_2)\Phi_i(x_1) & \Phi_i(x_2)^2 &  & \Phi_i(x_2)\Phi_i(x_N) \\
-    \vdots & & \ddots & \vdots \\
-    \Phi_i(x_N)\Phi_i(x_1) & \ldots & \ldots & \Phi_i(x_N)^2
-  \end{bmatrix},
-$$
-where $\omega_i$ and $\eta_i$ have been determined using the peak picking method or the circle fit method.
-
-To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), proceed as follows:
-
-* From the measurement of an input admittance (diagonal term of the admittance matrix), the mode shape value at point $x_q$ is obtained:
-  $$
-  \Phi_i(x_q)^2 = -\eta_i\omega_i^2 \text{Im}(H_{qq}(\omega_i)).
-  $$
-
-* From the cross-admittances (off-diagonal terms of the admittance matrix), the mode shape value at a point $x_p$ is calculated:
-  $$
-  \Phi_i(x_p)\Phi_i(x_q) = -\eta_i\omega_i^2 \text{Im}(H_{pq}(\omega_i))
-  $$
-
-## API
-
-**Data types**
-
-::: {.api}
-**AutoEMASdofProblem**
-
----
-```{julia}
-#| echo: false
-@doc AutoEMASdofProblem
-```
-:::
-
-::: {.api}
-**EMASdofSolution**
-
----
-```{julia}
-#| echo: false
-@doc EMASdofSolution
-```
-:::
-
-**Related unctions**
-
-::: {.api}
-**freq_extraction**
-
----
-```{julia}
-#| echo: false
-@doc  freq_extraction
-```
-:::
-
-::: {.api}
-**modeshape_extraction**
-
----
-```{julia}
-#| echo: false
-@doc  modeshape_extraction(H::AbstractArray, freq::AbstractVector, fn::AbstractVector, ξn::AbstractVector, dpi::AbstractVector)
-```
-:::
-
-::: {.api}
-**solve**
-
----
-```{julia}
-#| echo: false
-@doc solve(prob::AutoEMASdofProblem)
-```
-:::
-
-## Example
-
-```{julia}
-#| output: false
-# Structure parameters of the beam
-L = 1.        # Length
-b = 0.03      # Width
-h = 0.01      # Thickness
-S = b*h       # Cross-section area
-Iz = b*h^3/12 # Moment of inertia
-
-# Material parameters
-E = 2.1e11  # Young's modulus
-ρ = 7850.   # Density
-ξ = 0.01    # Damping ratio
-
-# Mesh
-xexc = 0:0.05:L
-xm = xexc[2]
-
-# Mode calculation - Simply supported boundary conditions
-beam = Beam(L, S, Iz, E, ρ)
-fmax = 500.
-
-ωn, kn = modefreq(beam, 2fmax)
-ϕexc = modeshape(beam, kn, xexc)
-ϕm = modeshape(beam, kn, xm)
-
-# FRF calculation
-freq = 1.:0.1:fmax
-prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
-H = solve(prob; ismat = true).u
-
-# Natural frequencies and damping ratios extraction
-fn_pp, ξn_pp = freq_extraction(H, freq, PeakPicking())
-fn_cf, ξn_cf = freq_extraction(H, freq, CircleFit())
-fn_lsf, ξn_lsf = freq_extraction(H, freq, LSFit())
-
-# Mode shape extraction
-dpi = [1, 2]
-ϕid = modeshape_extraction(H, freq, fn_cf, ξn_cf, dpi)
-
-# Automatic EMA
-prob_ema = AutoEMASdofProblem(H, freq, dpi = dpi, method = LSFit())
-sol_ema = solve(prob_ema)
-fn_ema = sol_ema.f
-ξn_ema = sol_ema.xi
-ϕn_ema = sol_ema.ms
-```
-
-```{julia}
-#| echo: false
-# Natural frequencies and damping ratios
-fig_f = Figure()
-ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
-ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
-
-scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
-scatter!(ax_f1, 1:4, fn_pp, markersize = 20, label = "Peak picking")
-scatter!(ax_f1, 1:4, fn_cf, marker = :star4, markersize = 15, label = "Circle fit")
-scatter!(ax_f1, 1:4, fn_lsf, marker = :circle, markersize = 10, label = "Least squares fit")
-axislegend(ax_f1, position = :lt)
-
-scatter!(ax_f2, 1:4, 100ξ*ones(4), marker = :rect, markersize = 25, label = "Reference")
-scatter!(ax_f2, 1:4, 100ξn_pp, markersize = 20, label = "Peak picking")
-scatter!(ax_f2, 1:4, 100ξn_cf, marker = :star4, markersize = 15, label = "Circle fit")
-scatter!(ax_f2, 1:4, 100ξn_lsf, marker = :circle, markersize = 10, label = "Least squares fit")
-
-display(fig_f);
-
-# Mode shapes
-fig_mode = Figure()
-ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
-ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
-ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
-ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
-
-lines!(ax_mode1, xexc, ϕexc[:, 1], label = "Reference")
-lines!(ax_mode1, xexc, ϕid[:, 1], linestyle = :dash, label = "Estimated")
-xlims!(ax_mode1, 0, L)
-axislegend(ax_mode1, position = :cb)
-
-lines!(ax_mode2, xexc, ϕexc[:, 2], label = "Reference")
-lines!(ax_mode2, xexc, ϕid[:, 2], linestyle = :dash, label = "Estimated")
-xlims!(ax_mode2, 0, L)
-
-lines!(ax_mode3, xexc, ϕexc[:, 3], label = "Reference")
-lines!(ax_mode3, xexc, ϕid[:, 3], linestyle = :dash, label = "Estimated")
-xlims!(ax_mode3, 0, L)
-
-lines!(ax_mode4, xexc, ϕexc[:, 4], label = "Reference")
-lines!(ax_mode4, xexc, ϕid[:, 4], linestyle = :dash, label = "Estimated")
-xlims!(ax_mode4, 0, L)
-
-display(fig_mode);
-```

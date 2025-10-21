@@ -48,16 +48,21 @@ Extract complex poles from Frequency Response Function (FRF) data using the spec
 **Output**
 - `poles`: Vector of extracted complex poles
 """
-function poles_extraction(frf, freq, order, method::MdofModalExtraction = LSCF(); frange, stabdiag = false)
-    if method isa LSCE
-        return lsce(frf, freq, order; frange = frange, stabdiag = stabdiag)
-    elseif method isa LSCF
-        return lscf(frf, freq, order; frange = frange, stabdiag = stabdiag)
-    elseif method isa PLSCF
-        return plscf(frf, freq, order; frange = frange, stabdiag = stabdiag)
-    else
-        error("Unknown modal extraction method.")
+function poles_extraction(frf, freq, order::Int, method::MdofModalExtraction; frange = [freq[1], freq[end]], stabdiag = false)
+
+    est_method = let
+        if method isa LSCE
+            lsce
+        elseif method isa LSCF
+            lscf
+        elseif method isa PLSCF
+            plscf
+        else
+            error("Unknown modal extraction method.")
+        end
     end
+
+    return est_method(frf, freq, order; frange = frange, stabdiag = stabdiag)
 end
 
 

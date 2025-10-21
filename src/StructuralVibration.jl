@@ -50,7 +50,7 @@ export c2d, c2r_modeshape, modal_parameters, ss_model, ss_modal_model
 export freq_extraction, modeshape_extraction
 
 export cmif, comac, ecomac, frac, impulse_response, mac, mcf,
-       modal2poles, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization
+       modal2poles, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization, poles_ppm_extract, poles_cfm_extract, poles_lsf_extract
 
 export bartlett, bartlett_hann, blackman, blackman_harris, blackman_nuttall,
        cosine, csd, dpss, exponential, flattop, force, gaussian, hamming, hanning, kaiser, lanczos, nuttall, parzen, planck, rect, spectrum, tfestimate, triang, tukey, welch
@@ -83,7 +83,7 @@ include("modal_extraction/ema_sdof.jl")
 include("modal_extraction/ema_indicators.jl")
 include("modal_extraction/ema_mdof_ms.jl")
 include("modal_extraction/ema_mdof_poles.jl")
-include("modal_extraction/ema_mdof_utils.jl")
+include("modal_extraction/ema_utils.jl")
 
 # Include files - Sdof
 include("models/sdof_mdof.jl")

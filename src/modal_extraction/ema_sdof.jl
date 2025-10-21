@@ -34,49 +34,68 @@ Structure containing the input data for automatic experimental modal analysis us
 end
 
 """
-    EMASdofSolution(fn, ξn, ϕn)
+    EMASdofSolution(poles, ϕn)
 
 Structure containing the solution of the automatic experimental modal analysis using Sdof methods
 
 **Fields**
-* `f`: Natural frequencies
-* `xi`: Damping ratios
+* `poles`: Extracted poles
 * `ms`: Mode shapes
 """
-@show_data struct EMASdofSolution{T <: Real}
-    f::Vector{T}
-    xi::Vector{T}
-    ms::AbstractArray{T}
+@show_data struct EMASdofSolution{Tp <: Complex, Tm <: Real}
+    poles:: Vector{Tp}
+    ms::AbstractArray{Tm}
 end
 
 """
-    freq_extraction(H::AbstractArray, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
+    poles_extraction(H::AbstractArray, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
 
-    freq_extraction(H::AbstractVector, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
+    poles_extraction(H::AbstractVector, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
 
-Extract natural frequencies and damping ratios from the Bode diagram fitting method
+Extract poles from the Bode diagram fitting method
 
 **Inputs**
 * `H`: Frequency response function (either a matrix of size (nm, ne, nf) or a vector of size (nf))
 * `freq`: Frequency vector
-* `method`: Method to extract the natural frequencies and damping ratios
+* `method::SdofModalExtraction`: Method to extract the poles
     * `PeakPicking`: Peak picking method (default)
     * `CircleFit`: Circle fitting method
     * `LSFit`: Least squares fitting method
 * `frange`: Frequency range to consider for the extraction - default = [freq[1], freq[end]]
-* `type`: Type of FRF used to extract the natural frequencies and damping ratios
+* `type`: Type of FRF used to extract the poles
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
 
 **Outputs**
-* `fn`: Natural frequencies
-* `ξn`: Damping ratios
+* `poles`: Vector of extracted complex poles
 
 **Note**
 When `H` is a matrix, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function freq_extraction(H::AbstractArray, freq, method::SdofModalExtraction = PeakPicking(); frange = [freq[1], freq[end]], type = :dis)
+function poles_extraction(H::AbstractVector, freq, method::SdofModalExtraction = PeakPicking(); frange = [freq[1], freq[end]], type = :dis)
+    fidx = @. frange[1] ≤ freq ≤ frange[2]
+    Hred = H[fidx]
+    freq_red = freq[fidx]
+
+    est_method = let
+        if method isa PeakPicking
+            poles_ppm_extract
+        elseif method isa CircleFit
+            poles_cfm_extract
+        elseif method isa LSFit
+            poles_lsf_extract
+        else
+            throw(ArgumentError("Unknown modal extraction method"))
+        end
+    end
+
+    return est_method(Hred, freq_red, type = type)
+end
+
+function poles_extraction(H::AbstractArray, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
+
+    # FRF post-processing - Frequency range reduction
     fidx = @. frange[1] ≤ freq ≤ frange[2]
     Hred = H[:, :, fidx]
     freq_red = freq[fidx]
@@ -92,79 +111,61 @@ function freq_extraction(H::AbstractArray, freq, method::SdofModalExtraction = P
         npeak = max(npeak, np[k])
     end
 
-    # Initialization
-    fnk = similar(freq, nm*ne, npeak)
-    drk = similar(fnk)
-    fn = similar(freq, npeak)
-    dr = similar(freq, npeak)
-    for (k, Hv) in enumerate(eachrow(Hr))
+    est_method = let
         if method isa PeakPicking
-            p = freq_ppm_extract(Hv, freq_red, type = type)
+            poles_ppm_extract
         elseif method isa CircleFit
-            p = freq_cfm_extract(Hv, freq_red, type = type)
+            poles_cfm_extract
         elseif method isa LSFit
-            p = freq_lsf_extract(Hv, freq_red, type = type)
+            poles_lsf_extract
         else
             throw(ArgumentError("Unknown modal extraction method"))
         end
+    end
 
-        nk = length(p[1])
-        fnk[k, :] .= [p[1]; fill(NaN, npeak - nk)]
-        drk[k, :] .= [p[2]; fill(NaN, npeak - nk)]
+    # Initialization
+    pk = similar(H, nm*ne, npeak)
+    pn = similar(H, npeak)
+    for (k, Hv) in enumerate(eachrow(Hr))
+        p = est_method(Hv, freq_red, type = type)
+
+        nk = length(p)
+        pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
     end
 
     # Average the results from different FRFs
     keeprow = np .== npeak
     for i in 1:npeak
-        fn[i] = mean(skipnan(fnk[keeprow, i]))
-        dr[i] = mean(skipnan(drk[keeprow, i]))
+        pn[i] = mean(skipnan(pk[keeprow, i]))
     end
 
-    return fn, dr
+    return pn
 end
-
-function freq_extraction(H::AbstractVector, freq, method::SdofModalExtraction = PeakPicking(); frange = [freq[1], freq[end]], type = :dis)
-    fidx = @. frange[1] ≤ freq ≤ frange[2]
-    Hred = H[fidx]
-    freq_red = freq[fidx]
-
-    if method isa PeakPicking
-        return freq_ppm_extract(Hred, freq_red, type = type)
-    elseif method isa CircleFit
-        return freq_cfm_extract(Hred, freq_red, type = type)
-    elseif method isa LSFit
-        return freq_lsf_extract(Hred, freq_red, type = type)
-    else
-        throw(ArgumentError("Unknown modal extraction method"))
-    end
-end
-
 
 """
-    freq_ppm_extract(H, freq; type = :dis)
+    poles_ppm_extract(H, freq; type = :dis)
 
-Extract natural frequencies and damping ratios from the Bode diagram peak picking method
+Extract poles from the Bode diagram peak picking method
 
 **Inputs**
 * `H`: Frequency response function
 * `freq`: Frequency vector
-* `type`: Type of FRF used to extract the natural frequencies and damping ratios
+* `type`: Type of FRF used to extract the poles
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
 
 **Outputs**
-* `fn`: Natural frequencies
-* `ξn`: Damping ratios
+* `poles`: Extracted poles
 """
-function freq_ppm_extract(H, freq; type = :dis)
+function poles_ppm_extract(H, freq; type = :dis)
     ω = 2π*freq
 
     Habs = abs.(H)
     pks = findmaxima(Habs)
     # Peaks not found
     if isempty(pks.indices)
-        return eltype(freq)[], eltype(freq)[]
+        return Complex{eltype(freq)}[]
     end
     pks = peakproms!(pks) |> peakwidths!
 
@@ -210,33 +211,32 @@ function freq_ppm_extract(H, freq; type = :dis)
         fn[n] = ftemp[n]/√(1 - ξn[n]^2)
     end
 
-    return fn, ξn
+    return modal2poles(fn, ξn)
 end
 
 """
-    freq_cfm_extract(H, freq; type = :dis)
+    poles_cfm_extract(H, freq; type = :dis)
 
-Extract natural frequencies and damping ratios from the Bode diagram circle fitting method
+Extract poles from the Bode diagram circle fitting method
 
 **Inputs**
 * `H`: Frequency response function
 * `freq`: Frequency vector
-* `type`: Type of FRF used to extract the natural frequencies and damping ratios
+* `type`: Type of FRF used to extract the poles
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
 
 **Outputs**
-* `fn`: Natural frequencies
-* `ξn`: Damping ratios
+* `poles`: Extracted poles
 """
-function freq_cfm_extract(H, freq; type = :dis)
+function poles_cfm_extract(H, freq; type = :dis)
     ω = 2π*freq
 
     pks = findmaxima(abs.(H))
     # Peaks not found
     if isempty(pks.indices)
-        return [NaN], [NaN]
+        return Complex{eltype(freq)}[]
     end
     pks = peakproms!(pks) |> peakwidths!
 
@@ -293,38 +293,37 @@ function freq_cfm_extract(H, freq; type = :dis)
 
     end
 
-    return fn, ξn
+    return modal2poles(fn, ξn)
 end
 
 """
-    freq_lsf_extract(H, freq; type = :dis)
+    poles_lsf_extract(H, freq; type = :dis)
 
-Extract natural frequencies and damping ratios from the Bode diagram least squares fitting method
+Extract poles from the Bode diagram least squares fitting method
 
 **Inputs**
 * `H`: Frequency response function
 * `freq`: Frequency vector
-* `type`: Type of FRF used to extract the natural frequencies and damping ratios
+* `type`: Type of FRF used to extract the poles
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
 
 **Outputs**
-* `fn`: Natural frequencies
-* `ξn`: Damping ratios
+* `poles`: Extracted poles
 
 **Source**
 [1] Matlab documentation - `modalfit` function (https://www.mathworks.com/help/signal/ref/modalfit.html)
 [2] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 
 """
-function freq_lsf_extract(H, freq; type = :dis)
+function poles_lsf_extract(H, freq; type = :dis)
     ω = 2π*freq
 
     pks = findmaxima(abs.(H))
     # Peaks not found
     if isempty(pks.indices)
-        return [NaN], [NaN]
+        return Complex{eltype(freq)}[]
     end
     pks = peakproms!(pks) |> peakwidths!
 
@@ -384,19 +383,18 @@ function freq_lsf_extract(H, freq; type = :dis)
         ξn[n] = res[2]/fn[n]
     end
 
-    return fn, ξn
+    return modal2poles(fn, ξn)
 end
 
 """
-    modeshape_extraction(H, freq, fn, ξn, dpi; type = :dis)
+    modeshape_extraction(H, freq, poles, dpi; type = :dis)
 
 Extract mode shapes using Sdof approximation
 
 **Inputs**
 * `H`: Frequency response function matrix of size (nm, ne, nf)
 * `freq`: Frequency vector
-* `fn`: Natural frequencies
-* `ξn`: Damping ratios
+* `poles`: Vector of complex poles
 * `dpi`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
     * `dpi[2]`: Driving point index on the excitation mesh
@@ -411,10 +409,13 @@ Extract mode shapes using Sdof approximation
 **Note**
 If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
 """
-function modeshape_extraction(H, freq, fn, ξn, dpi = [1, 1]; type = :dis)
-    ω = 2π*freq
+function modeshape_extraction(H, freq::AbstractVector, poles::Vector{T}, dpi = [1, 1]; type = :dis) where {T <: Complex}
+
+    # Conversion of poles to modal parameters
+    fn, ξn = poles2modal(poles)
     ωn = 2π*fn
 
+    # Data preparation
     nmes, nexc = size(H)[1:2]
     if nmes < nexc
         # Roving hammer test
@@ -425,7 +426,8 @@ function modeshape_extraction(H, freq, fn, ξn, dpi = [1, 1]; type = :dis)
         H = H[:, dpi[2], :]
     end
 
-    # Convert to displacement
+    # Convert to admittance
+    ω = 2π*freq
     if type == :vel
         H ./= ω'
     elseif type == :acc
@@ -504,8 +506,7 @@ Solve automatically experimental modal analysis problem using Sdof methods
 
 **Outputs**
 * `sol`: Solution of problem:
-    * `f`: Natural frequencies
-    * `xi`: Damping ratios
+    * `poles`: Extracted poles
     * `ms`: Mode shapes
 """
 function solve(prob::AutoEMASdofProblem)
@@ -513,10 +514,10 @@ function solve(prob::AutoEMASdofProblem)
     (; H, freq, type, dpi, method) = prob
 
     # Extraction of natural frequencies and damping ratios
-    fn, ξn = freq_extraction(H, freq, method, type = type)
+    poles = poles_extraction(H, freq, method, type = type)
 
     # Extraction of mode shapes
-    ϕn = modeshape_extraction(H, freq, fn, ξn, dpi, type = type)
+    ϕn = modeshape_extraction(H, freq, poles, dpi, type = type)
 
-    return EMASdofSolution(fn, ξn, ϕn)
+    return EMASdofSolution(poles, ϕn)
 end

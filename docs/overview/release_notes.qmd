@@ -14,7 +14,8 @@ format:
   - Refactor `SdofHarmonicTimeProblem`, `SdofForcedTimeProblem` and `SdofFrequencyProblem` to comply with `DifferentialEquations.jl` conventions
 
 - Signal processing
-  - Add `csd` function to compute the Cross Spectral Density (CSD) between two signals
+  - Add `csd` function to compute the Cross Spectral Density (CSD) between two signals or between multiple input and output signals
+  - Add support for matrix inputs in `tfestimate` function to compute the Frequency Response Function (FRF) between multiple input and output signals
   - Refactor `tfestimate`, `welch`, `csd` and `spectrum` functions to accept window functions instead of pre-computed window vectors
   - Add `nfft` parameter to `tfestimate`, `welch`, `csd` and `spectrum` functions to specify the number of FFT points to be used
 

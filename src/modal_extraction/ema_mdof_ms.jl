@@ -65,7 +65,9 @@ Extract mode shapes using MDOF approximation
 **Inputs**
 - `residues`: Residues matrix of size (np, nm, ne)
 - `poles`: Vector of complex poles
-- `di`: Vector indicating the location of the driving point on the measurement and excitation meshes (default: [1, 1])
+* `dpi`: Driving point indices - default = [1, 1]
+    * `dpi[1]`: Driving point index on the measurement mesh
+    * `dpi[2]`: Driving point index on the excitation mesh
 - `type`: Type of mode shape
     * `:complex`: Complex mode shapes (default)
     * `:real`: Real mode shapes
@@ -74,7 +76,7 @@ Extract mode shapes using MDOF approximation
 - `ϕ`: Mode shapes matrix
 - `Q`: Scaling factors vector
 """
-function modeshape_extraction(residues, poles, di = [1, 1]; type = :complex)
+function modeshape_extraction(residues, poles::Vector{T}, dpi = [1, 1]; type = :complex) where {T <: Complex}
 
 
 end

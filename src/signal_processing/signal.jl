@@ -54,14 +54,15 @@ Structure to store the time and frequency parameters for the FFT analysis
 end
 
 """
-    tfestimate(input_signal, output_signal, bs::Int, window_input = hanning,
-               window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
+    tfestimate(input_signal::AbstractMatrix, output_signal::AbstractMatrix, bs::Int, window_input = hanning, window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
+
+    tfestimate(input_signal::AbstractVector, output_signal::AbstractVector, bs::Int, window_input = hanning, window_output = window_input; fs::Int = 1, overlap = 0., type = :h1)
 
 Estimation of the one-sided transfer function between two signals
 
 **Inputs**
-* `input_signal::Vector{Real}`: Input signal
-* `output_signal::Vector{Real}`: Output signal
+* `input_signal::AbstractVector` or `AbstractMatrix`: Input signal
+* `output_signal::AbstractVector` or `AbstractMatrix`: Output signal
 * `bs::Int` Block size
 * `window_input`: Window function for the input signal (default: hanning)
 * `window_output`: Window function for the output signal (default: same as window_input)
@@ -78,35 +79,35 @@ Estimation of the one-sided transfer function between two signals
 * `H`: Transfer function
 * `freq`: Frequency range
 * `coh`: Coherence
-
-**Available window functions**
-
-**From DSP.jl**
-* `rect`
-* `hann` (default)
-* `hamming`
-* `tukey`
-* `cosine`
-* `lanczos`
-* `triang`
-* `bartlett`
-* `bartlett_hann`
-* `gaussian`
-* `blackman`
-* `kaiser`
-* `dpss`
-
-**From StructuralVibration.jl**
-* `exponential`
-* `force`
-* `flattop`
-* `nutall`
-* `blackman_nutall`
-* `blackman_harris`
-* `parzen`
-* `planck`
 """
-function tfestimate(input_signal::Vector{T}, output_signal::Vector{T}, bs::Int, window_input = hanning, window_output = window_input; fs::Int = 1, overlap = 0., nfft::Int = bs, type = :h1) where {T <: Real}
+function tfestimate(input_signal::AbstractMatrix, output_signal::AbstractMatrix, bs::Int, window_input = hanning, window_output = window_input; fs::Int = 1, overlap = 0., nfft::Int = bs, type = :h1)
+
+    ni, nti = size(input_signal)
+    no, nto = size(output_signal)
+
+    if nti != nto
+        throw(DimensionMismatch("Input and output signals must have the same number of time samples"))
+    end
+
+    # Estimate the number of fft points
+    (; freq) = FFTParameters(fs, bs)
+    m = nfft > bs ? nfft : bs
+    freqs = rfftfreq(m, fs)
+    useful_freqs = findall(freqs .<= freq[end])
+    nf = length(useful_freqs)
+
+    H = similar(complex.([1.], [1.]), no, ni, nf)
+    coh = similar(real(H))
+    for (i, xi) in enumerate(eachrow(input_signal))
+        for (j, yj) in enumerate(eachrow(output_signal))
+            H[j, i, :], _, coh[j, i, :] = tfestimate(xi, yj, bs, window_input, window_output; fs = fs, overlap = overlap, nfft = nfft, type = type)
+        end
+    end
+
+    return H, freqs[useful_freqs], coh
+end
+
+function tfestimate(input_signal::AbstractVector, output_signal::AbstractVector, bs::Int, window_input = hanning, window_output = window_input; fs::Int = 1, overlap = 0., nfft::Int = bs, type = :h1)
 
     # FFT Parameters
     (; freq) = FFTParameters(fs, bs)
@@ -195,7 +196,7 @@ end
 Estimation of one-sided Autopower functions of a signal using the Welch method
 
 **Inputs**
-* `input_signal::Vector{Real}`: Input signal
+* `input_signal::AbstractVector`: Input signal
 * `bs::Int`: Block size
 * `window`: Window function (default: hanning)
 * `fs::Int`: Sampling rate (default: 1)
@@ -211,38 +212,12 @@ Estimation of one-sided Autopower functions of a signal using the Welch method
 * `pxx`: Autopower
 * `freq`: Frequency range
 
-**Available window functions**
-
-**From DSP.jl**
-* `rect`
-* `hann` (default)
-* `hamming`
-* `tukey`
-* `cosine`
-* `lanczos`
-* `triang`
-* `bartlett`
-* `gaussian`
-* `bartlett_hann`
-* `blackman`
-* `kaiser`
-* `dpss`
-
-**From StructuralVibration.jl**
-* `exponential`
-* `force`
-* `flattop`
-* `nutall`
-* `blackman_nutall`
-* `blackman_harris`
-* `parzen`
-* `planck`
-
 **Notes**
 - The `welch`` function is already implemented in `DSP.jl` under the name `welch_pgram`. The function `welch` is implemented here for pedagogical purposes.
 - The `welch` function is equivalent to calling `csd(x, x, ...)`.
 """
-function welch(input_signal::Vector{T}, bs::Int, window = hanning; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd) where {T <: Real}
+function welch(input_signal::AbstractVector, bs::Int, window = hanning; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd)
+
     # FFT Parameters
     (; tspan, freq) = FFTParameters(fs, bs, pow2 = false)
 
@@ -309,8 +284,8 @@ end
 Estimation of the one-sided Cross-spectral density between two signals
 
 **Inputs**
-* `x::Vector{Real}`: First signal
-* `y::Vector{Real}`: Second signal
+* `x::AbstractVector`: First signal
+* `y::AbstractVector`: Second signal
 * `bs::Int`: Block size
 * `window_x`: Window function for the first signal (default: hanning)
 * `window_y`: Window function for the second signal (default: same as window_x)
@@ -327,37 +302,37 @@ Estimation of the one-sided Cross-spectral density between two signals
 * `pxy`: Cross-spectral density
 * `freq`: Frequency range
 
-**Available window functions**
-
-**From DSP.jl**
-* `rect`
-* `hann` (default)
-* `hamming`
-* `tukey`
-* `cosine`
-* `lanczos`
-* `triang`
-* `bartlett`
-* `gaussian`
-* `bartlett_hann`
-* `blackman`
-* `kaiser`
-* `dpss`
-
-**From StructuralVibration.jl**
-* `exponential`
-* `force`
-* `flattop`
-* `nutall`
-* `blackman_nutall`
-* `blackman_harris`
-* `parzen`
-* `planck`
-
 **Notes**
 - The `csd(x, x, ...) = welch(x, ...)`.
 """
-function csd(x::Vector{T}, y::Vector{T}, bs::Int, window_x = hanning, window_y = window_x; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd) where {T <: Real}
+function csd(x::AbstractMatrix, y::AbstractMatrix, bs::Int, window_x = hanning, window_y = window_x; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd)
+
+    ni, nti = size(x)
+    no, nto = size(y)
+
+    if nti != nto
+        throw(DimensionMismatch("Input and output signals must have the same number of time samples"))
+    end
+
+    # Estimate the number of fft points
+    (; freq) = FFTParameters(fs, bs)
+    m = nfft > bs ? nfft : bs
+    freqs = rfftfreq(m, fs)
+    useful_freqs = findall(freqs .<= freq[end])
+    nf = length(useful_freqs)
+
+    Pxy = similar(complex.([1.], [1.]), no, ni, nf)
+    for (i, xi) in enumerate(eachrow(x))
+        for (j, yj) in enumerate(eachrow(y))
+            Pxy[j, i, :] = csd(xi, yj, bs, window_x, window_y; fs = fs, overlap = overlap, nfft = nfft, scaling = scaling)[1]
+        end
+    end
+
+    return Pxy, freqs[useful_freqs]
+end
+
+function csd(x::AbstractVector, y::AbstractVector, bs::Int, window_x = hanning, window_y = window_x; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd)
+
     # FFT Parameters
     (; tspan, freq) = FFTParameters(fs, bs)
 
@@ -445,33 +420,6 @@ Estimation of the spectrum of a signal
 **Outputs**
 * `y`: Signal spectrum
 * `freq`: Frequency range
-
-**Available window functions**
-
-**From DSP.jl**
-* `rect`
-* `hann` (default)
-* `hamming`
-* `tukey`
-* `cosine`
-* `lanczos`
-* `triang`
-* `bartlett`
-* `gaussian`
-* `bartlett_hann`
-* `blackman`
-* `kaiser`
-* `dpss`
-
-**From StructuralVibration.jl**
-* `exponential`
-* `force`
-* `flattop`
-* `nutall`
-* `blackman_nutall`
-* `blackman_harris`
-* `parzen`
-* `planck`
 """
 function spectrum(input_signal::Vector{T}, bs::Int, window = hanning; fs::Int = 1, overlap = 0.5, nfft::Int = bs) where {T <: Real}
 
