@@ -444,6 +444,22 @@ function stabilization(frf, freq, max_order::Int, method::MdofModalExtraction = 
     return EMAMdofStabilization(frf, freq, frange, poles[1:max_order], modefn[1:max_order, 1:max_order], mode_stabfn[1:max_order, 1:max_order], mode_stabdr[1:max_order, 1:max_order])
 end
 
+"""
+    check_stability(fn_new, fn_old, dr_new, dr_old, stabcrit)
+
+Check the stability of natural frequencies and damping ratios between two consecutive model orders.
+
+**Inputs**
+- `fn_new`: Vector of natural frequencies at the new model order
+- `fn_old`: Vector of natural frequencies at the old model order
+- `dr_new`: Vector of damping ratios at the new model order
+- `dr_old`: Vector of damping ratios at the old model order
+- `stabcrit`: Vector containing the stability criteria for natural frequencies and damping ratios
+
+**Outputs**
+- `stabfn`: Boolean vector indicating the stability of natural frequencies
+- `stabdr`: Boolean vector indicating the stability of damping ratios
+"""
 function check_stability(fn_new, fn_old, dr_new, dr_old, stabcrit)
     Nmodes_old = length(fn_old)
     stabfn = falses(Nmodes_old)

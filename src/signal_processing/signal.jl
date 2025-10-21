@@ -96,6 +96,7 @@ function tfestimate(input_signal::AbstractMatrix, output_signal::AbstractMatrix,
     useful_freqs = findall(freqs .<= freq[end])
     nf = length(useful_freqs)
 
+    # Calculate the transfer function and coherence
     H = similar(complex.([1.], [1.]), no, ni, nf)
     coh = similar(real(H))
     for (i, xi) in enumerate(eachrow(input_signal))
@@ -115,9 +116,8 @@ function tfestimate(input_signal::AbstractVector, output_signal::AbstractVector,
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
-    m = nfft > bs ? nfft : bs
-
     # Check if the number of fft points is even or odd
+    m = nfft > bs ? nfft : bs
     n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
 
     Gxx = zeros(Complex{eltype(freq)}, n)
@@ -224,9 +224,8 @@ function welch(input_signal::AbstractVector, bs::Int, window = hanning; fs::Int 
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
-    m = nfft > bs ? nfft : bs
-
     # Check if the number of fft points is even or odd
+    m = nfft > bs ? nfft : bs
     n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
 
     # Signal segmentation
@@ -321,6 +320,7 @@ function csd(x::AbstractMatrix, y::AbstractMatrix, bs::Int, window_x = hanning, 
     useful_freqs = findall(freqs .<= freq[end])
     nf = length(useful_freqs)
 
+    # Compute cross-spectral density
     Pxy = similar(complex.([1.], [1.]), no, ni, nf)
     for (i, xi) in enumerate(eachrow(x))
         for (j, yj) in enumerate(eachrow(y))
@@ -339,9 +339,8 @@ function csd(x::AbstractVector, y::AbstractVector, bs::Int, window_x = hanning, 
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
-    m = nfft > bs ? nfft : bs
-
     # Check if the block size is even or odd
+    m = nfft > bs ? nfft : bs
     n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
 
     # Signal segmentation
@@ -526,8 +525,8 @@ Zero-pad a vector to a specified length N for usage in RFFT/IRFFT
 - `x`: Input vector or matrix
 - `N`: Desired length after zero-padding
 - `type`: Padding type
-    * `:dir` (default): Zero-padding for direct RFFT
-    * `:inv`: Zero-padding for inverse RFFT
+    * `:fft` (default): Zero-padding for direct RFFT
+    * `:ifft`: Zero-padding for inverse RFFT
 
 **Output**
 - `xpad`: Zero-padded vector or matrix
@@ -536,17 +535,12 @@ Zero-pad a vector to a specified length N for usage in RFFT/IRFFT
 - If the length of `x` is already greater than or equal to `N`, the original `x` is returned.
 - The function supports both vectors and matrices, padding along the last dimension.
 """
-function zpad(x::AbstractVector, N, type = :dir)
+function zpad(x::AbstractVector, N, type = :fft)
     nx = length(x)
 
     if N > nx
-        if type == :inv
-            if N%2 == 0
-                M = Int(round(N/2 + 1))
-            else
-                M = Int(round((N + 1)/2))
-            end
-
+        if type == :ifft
+            M = iseven(N) ? N ÷ 2 + 1 : (N + 1) ÷ 2
             xpad = [x; zeros(eltype(x), M - nx)]
         else
             xpad = [x; zeros(eltype(x), N - nx)]
@@ -558,17 +552,12 @@ function zpad(x::AbstractVector, N, type = :dir)
     return xpad
 end
 
-function zpad(x::AbstractMatrix, N, type = :dir)
+function zpad(x::AbstractMatrix, N, type = :fft)
     nx, ny = size(x)
 
     if N > ny
-        if type == :inv
-            if N%2 == 0
-                M = Int(round(N/2 + 1))
-            else
-                M = Int(round((N+1)/2))
-            end
-
+        if type == :ifft
+            M = iseven(N) ? N ÷ 2 + 1 : (N + 1) ÷ 2
             xpad = [x zeros(eltype(x), nx, M - ny)]
         else
             xpad = [x zeros(eltype(x), nx, N - ny)]

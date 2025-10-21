@@ -58,7 +58,7 @@ function impulse_response(H, freq, fs)
 
     # Data preparation
     nd = ndims(H)
-    H_padded = zpad(H, N, :inv)
+    H_padded = zpad(H, N, :ifft)
 
     return irfft(H_padded, N, nd)
 end
