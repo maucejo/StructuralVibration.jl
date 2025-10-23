@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -70,7 +70,39 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -151,6 +183,12 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../modal_extraction/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Primer on EMA</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../modal_extraction/sdof_methods.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Sdof methods</span></a>
   </div>
 </li>
@@ -177,8 +215,32 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#mode-complexity-indicators" id="toc-mode-complexity-indicators" class="nav-link active" data-scroll-target="#mode-complexity-indicators"><span class="header-section-number">1</span> Mode complexity indicators</a>
+  <ul class="collapse">
+  <li><a href="#mode-overcomplexity-value" id="toc-mode-overcomplexity-value" class="nav-link" data-scroll-target="#mode-overcomplexity-value"><span class="header-section-number">1.1</span> Mode Overcomplexity Value</a></li>
+  <li><a href="#mode-phase-collinearity" id="toc-mode-phase-collinearity" class="nav-link" data-scroll-target="#mode-phase-collinearity"><span class="header-section-number">1.2</span> Mode Phase Collinearity</a></li>
+  <li><a href="#mode-complexity-factor" id="toc-mode-complexity-factor" class="nav-link" data-scroll-target="#mode-complexity-factor"><span class="header-section-number">1.3</span> Mode Complexity Factor</a></li>
+  <li><a href="#mean-phase-deviation" id="toc-mean-phase-deviation" class="nav-link" data-scroll-target="#mean-phase-deviation"><span class="header-section-number">1.4</span> Mean Phase Deviation</a></li>
+  </ul></li>
+  <li><a href="#correlation-indicators" id="toc-correlation-indicators" class="nav-link" data-scroll-target="#correlation-indicators"><span class="header-section-number">2</span> Correlation indicators</a>
+  <ul class="collapse">
+  <li><a href="#modal-assurance-criterion" id="toc-modal-assurance-criterion" class="nav-link" data-scroll-target="#modal-assurance-criterion"><span class="header-section-number">2.1</span> Modal Assurance Criterion</a></li>
+  <li><a href="#coordinate-modal-assurance-criterion" id="toc-coordinate-modal-assurance-criterion" class="nav-link" data-scroll-target="#coordinate-modal-assurance-criterion"><span class="header-section-number">2.2</span> Coordinate Modal Assurance Criterion</a></li>
+  <li><a href="#enhanced-coordinate-modal-assurance-criterion" id="toc-enhanced-coordinate-modal-assurance-criterion" class="nav-link" data-scroll-target="#enhanced-coordinate-modal-assurance-criterion"><span class="header-section-number">2.3</span> Enhanced Coordinate Modal Assurance Criterion</a></li>
+  <li><a href="#frequency-response-assurance-criterion" id="toc-frequency-response-assurance-criterion" class="nav-link" data-scroll-target="#frequency-response-assurance-criterion"><span class="header-section-number">2.4</span> Frequency response assurance criterion</a></li>
+  </ul></li>
+  <li><a href="#indicator-functions" id="toc-indicator-functions" class="nav-link" data-scroll-target="#indicator-functions"><span class="header-section-number">3</span> Indicator functions</a>
+  <ul class="collapse">
+  <li><a href="#complex-mode-indicator-function" id="toc-complex-mode-indicator-function" class="nav-link" data-scroll-target="#complex-mode-indicator-function"><span class="header-section-number">3.1</span> Complex Mode Indicator Function</a></li>
+  <li><a href="#power-spectrum-indicator-function" id="toc-power-spectrum-indicator-function" class="nav-link" data-scroll-target="#power-spectrum-indicator-function"><span class="header-section-number">3.2</span> Power spectrum indicator function</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -202,9 +264,395 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>To be implemented.</p>
+<section id="mode-complexity-indicators" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="mode-complexity-indicators"><span class="header-section-number">1</span> Mode complexity indicators</h2>
+<p>The following indicators can be used to assess the complexity of the identified modes.</p>
+<section id="mode-overcomplexity-value" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="mode-overcomplexity-value"><span class="header-section-number">1.1</span> Mode Overcomplexity Value</h3>
+<p>The Mode Overcomplexity Value (MOV) of a mode <span class="math inline">\(i\)</span> is defined as: <span class="math display">\[
+MOV_i = \frac{\sum_{n = 1}^N s_{ni} \vert\phi_{ni}\vert^2}{\sum_{n = 1}^N \vert\phi_{ni}\vert^2},
+\]</span> where <span class="math inline">\(\phi_{ni}\)</span> is the mode shape value at degree of freedom <span class="math inline">\(n\)</span> for mode <span class="math inline">\(i\)</span>, and <span class="math inline">\(s_{ni}\)</span> is a weighted factor. The latter is given by: <span class="math display">\[
+s_{ni} = \begin{cases}
+0 &amp; \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 c_i) &gt; 0 \\
+1 &amp; \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 c_i) \leq 0
+\end{cases},
+\]</span> where <span class="math inline">\(\lambda_i\)</span> is the complex eigenvalue for mode <span class="math inline">\(i\)</span>, and <span class="math inline">\(c_i\)</span> is the corresponding scaling factor.</p>
+<p>A value close to 1 indicates physical modes, while a value close to 0 indicates spurious modes (or computational modes).</p>
+<div class="api">
+<p><strong>mov</strong></p>
+<hr>
+<div id="4" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">mov(poles, ms, ci)</code></pre>
+<p>Compute the mode overcomplexity value</p>
+<p>This indicator is a weighted percentage of the degrees of freedom of the response for which adding mass leads to a negative frequency shift. A value close to 1 indicates physical modes, while a low value indicates non-physical modes (numerical or noise-related)</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>poles</code>: Poles of the system</p>
+</li>
+<li><p><code>ms</code>: Mode shapes (each column corresponds to a mode)</p>
+</li>
+<li><p><code>ci</code>: Scaling factors associated to the mode shapes</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>mov</code>: Mode overcomplexity values</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] M+P Analyzer manual. Rev. 5.1. 2017</p>
 
 
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="mode-phase-collinearity" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="mode-phase-collinearity"><span class="header-section-number">1.2</span> Mode Phase Collinearity</h3>
+<p>The Mode Phase Collinearity (MPC) aims at determining whether a mode is real or complex. It is an indicator defined in <span class="math inline">\([0, 1]\)</span>. For a mode <span class="math inline">\(i\)</span>, it is given by: <span class="math display">\[
+  MPC_i = \left(\frac{\lambda_1 - \lambda_2}{\lambda_1 + \lambda_2}\right)^2,
+\]</span> where <span class="math inline">\(\lambda_1 = \frac{S_{xx} + S_{yy}}{2} + \sqrt{\left(\frac{S_{xx} - S_{yy}}{2}\right)^2 + S_{xy}^2}\)</span> and <span class="math inline">\(\lambda_2 = \frac{S_{xx} + S_{yy}}{2} - \sqrt{\left(\frac{S_{xx} - S_{yy}}{2}\right)^2 + S_{xy}^2}\)</span> are the eigenvalues of the covariance matrix <span class="math inline">\(\mathbf{S}\)</span>: <span class="math display">\[
+\mathbf{S} = \begin{bmatrix}
+S_{xx} &amp; S_{xy} \\
+S_{xy} &amp; S_{yy}
+\end{bmatrix} \text{ with } \begin{cases}
+S_{xx} = \text{Re}(\tilde{\phi}_i)^T\text{Re}(\tilde{\phi}_i) \\
+S_{yy} = \text{Im}(\tilde{\phi}_i)^T\text{Im}(\tilde{\phi}_i) \\
+S_{xy} = \text{Re}(\tilde{\phi}_i)^T\text{Im}(\tilde{\phi}_i)
+\end{cases}
+\]</span> Here, <span class="math inline">\(\tilde{\phi}_i\)</span> is the corrected mode shape vector for the mode <span class="math inline">\(i\)</span> such that: <span class="math display">\[
+\tilde{\phi}_{ni} = \phi_{ni} - \frac{\sum_{m = 1}^N \phi_{mi}}{N}.
+\]</span></p>
+<p>A value close to 1 indicates a real mode, while a value close to 0 indicates a complex mode.</p>
+<div class="api">
+<p><strong>mpc</strong></p>
+<hr>
+<div id="6" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">mpc(ms)</code></pre>
+<p>Compute the mode phase collinearity.</p>
+<p>This indicator aims to measure the complexity of a mode. Its value ranges from 0 (no collinearity) to 1 (perfect collinearity). For real modes, mpc tends towards 1.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>ms</code>: Mode shapes (each column corresponds to a mode)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>mpc</code>: Mode phase collinearity values</p>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<p>[1] J.-N. Juang and R. Pappa: "An eigensystem realization algorithm for modal parameter identification and model reduction", Journal of Guidance, Control, and Dynamics, Vol. 8, No. 5, Sept.-Oct. 1985, pp. 620-627.</p>
+<p>[2] M+P Analyzer manual. Rev. 5.1. 2017</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="mode-complexity-factor" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="mode-complexity-factor"><span class="header-section-number">1.3</span> Mode Complexity Factor</h3>
+<p>The Mode Complexity Factor (MCF) for a mode <span class="math inline">\(i\)</span> is defined as: <span class="math display">\[
+MCF_i = 1 - \frac{(S_{xx} - S_{yy})^2 + 4S_{xy}^2}{(S_{xx} + S_{yy})^2}
+\]</span></p>
+<p>A value close to 0 indicates a real mode, while a value close to 1 indicates a complex mode.</p>
+</section>
+<section id="mean-phase-deviation" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="mean-phase-deviation"><span class="header-section-number">1.4</span> Mean Phase Deviation</h3>
+<p>The Mean Phase Deviation (MPD) indicator aims to measure the complexity of a mode. Its value is close to 0 for real modes, and increases as the mode becomes more complex. It is defined as: <span class="math display">\[
+MPD_i = \frac{\sum_{n = 1}^N\vert\phi_{ni}\vert\; \text{acos}\left\vert\frac{\text{Re}(\phi_{ni})V_{22} - \text{Im}(\phi_{ni})V_{12}}{\sqrt{V_{12}^2 + V_{22}^2}\;\vert\phi_{ni}\vert}\right\vert}{\sum_{n = 1}^N \vert\phi_{ni}\vert},
+\]</span> where <span class="math inline">\(V_{12}\)</span> and <span class="math inline">\(V_{22}\)</span> are the components of the right singular vector associated to the singular value decomposition of the 2 <span class="math inline">\(\times\)</span> 2 matrix <span class="math inline">\(\mathbf{P}\)</span> expressed as: <span class="math display">\[
+\mathbf{P} = \begin{bmatrix}
+\text{Re}(\tilde{\phi}_i) &amp;
+\text{Im}(\tilde{\phi}_i)
+\end{bmatrix}.
+\]</span></p>
+<p>For real modes, the indicator is close to 0, while it increases for complex modes.</p>
+<div class="api">
+<p><strong>mpd</strong></p>
+<hr>
+<div id="8" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">mpd(ms)</code></pre>
+<p>Compute the mode phase deviation.</p>
+<p>This indicator aims to measure the complexity of a mode. Its value is close to 0 for real modes, and increases as the mode becomes more complex.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>ms</code>: Mode shapes (each column corresponds to a mode)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>mpd</code>: Mode phase deviation values</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] E. Reynders, J. Houbrechts and G. De Roeck. Fully automated (operational) modal analysis. Mechanical Systems and Signal Processing. 29: 228-250. 2012</p>
+<p>[2] A. C. Dederichs and O. Oiseth. Experimental comparison of automatic operational modal analysis algorithms for application to long-span road bridges. Mechanical Systems and Signal Processing. 199: 110485. 2023</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="correlation-indicators" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="correlation-indicators"><span class="header-section-number">2</span> Correlation indicators</h2>
+<p>The following indicators can be used to assess the correlation between measured and reconstructed quantities.</p>
+<section id="modal-assurance-criterion" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="modal-assurance-criterion"><span class="header-section-number">2.1</span> Modal Assurance Criterion</h3>
+<p>The Modal Assurance Criterion (MAC) is a widely used indicator to quantify the correlation between two sets mode shapes. For two mode shapes <span class="math inline">\(\phi_i\)</span> and <span class="math inline">\(\psi_j\)</span> (column vectors), it is defined as: <span class="math display">\[
+MAC_{ij} = \frac{\vert\psi_j^H\phi_i\vert^2}{(\phi_i^H\phi_i) (\psi_j^H\psi_j)},
+\]</span> where the superscript <span class="math inline">\(H\)</span> denotes the Hermitian transpose.</p>
+<p>A value close to 1 indicates a strong correlation between the two mode shapes, while a value close to 0 indicates no correlation.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In <code>StructuralVibration.jl</code>, it is assumed that <span class="math inline">\(\phi_i\)</span> is the theoretical (or reference) mode shape, while <span class="math inline">\(\psi_j\)</span> is the experimental (or identified) mode shape.</p>
+</div>
+</div>
+<div class="api">
+<p><strong>mac</strong></p>
+<hr>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">mac(ms_exp, ms_th)</code></pre>
+<p>Compute the modal assurance criterion (MAC) between experimental and theoretical mode shapes.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>ms_exp</code>: Experimental mode shapes (nmes x nmodes array)</p>
+</li>
+<li><p><code>ms_th</code>: Theoretical mode shapes (nmes x nmodes array)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>mac</code>: Modal assurance criterion values (nmodes x nmodes array)</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound &amp; Vibration. 37 (8): 14-23. 2003</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="coordinate-modal-assurance-criterion" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="coordinate-modal-assurance-criterion"><span class="header-section-number">2.2</span> Coordinate Modal Assurance Criterion</h3>
+<p>The Coordinate Modal Assurance Criterion (COMAC) is a variant of the MAC that considers the correlation between the coordinates of two mode shapes. For a coordinate <span class="math inline">\(p\)</span> of two mode shapes <span class="math inline">\(\phi_p\)</span> and <span class="math inline">\(\psi_p\)</span> (row vectors), it is defined as: <span class="math display">\[
+COMAC_p = \frac{\vert\phi_{pi}\psi_{pi}^H\vert^2}{(\phi_{pi}\phi_{pi}^H) (\psi_{pi}
+\psi_{pi}^H)},
+\]</span> where the superscript <span class="math inline">\(H\)</span> denotes the Hermitian transpose.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The computation of the COMAC indicator requires that the two mode shapes have the same number of coordinates and similar scaling. For the the latter, one of the mode shapes is multiplied by the modal scaling factor: <span class="math display">\[
+MSF_i = \frac{\phi_i^H\psi_i}{\phi_i^H\phi_i}.
+\]</span> The previous equation assumes that <span class="math inline">\(\phi_i\)</span> is the reference mode shape to which <span class="math inline">\(\psi_i\)</span> is scaled.</p>
+</div>
+</div>
+<p>A value close to 1 indicates a strong correlation between the two mode shapes, while a value close to 0 indicates no correlation.</p>
+<div class="api">
+<p><strong>comac</strong></p>
+<hr>
+<div id="12" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">comac(ms_exp, ms_th)</code></pre>
+<p>Compute the coordinate modal assurance criterion (COMAC) between experimental and theoretical mode shapes.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>ms_exp</code>: Experimental mode shapes (nmes x nmodes array)</p>
+</li>
+<li><p><code>ms_th</code>: Theoretical mode shapes (nmes x nmodes array)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>comac</code>: Coordinate modal assurance criterion values (nmes array)</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound &amp; Vibration. 37 (8): 14-23. 2003</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="enhanced-coordinate-modal-assurance-criterion" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="enhanced-coordinate-modal-assurance-criterion"><span class="header-section-number">2.3</span> Enhanced Coordinate Modal Assurance Criterion</h3>
+<p>The Enhanced Coordinate Modal Assurance Criterion (ECOMAC) extends the COMAC to take into account potential calibration scaling errors and/or sensor orientation errors by compouting the mean deviations of mode amplitudes of each coordinate. It is defined as: <span class="math display">\[
+ECOMAC_p = \frac{\sum_{i=1}^N \vert \phi_{pi} - \psi_{pi} \vert}{2 N},
+\]</span> where <span class="math inline">\(N\)</span> is the number of modes.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As for the COMAC indicator, the computation of the ECOMAC indicator requires that the two mode shapes have the same number of coordinates and similar scaling.</p>
+</div>
+</div>
+<p>Low values of the indicator indicates a strong correlation between the two mode shapes, while high values indicate very little correlation.</p>
+<div class="api">
+<p><strong>ecomac</strong></p>
+<hr>
+<div id="14" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">ecomac(ms_exp, ms_th)</code></pre>
+<p>Compute the enhanced coordinate modal assurance criterion (eCOMAC) between experimental and theoretical mode shapes.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>ms_exp</code>: Experimental mode shapes (nmes x nmodes array)</p>
+</li>
+<li><p><code>ms_th</code>: Theoretical mode shapes (nmes x nmodes array)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>ecomac</code>: Enhanced coordinate modal assurance criterion values (nmes array)</p>
+</li>
+</ul>
+<p><strong>Reference</strong> [1] D. L. Hunt. Application of an Enhanced Coordinate Modal Assurance Criterion (ECOMAC). Proceedings of International Modal Analysis Conference, pp. 66-71, 1992.</p>
+<p>[2] G. Martin, E. Balmes and T. Chancelier. Improved Modal Assurance Criterion using a quantification of identification errors per mode/sensor. Proceedings of ISMA 2014, pp. 2509-2519. 2014.</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="frequency-response-assurance-criterion" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="frequency-response-assurance-criterion"><span class="header-section-number">2.4</span> Frequency response assurance criterion</h3>
+<p>The Frequency Response Assurance Criterion (FRAC) is an indicator that quantifies the correlation between two frequency response functions (FRFs) over a given frequency range for a given measurement point <span class="math inline">\(p\)</span> and a given excitation point <span class="math inline">\(q\)</span>. For two FRFs <span class="math inline">\(H_{pq}(\omega)\)</span> and <span class="math inline">\(G_{pq}(\omega)\)</span>, it is defined as: <span class="math display">\[
+FRAC_{pq} = \frac{\vert \sum_{\omega = \omega_1}^{\omega_2} H_{pq}(\omega) G_{pq}^\ast(\omega) \, \vert^2}{\left( \sum_{\omega = \omega_1}^{\omega_2} \vert H_{pq}(\omega) \vert^2\right) \left( \sum_{\omega = \omega_1}^{\omega_2} \vert G_{pq}(\omega) \vert^2 \right)},
+\]</span> <span class="math inline">\(G_{pq}^\ast(\omega)\)</span> is the complex conjugate of <span class="math inline">\(G_{pq}(\omega)\)</span>, and <span class="math inline">\(\omega_1\)</span> and <span class="math inline">\(\omega_2\)</span> define the frequency range of interest.</p>
+<div class="api">
+<p><strong>frac</strong></p>
+<hr>
+<div id="16" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">frac(frf_exp, frf_th)</code></pre>
+<p>Compute the frequency response assurance criterion (FRAC) between experimental and theoretical frequency response functions.</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>frf_exp</code>: Experimental frequency response functions (nmes x nexc x nf array</p>
+</li>
+<li><p><code>frf_th</code>: Theoretical frequency response functions (nmes x nexc x nf array)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>frac</code>: Frequency response assurance criterion values (nmes x nexc array)</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound &amp; Vibration. 37 (8): 14-23. 2003</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="indicator-functions" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="indicator-functions"><span class="header-section-number">3</span> Indicator functions</h2>
+<p>The following indicator functions can be used to estimate the number of modes of a structure.</p>
+<section id="complex-mode-indicator-function" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="complex-mode-indicator-function"><span class="header-section-number">3.1</span> Complex Mode Indicator Function</h3>
+<p>The Complex Mode Indicator Function (CMIF) is a global indicator that helps identify the number of modes in a system. It is defined as the singular values of the frequency response function (FRF) matrix <span class="math inline">\(\mathbf{H}(\omega)\)</span> over a frequency range of interest. The FRF matrix is constructed by stacking the FRFs for all measurement points and excitation points.</p>
+<p>When admittance or accelerance are used, the CMIF is computed as the singular values of the imaginary part of the FRF matrix, while for mobility, the real part is used. From a general standpoint, the CMIF is given by: <span class="math display">\[
+CMIF(\omega) = \mathbf{\Sigma}(\omega),
+\]</span> where <span class="math inline">\(\mathbf{\Sigma}(\omega)\)</span> is the vector of singular values obtained from the singular value decomposition of the FRF matrix.</p>
+<div class="api">
+<p><strong>cmif</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">cmif(frf; type = :dis)</code></pre>
+<p>Compute the complex mode indicator function (CMIF)</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>frf</code>: Frequency response functions (nmes x nexc x nf array)</p>
+</li>
+<li><p><code>type</code>: Type of FRF (:dis for displacement, :vel for velocity, :acc for acceleration)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>cmif</code>: Complex mode indicator function (min(nmes, nexc) x nf array)</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] R. J. Allemang and D. L. Brown. A Complete Review of the Complex Mode  Indicator Function (CMIF) with Applications. ISMA 2006. 2006</p>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="power-spectrum-indicator-function" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="power-spectrum-indicator-function"><span class="header-section-number">3.2</span> Power spectrum indicator function</h3>
+<p>The Power Spectrum Indicator Function (PSIF) is another global indicator that helps identify the number of modes in a system. It is defined as the sum of the squared magnitudes of the FRFs over all measurement points and excitation points. The PSIF is given by: <span class="math display">\[
+PSIF(\omega) = \sum_{p=1}^{N_p} \sum_{q=1}^{N_q} \vert H_{pq}(\omega) \vert^2,
+\]</span> where <span class="math inline">\(N_p\)</span> is the number of measurement points, <span class="math inline">\(N_q\)</span> is the number of excitation points, and <span class="math inline">\(H_{pq}(\omega)\)</span> is the FRF between measurement point <span class="math inline">\(p\)</span> and excitation point <span class="math inline">\(q\)</span>.</p>
+<div class="api">
+<p><strong>psif</strong></p>
+<hr>
+<div id="20" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">psif(frf)</code></pre>
+<p>Compute the power spectrum indicator function (PSIF).</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><p><code>frf</code>: Frequency response functions (nmes x nexc x nf array or nmes x nf array)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>psif</code>: Power spectrum indicator function (nf array)</p>
+</li>
+</ul>
+<p><strong>Reference</strong></p>
+<p>[1] M+P Analyzer manual. Rev. 5.1. 2017</p>
+
+
+</div>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -215,6 +215,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#mechanical-models" id="toc-mechanical-models" class="nav-link" data-scroll-target="#mechanical-models">Mechanical models</a></li>
   <li><a href="#vibration-data-generation" id="toc-vibration-data-generation" class="nav-link" data-scroll-target="#vibration-data-generation">Vibration data generation</a></li>
+  <li><a href="#modal-analysis" id="toc-modal-analysis" class="nav-link" data-scroll-target="#modal-analysis">Modal analysis</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
   </ul></li>
   <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">License</a></li>
@@ -247,7 +249,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <img src="./assets/logo/doclogo.svg" class="img-fluid" style="width:35.0%">
 </center>
 <p><br></p>
-<p><a href=""><img src="https://img.shields.io/badge/Version-0.3.0-cornflowerblue.svg" class="img-fluid" alt="Generic badge"></a> <a href="https://github.com/maucejo/elsearticle/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-forestgreen.png" class="img-fluid" alt="MIT License"></a> <a href="https://github.com/JuliaTesting/Aqua.jl"><img src="https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg" class="img-fluid" alt="Aqua QA"></a> <a href="https://github.com/MilesCranmer/DispatchDoctor.jl"><img src="https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white" class="img-fluid" alt="DispatchDoctor"></a></p>
+<p><a href=""><img src="https://img.shields.io/badge/Version-1.0.0-cornflowerblue.svg" class="img-fluid" alt="Generic badge"></a> <a href="https://github.com/maucejo/elsearticle/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-forestgreen.png" class="img-fluid" alt="MIT License"></a> <a href="https://github.com/JuliaTesting/Aqua.jl"><img src="https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg" class="img-fluid" alt="Aqua QA"></a> <a href="https://github.com/MilesCranmer/DispatchDoctor.jl"><img src="https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white" class="img-fluid" alt="DispatchDoctor"></a></p>
 <p><code>StructuralVibration.jl</code> is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -395,13 +397,52 @@ Warning
 <li>Signal spectrum estimation</li>
 </ul></li>
 </ul></li>
-<li><strong>Visualization</strong>
+</ul>
+</section>
+<section id="modal-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="modal-analysis">Modal analysis</h3>
+<ul>
+<li><strong>Modal extraction - SDOF methods</strong>
+<ul>
+<li>Peak picking method</li>
+<li>Circle fit method</li>
+<li>Least-squares fit method</li>
+</ul></li>
+<li><strong>Modal extraction - MDOF methods</strong>
+<ul>
+<li>Least-squares complex exponential (LSCE)</li>
+<li>Least-squares complex frequency (LSCF)</li>
+<li>Polyreference least-squares complex frequency (PLSCF)</li>
+<li>Stabilization diagram</li>
+</ul></li>
+<li><strong>Analysis indicators</strong>
+<ul>
+<li>Modal Overlap Factor (MOF)</li>
+<li>Mode overcomplexity value (MOV)</li>
+<li>Mode Phase Collinearity (MPC)</li>
+<li>Mode Complexity Factor (MCF)</li>
+<li>Mean Phase Deviation (MPD)</li>
+<li>Modal Assurance Criterion (MAC)</li>
+<li>Coordinate Modal Assurance Criterion (COMAC)</li>
+<li>Enhanced Coordinate Modal Assurance Criterion (ECOMAC)</li>
+<li>Frequency Response Assurance Criterion (FRAC)</li>
+<li>Complex Mode Indicator Function (CMIF)</li>
+<li>Power Spectrum indicator function (PSIF)</li>
+</ul></li>
+<li><strong>Modal synthesis</strong>
+<ul>
+<li>Estimation of the FRF residuals</li>
+<li>Reconstruct FRF from modal parameters</li>
+</ul></li>
+</ul>
+</section>
+<section id="visualization" class="level3">
+<h3 class="anchored" data-anchor-id="visualization">Visualization</h3>
 <ul>
 <li>Bode plot</li>
 <li>2D and 3D Nyquist plot</li>
 <li>Waterfall plot</li>
 <li>General 2D plot</li>
-</ul></li>
 </ul>
 </section>
 </section>
@@ -419,20 +460,22 @@ Project direct dependencies
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Project StructuralVibration v0<span class="fl">.1.2</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Project StructuralVibration v1<span class="fl">.0.0</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Status</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">717857</span><span class="er">b8</span>] DSP v0<span class="fl">.8.3</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">7</span><span class="er">a1cc6ca</span>] FFTW v1<span class="fl">.8.1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">717857</span><span class="er">b8</span>] DSP v0<span class="fl">.8.4</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">7</span><span class="er">a1cc6ca</span>] FFTW v1<span class="fl">.10.0</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">442</span><span class="er">a2c76</span>] FastGaussQuadrature v1<span class="fl">.0.2</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  [a98d9a8b] Interpolations v0<span class="fl">.15.1</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">429524</span><span class="er">aa</span>] Optim v1<span class="fl">.12.0</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">18e31</span><span class="er">ff7</span>] Peaks v0<span class="fl">.5.3</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>⌅ [aea7be01] PrecompileTools v1<span class="fl">.2.1</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">92933</span><span class="er">f4c</span>] ProgressMeter v1<span class="fl">.10.4</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">276</span><span class="er">daf66</span>] SpecialFunctions v2<span class="fl">.5.0</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">10745</span><span class="er">b16</span>] Statistics v1<span class="fl">.11.1</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">37e2</span><span class="er">e46d</span>] LinearAlgebra v1<span class="fl">.11.0</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">9</span><span class="er">a3f8284</span>] Random v1<span class="fl">.11.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">37e2</span><span class="er">e46d</span>] LinearAlgebra v1<span class="fl">.12.0</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">429524</span><span class="er">aa</span>] Optim v1<span class="fl">.13.2</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  [<span class="fl">18e31</span><span class="er">ff7</span>] Peaks v0<span class="fl">.5.3</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  [f27b6e38] Polynomials v4<span class="fl">.1.0</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  [aea7be01] PrecompileTools v1<span class="fl">.3.3</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">92933</span><span class="er">f4c</span>] ProgressMeter v1<span class="fl">.11.0</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">9</span><span class="er">a3f8284</span>] Random v1<span class="fl">.11.0</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">276</span><span class="er">daf66</span>] SpecialFunctions v2<span class="fl">.6.1</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  [<span class="dv">10745</span><span class="er">b16</span>] Statistics v1<span class="fl">.11.1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  [c751599d] ToeplitzMatrices v0<span class="fl">.8.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -448,18 +491,21 @@ Julia version and machine information
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Julia Version <span class="fl">1.11.4</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Commit <span class="fl">8561</span>cc3d68 (<span class="fl">2025</span><span class="op">-</span><span class="fl">03</span><span class="op">-</span><span class="fl">10</span> <span class="fl">11</span><span class="op">:</span><span class="fl">36</span> UTC)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Julia Version <span class="fl">1.12.0</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Commit b907bd0600f (<span class="fl">2025</span><span class="op">-</span><span class="fl">10</span><span class="op">-</span><span class="fl">07</span> <span class="fl">15</span><span class="op">:</span><span class="fl">42</span> UTC)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Build Info<span class="op">:</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  Official https<span class="op">://</span>julialang.org<span class="op">/</span> release</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  Official https<span class="op">://</span>julialang.org release</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>Platform Info<span class="op">:</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  OS<span class="op">:</span> Windows (x86_64<span class="op">-</span>w64<span class="op">-</span>mingw32)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  CPU<span class="op">:</span> <span class="fl">8</span> <span class="op">×</span> <span class="fu">Intel</span>(R) <span class="fu">Core</span>(TM) i7<span class="op">-</span><span class="fl">10610</span>U CPU @ <span class="fl">1.80</span>GHz</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  OS<span class="op">:</span> macOS (arm64<span class="op">-</span>apple<span class="op">-</span>darwin22<span class="fl">.4.0</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  CPU<span class="op">:</span> <span class="fl">16</span> <span class="op">×</span> Apple M4 Max</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="cn">WORD_SIZE</span><span class="op">:</span> <span class="fl">64</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  LLVM<span class="op">:</span> libLLVM<span class="op">-</span><span class="fl">16.0.6</span> (ORCJIT, skylake)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">Threads</span><span class="op">:</span> <span class="fl">8</span> default, <span class="fl">0</span> interactive, <span class="fl">4</span> GC (on <span class="fl">8</span> virtual cores)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>Environment<span class="op">:</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  JULIA_EDITOR <span class="op">=</span> code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  LLVM<span class="op">:</span> libLLVM<span class="op">-</span><span class="fl">18.1.7</span> (ORCJIT, apple<span class="op">-</span>m4)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  GC<span class="op">:</span> Built with stock GC</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">Threads</span><span class="op">:</span> <span class="fl">1</span> default, <span class="fl">1</span> interactive, <span class="fl">1</span> GC (on <span class="fl">12</span> virtual cores)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Environment<span class="op">:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  JULIA_EDITOR <span class="op">=</span> code</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  JULIA_VSCODE_REPL <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  JULIA_PKG_SERVER <span class="op">=</span> https<span class="op">://</span>juliahub.com</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>

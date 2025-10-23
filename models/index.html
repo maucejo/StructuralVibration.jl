@@ -364,7 +364,7 @@ m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 <hr>
 <div id="4" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Bar(L, S, E, ρ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Bar(L, S, E, ρ)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic longitudinal bar</p>
 <p><strong>Constructor parameters</strong></p>
 <ul>
@@ -397,7 +397,7 @@ m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 <hr>
 <div id="6" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Rod(L, I, J, G, ρ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Rod(L, I, J, G, ρ)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic torsional bar</p>
 <p><strong>Constructor parameters</strong></p>
 <ul>
@@ -432,7 +432,7 @@ m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 <hr>
 <div id="8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Strings(L, S, D, ρ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Strings(L, S, D, ρ)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic string</p>
 <p><strong>Constructor parameters</strong></p>
 <ul>
@@ -465,7 +465,7 @@ m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 <hr>
 <div id="10" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Beam(L, S, I, E, ρ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Beam(L, S, I, E, ρ)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic bending beam</p>
 <p><strong>Constructor parameters</strong></p>
 <ul>
@@ -501,7 +501,7 @@ m\ddot v(x, t) + D\frac{\partial^4 v(x, t)}{\partial x^4} = p(x, t),
 <hr>
 <div id="12" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modefreq(model::Bar, fmax, bc = :CC)
+<div class="markdown"><pre><code class="language-julia">modefreq(model::Bar, fmax, bc = :CC)
 modefreq(model::Rod, fmax, bc = :CC)
 modefreq(model::Strings, fmax, bc = :CC)
 modefreq(model::Beam, fmax, bc = :SS)</code></pre>
@@ -555,7 +555,7 @@ modefreq(model::Beam, fmax, bc = :SS)</code></pre>
 <hr>
 <div id="14" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modeshape(model::Bar, kn, x, bc = :CC)
+<div class="markdown"><pre><code class="language-julia">modeshape(model::Bar, kn, x, bc = :CC)
 modeshape(model::Rod, kn, x, bc = :CC)
 modeshape(model::Strings, kn, x, bc = :CC)
 modeshape(model::Beam, kn, x, bc = :SS)</code></pre>
@@ -684,7 +684,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <hr>
 <div id="16" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Membrane(L, b, m, D)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Membrane(L, b, m, D)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic rectangular membrane</p>
 <p><strong>Fields</strong></p>
 <ul>
@@ -708,7 +708,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <hr>
 <div id="18" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Plate(L, b, h, E, ρ, ν)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Plate(L, b, h, E, ρ, ν)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic bending plate</p>
 <p><strong>Constructor parameters</strong></p>
 <ul>
@@ -746,7 +746,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <hr>
 <div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modefreq(model::Plate, fmax)
+<div class="markdown"><pre><code class="language-julia">modefreq(model::Plate, fmax)
 modefreq(model::Membrane, fmax)</code></pre>
 <p>Computes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax</p>
 <p><strong>Inputs</strong></p>
@@ -774,7 +774,7 @@ modefreq(model::Membrane, fmax)</code></pre>
 <hr>
 <div id="22" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modeshape(model::Plate, kpq, x, y)
+<div class="markdown"><pre><code class="language-julia">modeshape(model::Plate, kpq, x, y)
 modeshape(model::Membrane, kpq, x, y)</code></pre>
 <p>Computes the mass-normalized mode shapes of a simply supported rectangular plate or a clamped rectangular membrane</p>
 <p><strong>Inputs</strong></p>
@@ -857,7 +857,7 @@ Figure&nbsp;1: Classical representation of an Sdof system
 <hr>
 <div id="24" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Sdof(m, ω0, ξ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">Sdof(m, ω0, ξ)</code></pre>
 <p>Structure containing the data of a sdof system</p>
 <p><strong>Constructor</strong></p>
 <ul>
@@ -934,7 +934,7 @@ k_1 &amp; -k_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>Mdof(k, m, c = Float64[])</code></pre>
+<div class="markdown"><pre><code class="language-julia">Mdof(k, m, c = Float64[])</code></pre>
 <p>Structure containing the data for building a mdof system</p>
 <p><strong>Fields</strong></p>
 <ul>
@@ -981,7 +981,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="28" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>MdofMesh(Elt, constrained_dofs, free_dofs)</code></pre>
+<div class="markdown"><pre><code class="language-julia">MdofMesh(Elt, constrained_dofs, free_dofs)</code></pre>
 <p>Structure containing the data for building a mdof mesh</p>
 <p><strong>Constructor</strong></p>
 <ul>
@@ -1019,7 +1019,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="30" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>assembly(model::Mdof)</code></pre>
+<div class="markdown"><pre><code class="language-julia">assembly(model::Mdof)</code></pre>
 <p>Assembly of the mass, stiffness and damping matrices of a mdof system</p>
 <p><strong>Input</strong></p>
 <ul>
@@ -1046,7 +1046,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>apply_bc(A, mesh)</code></pre>
+<div class="markdown"><pre><code class="language-julia">apply_bc(A, mesh)</code></pre>
 <p>Apply boundary conditions to a given matrix</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1071,7 +1071,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="34" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>eigenmode(K, M, n = size(K, 1))</code></pre>
+<div class="markdown"><pre><code class="language-julia">eigenmode(K, M, n = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1100,7 +1100,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="36" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_matrices(ωn, ξn)</code></pre>
+<div class="markdown"><pre><code class="language-julia">modal_matrices(ωn, ξn)</code></pre>
 <p>Computes the modal mass, stiffness, and damping matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1129,7 +1129,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="38" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_effective_mass(M, ϕn, r)</code></pre>
+<div class="markdown"><pre><code class="language-julia">modal_effective_mass(M, ϕn, r)</code></pre>
 <p>Computes the effective mass of a mode</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1195,7 +1195,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="40" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>OneDMesh(model, xmin, Nelt, bc)</code></pre>
+<div class="markdown"><pre><code class="language-julia">OneDMesh(model, xmin, Nelt, bc)</code></pre>
 <p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>
 <p><strong>Constructor parameters</strong></p>
 <ul>
@@ -1253,7 +1253,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="42" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>assembly(model::OneDstructure, mesh::OneDMesh)</code></pre>
+<div class="markdown"><pre><code class="language-julia">assembly(model::OneDstructure, mesh::OneDMesh)</code></pre>
 <p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1286,7 +1286,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>rayleigh_damping_matrix(K, M, α, β)
+<div class="markdown"><pre><code class="language-julia">rayleigh_damping_matrix(K, M, α, β)
 rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>
 <p><strong>Inputs</strong></p>
@@ -1336,7 +1336,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="46" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_damping_matrix(M, ωn, ξn, Φn)</code></pre>
+<div class="markdown"><pre><code class="language-julia">modal_damping_matrix(M, ωn, ξn, Φn)</code></pre>
 <p>Compute the damping matrix C from modal parameters</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1365,7 +1365,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="48" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>selection_matrix(mesh, selected_dofs)</code></pre>
+<div class="markdown"><pre><code class="language-julia">selection_matrix(mesh, selected_dofs)</code></pre>
 <p>Compute the selection matrix for the selected dofs.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1492,7 +1492,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="50" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>ContinuousStateSpace(Ac, Bc)</code></pre>
+<div class="markdown"><pre><code class="language-julia">ContinuousStateSpace(Ac, Bc)</code></pre>
 <p>Continuous-time state-space model</p>
 <p><strong>Fields</strong></p>
 <ul>
@@ -1513,7 +1513,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="52" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>ss_model(K, M, C)</code></pre>
+<div class="markdown"><pre><code class="language-julia">ss_model(K, M, C)</code></pre>
 <p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1540,7 +1540,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="54" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>ss_modal_model(ωn, ξn, ϕn)</code></pre>
+<div class="markdown"><pre><code class="language-julia">ss_modal_model(ωn, ξn, ϕn)</code></pre>
 <p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1567,7 +1567,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="56" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>eigenmode(K, M, n = size(K, 1))</code></pre>
+<div class="markdown"><pre><code class="language-julia">eigenmode(K, M, n = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1596,7 +1596,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="58" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modal_parameters(λ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">modal_parameters(λ)</code></pre>
 <p>Computes the natural angular frequencies and damping ratios from the complex eigenvalues</p>
 <p><strong>Input</strong></p>
 <ul>
@@ -1621,7 +1621,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="60" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>c2r_modeshape(Ψ)</code></pre>
+<div class="markdown"><pre><code class="language-julia">c2r_modeshape(Ψ)</code></pre>
 <p>Converts the complex modes to real modes</p>
 <p><strong>Input</strong></p>
 <ul>
@@ -1651,7 +1651,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>, <span class="op">:</span>])</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ωn, ϕn <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
@@ -1716,7 +1716,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>DiscreteStateSpace(Ad, Bd, Bdp)</code></pre>
+<div class="markdown"><pre><code class="language-julia">DiscreteStateSpace(Ad, Bd, Bdp)</code></pre>
 <p>Discrete-time state-space model</p>
 <p><strong>Fields</strong></p>
 <ul>
@@ -1739,7 +1739,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <hr>
 <div id="64" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>c2d(css::ContinuouStateSpace, h::Float64, method::Symbol)</code></pre>
+<div class="markdown"><pre><code class="language-julia">c2d(css::ContinuouStateSpace, h::Float64, method::Symbol)</code></pre>
 <p>Converts a continuous-time state-space model to a discrete-time state-space model.</p>
 <p><strong>Inputs</strong></p>
 <ul>

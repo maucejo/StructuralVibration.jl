@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Sdof methods – StructuralVibration.jl</title>
+<title>Primer on EMA – StructuralVibration.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,52 +20,17 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../modal_extraction/mdof_methods.html" rel="next">
+<link href="../modal_extraction/sdof_methods.html" rel="next">
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -105,9 +70,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -203,7 +165,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../modal_extraction/index.html">Sdof methods</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../modal_extraction/index.html">Primer on EMA</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -218,6 +180,12 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../modal_extraction/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Primer on EMA</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../modal_extraction/sdof_methods.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Sdof methods</span></a>
   </div>
 </li>
@@ -249,14 +217,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#natural-frequencies-and-damping-ratios-extraction" id="toc-natural-frequencies-and-damping-ratios-extraction" class="nav-link active" data-scroll-target="#natural-frequencies-and-damping-ratios-extraction"><span class="header-section-number">1</span> Natural frequencies and damping ratios extraction</a>
-  <ul class="collapse">
-  <li><a href="#peak-picking-method" id="toc-peak-picking-method" class="nav-link" data-scroll-target="#peak-picking-method"><span class="header-section-number">1.1</span> Peak picking method</a></li>
-  <li><a href="#circle-fit-method" id="toc-circle-fit-method" class="nav-link" data-scroll-target="#circle-fit-method"><span class="header-section-number">1.2</span> Circle fit method</a></li>
-  </ul></li>
-  <li><a href="#mode-shapes-extraction" id="toc-mode-shapes-extraction" class="nav-link" data-scroll-target="#mode-shapes-extraction"><span class="header-section-number">2</span> Mode shapes extraction</a></li>
-  <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api"><span class="header-section-number">3</span> API</a></li>
-  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">4</span> Example</a></li>
+  <li><a href="#general-principles" id="toc-general-principles" class="nav-link active" data-scroll-target="#general-principles"><span class="header-section-number">1</span> General principles</a></li>
+  <li><a href="#modal-parameters-extraction-methods" id="toc-modal-parameters-extraction-methods" class="nav-link" data-scroll-target="#modal-parameters-extraction-methods"><span class="header-section-number">2</span> Modal parameters extraction methods</a></li>
   </ul>
 </nav>
     </div>
@@ -265,7 +227,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Sdof methods</h1>
+<h1 class="title">Primer on EMA</h1>
 </div>
 
 
@@ -282,310 +244,51 @@ window.Quarto = {
 </header>
 
 
-<p>The Sdof methods are based on the assumption that the system can be represented as a single degree of freedom system. This means that the system can be described by a single natural frequency, damping ratio, and mode shape. The Sdof methods are typically used for systems that are lightly damped and for which the modes are well separated.</p>
-<p>For these methods, it is assumed that the FRF (admittance) is given by: <span class="math display">\[
-H_{pq}(\omega) = \sum_{i = 1}^N\frac{_{i}A_{pq}}{\omega_i^2 - \omega^2 + j\eta_i\omega_i^2}
-\]</span> where, for a mode <span class="math inline">\(i\)</span>, <span class="math inline">\(_{i}A_{pq} = \Phi_i(x_p)\Phi_i(x_q)\)</span> is the residue, <span class="math inline">\(\omega_i\)</span> is the natural frequency, <span class="math inline">\(\eta_i\)</span> is the modal damping factor, and <span class="math inline">\(\Phi_i(x_p)\)</span> is the mass-normalized mode shape at the point <span class="math inline">\(x_p\)</span>.</p>
-<p>When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency <span class="math inline">\(\omega\)</span> close to the natural frequency <span class="math inline">\(\omega_i\)</span>: <span class="math display">\[
-H_{pq}(\omega) \approx \frac{\Phi_i(x_p)\Phi_i(x_q)}{M_i\left(\omega_i^2 - \omega^2 + j\eta_i\omega_i^2\right)}.
-\]</span></p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>One can note that the modal damping factor <span class="math inline">\(\eta_i\)</span> is related to the damping ratio <span class="math inline">\(\xi_i\)</span> by the relation: <span class="math display">\[
-\eta_i = 2\xi_i.
-\]</span></p>
-</div>
-</div>
-<section id="natural-frequencies-and-damping-ratios-extraction" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="natural-frequencies-and-damping-ratios-extraction"><span class="header-section-number">1</span> Natural frequencies and damping ratios extraction</h2>
-<p><code>StructuralDynamics.jl</code> provides two SDOF methods for extracting the natural frequencies and damping ratios of a system from its frequency response function (FRF):</p>
+<p>The modal approach enables the dynamic behavior of a structure to be predicted based on knowledge of its natural modes of vibration, which are intrinsic to the system. From a practical point of view, this information can be used to determine the frequencies at which the structure is most likely to vibrate. For industry, this information is invaluable, as vibrations can cause discomfort, noise, premature wear and tear, or even damage to a system. This is where <strong>Experimental Modal Analysis</strong> (EMA) comes in. Experimental identification of vibration modes can also be used to calibrate a finite element model or certify a product (e.g.&nbsp;ground vibration testing or regulations related to the modal behavior of the structure).</p>
+<p>EMA aims to estimate the natural frequencies of the system and other characteristic parameters (e.g.&nbsp;damping ratios and mode shapes) from the vibration measurements in order to obtain a modal model of the system under consideration. This model can then be used to determine the structure’s dynamic behaviour for a given excitation.</p>
+<p>To reach these goals, it is supposed that:</p>
 <ul>
-<li>Peak picking method</li>
-<li>Circle fit method</li>
+<li>the system is <strong>linear and time-invariant</strong> ;</li>
+<li>the modal damping is of <strong>viscous</strong> type.</li>
 </ul>
-<section id="peak-picking-method" class="level3" data-number="1.1">
-<h3 data-number="1.1" class="anchored" data-anchor-id="peak-picking-method"><span class="header-section-number">1.1</span> Peak picking method</h3>
-<p>The peak picking method is a simple and effective way to extract the natural frequencies and damping ratios of a system. The method consists of the following steps:</p>
-<ol type="1">
-<li><p><strong>Identification of natural frequencies</strong></p>
-<p>They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using <code>Peaks.jl</code>.</p></li>
-<li><p><strong>Estimation of modal damping factors</strong></p>
-<p>To estimate the value of the damping factor for mode <span class="math inline">\(i\)</span>, the half power bandwidth method is used. This procedure, valid for low damping (<span class="math inline">\(\eta_i &lt; 0.1\)</span>), first determines the frequencies <span class="math inline">\(\omega_1\)</span> and <span class="math inline">\(\omega_2\)</span> such that: <span class="math display">\[
-\vert H_{pq}(\omega_1)\vert = \vert H_{pq}(\omega_2)\vert = \frac{\vert H_{pq}(\omega_i)\vert}{\sqrt{2}},
-\]</span> with <span class="math inline">\(\omega_i \in [\omega_1, \omega_2]\)</span>.</p>
-<p>Knowing the values of <span class="math inline">\(\omega_i\)</span>, <span class="math inline">\(\omega_1\)</span>, and <span class="math inline">\(\omega_2\)</span>, the damping ratio for mode <span class="math inline">\(i\)</span> is determined using the formula: <span class="math display">\[
-\eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
-\]</span></p></li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If we consider that the shape of a resonance peak is symmetric then <span class="math inline">\(\omega_i = \frac{\omega_1 + \omega_2}{2}\)</span>.</p>
-<p>It comes that: <span class="math display">\[
-\omega_2^2 - \omega_1^2 \approx 2\omega_i(\omega_2 - \omega_1).
-\]</span></p>
-<p>Hence, the damping ratio can be approximated as: <span class="math display">\[
-\eta_i \approx \frac{\omega_2 - \omega_1}{\omega_i}.
-\]</span></p>
-<p>This formula is often given in textbooks when dealing with the half power bandwidth method.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Thanks to its extreme simplicity, this method allows for quick analysis. However, this method generally does not provide satisfactory results, as it relies on measuring the resonance peak, which is very difficult to measure precisely. This is why this method is mainly applicable to lightly damped structures with well-separated modes, whose transfer functions have been measured with good frequency resolution.</p>
-</div>
-</div>
+<p>EMA is a family of <strong>inverse methods</strong> attempting to determine the modal characteristics of a structure from the responses measured at each point of the mesh.</p>
+<section id="general-principles" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="general-principles"><span class="header-section-number">1</span> General principles</h2>
+<p>To identify the modal parameters of a structure or mechanical system, EMA relies on the measurement of the structure’s transfer function matrix. By definition, the transfer function <span class="math inline">\(H_{pq}(\omega)\)</span> can be seen as the frequency response of the system at a point <span class="math inline">\(x_p\)</span> to an excitation of unit amplitude at a point <span class="math inline">\(x_q\)</span>. Classically, the transfer function matrix (here the admittance) is given by the relation</p>
+<p><span class="math display">\[
+H_{pq}(\omega) = \sum_{i = 1}^{+\infty} \frac{\phi_i(x_p)\, \phi_i(x_q)}{M_i(\omega_i^2 - \omega^2 + 2j\xi_i\omega_i\omega)} = \sum_{i = 1}^{+\infty} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
+\]</span> where:</p>
+<ul>
+<li><span class="math inline">\(\lambda_i = -\xi_i + j\,\Omega_i\)</span> is the pole related to the mode <span class="math inline">\(i\)</span>, with:
+<ul>
+<li><span class="math inline">\(\Omega_i = \omega_i\sqrt{1 - \xi_i^2}\)</span> is the damped natural frequency of the mode <span class="math inline">\(i\)</span>, with <span class="math inline">\(\omega_i = \vert \lambda_i\vert\)</span>.</li>
+<li><span class="math inline">\(\xi_i = -\frac{\text{Re}(\lambda_i)}{\omega_i}\)</span> the modal damping factor of the mode <span class="math inline">\(i\)</span> <br><br></li>
+</ul></li>
+<li><span class="math inline">\({}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q)\)</span> is the residue of the mode <span class="math inline">\(i\)</span>, with:
+<ul>
+<li><span class="math inline">\(\phi_i(x_p)\)</span> the mode shape of the mode <span class="math inline">\(i\)</span> at point <span class="math inline">\(x_p\)</span></li>
+<li><span class="math inline">\(c_i = \frac{1}{2jM_i\Omega_i}\)</span> the normalization constant of the mode shape of the mode <span class="math inline">\(i\)</span></li>
+</ul></li>
+</ul>
+<p>The objective of an EMA is therefore to identify the residuals <span class="math inline">\({}_i R_{pq}\)</span> and the poles <span class="math inline">\(\lambda_i\)</span> of the transfer function <span class="math inline">\(H_{pq}(\omega)\)</span> in order to extract, in a second step, the modal parameters of the system under study (natural angular frequencies <span class="math inline">\(\omega_i\)</span>, modal damping factors <span class="math inline">\(\xi_i\)</span> and mode shapes <span class="math inline">\(\phi_i\)</span>).</p>
 </section>
-<section id="circle-fit-method" class="level3" data-number="1.2">
-<h3 data-number="1.2" class="anchored" data-anchor-id="circle-fit-method"><span class="header-section-number">1.2</span> Circle fit method</h3>
-<p>The circle fit method is a more sophisticated method for extracting the natural frequencies and damping ratios of a system. It allows for more accurate results than the peak picking method. It is based on the fact that the admittance forms a circle (Nyquist circle) when plotted in the complex plane (see <a href="#fig-cfm" class="quarto-xref">Figure&nbsp;1</a>). Indeed, assuming that the modes are mass-normalized, it can be shown that: <span class="math display">\[
-Re\left[H_{pq}(\omega)\right]^2 + \left(Im\left[H_{pq}(\omega)\right] + \frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\right)^2 = \left(\frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\right)^2,
-\]</span> which is the equation of a circle of radius <span class="math inline">\(R = \frac{\vert\Phi_i(x_p)\Phi_i(x_q)\vert}{2\eta_i\omega_i^2}\)</span> and center <span class="math inline">\((x_c,y_c) = \Bigl(0,-\frac{\Phi_i(x_p)\Phi_i(x_q)}{2\eta_i\omega_i^2}\Bigr)\)</span>.</p>
-<div id="fig-cfm" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-cfm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="../assets/images/cercle_nyquist.png" class="img-fluid figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cfm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Typical Nyquist circle of an admittance <span class="math inline">\(H_{pq}(\omega)\)</span>
-</figcaption>
-</figure>
-</div>
-<p>The circle fit method consists of the following steps:</p>
-<ol type="1">
-<li><p><strong>Identification of natural frequencies</strong></p>
-<p>To identify the natural frequency of a mode <span class="math inline">\(i\)</span>, we start by parameterizing the Nyquist circle by defining the angles <span class="math inline">\(\psi\)</span> and <span class="math inline">\(\theta\)</span> as shown in <a href="#fig-cfm" class="quarto-xref">Figure&nbsp;1</a>. Mathematically, it can then be shown that: <span class="math display">\[
-\omega_i^2 = \frac{\omega_1^2\tan\frac{\theta_2}{2} - \omega_2^2\tan\frac{\theta_1}{2}}{\tan\frac{\theta_2}{2} - \tan\frac{\theta_1}{2}},
-\]</span> where <span class="math inline">\(\omega_1\)</span> and <span class="math inline">\(\omega_2\)</span> are the angular frequencies such that <span class="math inline">\(\omega_1 &lt; \omega_i &lt; \omega_2\)</span>, while <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> are the corresponding angles of the Nyquist circle.</p></li>
-<li><p><strong>Estimation of modal damping factors</strong></p>
-<p>The damping ratio is estimated using the following formula: <span class="math display">\[
-\eta_i = \frac{\omega_2^2 - \omega_1^2}{\omega_i^2}\frac{1}{\tan\frac{\theta_1}{2} - \tan\frac{\theta_2}{2}}.
-\]</span></p></li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Generally, the angles <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> are chosen so that: <span class="math display">\[
-\theta_1 = \frac{\pi}{2} \text{ and } \theta_2 = -\frac{\pi}{2}.
-\]</span></p>
-<p>In doing so, we have: <span class="math display">\[
-\omega_i^2 = \frac{\omega_1^2 + \omega_2^2}{2} \text{ and } \eta_i = \frac{\omega_2^2 - \omega_1^2}{2\omega_i^2}.
-\]</span></p>
-</div>
-</div>
-</section>
-</section>
-<section id="mode-shapes-extraction" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="mode-shapes-extraction"><span class="header-section-number">2</span> Mode shapes extraction</h2>
-<p>The mode shapes are extracted from the admittance matrix at the resonance frequency <span class="math inline">\(\omega_i\)</span>. In this situation, the admittance matrix is defined as: <span class="math display">\[
-\mathbf{H} = \frac{1}{j\eta_i\omega_i^2}
-  \begin{bmatrix}
-    \Phi_i(x_1)^2 &amp; \Phi_i(x_1)\Phi_i(x_2) &amp; \ldots\ &amp; \Phi_i(x_1)\Phi_i(x_N) \\
-    \Phi_i(x_2)\Phi_i(x_1) &amp; \Phi_i(x_2)^2 &amp;  &amp; \Phi_i(x_2)\Phi_i(x_N) \\
-    \vdots &amp; &amp; \ddots &amp; \vdots \\
-    \Phi_i(x_N)\Phi_i(x_1) &amp; \ldots &amp; \ldots &amp; \Phi_i(x_N)^2
-  \end{bmatrix},
-\]</span> where <span class="math inline">\(\omega_i\)</span> and <span class="math inline">\(\eta_i\)</span> have been determined using the peak picking method or the circle fit method.</p>
-<p>To determine the mode shapes from the knowledge of a column <span class="math inline">\(q\)</span> (or a row <span class="math inline">\(p\)</span>), proceed as follows:</p>
+<section id="modal-parameters-extraction-methods" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="modal-parameters-extraction-methods"><span class="header-section-number">2</span> Modal parameters extraction methods</h2>
+<p>In this <code>StructuralVibration.jl</code>, two families of modal extraction methods are implemented:</p>
 <ul>
-<li><p>From the measurement of an input admittance (diagonal term of the admittance matrix), the mode shape value at point <span class="math inline">\(x_q\)</span> is obtained: <span class="math display">\[
-\Phi_i(x_q)^2 = -\eta_i\omega_i^2 \text{Im}(H_{qq}(\omega_i)).
-\]</span></p></li>
-<li><p>From the cross-admittances (off-diagonal terms of the admittance matrix), the mode shape value at a point <span class="math inline">\(x_p\)</span> is calculated: <span class="math display">\[
-\Phi_i(x_p)\Phi_i(x_q) = -\eta_i\omega_i^2 \text{Im}(H_{pq}(\omega_i))
-\]</span></p></li>
-</ul>
-</section>
-<section id="api" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="api"><span class="header-section-number">3</span> API</h2>
-<div class="api">
-<p><strong>freq_extraction</strong></p>
-<hr>
-<div id="4" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>freq_extraction(freq, H, method::SdofModalExtraction; type = :dis)</code></pre>
-<p>Extract natural frequencies and damping ratios from the Bode diagram fitting method</p>
-<p><strong>Inputs</strong></p>
+<li><p>methods based on the use of single degree of freedom (sdof) models, known as <strong>Sdof methods</strong>. These methods seek to adjust ideal transfer functions of Sdof systems to experimental curves around their resonances. These methods therefore consist of identifying the modal parameters mode by mode. To do this, the operator must select a frequency band around each resonance to perform the extraction. Currently, three Sdof methods are implemented in this package:</p>
 <ul>
-<li><p><code>freq</code>: Frequency vector</p>
-</li>
-<li><p><code>H</code>: Frequency response function</p>
-</li>
-<li><p><code>method</code>: Method to extract the natural frequencies and damping ratios</p>
+<li>Peak Picking method</li>
+<li>Circle Fit method</li>
+<li>Least Squares Fit method</li>
+</ul></li>
+<li><p>methods based on the use of multiple degree of freedom (mdof) models, known as <strong>Mdof methods</strong>. These methods consider that the system can be represented as a multiple degree of freedom system. They are generally based on the construction of a high-order polynomial matrix whose coefficients are estimated from the measured transfer functions.Three Mdof methods are implemented in this package:</p>
 <ul>
-<li><p><code>PeakPicking</code>: Peak picking method (default)</p>
-</li>
-<li><p><code>CircleFit</code>: Circle fitting method</p>
-</li>
+<li>Least-Squares Complex Exponential method</li>
+<li>Least-Squares Complex Frequency-domain method</li>
+<li>Polyreference Least-Squares Complex Frequency-domain method</li>
+</ul></li>
 </ul>
-</li>
-<li><p><code>type</code>: Type of FRF used to extract the natural frequencies and damping ratios</p>
-<ul>
-<li><p><code>:dis</code>: Admittance (default)</p>
-</li>
-<li><p><code>:vel</code>: Mobility</p>
-</li>
-<li><p><code>:acc</code>: Accelerance</p>
-</li>
-</ul>
-</li>
-</ul>
-<p><strong>Outputs</strong></p>
-<ul>
-<li><p><code>fn</code>: Natural frequencies</p>
-</li>
-<li><p><code>ξn</code>: Damping ratios</p>
-</li>
-</ul>
-<p><strong>Note</strong> It is supposed that <code>H</code> is a row or a column of the FRF, meaning that H is a Vector</p>
-
-
-</div>
-</div>
-</div>
-</div>
-<div class="api">
-<p><strong>modeshape_extraction</strong></p>
-<hr>
-<div id="6" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code>modeshape_extraction(freq, H, fn, ξn, dpi; type = :dis)</code></pre>
-<p>Extract mode shapes using Sdof approximation</p>
-<p><strong>Inputs</strong></p>
-<ul>
-<li><p><code>freq</code>: Frequency vector</p>
-</li>
-<li><p><code>H</code>: Frequency response function</p>
-</li>
-<li><p><code>fn</code>: Natural frequencies</p>
-</li>
-<li><p><code>ξn</code>: Damping ratios</p>
-</li>
-<li><p><code>dpi</code>: Driving point indices</p>
-<ul>
-<li><p><code>dpi[1]</code>: Driving point index on the measurement mesh</p>
-</li>
-<li><p><code>dpi[2]</code>: Driving point index on the excitation mesh</p>
-</li>
-</ul>
-</li>
-<li><p><code>method</code>: Method to extract the mode shapes</p>
-<ul>
-<li><p><code>PeakPicking</code>: Peak picking method (default)</p>
-</li>
-<li><p><code>CircleFit</code>: Circle fitting method</p>
-</li>
-</ul>
-</li>
-<li><p><code>type</code>: Type of FRF used to extract the natural frequencies and damping ratios</p>
-<ul>
-<li><p><code>:dis</code>: Admittance (default)</p>
-</li>
-<li><p><code>:vel</code>: Mobility</p>
-</li>
-<li><p><code>:acc</code>: Accelerance</p>
-</li>
-</ul>
-</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li><p><code>ϕn</code>: Mode shapes</p>
-</li>
-</ul>
-<p><strong>Note</strong> If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).</p>
-
-
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="example" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="example"><span class="header-section-number">4</span> Example</h2>
-<div id="8" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structure parameters of the beam</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.        <span class="co"># Length</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="fl">0.03</span>      <span class="co"># Width</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">0.01</span>      <span class="co"># Thickness</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> b<span class="op">*</span>h       <span class="co"># Cross-section area</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Iz <span class="op">=</span> b<span class="op">*</span>h<span class="op">^</span><span class="fl">3</span><span class="op">/</span><span class="fl">12</span> <span class="co"># Moment of inertia</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Material parameters</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> <span class="fl">2.1e11</span>  <span class="co"># Young's modulus</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ρ <span class="op">=</span> <span class="fl">7850</span>.   <span class="co"># Density</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span>    <span class="co"># Damping ratio</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Mesh</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>xexc <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">0.05</span><span class="op">:</span>L</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>xm <span class="op">=</span> xexc[<span class="fl">2</span>]</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Mode calculation - Simply supported boundary conditions</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">500</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ωn, kn <span class="op">=</span> <span class="fu">modefreq</span>(beam, <span class="fl">2</span>fmax)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ϕexc <span class="op">=</span> <span class="fu">modeshape</span>(beam, kn, xexc)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ϕm <span class="op">=</span> <span class="fu">modeshape</span>(beam, kn, xm)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># FRF calculation</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">1</span>.<span class="op">:</span><span class="fl">0.1</span><span class="op">:</span>fmax</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">ModalFRFProblem</span>(ωn, ξ, freq, ϕm, ϕexc)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob; ismat <span class="op">=</span> <span class="cn">true</span>).u</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Natural frequencies and damping ratios extraction</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>fn_pp, ξn_pp <span class="op">=</span> <span class="fu">freq_extraction</span>(freq, H[<span class="fl">1</span>, <span class="fl">2</span>, <span class="op">:</span>], <span class="fu">PeakPicking</span>())</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>fn_cf, ξn_cf <span class="op">=</span> <span class="fu">freq_extraction</span>(freq, H[<span class="fl">1</span>, <span class="fl">2</span>, <span class="op">:</span>], <span class="fu">CircleFit</span>())</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Mode shape extraction</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>ϕid <span class="op">=</span> <span class="fu">modeshape_extraction</span>(freq, H, fn_cf, ξn_cf, [<span class="fl">1</span>, <span class="fl">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="10" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-2.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
 
 
 </section>
@@ -994,8 +697,8 @@ Note
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../modal_extraction/mdof_methods.html" class="pagination-link" aria-label="Mdof methods">
-        <span class="nav-page-text">Mdof methods</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../modal_extraction/sdof_methods.html" class="pagination-link" aria-label="Sdof methods">
+        <span class="nav-page-text">Sdof methods</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

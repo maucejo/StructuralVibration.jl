@@ -176,7 +176,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#v0.3.0" id="toc-v0.3.0" class="nav-link active" data-scroll-target="#v0.3.0">v0.3.0</a></li>
+  <li><a href="#v1.0.0" id="toc-v1.0.0" class="nav-link active" data-scroll-target="#v1.0.0">v1.0.0</a></li>
+  <li><a href="#v0.3.0" id="toc-v0.3.0" class="nav-link" data-scroll-target="#v0.3.0">v0.3.0</a></li>
   <li><a href="#v0.2.0" id="toc-v0.2.0" class="nav-link" data-scroll-target="#v0.2.0">v0.2.0</a></li>
   <li><a href="#v0.1.2" id="toc-v0.1.2" class="nav-link" data-scroll-target="#v0.1.2">v0.1.2</a></li>
   <li><a href="#v0.1.1" id="toc-v0.1.1" class="nav-link" data-scroll-target="#v0.1.1">v0.1.1</a></li>
@@ -206,6 +207,61 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="v1.0.0" class="level2">
+<h2 class="anchored" data-anchor-id="v1.0.0">v1.0.0</h2>
+<p><strong>Breaking changes</strong></p>
+<ul>
+<li>Sdof solvers
+<ul>
+<li>Refactor <code>SdofHarmonicTimeProblem</code>, <code>SdofForcedTimeProblem</code> and <code>SdofFrequencyProblem</code> to comply with <code>DifferentialEquations.jl</code> conventions</li>
+</ul></li>
+<li>Signal processing
+<ul>
+<li>Add <code>csd</code> function to compute the Cross Spectral Density (CSD) between two signals or between multiple input and output signals</li>
+<li>Add support for matrix inputs in <code>tfestimate</code> function to compute the Frequency Response Function (FRF) between multiple input and output signals</li>
+<li>Refactor <code>tfestimate</code>, <code>welch</code>, <code>csd</code> and <code>spectrum</code> functions to accept window functions instead of pre-computed window vectors</li>
+<li>Add <code>nfft</code> parameter to <code>tfestimate</code>, <code>welch</code>, <code>csd</code> and <code>spectrum</code> functions to specify the number of FFT points to be used</li>
+</ul></li>
+<li>Modal extraction
+<ul>
+<li>Add <code>LSFit()</code> method for modal parameter extraction using least squares fitting of the frequency response function around the resonance peak</li>
+<li>Add <code>AutoEMASdofProblem</code> and <code>AutoEMAMdofProblem</code> structures and <code>solve</code> functions to perform automatic modal extraction based on Sdof or Mdof approximations</li>
+<li>Solutions of AutoEMA problems are stored in <code>EMASdofSolution</code> or <code>EMAMdofSolution</code> structures containing the poles and the modal parameters</li>
+<li>Add <code>poles_extraction</code> function to extract system poles using different Mdof methods:
+<ul>
+<li>Least-Squares Complex Exponential (LSCE) method</li>
+<li>Least-Squares Complex Frequency-domain (LSCF) method</li>
+<li>Polyreference Least-Squares Complex Frequency-domain (pLSCF) method</li>
+</ul></li>
+<li>Add <code>modeshape_extraction</code> function to extract mode shapes from residues and poles using Mdof methods</li>
+<li>Add <code>stabilization</code> function to perform stabilization diagram analysis using Mdof methods</li>
+<li>Add <code>stabilization_plot</code> function to visualize stabilization diagrams</li>
+<li>Stabilization results are now stored in the <code>EMAMdofStabilization</code> structure for plotting and further analysis</li>
+<li>Add <code>frf_reconstruction</code> function to reconstruct FRFs from extracted modal parameters</li>
+<li>Add <code>compute_residuals</code> function to compute the lower and upper residuals of the FRF</li>
+<li>Add <code>mode2residues</code> function to compute residues from real modes information</li>
+<li>Add modal extraction indicators:
+<ul>
+<li>Modal Overlap Factor (MOF)</li>
+<li>Mode Overcomplexity Value (MOV)</li>
+<li>Mode Phase Collinearity (MPC)</li>
+<li>Mode Complexity Factor (MCF)</li>
+<li>Mode Phase Deviation (MPD)</li>
+<li>Modal Scale Factor (MSF)</li>
+<li>Modal Assurance Criterion (MAC)</li>
+<li>Coordinate Modal Assurance Criterion (COMAC)</li>
+<li>Enhanced Coordinate Modal Assurance Criterion (ECOMAC)</li>
+<li>Frequency Response Assurance Criterion (FRAC)</li>
+<li>Complex Mode Indicator Function (CMIF)</li>
+<li>Power Spectrum Indicator Function (PSIF)</li>
+</ul></li>
+<li>Utils
+<ul>
+<li>Add <code>modal2poles</code> and <code>poles2modal</code> functions to convert between modal parameters and system poles</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
 <section id="v0.3.0" class="level2">
 <h2 class="anchored" data-anchor-id="v0.3.0">v0.3.0</h2>
 <p><strong>Breaking change</strong></p>
