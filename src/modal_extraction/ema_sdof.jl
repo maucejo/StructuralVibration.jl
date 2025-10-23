@@ -4,33 +4,58 @@ struct CircleFit <: SdofModalExtraction end
 struct LSFit <: SdofModalExtraction end
 
 """
-    AutoEMASdofProblem(H, freq; type, dpi, method)
+    EMASdofProblem(frf, freq; frange = [freq[1], freq[end]])
+
+Data structure defining the inputs for EMA-MDOF modal extraction methods.
+
+**Constructor parameters**
+- `frf::Array{Complex,3}`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
+- `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
+- `frange::Vector{Real}`: Frequency range for analysis (default: [freq[1], freq[end]])
+
+**Fields**
+- `frf::Array{Complex, 3}`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
+- `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
+"""
+@show_data struct EMASdofProblem{C <: Complex, R <: Real}
+    frf::Array{C, 3}
+    freq::AbstractArray{R}
+
+    function EMASdofProblem(frf::Array{C,3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]]) where {C <: Complex, R <: Real}
+
+        # FRF post-processing - Frequency range reduction
+        fidx = @. frange[1] ≤ freq ≤ frange[2]
+
+        return new{C, R}(frf[:, :, fidx], freq[fidx])
+    end
+end
+
+"""
+    AutoEMASdofProblem(prob, dpi, method; type_frf)
 
 Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
 **Fields**
-* `H::Array{Complex, 3}`: Frequency response function matrix
-* `freq::AbstractRange`: Frequency vector [Hz]
-* `type::Symbol`: Type of FRF used to extract the natural frequencies and damping ratios
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
+* `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector
 * `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
     * `dpi[2]`: Driving point index on the excitation mesh
-* `method::SdofModalExtraction`: Method to extract the natural frequencies and damping ratios
+* `method::SdofModalExtraction`: Method to extract the poles
     * `PeakPicking`: Peak picking method (default)
     * `CircleFit`: Circle fitting method
     * `LSFit`: Least squares fitting method
+* `type_frf::Symbol`: Type of FRF used for poles extraction
+    * `:dis`: Admittance (default)
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 """
-@show_data struct AutoEMASdofProblem{T <: Complex, Tf <: AbstractRange}
-    H::Array{T, 3}
-    freq::Tf
-    type::Symbol
+@show_data struct AutoEMASdofProblem
+    prob::EMASdofProblem
     dpi:: Vector{Int}
     method::SdofModalExtraction
+    type_frf::Symbol
 
-    AutoEMASdofProblem(H::Array{T, 3}, freq::Tf; type::Symbol = :dis, dpi::Vector{Int} = [1, 1], method::SdofModalExtraction = PeakPicking()) where {T, Tf} = new{T, Tf}(H, freq, type, dpi, method)
+    AutoEMASdofProblem(prob::EMASdofProblem, dpi::Vector{Int} = [1, 1], method::SdofModalExtraction = PeakPicking(); type_frf::Symbol = :dis) = new(prob, dpi, method, type_frf)
 end
 
 """
@@ -43,20 +68,17 @@ Structure containing the solution of the automatic experimental modal analysis u
 * `ms`: Mode shapes
 """
 @show_data struct EMASdofSolution{Tp <: Complex, Tm <: Real}
-    poles:: Vector{Tp}
+    poles::Vector{Tp}
     ms::AbstractArray{Tm}
 end
 
 """
-    poles_extraction(H::AbstractArray, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
-
-    poles_extraction(H::AbstractVector, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
+    poles_extraction(prob, method::SdofModalExtraction; type = :dis)
 
 Extract poles from the Bode diagram fitting method
 
 **Inputs**
-* `H`: Frequency response function (either a matrix of size (nm, ne, nf) or a vector of size (nf))
-* `freq`: Frequency vector
+* `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector
 * `method::SdofModalExtraction`: Method to extract the poles
     * `PeakPicking`: Peak picking method (default)
     * `CircleFit`: Circle fitting method
@@ -71,37 +93,16 @@ Extract poles from the Bode diagram fitting method
 * `poles`: Vector of extracted complex poles
 
 **Note**
-When `H` is a matrix, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
+The natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(H::AbstractVector, freq, method::SdofModalExtraction = PeakPicking(); frange = [freq[1], freq[end]], type = :dis)
-    fidx = @. frange[1] ≤ freq ≤ frange[2]
-    Hred = H[fidx]
-    freq_red = freq[fidx]
-
-    est_method = let
-        if method isa PeakPicking
-            poles_ppm_extract
-        elseif method isa CircleFit
-            poles_cfm_extract
-        elseif method isa LSFit
-            poles_lsf_extract
-        else
-            throw(ArgumentError("Unknown modal extraction method"))
-        end
-    end
-
-    return est_method(Hred, freq_red, type = type)
-end
-
-function poles_extraction(H::AbstractArray, freq, method::SdofModalExtraction; frange = [freq[1], freq[end]], type = :dis)
+function poles_extraction(prob::EMASdofProblem, method::SdofModalExtraction;  type = :dis)
 
     # FRF post-processing - Frequency range reduction
-    fidx = @. frange[1] ≤ freq ≤ frange[2]
-    Hred = H[:, :, fidx]
-    freq_red = freq[fidx]
+    # Extract FRF and frequency from problem
+    (; frf, freq) = prob
 
-    nm, ne, nf = size(Hred)
-    Hr = reshape(Hred, nm*ne, nf)
+    nm, ne, nf = size(frf)
+    Hr = reshape(frf, nm*ne, nf)
 
     # Estimate the number of peaks in the FRF
     npeak = 0
@@ -124,10 +125,10 @@ function poles_extraction(H::AbstractArray, freq, method::SdofModalExtraction; f
     end
 
     # Initialization
-    pk = similar(H, nm*ne, npeak)
-    pn = similar(H, npeak)
+    pk = similar(frf, nm*ne, npeak)
+    pn = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
-        p = est_method(Hv, freq_red, type = type)
+        p = est_method(Hv, freq, type = type)
 
         nk = length(p)
         pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
@@ -387,13 +388,12 @@ function poles_lsf_extract(H, freq; type = :dis)
 end
 
 """
-    modeshape_extraction(H, freq, poles, dpi; type = :dis)
+    modeshape_extraction(prob, poles, dpi; type = :dis)
 
 Extract mode shapes using Sdof approximation
 
 **Inputs**
-* `H`: Frequency response function matrix of size (nm, ne, nf)
-* `freq`: Frequency vector
+* `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector
 * `poles`: Vector of complex poles
 * `dpi`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
@@ -409,21 +409,23 @@ Extract mode shapes using Sdof approximation
 **Note**
 If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
 """
-function modeshape_extraction(H, freq::AbstractVector, poles::Vector{T}, dpi = [1, 1]; type = :dis) where {T <: Complex}
+function modeshape_extraction(prob::EMASdofProblem, poles::Vector{T}, dpi = [1, 1]; type = :dis) where {T <: Complex}
+    # Extract FRF and frequency from problem
+    (; frf, freq) = prob
 
     # Conversion of poles to modal parameters
     fn, ξn = poles2modal(poles)
     ωn = 2π*fn
 
     # Data preparation
-    nmes, nexc = size(H)[1:2]
-    if nmes < nexc
+    nm, ne = size(frf)[1:2]
+    if nm < ne
         # Roving hammer test
-        H = H[dpi[1], :, :]
+        H = frf[dpi[1], :, :]
         dpi = [dpi[2], dpi[1]]
     else
         # Roving accelerometer test
-        H = H[:, dpi[2], :]
+        H = frf[:, dpi[2], :]
     end
 
     # Convert to admittance
@@ -452,12 +454,12 @@ function modeshape_extraction(H, freq::AbstractVector, poles::Vector{T}, dpi = [
         pos_max = argmin(@. abs(ω - ω₀))
 
         # Mode shape estimation at driving point
-        Hmax = -imag(H[:, pos_max])
-        ϕn[dpi[1], n] = √(η*ω₀^2*Hmax[dpi[1]])
+        Himag = -imag(H[:, pos_max])
+        ϕn[dpi[1], n] = √(η*ω₀^2*Himag[dpi[1]])
 
         # Mode shape estimation at other nodes
         for pos in pos_ndi
-            ϕn[pos, n] = η*ω₀^2*Hmax[pos]/ϕn[dpi[1], n]
+            ϕn[pos, n] = η*ω₀^2*Himag[pos]/ϕn[dpi[1], n]
         end
     end
 
@@ -502,22 +504,22 @@ end
 Solve automatically experimental modal analysis problem using Sdof methods
 
 **Inputs**
-* `prob`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
+* `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
 **Outputs**
 * `sol`: Solution of problem:
     * `poles`: Extracted poles
     * `ms`: Mode shapes
 """
-function solve(prob::AutoEMASdofProblem)
+function solve(prob_ema::AutoEMASdofProblem)
     # Unpack problem data
-    (; H, freq, type, dpi, method) = prob
+    (; prob, dpi, method, type_frf) = prob_ema
 
     # Extraction of natural frequencies and damping ratios
-    poles = poles_extraction(H, freq, method, type = type)
+    poles = poles_extraction(prob, method, type = type_frf)
 
     # Extraction of mode shapes
-    ϕn = modeshape_extraction(H, freq, poles, dpi, type = type)
+    phi = modeshape_extraction(prob, poles, dpi, type = type_frf)
 
-    return EMASdofSolution(poles, ϕn)
+    return EMASdofSolution(poles, phi)
 end

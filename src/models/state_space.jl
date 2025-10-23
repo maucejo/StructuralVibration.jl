@@ -182,21 +182,25 @@ Converts the complex modes to real modes
 """
 function c2r_modeshape(Ψ)
 
-    m, n = size(Ψ)
-    Ψn = Ψ[1:2:m, :]
-    ϕ = zeros(Int(m/2), n)
+    # Initialization
+    m = size(Ψ, 1)
+    ϕ = similar(real(Ψ))
+    x = similar(ϕ, m)
+    y = similar(x)
+    p = similar(x, 2)
 
-    for (i, Ψi) in enumerate(eachcol(Ψn))
-        x = real(Ψi)
-        y = imag(Ψi)
+    # Real mode shape calculation
+    for (i, Ψi) in enumerate(eachcol(Ψ))
+        x .= real(Ψi)
+        y .= imag(Ψi)
 
         # Fit a first order line to the data
-        p = polyfit(x, y, 1)
+        p .= polyfit(x, y, 1)
 
         # Angle of maximum correlation line
         θ = atan(p[1])
 
-        ϕ[:, i] = real(Ψi*exp(-1im*θ))
+        ϕ[:, i] .= real(Ψi*exp(-1im*θ))
     end
 
     return ϕ

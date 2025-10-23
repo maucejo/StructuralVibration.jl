@@ -31,10 +31,10 @@
                 "\n",
                 "## General principles\n",
                 "\n",
-                "To identify the modal parameters of a structure or mechanical system, EMA relies on the measurement of the structure's transfer function matrix. By definition, the transfer function $H_{pq}(\\omega)$ can be seen as the frequency response of the system at a point $x_p$ to an excitation of unit amplitude at a point $x_q$. Classically, the transfer function matrix is given by the relation\n",
+                "To identify the modal parameters of a structure or mechanical system, EMA relies on the measurement of the structure's transfer function matrix. By definition, the transfer function $H_{pq}(\\omega)$ can be seen as the frequency response of the system at a point $x_p$ to an excitation of unit amplitude at a point $x_q$. Classically, the transfer function matrix (here the admittance) is given by the relation\n",
                 "\n",
                 "$$\n",
-                "H_{pq}(\\omega) = \\sum_{i = 1}^N \\frac{\\phi_i(x_p)\\, \\phi_i(x_q)}{M_i(\\omega_i^2 - \\omega^2 + 2j\\xi_i\\omega_i\\omega)} = \\sum_{i = 1}^N \\left[\\frac{{}_i R_{pq}}{(j\\omega - \\lambda_i)} + \\frac{{}_i R_{pq}^\\ast}{(j\\omega - \\lambda_i^\\ast)}\\right],\n",
+                "H_{pq}(\\omega) = \\sum_{i = 1}^{+\\infty} \\frac{\\phi_i(x_p)\\, \\phi_i(x_q)}{M_i(\\omega_i^2 - \\omega^2 + 2j\\xi_i\\omega_i\\omega)} = \\sum_{i = 1}^{+\\infty} \\left[\\frac{{}_i R_{pq}}{(j\\omega - \\lambda_i)} + \\frac{{}_i R_{pq}^\\ast}{(j\\omega - \\lambda_i^\\ast)}\\right],\n",
                 "$$\n",
                 "where:\n",
                 "\n",
@@ -56,19 +56,17 @@
                 "\n",
                 "    * Peak Picking method\n",
                 "    * Circle Fit method\n",
-                "    * Least Squares Fit (LSFit) method\n",
+                "    * Least Squares Fit method\n",
                 "\n",
                 "* methods based on the use of multiple degree of freedom (mdof) models, known as **Mdof methods**. These methods consider that the system can be represented as a multiple degree of freedom system. They are generally based on the construction of a high-order polynomial matrix whose coefficients are estimated from the measured transfer functions.Three Mdof methods are implemented in this package:\n",
                 "\n",
-                "    * Least-Squares Complex Exponential (LSCE) method\n",
-                "    * Least-Squares Complex Frequency-domain (LSCF) method\n",
-                "    * Polyreference Least-Squares Complex Frequency-domain (pLSCF) method\n",
-                "\n",
-                "## Common helper functions"
+                "    * Least-Squares Complex Exponential method\n",
+                "    * Least-Squares Complex Frequency-domain method\n",
+                "    * Polyreference Least-Squares Complex Frequency-domain method"
             ]
         }
     ],
-    "timestamp": "2025-10-21T15:56:25.017",
+    "timestamp": "2025-10-22T15:16:51.922",
     "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/modal_extraction/index.qmd",
     "qnr_schema_version": "1.0.0"
 }

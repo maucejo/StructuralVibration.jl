@@ -233,6 +233,16 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 **Data types**
 
 ::: {.api}
+**EMASdofProblem**
+
+---
+```{julia}
+#| echo: false
+@doc EMASdofProblem
+```
+:::
+
+::: {.api}
 **AutoEMASdofProblem**
 
 ---
@@ -260,7 +270,7 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ---
 ```{julia}
 #| echo: false
-@doc poles_extraction(::AbstractVector, ::AbstractVector, ::CircleFit)
+@doc poles_extraction(::EMASdofProblem, ::CircleFit)
 ```
 :::
 
@@ -270,7 +280,7 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ---
 ```{julia}
 #| echo: false
-@doc modeshape_extraction(H::AbstractArray, freq::AbstractVector, poles::Vector{T}, dpi::Vector{Int}; type = :dis) where {T <: Complex}
+@doc modeshape_extraction(::EMASdofProblem, ::Vector{T}, ::Vector{Int}; ::Symbol) where {T <: Complex}
 ```
 :::
 
@@ -280,7 +290,7 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ---
 ```{julia}
 #| echo: false
-@doc solve(prob::AutoEMASdofProblem)
+@doc solve(::AutoEMASdofProblem)
 ```
 :::
 
@@ -338,16 +348,17 @@ prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
 # Natural frequencies and damping ratios extraction
-fn_pp, ξn_pp = poles2modal(poles_extraction(H, freq, PeakPicking()))
-fn_cf, ξn_cf = poles2modal(poles_extraction(H, freq, CircleFit()))
-fn_lsf, ξn_lsf = poles2modal(poles_extraction(H, freq, LSFit()))
+prob_sdof = EMASdofProblem(H, freq)
+fn_pp, ξn_pp = poles2modal(poles_extraction(prob_sdof, PeakPicking()))
+fn_cf, ξn_cf = poles2modal(poles_extraction(prob_sdof, CircleFit()))
+fn_lsf, ξn_lsf = poles2modal(poles_extraction(prob_sdof, LSFit()))
 
 # Mode shape extraction
 dpi = [1, 2]
-ϕid = modeshape_extraction(H, freq, modal2poles(fn_pp, ξn_pp), dpi)
+ϕid = modeshape_extraction(prob_sdof, modal2poles(fn_pp, ξn_pp), dpi)
 
 # Automatic EMA
-prob_ema = AutoEMASdofProblem(H, freq, dpi = dpi, method = LSFit())
+prob_ema = AutoEMASdofProblem(prob_sdof, dpi, LSFit())
 sol_ema = solve(prob_ema)
 fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ϕn_ema = sol_ema.ms

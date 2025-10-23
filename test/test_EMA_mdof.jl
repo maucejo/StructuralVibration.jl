@@ -34,12 +34,24 @@ freq = 1.:0.1:fmax
 prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
-p_lsce = poles_extraction(H, freq, 20, LSCE())
-p_lscf = poles_extraction(H, freq, 20, LSCF())
-p_plscf = poles_extraction(H, freq, 20, PLSCF())
+prob_mdof = EMAMdofProblem(H, freq)
+p_lsce = poles_extraction(prob_mdof, 20, LSCE())
+p_lscf = poles_extraction(prob_mdof, 20, LSCF())
+p_plscf = poles_extraction(prob_mdof, 20, PLSCF())
 
 # EMA-MDOF pole stability analysis
-sol_stab = stabilization(H, freq, 15, LSCE())
+sol_stab = stabilization(prob_mdof, 15, LSCF())
 
 # Plot stabilization diagram
 stabilization_plot(sol_stab)
+
+# Mode shape extraction
+dpi = [1, 2]
+res = mode_residues(prob_mdof, p_lsce)[1]
+ϕid = modeshape_extraction(res, p_lscf, dpi, type = :real)[1]
+
+# Automatic EMA-MDOF procedure
+prob_ema = AutoEMAMdofProblem(prob_mdof, 20, dpi, LSCE())
+sol_ema = solve(prob_ema)
+fn_ema, ξn_ema = poles2modal(sol_ema.poles)
+ϕn_ema = sol_ema.ms

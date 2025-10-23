@@ -165,19 +165,17 @@ Plot stabilization diagram for EMA-MDOF pole stability analysis.
 """
 function stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type = :dis)
     # Extract data for the selected indicator
-    (; frf, freq, frange, poles, modefn, mode_stabfn, mode_stabdr) = stab
+    (; prob, poles, modefn, mode_stabfn, mode_stabdr) = stab
 
     # FRF post-processing - Frequency range reduction
-    fidx = @. frange[1] ≤ freq ≤ frange[2]
-    frf_red = frf[:, :, fidx]
-    freq_red = freq[fidx]
+    (; frf, freq) = prob
 
     # Indicator calculation
     if indicator == :psif
-        indicator_data = psif(frf_red)
+        indicator_data = psif(frf)
         indicator_name = "PSIF"
     elseif indicator == :cmif
-        indicator_data = cmif(frf_red, type = type)
+        indicator_data = cmif(frf, type = type)
         indicator_name = "CMIF"
     else
         throw(ArgumentError("Indicator not available. Available indicators are :psif and :cmif"))
@@ -216,7 +214,7 @@ function stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type 
     scatter!(ax_poles, Point2f.(fn[isstab], orders[isstab]), color = :green, marker = :star4, label = "Stable freq. & damp.")
     scatter!(ax_poles, Point2f.(fn[isstabf], orders[isstabf]), color = :blue, label = "Stable freq.")
     scatter!(ax_poles, Point2f.(fn[isnotstab], orders[isnotstab]), color = :red, marker = :xcross, label = "Not stable")
-    xlims!(ax_poles, minimum(freq_red), maximum(freq_red))
+    xlims!(ax_poles, minimum(freq), maximum(freq))
 
     # Indicator
     ax_indicator = Axis(
@@ -231,13 +229,13 @@ function stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type 
         yscale = log10
     )
     if indicator == :psif
-        lines!(ax_indicator, freq_red, indicator_data, color = (:gray, 0.5))
+        lines!(ax_indicator, freq, indicator_data, color = (:gray, 0.5))
     else
         for cmifk in eachrow(indicator_data)
-            lines!(ax_indicator, freq_red, cmifk, color = (:gray, 0.25))
+            lines!(ax_indicator, freq, cmifk, color = (:gray, 0.25))
         end
     end
-    xlims!(ax_indicator, minimum(freq_red), maximum(freq_red))
+    xlims!(ax_indicator, minimum(freq), maximum(freq))
 
     Legend(fig[1, 1], ax_poles, orientation = :horizontal)
     return fig

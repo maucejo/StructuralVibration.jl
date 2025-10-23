@@ -21,7 +21,8 @@ format:
 
 - Modal extraction
   - Add `LSFit()` method for modal parameter extraction using least squares fitting of the frequency response function around the resonance peak
-  - Add `AutoEMASdofProblem` structure and `solve` function to perform automatic modal extraction based on Sdof approximations
+  - Add `AutoEMASdofProblem` and `AutoEMAMdofProblem` structures and `solve` functions to perform automatic modal extraction based on Sdof or Mdof approximations
+  - Solutions of AutoEMA problems are stored in `EMASdofSolution` or `EMAMdofSolution` structures containing the poles and the modal parameters
   - Add `poles_extraction` function to extract system poles using different Mdof methods:
       - Least-Squares Complex Exponential (LSCE) method
       - Least-Squares Complex Frequency-domain (LSCF) method
