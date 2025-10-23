@@ -27,9 +27,13 @@ format:
       - Least-Squares Complex Exponential (LSCE) method
       - Least-Squares Complex Frequency-domain (LSCF) method
       - Polyreference Least-Squares Complex Frequency-domain (pLSCF) method
+  - Add `modeshape_extraction` function to extract mode shapes from residues and poles using Mdof methods
   - Add `stabilization` function to perform stabilization diagram analysis using Mdof methods
   - Add `stabilization_plot` function to visualize stabilization diagrams
   - Stabilization results are now stored in the `EMAMdofStabilization` structure for plotting and further analysis
+  - Add `frf_reconstruction` function to reconstruct FRFs from extracted modal parameters
+  - Add `compute_residuals` function to compute the lower and upper residuals of the FRF
+  - Add `mode2residues` function to compute residues from real modes information
   - Add modal extraction indicators:
     - Modal Overlap Factor (MOF)
     - Mode Overcomplexity Value (MOV)

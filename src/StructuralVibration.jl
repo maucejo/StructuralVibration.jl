@@ -47,8 +47,8 @@ export acn, agwn, anti_alias, denoising, estimated_SNR, mgwn, mixed_noise,
 
 export c2d, c2r_modeshape, modal_parameters, ss_model, ss_modal_model
 
-export cmif, comac, ecomac, frac, impulse_response, mac, mcf,
-       modal2poles, mode_residues, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization
+export cmif, comac, compute_residuals, ecomac, frac, frf_reconstruction,
+       impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization
 
 export bartlett, bartlett_hann, blackman, blackman_harris, blackman_nuttall,
        cosine, csd, dpss, exponential, flattop, force, gaussian, hamming, hanning, kaiser, lanczos, nuttall, parzen, planck, rect, spectrum, tfestimate, triang, tukey, welch
@@ -80,6 +80,7 @@ include("signal_processing/signal.jl")
 include("modal_extraction/ema_sdof.jl")
 include("modal_extraction/ema_indicators.jl")
 include("modal_extraction/ema_mdof.jl")
+include("modal_extraction/ema_frf.jl")
 include("modal_extraction/ema_utils.jl")
 
 # Include files - Sdof

@@ -30,11 +30,11 @@ $$
 where $\phi_{ni}$ is the mode shape value at degree of freedom $n$ for mode $i$, and $s_{ni}$ is a weighted factor. The latter is given by:
 $$
 s_{ni} = \begin{cases}
-0 & \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 Q_i) > 0 \\
-1 & \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 Q_i) \leq 0
+0 & \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 c_i) > 0 \\
+1 & \text{if } \text{Im}(-\lambda_i^2\phi_{ni}^2 c_i) \leq 0
 \end{cases},
 $$
-where $\lambda_i$ is the complex eigenvalue for mode $i$, and $Q_i$ is the corresponding scaling factor.
+where $\lambda_i$ is the complex eigenvalue for mode $i$, and $c_i$ is the corresponding scaling factor.
 
 A value close to 1 indicates physical modes, while a value close to 0 indicates spurious modes (or computational modes).
 
@@ -50,9 +50,9 @@ A value close to 1 indicates physical modes, while a value close to 0 indicates 
 
 ### Mode Phase Collinearity
 
-The Mode Phase Collinearity (MPC)aims at determining whether a mode is real or complex. It is an indicator defined in $[0, 1]$. For a mode $i$, it is given by:
+The Mode Phase Collinearity (MPC) aims at determining whether a mode is real or complex. It is an indicator defined in $[0, 1]$. For a mode $i$, it is given by:
 $$
-  MPC_i = \left[2\left(\frac{\vert\lambda_1\vert}{\vert\lambda_1\vert + \vert\lambda_2\vert} - 0.5\right)\right]^2,
+  MPC_i = \left(\frac{\lambda_1 - \lambda_2}{\lambda_1 + \lambda_2}\right)^2,
 $$
 where $\lambda_1 = \frac{S_{xx} + S_{yy}}{2} + \sqrt{\left(\frac{S_{xx} - S_{yy}}{2}\right)^2 + S_{xy}^2}$ and $\lambda_2 = \frac{S_{xx} + S_{yy}}{2} - \sqrt{\left(\frac{S_{xx} - S_{yy}}{2}\right)^2 + S_{xy}^2}$ are the eigenvalues of the covariance matrix $\mathbf{S}$:
 $$
@@ -130,6 +130,10 @@ $$
 where the superscript $H$ denotes the Hermitian transpose.
 
 A value close to 1 indicates a strong correlation between the two mode shapes, while a value close to 0 indicates no correlation.
+
+::: {.callout-note}
+In `StructuralVibration.jl`, it is assumed that $\phi_i$ is the theoretical (or reference) mode shape, while $\psi_j$ is the experimental (or identified) mode shape.
+:::
 
 ::: {.api}
 **mac**

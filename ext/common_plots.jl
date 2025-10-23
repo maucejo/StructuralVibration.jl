@@ -147,35 +147,32 @@ function sv_plot(x, y...; lw = 1., xscale = identity, yscale = identity, axis_ti
 end
 
 """
-    stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type = :dis)
+    stabilization_plot(stab::EMAMdofStabilization, indicator)
 
 Plot stabilization diagram for EMA-MDOF pole stability analysis.
 
 **Inputs**
 * `stab`: EMA-MDOF stabilization data
 * `indicator`: Indicator to plot
-    * `:psif` : Power spectrum indicator function
+    * `:psif` : Power spectrum indicator function (default)
     * `:cmif` : Complex mode indicator function
-* `type`: Type of FRF (for CMIF calculation)
-    * `:dis` : Displacement (default)
-    * `:vel` : Velocity
-    * `:acc` : Acceleration
+
 **Output**
 * `fig`: Figure
 """
-function stabilization_plot(stab::EMAMdofStabilization, indicator = :psif; type = :dis)
+function stabilization_plot(stab::EMAMdofStabilization, indicator = :psif)
     # Extract data for the selected indicator
     (; prob, poles, modefn, mode_stabfn, mode_stabdr) = stab
 
     # FRF post-processing - Frequency range reduction
-    (; frf, freq) = prob
+    (; frf, freq, type_frf) = prob
 
     # Indicator calculation
     if indicator == :psif
         indicator_data = psif(frf)
         indicator_name = "PSIF"
     elseif indicator == :cmif
-        indicator_data = cmif(frf, type = type)
+        indicator_data = cmif(frf, type = type_frf)
         indicator_name = "CMIF"
     else
         throw(ArgumentError("Indicator not available. Available indicators are :psif and :cmif"))

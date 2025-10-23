@@ -10,4 +10,181 @@ execute:
   cache: true
 ---
 
-To be implemented.
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+## Basic principle
+
+From the identified modal parameters (poles and residues), it is possible to reconstruct the frequency response functions (FRFs) of the system under study using the `frf_reconstruction` function. This function implements the following relation for a number $M$ of identified modes:
+
+$$
+H_{pq}(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
+$$
+where:
+
+* $\lambda_i = -\xi_i + j\,\Omega_i$ is the pole related to the mode $i$, with:
+    * $\Omega_i = \omega_i\sqrt{1 - \xi_i^2}$ is the damped natural frequency of the mode $i$, with $\omega_i = \vert \lambda_i\vert$.
+    * $\xi_i = -\frac{\text{Re}(\lambda_i)}{\omega_i}$ the modal damping factor of the mode $i$ <br></br>
+
+* ${}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q)$ is the residue of the mode $i$, with:
+    * $\phi_i(x_p)$ the mode shape of the mode $i$ at point $x_p$
+    * $c_i = \frac{1}{2jM_i\Omega_i}$ the normalization constant of the mode shape of the mode $i$
+
+In practice, however, the reconstructed FRF may not perfectly match the experimental FRF due to the unmodeled contribution of the modes outside the frequency range of interest. To account for this, it is common to include lower and upper residuals in the FRF reconstruction. This means that the admittance matrix can be expressed as:
+$$
+H_{pq}(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right] - \frac{L_{pq}}{\omega^2} + U_{pq},
+$$
+where $L_{pq}$ and $U_{pq}$ are the lower and upper residuals, respectively. These residuals can be computed using the `compute_residuals` function.
+
+::: {.callout-note}
+Theoretically, the residuals can be computed in conjunction with the estimation of the residues using a least-squares approach. However, we observed that this often leads to inaccurate estimates of the residuals. Therefore, in `StructuralVibration.jl`, the computation of the residuals is performed separately after estimating the residues and poles.
+:::
+
+Finally, when only real mode shapes are available, it is possible to compute the residues from the modal parameters using the `mode2residues` function. This function implements the following relation:
+$$
+{}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q),
+$$
+where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = \frac{1}{2jM_i\Omega_i}$ is the normalization constant of the mode shape of the mode $i$. Here, $M_i = 1$, since the mode shapes are mass-normalized. during the extraction process.
+
+## API
+
+::: {.api}
+**frf_reconstruction**
+
+---
+```{julia}
+#| echo: false
+@doc frf_reconstruction
+```
+:::
+
+::: {.api}
+**compute_residuals**
+
+---
+```{julia}
+#| echo: false
+@doc compute_residuals
+```
+:::
+
+::: {.api}
+**mode2residues**
+
+---
+```{julia}
+#| echo: false
+@doc mode2residues
+```
+:::
+
+## Example
+
+### Data preparation and FRF calculation
+```{julia}
+#| output: false
+# Structure parameters of the beam
+L = 1.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+Iz = b*h^3/12 # Moment of inertia
+
+# Material parameters
+E = 2.1e11  # Young's modulus
+ρ = 7850.   # Density
+ξ = 0.01    # Damping ratio
+
+# Mesh
+xexc = 0:0.05:L
+xm = xexc[2]
+
+# Mode calculation - Simply supported boundary conditions
+beam = Beam(L, S, Iz, E, ρ)
+fmax = 500.
+
+ωn, kn = modefreq(beam, 2fmax)
+ϕexc = modeshape(beam, kn, xexc)
+ϕm = modeshape(beam, kn, xm)
+
+# FRF calculation
+freq = 1.:0.1:fmax
+prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
+H = solve(prob; ismat = true).u
+```
+
+### Sdof method
+
+```{julia}
+#| output: false
+
+# Problem definition
+prob_sdof = EMASdofProblem(H, freq)
+
+# Poles extraction using the Peak Picking method
+poles_pp = poles_extraction(prob_sdof, PeakPicking())
+
+# Mode shape extraction
+dpi = [1, 2]
+ϕr = modeshape_extraction(prob_sdof, poles_pp, dpi)
+
+# Computation of the mode residues
+res_pp = mode2residues(ϕr, poles_pp, [2], 1:21)
+
+# FRF reconstruction - without residuals
+H_sdof = frf_reconstruction(res_pp, poles_pp, freq)
+
+# FRF reconstruction - with residuals
+lr, ur = compute_residuals(prob_sdof, res_pp, poles_pp)
+H_sdof2 = frf_reconstruction(res_pp, poles_pp, freq, lr = lr, ur = ur)
+```
+
+```{julia}
+#| echo: false
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 N/m)", title = "FRF Reconstruction using Sdof method")
+lines!(ax, freq, 20log10.(abs.(H[1, 2, :])), label = "Original FRF")
+lines!(ax, freq, 20log10.(abs.(H_sdof[1, 2, :])); linestyle = :dash, label = "Reconstructed FRF (no residuals)")
+lines!(ax, freq, 20log10.(abs.(H_sdof2[1, 2, :])); linestyle = :dot, label = "Reconstructed FRF (with residuals)")
+xlims!(ax, freq[1], freq[end])
+axislegend(ax; position = :rt)
+
+display(fig);
+```
+
+### Mdof method
+```{julia}
+#| output: false
+# Problem definition
+prob_mdof = EMAMdofProblem(H, freq)
+
+# Poles extraction using the Least-Squares Complex Frequency-domain method
+poles_lscf = poles_extraction(prob_mdof, 20, LSCF())
+
+# Residues extraction
+res_lscf = mode_residues(prob_mdof, poles_lscf)
+
+# FRF reconstruction - without residuals
+H_mdof = frf_reconstruction(res_lscf, poles_lscf, freq)
+
+# FRF reconstruction - with residuals
+lr, ur = compute_residuals(prob_mdof, res_lscf, poles_lscf)
+H_mdof2 = frf_reconstruction(res_lscf, poles_lscf, freq, lr = lr, ur = ur)
+```
+
+```{julia}
+#| echo: false
+fig1 = Figure()
+ax1 = Axis(fig1[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 N/m)", title = "FRF Reconstruction using Mdof method")
+lines!(ax1, freq, 20log10.(abs.(H[1, 2, :])), label = "Original FRF")
+lines!(ax1, freq, 20log10.(abs.(H_mdof[1, 2, :])); linestyle = :dash, label = "Reconstructed FRF (no residuals)")
+lines!(ax1, freq, 20log10.(abs.(H_mdof2[1, 2, :])); linestyle = :dot, label = "Reconstructed FRF (with residuals)")
+xlims!(ax1, freq[1], freq[end])
+axislegend(ax1; position = :rt)
+
+display(fig1);
+```

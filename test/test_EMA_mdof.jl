@@ -21,10 +21,7 @@ xm = xexc[2]
 # Mode calculation - Simply supported boundary conditions
 beam = Beam(L, S, Iz, E, ρ)
 
-# (; freq) = FFTParameters(1024, 4096)
-# fmax = freq[end]
 fmax = 500.
-
 ωn, kn = modefreq(beam, 2fmax)
 ϕexc = modeshape(beam, kn, xexc)
 ϕm = modeshape(beam, kn, xm)
@@ -47,11 +44,19 @@ stabilization_plot(sol_stab)
 
 # Mode shape extraction
 dpi = [1, 2]
-res = mode_residues(prob_mdof, p_lsce)[1]
-ϕid = modeshape_extraction(res, p_lscf, dpi, type = :real)[1]
+res = mode_residues(prob_mdof, p_lsce)
+ϕid, ci = modeshape_extraction(res, p_lsce, dpi, type = :real)
+ϕr = c2r_modeshape(ϕid)
 
 # Automatic EMA-MDOF procedure
 prob_ema = AutoEMAMdofProblem(prob_mdof, 20, dpi, LSCE())
 sol_ema = solve(prob_ema)
 fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ϕn_ema = sol_ema.ms
+
+# FRF reconstruction - without residuals
+H_mdof = frf_reconstruction(res, p_lscf, freq)
+
+# FRF reconstruction - with residuals
+lr, ur = compute_residuals(prob_mdof, res, p_lscf)
+H_mdof2 = frf_reconstruction(res, p_lscf, freq, lr = lr, ur = ur)

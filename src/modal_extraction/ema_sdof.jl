@@ -4,34 +4,56 @@ struct CircleFit <: SdofModalExtraction end
 struct LSFit <: SdofModalExtraction end
 
 """
-    EMASdofProblem(frf, freq; frange = [freq[1], freq[end]])
+    EMASdofProblem(frf, freq; frange, type_frf)
 
 Data structure defining the inputs for EMA-MDOF modal extraction methods.
 
 **Constructor parameters**
-- `frf::Array{Complex,3}`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
+- `frf::Array{Complex, 3}`: 3D FRF matrix (array nm x ne x nf)
 - `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
 - `frange::Vector{Real}`: Frequency range for analysis (default: [freq[1], freq[end]])
+- `type_frf::Symbol`: Type of FRF used in the analysis
+    * `:dis`: Admittance (default)
+    * `:vel`: Mobility
+    * `:acc`: Accelerance
 
 **Fields**
-- `frf::Array{Complex, 3}`: 3D array of Frequency Response Functions (FRF) (array nm x ne x nf)
+- `frf::Array{Complex, 3}`: 3D admittance matrix (array nm x ne x nf)
 - `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
+- `type_frf::Symbol`: Type of FRF used in the analysis
+
+**Note**
+The FRF is internally converted to admittance if needed.
 """
 @show_data struct EMASdofProblem{C <: Complex, R <: Real}
     frf::Array{C, 3}
     freq::AbstractArray{R}
+    type_frf::Symbol
 
-    function EMASdofProblem(frf::Array{C,3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]]) where {C <: Complex, R <: Real}
+    function EMASdofProblem(frf::Array{C,3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
 
         # FRF post-processing - Frequency range reduction
         fidx = @. frange[1] ≤ freq ≤ frange[2]
+        ω = 2π*freq[fidx]
+        frf_red = frf[:, :, fidx]
 
-        return new{C, R}(frf[:, :, fidx], freq[fidx])
+        # Conversion to admittance
+        if type_frf == :vel
+            for (f, ωf) in enumerate(ω)
+                frf_red[:, :, f] ./= (1im*ωf)
+            end
+        elseif type_frf == :acc
+            for (f, ωf) in enumerate(ω)
+                frf_red[:, :, f] ./= -ωf^2
+            end
+        end
+
+        return new{C, R}(frf_red, freq[fidx], type_frf)
     end
 end
 
 """
-    AutoEMASdofProblem(prob, dpi, method; type_frf)
+    AutoEMASdofProblem(prob, dpi, method)
 
 Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
@@ -44,18 +66,13 @@ Structure containing the input data for automatic experimental modal analysis us
     * `PeakPicking`: Peak picking method (default)
     * `CircleFit`: Circle fitting method
     * `LSFit`: Least squares fitting method
-* `type_frf::Symbol`: Type of FRF used for poles extraction
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
 """
 @show_data struct AutoEMASdofProblem
     prob::EMASdofProblem
     dpi:: Vector{Int}
     method::SdofModalExtraction
-    type_frf::Symbol
 
-    AutoEMASdofProblem(prob::EMASdofProblem, dpi::Vector{Int} = [1, 1], method::SdofModalExtraction = PeakPicking(); type_frf::Symbol = :dis) = new(prob, dpi, method, type_frf)
+    AutoEMASdofProblem(prob::EMASdofProblem, dpi::Vector{Int} = [1, 1], method::SdofModalExtraction = PeakPicking()) = new(prob, dpi, method)
 end
 
 """
@@ -73,7 +90,7 @@ Structure containing the solution of the automatic experimental modal analysis u
 end
 
 """
-    poles_extraction(prob, method::SdofModalExtraction; type = :dis)
+    poles_extraction(prob, method)
 
 Extract poles from the Bode diagram fitting method
 
@@ -83,11 +100,6 @@ Extract poles from the Bode diagram fitting method
     * `PeakPicking`: Peak picking method (default)
     * `CircleFit`: Circle fitting method
     * `LSFit`: Least squares fitting method
-* `frange`: Frequency range to consider for the extraction - default = [freq[1], freq[end]]
-* `type`: Type of FRF used to extract the poles
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
 
 **Outputs**
 * `poles`: Vector of extracted complex poles
@@ -95,9 +107,7 @@ Extract poles from the Bode diagram fitting method
 **Note**
 The natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::EMASdofProblem, method::SdofModalExtraction;  type = :dis)
-
-    # FRF post-processing - Frequency range reduction
+function poles_extraction(prob::EMASdofProblem, method::SdofModalExtraction)
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -128,7 +138,7 @@ function poles_extraction(prob::EMASdofProblem, method::SdofModalExtraction;  ty
     pk = similar(frf, nm*ne, npeak)
     pn = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
-        p = est_method(Hv, freq, type = type)
+        p = est_method(Hv, freq)
 
         nk = length(p)
         pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
@@ -144,24 +154,19 @@ function poles_extraction(prob::EMASdofProblem, method::SdofModalExtraction;  ty
 end
 
 """
-    poles_ppm_extract(H, freq; type = :dis)
+    poles_ppm_extract(H, freq)
 
 Extract poles from the Bode diagram peak picking method
 
 **Inputs**
 * `H`: Frequency response function
 * `freq`: Frequency vector
-* `type`: Type of FRF used to extract the poles
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function poles_ppm_extract(H, freq; type = :dis)
-    ω = 2π*freq
-
+function poles_ppm_extract(H, freq)
+    # Find peaks in the FRF
     Habs = abs.(H)
     pks = findmaxima(Habs)
     # Peaks not found
@@ -170,17 +175,10 @@ function poles_ppm_extract(H, freq; type = :dis)
     end
     pks = peakproms!(pks) |> peakwidths!
 
-    # Natural frequencies
+    # Estimation of natural frequencies and damping ratios
     ftemp = freq[pks.indices]
     fn = similar(ftemp)
     ξn = similar(ftemp)
-
-    # Convert to displacement
-    if type == :vel
-        H ./= 1im*ω
-    elseif type == :acc
-        H ./= -ω.^2
-    end
 
     # Damping ratios estimation from the half-bandwidth method
     nfreq_itp = 250
@@ -216,24 +214,20 @@ function poles_ppm_extract(H, freq; type = :dis)
 end
 
 """
-    poles_cfm_extract(H, freq; type = :dis)
+    poles_cfm_extract(H, freq)
 
 Extract poles from the Bode diagram circle fitting method
 
 **Inputs**
 * `H`: Frequency response function
 * `freq`: Frequency vector
-* `type`: Type of FRF used to extract the poles
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function poles_cfm_extract(H, freq; type = :dis)
-    ω = 2π*freq
+function poles_cfm_extract(H, freq)
 
+    # Find peaks in the FRF
     pks = findmaxima(abs.(H))
     # Peaks not found
     if isempty(pks.indices)
@@ -241,13 +235,7 @@ function poles_cfm_extract(H, freq; type = :dis)
     end
     pks = peakproms!(pks) |> peakwidths!
 
-    # Convert to displacement
-    if type == :vel
-        H ./= 1im*ω
-    elseif type == :acc
-        H ./= -ω.^2
-    end
-
+    # Estimation of natural frequencies and damping ratios
     fn = similar(freq[pks.indices])
     ξn = similar(fn)
 
@@ -298,29 +286,23 @@ function poles_cfm_extract(H, freq; type = :dis)
 end
 
 """
-    poles_lsf_extract(H, freq; type = :dis)
+    poles_lsf_extract(H, freq)
 
 Extract poles from the Bode diagram least squares fitting method
 
 **Inputs**
 * `H`: Frequency response function
 * `freq`: Frequency vector
-* `type`: Type of FRF used to extract the poles
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
 
 **Outputs**
 * `poles`: Extracted poles
 
 **Source**
-[1] Matlab documentation - `modalfit` function (https://www.mathworks.com/help/signal/ref/modalfit.html)
-[2] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
+[1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 
 """
-function poles_lsf_extract(H, freq; type = :dis)
-    ω = 2π*freq
-
+function poles_lsf_extract(H, freq)
+    # Find peaks in the FRF
     pks = findmaxima(abs.(H))
     # Peaks not found
     if isempty(pks.indices)
@@ -328,16 +310,9 @@ function poles_lsf_extract(H, freq; type = :dis)
     end
     pks = peakproms!(pks) |> peakwidths!
 
-    # Natural frequencies
+    # Estimation of natural frequencies and damping ratios
     fn = freq[pks.indices]
     ξn = similar(fn)
-
-    # Convert to displacement
-    if type == :vel
-        H ./= 1im*ω
-    elseif type == :acc
-        H ./= -ω.^2
-    end
 
     nfreq_itp = 500
     freq_itp = similar(fn, nfreq_itp)
@@ -388,7 +363,7 @@ function poles_lsf_extract(H, freq; type = :dis)
 end
 
 """
-    modeshape_extraction(prob, poles, dpi; type = :dis)
+    modeshape_extraction(prob, poles, dpi)
 
 Extract mode shapes using Sdof approximation
 
@@ -398,10 +373,6 @@ Extract mode shapes using Sdof approximation
 * `dpi`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
     * `dpi[2]`: Driving point index on the excitation mesh
-* `type`: Type of FRF used to extract the natural frequencies and damping ratios
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
 
 **Output**
 * `ϕn`: Mode shapes
@@ -409,9 +380,10 @@ Extract mode shapes using Sdof approximation
 **Note**
 If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
 """
-function modeshape_extraction(prob::EMASdofProblem, poles::Vector{T}, dpi = [1, 1]; type = :dis) where {T <: Complex}
+function modeshape_extraction(prob::EMASdofProblem, poles::Vector{T}, dpi = [1, 1]) where {T <: Complex}
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
+    ω = 2π*freq
 
     # Conversion of poles to modal parameters
     fn, ξn = poles2modal(poles)
@@ -426,14 +398,6 @@ function modeshape_extraction(prob::EMASdofProblem, poles::Vector{T}, dpi = [1, 
     else
         # Roving accelerometer test
         H = frf[:, dpi[2], :]
-    end
-
-    # Convert to admittance
-    ω = 2π*freq
-    if type == :vel
-        H ./= ω'
-    elseif type == :acc
-        H ./= ω'.^2
     end
 
     #Initialization
@@ -507,19 +471,17 @@ Solve automatically experimental modal analysis problem using Sdof methods
 * `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
 **Outputs**
-* `sol`: Solution of problem:
-    * `poles`: Extracted poles
-    * `ms`: Mode shapes
+* `sol::EMASdofSolution`: Structure containing the solution of the automatic experimental modal analysis using Sdof methods
 """
 function solve(prob_ema::AutoEMASdofProblem)
     # Unpack problem data
-    (; prob, dpi, method, type_frf) = prob_ema
+    (; prob, dpi, method) = prob_ema
 
     # Extraction of natural frequencies and damping ratios
-    poles = poles_extraction(prob, method, type = type_frf)
+    poles = poles_extraction(prob, method)
 
     # Extraction of mode shapes
-    phi = modeshape_extraction(prob, poles, dpi, type = type_frf)
+    phi = modeshape_extraction(prob, poles, dpi)
 
     return EMASdofSolution(poles, phi)
 end

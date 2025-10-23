@@ -30,7 +30,7 @@ end
 
 ## Mode complexity
 """
-    mov(poles, ms, Q)
+    mov(poles, ms, ci)
 
 Compute the mode overcomplexity value
 
@@ -39,7 +39,7 @@ This indicator is a weighted percentage of the degrees of freedom of the respons
 **Inputs**
 - `poles`: Poles of the system
 - `ms`: Mode shapes (each column corresponds to a mode)
-- `Q`: Scaling factors associated to the mode shapes
+- `ci`: Scaling factors associated to the mode shapes
 
 **Output**
 - `mov`: Mode overcomplexity values
@@ -48,14 +48,14 @@ This indicator is a weighted percentage of the degrees of freedom of the respons
 
 [1] M+P Analyzer manual. Rev. 5.1. 2017
 """
-function mov(poles, ms, Q)
+function mov(poles, ms, ci)
     n, m = size(ms)
     mov = zeros(m)
     s = zeros(n)
     Msen = similar(s)
     sig = similar(s)
 
-    for (i, (p, phi, Qi)) in enumerate(zip(poles, eachcol(ms), Q))
+    for (i, (p, phi, Qi)) in enumerate(zip(poles, eachcol(ms), ci))
         @. Msen = imag(-p^2*phi^2*Qi) # Poles sensitivity w.r.t. mass
         @. sig = sign(Msen)
         s[sig .> 0.] .= 0.
@@ -102,7 +102,7 @@ function mpc(ms)
         λ1 = (Sxx + Syy)/2 + sqrt(((Sxx - Syy)/2)^4 + Sxy^2)
         λ2 = (Sxx + Syy)/2 - sqrt(((Sxx - Syy)/2)^4 + Sxy^2)
 
-        mpc[i] = (2(abs(λ1)/(abs(λ1) + abs(λ2))) - 0.5)^2
+        mpc[i] = ((λ1 - λ2)/(λ1 + λ2))^2
     end
 
     return mpc
@@ -311,8 +311,8 @@ function mac(ms_exp, ms_th)
         throw(DimensionMismatch("The number of degrees of freedom of the experimental and theoretical mode shapes must be the same"))
     end
 
-    mac = zeros(nt, ne)
-    for i in 1:nt, j in 1:ne
+    mac = zeros(mt, me)
+    for i in 1:mt, j in 1:me
         num = abs2(ms_exp[:, j]'ms_th[:, i])
         den = (ms_exp[:, j]'ms_exp[:, j]) * (ms_th[:, i]'ms_th[:, i])
         mac[i, j] = num/real(den)
