@@ -4,3 +4,4 @@
 /test/matlab_comparison
 /src/unsused
 .vscode
+.DS_Store
