@@ -215,6 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#mechanical-models" id="toc-mechanical-models" class="nav-link" data-scroll-target="#mechanical-models">Mechanical models</a></li>
   <li><a href="#vibration-data-generation" id="toc-vibration-data-generation" class="nav-link" data-scroll-target="#vibration-data-generation">Vibration data generation</a></li>
+  <li><a href="#signal-processing" id="toc-signal-processing" class="nav-link" data-scroll-target="#signal-processing">Signal processing</a></li>
   <li><a href="#modal-analysis" id="toc-modal-analysis" class="nav-link" data-scroll-target="#modal-analysis">Modal analysis</a></li>
   <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
   </ul></li>
@@ -370,32 +371,32 @@ Warning
 <li>Multiplicative noise</li>
 <li>Mixed - agwn + multiplicative noise</li>
 </ul></li>
-<li><strong>Signal processing</strong>
+</ul>
+</section>
+<section id="signal-processing" class="level3">
+<h3 class="anchored" data-anchor-id="signal-processing">Signal processing</h3>
 <ul>
-<li>Measurement noise variance estimation algorithms from noisy data
+<li><strong>Measurement noise variance estimation algorithms from noisy data</strong>
 <ul>
 <li>Regularization-based estimation</li>
 <li>D’Errico’s method - <a href="https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise">Link to the Matlab version</a></li>
-</ul></li>
 <li>SNR estimation from estimated measurement noise variance</li>
-<li>Denoising algorithms
+</ul></li>
+<li><strong>Denoising algorithms</strong>
 <ul>
 <li>Regularization</li>
 <li>Kalman filtering</li>
 </ul></li>
-<li>Modal extraction - SDOF methods
+<li><strong>Signal preprocessing</strong>
 <ul>
-<li>Peak picking method</li>
-<li>Circle fit method</li>
-</ul></li>
 <li>Detrending data using polynomial fit</li>
 <li>Gradient calculation using interpolation</li>
-<li>Signal estimation
+</ul></li>
+<li><strong>Signal estimation</strong>
 <ul>
 <li>Transfer functions estimation (H1, H2, H3, Hv)</li>
 <li>Welch method (PSD, ESD, Autopower, Autopower linear)</li>
 <li>Signal spectrum estimation</li>
-</ul></li>
 </ul></li>
 </ul>
 </section>
