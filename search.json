@@ -224,7 +224,7 @@
     "href": "overview/installation.html#install-vibrationdata.jl",
     "title": "Installation",
     "section": "Install VibrationData.jl ",
-    "text": "Install VibrationData.jl \nThe package is registered in the Julia General Registry. So, to install the package, you can use the following command:\n(Yourenv) pkg&gt; add \"StructuralVibration\"",
+    "text": "Install VibrationData.jl \nThe package is registered in the Julia General Registry. So, to install the package, you can use the following command:\n(Yourenv) pkg&gt; add StructuralVibration",
     "crumbs": [
       "Overview",
       "Installation"
