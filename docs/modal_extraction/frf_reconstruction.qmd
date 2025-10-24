@@ -146,7 +146,7 @@ H_sdof2 = frf_reconstruction(res_pp, poles_pp, freq, lr = lr, ur = ur)
 ```{julia}
 #| echo: false
 fig = Figure()
-ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 N/m)", title = "FRF Reconstruction using Sdof method")
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)", title = "FRF Reconstruction using Sdof method")
 lines!(ax, freq, 20log10.(abs.(H[1, 2, :])), label = "Original FRF")
 lines!(ax, freq, 20log10.(abs.(H_sdof[1, 2, :])); linestyle = :dash, label = "Reconstructed FRF (no residuals)")
 lines!(ax, freq, 20log10.(abs.(H_sdof2[1, 2, :])); linestyle = :dot, label = "Reconstructed FRF (with residuals)")
@@ -179,7 +179,7 @@ H_mdof2 = frf_reconstruction(res_lscf, poles_lscf, freq, lr = lr, ur = ur)
 ```{julia}
 #| echo: false
 fig1 = Figure()
-ax1 = Axis(fig1[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 N/m)", title = "FRF Reconstruction using Mdof method")
+ax1 = Axis(fig1[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)", title = "FRF Reconstruction using Mdof method")
 lines!(ax1, freq, 20log10.(abs.(H[1, 2, :])), label = "Original FRF")
 lines!(ax1, freq, 20log10.(abs.(H_mdof[1, 2, :])); linestyle = :dash, label = "Reconstructed FRF (no residuals)")
 lines!(ax1, freq, 20log10.(abs.(H_mdof2[1, 2, :])); linestyle = :dot, label = "Reconstructed FRF (with residuals)")

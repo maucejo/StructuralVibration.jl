@@ -103,23 +103,25 @@ The package provides the following features:
     - Multiplicative noise
     - Mixed - agwn + multiplicative noise
 
-- **Signal processing**
-    - Measurement noise variance estimation algorithms from noisy data
-        - Regularization-based estimation
-        - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
+### Signal processing
+
+- **Measurement noise variance estimation algorithms from noisy data**
+    - Regularization-based estimation
+    - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
     - SNR estimation from estimated measurement noise variance
-    - Denoising algorithms
-        - Regularization
-        - Kalman filtering
-    - Modal extraction - SDOF methods
-        - Peak picking method
-        - Circle fit method
+
+- **Denoising algorithms**
+    - Regularization
+    - Kalman filtering
+
+- **Signal preprocessing**
     - Detrending data using polynomial fit
     - Gradient calculation using interpolation
-    - Signal estimation
-        - Transfer functions estimation (H1, H2, H3, Hv)
-        - Welch method (PSD, ESD, Autopower, Autopower linear)
-        - Signal spectrum estimation
+
+- **Signal estimation**
+    - Transfer functions estimation (H1, H2, H3, Hv)
+    - Welch method (PSD, ESD, Autopower, Autopower linear)
+    - Signal spectrum estimation
 
 ### Modal analysis
 

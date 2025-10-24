@@ -1,22 +1,15 @@
 # StructuralVibration.jl
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://maucejo.github.io/StructuralVibration.jl/)
 [![Generic badge](https://img.shields.io/badge/Version-1.0.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
 
-This Julia package is intended to provide a set of tools for generating vibration data either to validate new numerical methods or to serve as input data for solving inverse problems such as input state estimation via Bayesian filtering, Bayesian regularization, machine learning, etc.
+`StructuralVibration.jl` is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.
 
-The package is under active development. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
-
-## Installation
-
-To install the package, you can use the following command:
-
-```julia
-(Yourenv) pkg> add StructuralVibration
-```
+::: {.callout-warning}
+The package is under active development and is developed as part of my research activities on source identification in structural dynamics and acoustics.
+:::
 
 ## Features
 
@@ -98,25 +91,28 @@ The package provides the following features:
     - Multiplicative noise
     - Mixed - agwn + multiplicative noise
 
-- **Signal processing**
-    - Measurement noise variance estimation algorithms from noisy data
-        - Regularization-based estimation
-        - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
+### Signal processing
+
+- **Measurement noise variance estimation algorithms from noisy data**
+    - Regularization-based estimation
+    - D'Errico's method  - [Link to the Matlab version](https://fr.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
     - SNR estimation from estimated measurement noise variance
-    - Denoising algorithms
-        - Regularization
-        - Kalman filtering
-    - Modal extraction - SDOF methods
-        - Peak picking method
-        - Circle fit method
+
+- **Denoising algorithms**
+    - Regularization
+    - Kalman filtering
+
+- **Signal preprocessing**
     - Detrending data using polynomial fit
     - Gradient calculation using interpolation
-    - Signal estimation
-        - Transfer functions estimation (H1, H2, H3, Hv)
-        - Welch method (PSD, ESD, Autopower, Autopower linear)
-        - Signal spectrum estimation
+
+- **Signal estimation**
+    - Transfer functions estimation (H1, H2, H3, Hv)
+    - Welch method (PSD, ESD, Autopower, Autopower linear)
+    - Signal spectrum estimation
 
 ### Modal analysis
+
 - **Modal extraction - SDOF methods**
     - Peak picking method
     - Circle fit method
@@ -146,6 +142,7 @@ The package provides the following features:
     - Reconstruct FRF from modal parameters
 
 ### Visualization
+
 - Bode plot
 - 2D and 3D Nyquist plot
 - Waterfall plot
