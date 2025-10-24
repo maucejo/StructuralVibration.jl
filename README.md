@@ -1,5 +1,6 @@
 # StructuralVibration.jl
 
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://maucejo.github.io/StructuralVibration.jl/)
 [![Generic badge](https://img.shields.io/badge/Version-1.0.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
@@ -7,9 +8,8 @@
 
 `StructuralVibration.jl` is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.
 
-::: {.callout-warning}
-The package is under active development and is developed as part of my research activities on source identification in structural dynamics and acoustics.
-:::
+> [!WARNING]
+>The package is under active development and is developed as part of my research activities on source identification in structural dynamics and acoustics.
 
 ## Features
 
