@@ -48,5 +48,5 @@ juliaup add release
 The package is registered in the Julia General Registry. So, to install the package, you can use the following command:
 
 ```julia
-(Yourenv) pkg> add "StructuralVibration"
+(Yourenv) pkg> add StructuralVibration
 ```
