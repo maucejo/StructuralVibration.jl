@@ -147,3 +147,10 @@ The package provides the following features:
 - 2D and 3D Nyquist plot
 - Waterfall plot
 - General 2D plot
+
+## License
+
+MIT licensed
+
+Copyright (C) 2025 Mathieu AUCEJO (maucejo)
+
