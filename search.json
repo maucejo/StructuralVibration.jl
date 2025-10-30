@@ -202,7 +202,7 @@
     "href": "overview/installation.html",
     "title": "Installation",
     "section": "",
-    "text": "Note\n\n\n\nIf you are already a Julia user, you can skip this section.\nThis section explains how to install Julia and Vibration.jl.",
+    "text": "Note\n\n\n\nIf you are already a Julia user, you can skip this section.\nThis section explains how to install Julia and StructuralVibration.jl.",
     "crumbs": [
       "Overview",
       "Installation"
