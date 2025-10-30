@@ -220,11 +220,11 @@
     ]
   },
   {
-    "objectID": "overview/installation.html#install-structuralvibrationdata.jl",
-    "href": "overview/installation.html#install-structuralvibrationdata.jl",
+    "objectID": "overview/installation.html#install-structuralvibration.jl",
+    "href": "overview/installation.html#install-structuralvibration.jl",
     "title": "Installation",
-    "section": "Install StructuralVibrationData.jl ",
-    "text": "Install StructuralVibrationData.jl \nThe package is registered in the Julia General Registry. So, to install the package, you can use the following command:\n(Yourenv) pkg&gt; add StructuralVibration",
+    "section": "Install StructuralVibration.jl ",
+    "text": "Install StructuralVibration.jl \nThe package is registered in the Julia General Registry. So, to install the package, you can use the following command:\n(Yourenv) pkg&gt; add StructuralVibration",
     "crumbs": [
       "Overview",
       "Installation"
