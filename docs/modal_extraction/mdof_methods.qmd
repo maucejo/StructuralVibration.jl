@@ -259,12 +259,12 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 :::
 
 ::: {.api}
-**EMAMdofStabilization**
+**StabilizationAnalysis**
 
 ---
 ```{julia}
 #| echo: false
-@doc EMAMdofStabilization
+@doc StabilizationAnalysis
 ```
 :::
 
@@ -286,7 +286,7 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 ---
 ```{julia}
 #| echo: false
-@doc stabilization(::EMAMdofProblem)
+@doc stabilization
 ```
 :::
 
@@ -296,7 +296,7 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 ---
 ```{julia}
 #| echo: false
-@doc stabilization_plot(::EMAMdofStabilization)
+@doc stabilization_plot(::StabilizationAnalysis)
 ```
 :::
 
@@ -421,7 +421,7 @@ dpi = [1, 2]
 res = mode_residues(prob_mdof, p_lsce)
 
 # Extraction of the mode shapes
-ϕ_est = modeshape_extraction(res, p_lsce, dpi, type = :real)[1]
+ϕ_est = modeshape_extraction(res, p_lsce, dpi = dpi, modetype = :real)[1]
 
 # Convert to real mode shapes
 ϕ_est_real = c2r_modeshape(ϕ_est)

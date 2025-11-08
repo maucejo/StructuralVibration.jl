@@ -277,14 +277,15 @@ function welch(input_signal::AbstractVector, bs::Int, window = hanning; fs::Int 
 end
 
 """
-    csd(x, y, bs, window_x = hanning, window_y = window_x; fs = 1,
-        overlap = 0.5, nfft = bs, scaling = :psd)
+    csd(x::AbstractMatrix, y::AbstractMatrix, bs, window_x = hanning, window_y = window_x; fs = 1, overlap = 0.5, nfft = bs, scaling = :psd)
+
+    csd(x::AbstractVector, y::AbstractVector, bs, window_x = hanning, window_y = window_x; fs = 1, overlap = 0.5, nfft = bs, scaling = :psd)
 
 Estimation of the one-sided Cross-spectral density between two signals
 
 **Inputs**
-* `x::AbstractVector`: First signal
-* `y::AbstractVector`: Second signal
+* `x::AbstractVector` or `AbstractMatrix`: First signal
+* `y::AbstractVector` or `AbstractMatrix`: Second signal
 * `bs::Int`: Block size
 * `window_x`: Window function for the first signal (default: hanning)
 * `window_y`: Window function for the second signal (default: same as window_x)
@@ -302,7 +303,7 @@ Estimation of the one-sided Cross-spectral density between two signals
 * `freq`: Frequency range
 
 **Notes**
-- The `csd(x, x, ...) = welch(x, ...)`.
+- `csd(x, x, ...) = welch(x, ...)` if `x` is a vector.
 """
 function csd(x::AbstractMatrix, y::AbstractMatrix, bs::Int, window_x = hanning, window_y = window_x; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd)
 

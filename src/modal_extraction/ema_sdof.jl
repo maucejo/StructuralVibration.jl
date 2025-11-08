@@ -32,6 +32,9 @@ The FRF is internally converted to admittance if needed.
 
     function EMASdofProblem(frf::Array{C,3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
 
+        # Correct frange to avoid division by zero
+        frange[1] == 0. ? frange[1] = 1. : nothing
+
         # FRF post-processing - Frequency range reduction
         fidx = @. frange[1] ≤ freq ≤ frange[2]
         ω = 2π*freq[fidx]
@@ -363,7 +366,7 @@ function poles_lsf_extract(H, freq)
 end
 
 """
-    modeshape_extraction(prob, poles, dpi)
+    modeshape_extraction(prob, poles; dpi)
 
 Extract mode shapes using Sdof approximation
 
@@ -380,7 +383,7 @@ Extract mode shapes using Sdof approximation
 **Note**
 If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
 """
-function modeshape_extraction(prob::EMASdofProblem, poles::Vector{T}, dpi = [1, 1]) where {T <: Complex}
+function modeshape_extraction(prob::EMASdofProblem, poles::Vector{T}; dpi = [1, 1]) where {T <: Complex}
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
     ω = 2π*freq
@@ -481,7 +484,7 @@ function solve(prob_ema::AutoEMASdofProblem)
     poles = poles_extraction(prob, method)
 
     # Extraction of mode shapes
-    phi = modeshape_extraction(prob, poles, dpi)
+    phi = modeshape_extraction(prob, poles, dpi = dpi)
 
     return EMASdofSolution(poles, phi)
 end

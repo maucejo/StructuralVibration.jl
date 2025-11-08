@@ -44,33 +44,6 @@ function frf_reconstruction(res::Array{T, 3}, poles::Vector{T}, freq; lr = zeros
     return H_rec
 end
 
-# function frf_reconstruction(ms::Array{Tm, 2}, poles::Vector{Tp}, freq, idx_m, idx_e; lr = zeros(eltype(poles), length(idx_m), length(idx_e)), ur = zeros(eltype(poles), length(idx_m), length(idx_e)), type = :dis) where {Tm <: Real, Tp <: Complex}
-
-#     # Initialization
-#     ω = 2π*freq
-#     fn, ξn = poles2modal(poles)
-#     ωn = 2π*fn
-
-#     nf = length(freq)
-#     nm, ne = length(idx_m), length(idx_e)
-#     H_rec = similar(poles, nm, ne, nf)
-#     for (f, ωf) in enumerate(ω)
-#         for (i, mes) in enumerate(idx_m)
-#             for (j, exc) in enumerate(idx_e)
-#                 H_rec[i, j, f] = sum(ms[mes, :] .* ms[exc, :] ./ (ωn.^2 .- ωf^2 + 2im*ξn.*ωn.*ωf)) - lr[i, j]/ωf^2 + ur[i, j]
-
-#                 if type == :vel
-#                     H_rec[i, j, f] *= 1im*ωf
-#                 elseif type == :acc
-#                     H_rec[i, j, f] *= -ωf^2
-#                 end
-#             end
-#         end
-#     end
-
-#     return H_rec
-# end
-
 """
     compute_residuals(prob, res, poles)
 
@@ -89,14 +62,24 @@ function compute_residuals(prob:: Union{EMASdofProblem, EMAMdofProblem}, res::Ar
 
     # Initialization
     (; frf, freq) = prob
-    ω = 2π*freq
-    nm, ne, nf = size(frf)
+
+    # Correct frange to avoid division by zero
+    if freq[1] < 1.
+        freq_red = freq[2:end]
+        frf_red = frf[:, :, 2:end]
+    else
+        freq_red = freq
+        frf_red = frf
+    end
+
+    nm, ne, nf = size(frf_red)
+    ω = 2π*freq_red
 
     # FRF reconstruction
-    H_rec = frf_reconstruction(res, poles, freq)
+    H_rec = frf_reconstruction(res, poles, freq_red)
 
     # Residual computation
-    Y = permutedims(frf .- H_rec, (3, 1, 2))
+    Y = permutedims(frf_red .- H_rec, (3, 1, 2))
 
     R = [(-1. ./ ω.^2) ones(nf)]
     Comp = similar(res, 2, nm, ne)

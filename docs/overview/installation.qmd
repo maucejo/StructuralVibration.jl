@@ -10,7 +10,7 @@ format:
 If you are already a Julia user, you can skip this section.
 :::
 
-This section explains how to install Julia and `Vibration.jl`.
+This section explains how to install Julia and `StructuralVibration.jl`.
 
 ## Install Julia ![](/assets/logo/julia.svg){width=3%}
 
@@ -43,7 +43,7 @@ Once `juliaup` is installed, the latest version of Julia can be installed from a
 juliaup add release
 ```
 
-## Install VibrationData.jl ![](/assets/logo/doclogo.svg){width=5%}
+## Install StructuralVibration.jl ![](/assets/logo/doclogo.svg){width=5%}
 
 The package is registered in the Julia General Registry. So, to install the package, you can use the following command:
 

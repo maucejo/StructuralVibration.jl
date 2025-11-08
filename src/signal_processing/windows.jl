@@ -328,3 +328,24 @@ function planck(N, ϵ = 0.25)
 
     return w
 end
+
+"""
+    flattri(N, width = 0.5)
+
+Create a flat triangular window
+
+**Inputs**
+* `N`: Number of points
+* `width`: Width (fraction) of the flat part of the window (between 0 and 1)
+
+**Output**
+* `w`: Flat triangle window
+"""
+function flattri(N, width = 0.5)
+    # Gérer N pair et impair
+    kw = width * N
+    start = round(Int, kw)
+    k = (start + 1):N
+
+    return [ones(start); (N .- k) ./ (N - kw)]
+end
