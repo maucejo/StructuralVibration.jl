@@ -1,0 +1,67 @@
+using StructuralVibration, LinearAlgebra
+
+# Structure parameters of the beam
+L = 1.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+Iz = b*h^3/12 # Moment of inertia
+
+# Material parameters
+E = 2.1e11  # Young's modulus
+ρ = 7850.   # Density
+ξ = 0.01    # Damping ratio
+
+# Mesh
+xexc = 0:0.05:L
+xm = xexc[2]
+
+# Mode calculation - Simply supported boundary conditions
+beam = Beam(L, S, Iz, E, ρ)
+fmax = 500.
+
+ωn, kn = modefreq(beam, 2fmax)
+ϕexc = modeshape(beam, kn, xexc)
+ϕm = modeshape(beam, kn, xm)
+
+# FRF calculation
+# Acquisition parameters for one block
+sample_rate = 4096
+block_size = 4096
+fft_params = FFTParameters(sample_rate, block_size)
+
+idf = 1
+freq = fft_params.freq
+freq_calc = freq[idf:end]
+prob = ModalFRFProblem(ωn, ξ, freq_calc, ϕm, ϕexc)
+H = solve(prob; ismat = true).u
+
+# Acquisition parameters
+nblocks = 5
+tb = fft_params.t
+dt = fft_params.dt
+t = tb[1]:dt:(nblocks*(tb[end] + dt) - dt)
+
+# Chirp excitation
+F0 = 10.
+chirp = SweptSine(F0, tb[1], 0.8tb[end], freq[1], freq[end], zero_end = true)
+x = repeat(excitation(chirp, tb), outer = nblocks)
+
+force = zeros(length(xexc), length(t))
+force[2, :] .= x
+
+prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
+y = solve(prob).du
+
+# Chirp excitation - Excitation CSD matrix
+tukeywin(x) = tukey(x, 0.5)
+Gxx = csd(force, force, block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
+
+# Chirp excitation - Output CSD matrix
+Gyy = csd(y[2, :], y[2, :], block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
+Gyy2 = vec(psd_from_tf(H, Gxx[:, :, idf:end]))
+
+# Half power spectral density from FRF and excitation PSD
+SYY = vec(half_psd(Gyy[idf:end], freq_calc))
+# SYY = vec(half_psd(Gyy2, freq_calc))
+Syy = vec(half_psd(y[2, :], y[2, :], freq_calc, sample_rate, block_size))

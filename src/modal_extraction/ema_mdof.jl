@@ -1,16 +1,17 @@
 ## Structure definition for method selection
+abstract type MdofProblem end
 abstract type MdofModalExtraction end
 struct LSCE <: MdofModalExtraction end
 struct LSCF <: MdofModalExtraction end
 struct PLSCF <: MdofModalExtraction end
 
 """
-    EMAMdofProblem(frf, freq; frange, type_frf)
+    EMAMdofProblem(H, freq; frange, type_frf)
 
 Data structure defining the inputs for EMA-MDOF modal extraction methods.
 
 **Constructor parameters**
-- `frf::Array{Complex, 3}`: 3D FRF matrix (array nm x ne x nf)
+- `H::Array{Complex, 3}`: 3D FRF matrix (array nm x ne x nf)
 - `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
 - `frange::Vector{Real}`: Frequency range for analysis (default: [freq[1], freq[end]])
 - `type_frf::Symbol`: Type of FRF used in the analysis
@@ -19,19 +20,22 @@ Data structure defining the inputs for EMA-MDOF modal extraction methods.
     * `:acc`: Accelerance
 
 **Fields**
-- `frf::Array{Complex, 3}`: 3D admittance matrix (array nm x ne x nf)
+- `H::Array{Complex, 3}`: 3D admittance matrix (array nm x ne x nf)
 - `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
 - `type_frf::Symbol`: Type of FRF used in the analysis
 
 **Note**
 The FRF is internally converted to admittance if needed.
 """
-@show_data struct EMAMdofProblem{C <: Complex, R <: Real}
+@show_data struct EMAMdofProblem{C <: Complex, R <: Real} <: MdofProblem
     frf::Array{C, 3}
     freq::AbstractArray{R}
     type_frf::Symbol
 
     function EMAMdofProblem(frf::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
+
+        # Correct frange to avoid division by zero
+        frange[1] == 0. ? frange[1] = 1. : nothing
 
         # FRF post-processing - Frequency range reduction
         fidx = @. frange[1] ≤ freq ≤ frange[2]
@@ -49,7 +53,7 @@ The FRF is internally converted to admittance if needed.
             end
         end
 
-        return new{C, R}(frf[:, :, fidx], freq[fidx], type_frf)
+        return new{C, R}(frf_red, freq[fidx], type_frf)
     end
 end
 
@@ -104,12 +108,12 @@ Structure containing the solution of the automatic experimental modal analysis u
 end
 
 """
-    EMAMdofStabilization(prob, poles, modefn, mode_stabfn, mode_stabdr)
+    StabilizationAnalysis(prob, poles, modefn, mode_stabfn, mode_stabdr)
 
 Data structure summarizing the results of the stabilization analysis.
 
 **Fields**
-- `prob::EMAMdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
+- `prob::MdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
 - `frange::Vector{Real}`: Frequency range used for the stabilization analysis
 - `poles::Vector{Vector{Complex}}`: Vector of vectors containing extracted poles at each model order
 - `modefn::Matrix{Real}`: Matrix containing the natural frequencies (useful for plotting)
@@ -120,8 +124,8 @@ Data structure summarizing the results of the stabilization analysis.
 
 This structure is returned by the `stabilization` function after performing a stabilization diagram analysis and used by `stabilization_plot` for visualization.
 """
-@show_data struct EMAMdofStabilization{Tp <: Complex, Tf <: Real}
-    prob::EMAMdofProblem        # EMA-MDOF problem containing FRF data and frequency vector
+@show_data struct StabilizationAnalysis{Tp <: Complex, Tf <: Real}
+    prob::MdofProblem           # EMA-MDOF problem containing FRF data and frequency vector
     poles::Vector{Vector{Tp}}   # Extracted poles at each model order
     modefn::Matrix{Tf}          # Natural frequencies (used for plotting)
     mode_stabfn::BitMatrix      # Stability of natural frequencies
@@ -135,7 +139,7 @@ end
 Extract complex poles from Frequency Response Function (FRF) data using the specified modal extraction method.
 
 **Inputs**
-- `prob::EMAMdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
+- `prob::MdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
 - `order::Int`: Model order (number of poles to extract)
 - `method::MdofModalExtraction`: Modal extraction method
     - `LSCE`: Least Squares Complex Exponential method
@@ -151,7 +155,7 @@ Extract complex poles from Frequency Response Function (FRF) data using the spec
 
 The `weighting` parameter is only applicable for the LSCF and PLSCF methods.
 """
-function poles_extraction(prob::EMAMdofProblem, order::Int, method::MdofModalExtraction = LSCF(); stabdiag = false, weighting = true)
+function poles_extraction(prob::MdofProblem, order::Int, method::MdofModalExtraction = LSCF(); stabdiag = false, weighting = true)
     est_method = let
         if method isa LSCE
             lsce
@@ -165,15 +169,15 @@ function poles_extraction(prob::EMAMdofProblem, order::Int, method::MdofModalExt
     end
 
     # Retry mechanism for modal extraction, since it can fail due to numerical issues
-    estimation_success = false
+    success = false
     stop = 0
     local poles
-    while !estimation_success && (stop ≤ 10)
+    while !success && (stop ≤ 10)
         try
             # Modal extraction
              poles = est_method(prob, order, stabdiag = stabdiag, weighting = weighting)
 
-            estimation_success = true
+            success = true
         catch e # Estimation failed
             @warn "Modal extraction failed at order $order with error: $e. Retrying..."
             stop += 1
@@ -205,7 +209,7 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
 **Note**
 The weighting parameter is not used in the LSCE method but is included for consistency with other methods.
 """
-function lsce(prob::EMAMdofProblem, order::Int; stabdiag = false, weighting = true)
+function lsce(prob::MdofProblem, order::Int; stabdiag = false, weighting = true)
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -279,7 +283,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-function lscf(prob::EMAMdofProblem, order::Int; stabdiag = false, weighting = true) :: Vector{eltype(prob.frf)}
+function lscf(prob::MdofProblem, order::Int; stabdiag = false, weighting = true)
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -349,7 +353,7 @@ function lscf(prob::EMAMdofProblem, order::Int; stabdiag = false, weighting = tr
 end
 
 """
-    plscf(prob order; stabdiag, weighting)
+    plscf(prob, order; stabdiag, weighting)
 
 Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract complex poles from Frequency Response Function (FRF) data.
 
@@ -367,7 +371,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-function plscf(prob::EMAMdofProblem, order::Int; stabdiag = false, weighting = true) :: Vector{eltype(prob.frf)}
+function plscf(prob::MdofProblem, order::Int; stabdiag = false, weighting = true) :: Vector{eltype(prob.frf)}
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -459,7 +463,7 @@ end
 Perform stabilization diagram analysis using the specified modal extraction method (LSCE, LSCF, or PLSCF).
 
 **Inputs**
-- `prob::EMAMdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
+- `prob::MdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
 - `max_order::Int`: Maximum model order for the stabilization analysis
 - `method`: Modal extraction method to use
     - `LSCE()`: Least Squares Complex Exponential method
@@ -472,7 +476,7 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 **Output**
 - `sol::EMAMdofStabilization`: Data structure containing the results of the stabilization analysis
 """
-function stabilization(prob::EMAMdofProblem, max_order::Int, method::MdofModalExtraction = LSCF(); weighting = true, stabcrit = [0.01, 0.05])
+function stabilization(prob::MdofProblem, max_order::Int, method::MdofModalExtraction = LSCF(); weighting = true, stabcrit = [0.01, 0.05])
 
     # Initialization
     max_order += 1 # For having stability information from order 1 to max_order
@@ -499,7 +503,7 @@ function stabilization(prob::EMAMdofProblem, max_order::Int, method::MdofModalEx
 
     # Remove last order (not used for stability check)
     max_order -= 1
-    return EMAMdofStabilization(prob, poles[1:max_order], modefn[1:max_order, 1:max_order], mode_stabfn[1:max_order, 1:max_order], mode_stabdr[1:max_order, 1:max_order])
+    return StabilizationAnalysis(prob, poles[1:max_order], modefn[1:max_order, 1:max_order], mode_stabfn[1:max_order, 1:max_order], mode_stabdr[1:max_order, 1:max_order])
 end
 
 """
@@ -590,25 +594,25 @@ function mode_residues(prob, poles)
 end
 
 """
-    modeshape_extraction(residues, poles, dpi; type = :complex)
+    modeshape_extraction(residues, poles; dpi, modetype)
 
 Extract mode shapes using MDOF approximation
 
 **Inputs**
 - `residues`: Residues matrix of size (np, nm, ne)
 - `poles`: Vector of complex poles
-* `dpi`: Driving point indices - default = [1, 1]
-    * `dpi[1]`: Driving point index on the measurement mesh
-    * `dpi[2]`: Driving point index on the excitation mesh
-- `type`: Type of mode shape
-    * `:complex`: Complex mode shapes (default)
-    * `:real`: Real mode shapes
+- `dpi`: Driving point indices - default = [1, 1]
+    - `dpi[1]`: Driving point index on the measurement mesh
+    - `dpi[2]`: Driving point index on the excitation mesh
+- `modetype`: Type of mode shape
+    - `:complex`: Complex mode shapes (default)
+    - `:real`: Real mode shapes
 
 **Outputs**
 - `ms`: Mode shapes matrix
 - `ci`: Scaling factors vector
 """
-function modeshape_extraction(residues, poles::Vector{T}, dpi = [1, 1]; type = :complex) where {T <: Complex}
+function modeshape_extraction(residues, poles::Vector{T}; dpi = [1, 1], modetype = :complex) where {T <: Complex}
 
     # Data preparation
     np, nm, ne = size(residues)
@@ -630,7 +634,7 @@ function modeshape_extraction(residues, poles::Vector{T}, dpi = [1, 1]; type = :
 
     # Scaling mode shapes to unit modal mass if real mode shapes are requested
     ci = ones(eltype(ms), np)
-    if type == :real
+    if modetype == :real
         fn, ξn = poles2modal(poles)
         ωn = 2π*fn
         @. ci /= 2im*ωn*√(1. - ξn^2)
@@ -664,7 +668,7 @@ function solve(prob_ema::AutoEMAMdofProblem)
     # Compute the residuals separately for accuracy
     lr, ur = compute_residuals(prob, res, poles)
 
-    phi, ci = modeshape_extraction(res, poles, dpi, type = :real)
+    phi, ci = modeshape_extraction(res, poles, dpi = dpi, modetype = :real)
 
     return EMAMdofSolution(poles, c2r_modeshape(phi), ci, res, lr, ur)
 end

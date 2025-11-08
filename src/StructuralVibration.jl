@@ -18,7 +18,7 @@ module StructuralVibration
 
     # Structs - Problems
     export DirectFRFProblem, DirectFreqProblem, DirectTimeProblem,
-        ForcedModalTimeProblem, FreeModalTimeProblem, HarmonicModalTimeProblem,ModalFRFProblem, ModalFreqProblem, SdofForcedTimeProblem, SdofFreeTimeProblem, SdofFrequencyProblem, SdofFRFProblem, SdofHarmonicTimeProblem, StateSpaceFreqProblem, StateSpaceFRFProblem, StateSpaceModalFRFProblem, StateSpaceModalFreqProblem, StateSpaceTimeProblem
+           ForcedModalTimeProblem, FreeModalTimeProblem, HarmonicModalTimeProblem,ModalFRFProblem, ModalFreqProblem, SdofForcedTimeProblem, SdofFreeTimeProblem, SdofFrequencyProblem, SdofFRFProblem, SdofHarmonicTimeProblem, StateSpaceFreqProblem, StateSpaceFRFProblem, StateSpaceModalFRFProblem, StateSpaceModalFreqProblem, StateSpaceTimeProblem
 
     # Structs - Time solvers
     export CentralDiff, FoxGoodwin, GeneralizedAlpha, HHT, LinearAcceleration,
@@ -32,7 +32,7 @@ module StructuralVibration
 
     # Structs - Modal extraction
     export AutoEMAMdofProblem, AutoEMASdofProblem, CircleFit, EMAMdofProblem,
-           EMAMdofStabilization, EMASdofProblem, EMAMdofSolution, EMASdofSolution, LSCE, LSCF, LSFit, PeakPicking, PLSCF
+           StabilizationAnalysis, EMASdofProblem, EMAMdofSolution, EMASdofSolution, LSCE, LSCF, LSFit, PeakPicking, PLSCF
 
     # Structs - Signal processing
     export FFTParameters
@@ -48,11 +48,13 @@ module StructuralVibration
 
     export c2d, c2r_modeshape, modal_parameters, ss_model, ss_modal_model
 
-    export cmif, comac, compute_residuals, ecomac, frac, frf_reconstruction,
-           impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization
+    # Modal extraction
+    export cmif, comac, compute_residuals, convert_Gyy, ecomac, frac,
+           frf_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization, psd_from_tf, half_psd, xcorr
 
+    # Signal processing
     export bartlett, bartlett_hann, blackman, blackman_harris, blackman_nuttall,
-           cosine, csd, dpss, exponential, flattop, force, gaussian, hamming, hanning, kaiser, lanczos, nuttall, parzen, planck, rect, spectrum, tfestimate, triang, tukey, welch
+           cosine, csd, dpss, exponential, flattop, flattri, force, gaussian, hamming, hanning, kaiser, lanczos, nuttall, parzen, planck, rect, spectrum, tfestimate, triang, tukey, welch
 
     export detrend, gradient
 
@@ -83,6 +85,7 @@ module StructuralVibration
     include("modal_extraction/ema_mdof.jl")
     include("modal_extraction/ema_frf.jl")
     include("modal_extraction/ema_utils.jl")
+    include("modal_extraction/oma_utils.jl")
 
     # Include files - Sdof
     include("models/sdof_mdof.jl")

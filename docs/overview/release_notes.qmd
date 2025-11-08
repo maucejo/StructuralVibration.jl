@@ -6,12 +6,36 @@ format:
     number-sections: false
 ---
 
+## v1.1.0
+
+**Breaking changes**
+
+- Modal extraction
+  - Rename `EMAMdofStabilization` structure to `StabilizationAnalysis` for clarity and generality
+  - `dpi` argument of `modeshape_extraction` function is now passed as keyword arguments instead of positional arguments (for both Sdof and Mdof methods)
+  - `type` argument argument of `modeshape_extraction` function (Mdof methods) has been renamed to `modetype` for clarity
+  - Add `OMAMdofProblem` structure to perform Operational Modal Analysis (OMA) using half-spectrum data
+  - Add `halfspec_reconstruction` function to reconstruct half-spectrum from extracted modal parameters
+  - Add `compute_residuals` function for `OMAMdofProblem` to compute the lower and upper residuals of the half-spectrum
+
+**New features**
+
+- Window functions
+  - Add `flattri` function to generate a flat-triangular window
+
+- Modal extraction
+  - Add `xcorr` function to compute the cross-correlation matrix of a signal or between two signals
+  - Add `psd_from_tf` function to compute the full Power Spectral Density (PSD) matrix of multiple signals from transfer function estimates and input PSDs
+  - Add `half_psd` function to compute the half Power Spectral Density (PSD) matrix from the full PSD matrix or from time-domain signals
+
 ## v1.0.0
 
 **Breaking changes**
 
 - Sdof solvers
   - Refactor `SdofHarmonicTimeProblem`, `SdofForcedTimeProblem` and `SdofFrequencyProblem` to comply with `DifferentialEquations.jl` conventions
+
+**New features**
 
 - Signal processing
   - Add `csd` function to compute the Cross Spectral Density (CSD) between two signals or between multiple input and output signals

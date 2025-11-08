@@ -262,7 +262,7 @@ The triangular window is a simple window function that tapers the signal at both
 $$
 w[n] = 1 - \frac{|2n - (N-1)|}{L},
 $$
-where $L = N/N+1$ is $N$ is even/odd and $n \in [0, N-1]$.
+where $L = N/N+1$ if $N$ is even/odd and $n \in [0, N-1]$.
 
 ##### API
 
@@ -821,6 +821,47 @@ lines!(ax_planck, 0:1023, planckwin)
 xlims!(ax_planck, 0, 1023)
 
 display(fig_planck);
+```
+
+#### Flat triangular window
+
+The flat triangular window is a window function that is defined as:
+$$
+w[n] = \begin{cases}
+1 & 0 \leq n < L \\
+\frac{N - n}{N - L} & L \leq n \leq N \\
+\end{cases},
+$$
+where $n \in [0, N-1]$ and $L = pN$ is the width of the flat part of the window, with $p$ being the percentage of the length of the data acquisition block.
+
+##### API
+
+::: {.api}
+**planck**
+
+---
+```{julia}
+#| echo: false
+@doc flattri
+```
+:::
+
+
+##### Example
+
+```{julia}
+#| output: false
+flattriwin = flattri(1024, 0.25)
+```
+
+```{julia}
+#| echo: false
+fig_flattri = Figure()
+ax_flattri = Axis(fig_flattri[1, 1], title = "Flat triangular window")
+lines!(ax_flattri, 0:1023, flattriwin)
+xlims!(ax_flattri, 0, 1023)
+
+display(fig_flattri);
 ```
 
 ### Choice of a window function

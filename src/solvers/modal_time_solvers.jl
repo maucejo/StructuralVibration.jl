@@ -101,7 +101,7 @@ Structure containing data for the modal time solver for computing the forced res
 end
 
 """
-    ForcedModalTimeProblem(K, M, ξn, u0, t, F, n = size(K, 1); ismodal = false)
+    ForcedModalTimeProblem(K, M, ξn, F, u0, t,  n = size(K, 1); ismodal = false)
 
 Structure containing data for modal time solver for computing the forced response due to an arbitrary excitation
 
