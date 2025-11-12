@@ -233,12 +233,12 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 **Data types**
 
 ::: {.api}
-**EMASdofProblem**
+**EMAProblem**
 
 ---
 ```{julia}
 #| echo: false
-@doc EMASdofProblem
+@doc EMAProblem
 ```
 :::
 
@@ -270,7 +270,7 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ---
 ```{julia}
 #| echo: false
-@doc poles_extraction(::EMASdofProblem, ::CircleFit)
+@doc poles_extraction(::EMAProblem, ::CircleFit)
 ```
 :::
 
@@ -280,7 +280,7 @@ To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), 
 ---
 ```{julia}
 #| echo: false
-@doc modeshape_extraction(::EMASdofProblem, ::Vector{T}, ::Vector{Int}; ::Symbol) where {T <: Complex}
+@doc modeshape_extraction(::EMAProblem, ::Vector{T}, ::CircleFit; ::Symbol) where {T <: Complex}
 ```
 :::
 
@@ -348,14 +348,14 @@ prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
 # Natural frequencies and damping ratios extraction
-prob_sdof = EMASdofProblem(H, freq)
+prob_sdof = EMAProblem(H, freq)
 fn_pp, ξn_pp = poles2modal(poles_extraction(prob_sdof, PeakPicking()))
 fn_cf, ξn_cf = poles2modal(poles_extraction(prob_sdof, CircleFit()))
 fn_lsf, ξn_lsf = poles2modal(poles_extraction(prob_sdof, LSFit()))
 
 # Mode shape extraction
 dpi = [1, 2]
-ϕid = modeshape_extraction(prob_sdof, modal2poles(fn_pp, ξn_pp), dpi = dpi)
+ϕid = modeshape_extraction(prob_sdof, modal2poles(fn_pp, ξn_pp), PeakPicking(), dpi = dpi)
 
 # Automatic EMA
 prob_ema = AutoEMASdofProblem(prob_sdof, dpi, LSFit())

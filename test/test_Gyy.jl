@@ -51,7 +51,7 @@ force = zeros(length(xexc), length(t))
 force[2, :] .= x
 
 prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
-y = solve(prob).du
+y = solve(prob).u
 
 # Chirp excitation - Excitation CSD matrix
 tukeywin(x) = tukey(x, 0.5)
