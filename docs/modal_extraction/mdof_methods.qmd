@@ -229,16 +229,6 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 **Data types**
 
 ::: {.api}
-**EMAMdofProblem**
-
----
-```{julia}
-#| echo: false
-@doc EMAMdofProblem
-```
-:::
-
-::: {.api}
 **AutoEMAMdofProblem**
 
 ---
@@ -276,7 +266,7 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 ---
 ```{julia}
 #| echo: false
-@doc poles_extraction(::EMAMdofProblem, ::Int, ::LSCE)
+@doc poles_extraction(::EMAProblem, ::Int, ::LSCE)
 ```
 :::
 
@@ -306,7 +296,7 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 ---
 ```{julia}
 #| echo: false
-@doc mode_residues(::EMAMdofProblem, ::Vector{T}) where {T <: Complex}
+@doc mode_residues(::EMAProblem, ::Vector{T}) where {T <: Complex}
 ```
 :::
 
@@ -316,7 +306,7 @@ Here, the scaling factors $c_i$ can be computed based on a normalization criteri
 ---
 ```{julia}
 #| echo: false
-@doc modeshape_extraction(::Array{T, 3}, ::Vector{T}, ::Vector{Int}) where {T <: Complex}
+@doc modeshape_extraction(::Array{T, 3}, ::Vector{T} ::LSCE, ::Vector{Int}) where {T <: Complex}
 ```
 :::
 
@@ -369,7 +359,7 @@ H = solve(prob; ismat = true).u
 
 ```{julia}
 # EMA-MDOF problem
-prob_mdof = EMAMdofProblem(H, freq)
+prob_mdof = EMAProblem(H, freq)
 
 # Poles extraction
 order = 10 # Model order
@@ -421,7 +411,7 @@ dpi = [1, 2]
 res = mode_residues(prob_mdof, p_lsce)
 
 # Extraction of the mode shapes
-ϕ_est = modeshape_extraction(res, p_lsce, dpi = dpi, modetype = :real)[1]
+ϕ_est = modeshape_extraction(res, p_lsce, LSCE(), dpi = dpi, modetype = :emar)[1]
 
 # Convert to real mode shapes
 ϕ_est_real = c2r_modeshape(ϕ_est)

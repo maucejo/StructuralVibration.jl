@@ -61,15 +61,15 @@ Compute lower and upper residuals of a half-spectrum given its residues and pole
 function compute_residuals(prob:: OMAMdofProblem, res::Array{T, 3}, poles::Vector{T}) where {T <: Complex}
 
     # Initialization
-    (; halfspec, freq) = prob
+    (; frf, freq) = prob
 
     # Correct frange to avoid division by zero
     if freq[1] < 1.
         freq_red = freq[2:end]
-        Gyy_red = halfspec[:, :, 2:end]
+        Gyy_red = frf[:, :, 2:end]
     else
         freq_red = freq
-        Gyy_red = halfspec
+        Gyy_red = frf
     end
 
     nm, ne = size(Gyy_red)[1:2]

@@ -165,14 +165,24 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif)
     (; prob, poles, modefn, mode_stabfn, mode_stabdr) = stab
 
     # FRF post-processing - Frequency range reduction
-    (; H, freq, type_frf) = prob
+    if prob isa EMAProblem
+        (; frf, freq, type_frf) = prob
+    elseif prob isa OMAMdofProblem
+        frf = prob.halfspec
+        freq = prob.freq
+        indicator = :psif
+    elseif prob isa OMAProblem
+        frf = prob.halfspec
+        freq = prob.freq
+        indicator = :psif
+    end
 
     # Indicator calculation
     if indicator == :psif
-        indicator_data = psif(H)
+        indicator_data = psif(frf)
         indicator_name = "PSIF"
     elseif indicator == :cmif
-        indicator_data = cmif(H, type = type_frf)
+        indicator_data = cmif(frf, type = type_frf)
         indicator_name = "CMIF"
     else
         throw(ArgumentError("Indicator not available. Available indicators are :psif and :cmif"))

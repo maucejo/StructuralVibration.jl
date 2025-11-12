@@ -1,12 +1,10 @@
 """
-    xcorr(y, yref, N)
-    xcorr(y, N) = xcorr(y, y, N)
+    xcorr(y, N)
 
 Compute the cross-correlation matrix R of a signal y up to lag N-1.
 
 **Inputs**
 - `y::VecOrMat{Real}`: Input signal
-- `yref::VecOrMat{Real}`: Reference signal
 - `N`: Number of lags
 
 **Output**
@@ -15,39 +13,28 @@ Compute the cross-correlation matrix R of a signal y up to lag N-1.
 
 
 """
-function xcorr(y, yref, N)
+@views function xcorr(y, N)
     ndy = ndims(y)
-    ndyref = ndims(yref)
-
-    ndy != ndyref ? throw(ArgumentError("y and yref must have the same number of dimensions")) : nothing
 
     if ndy == 1
         ny = 1
-        nyref = 1
         nt = length(y)
-        ntref = length(yref)
     else
         ny, nt = size(y)
-        nyref, ntref = size(yref)
     end
 
-    nt != ntref ? throw(ArgumentError("Length of signals in y and yref must be the same")) : nothing
-
-    R = similar(y, ny, nyref, N)
+    R = similar(y, ny, ny, N)
 
     for k in 1:N
         if ndy == 1
-            R[:, :, k] .= (y[1:nt - k + 1] ⋅ yref[k:nt]) / (nt - k + 1)
+            R[:, :, k] .= (y[1:nt - k + 1] ⋅ y[k:nt]) / (nt - k)
         else
-            R[:, :, k] .= (y[:, 1:nt - k + 1] * yref[:, k:nt]') / (nt - k + 1)
+            R[:, :, k] .= (y[:, 1:nt - k + 1] * y[:, k:nt]') / (nt - k)
         end
     end
 
     return R
 end
-
-# Convenience method for autocorrelation
-xcorr(y, N) = xcorr(y, y, N)
 
 """
     psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
@@ -71,7 +58,7 @@ matrix Gxx.
 
 [1] B. Peeters and H. Van der Auweraer, "PolyMax: A revolution in operational modal analysis". In Proceedings of the 1st International Operational Modal Analysis Conference (IOMAC), Copenhagen, Denmark, 2005.
 """
-function psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
+@views function psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
     ni = length(id_input)
     no = length(id_output)
     nf = size(H, 3)
@@ -84,8 +71,8 @@ function psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = i
     end
 
     for f in 1:nf
-        Hi = @view H[id_input, :, f]
-        Ho = @view H[id_output, :, f]
+        Hi = H[id_input, :, f]
+        Ho = H[id_output, :, f]
 
         if ndg == 3
             Gxx_f .= Gxx[:, :, f]
@@ -100,7 +87,7 @@ end
 
 """
     half_psd(Gyy, freq)
-    half_psd(y, yref, freq, fs, bs)
+    half_psd(y, freq, fs, bs)
 
     Compute the half power spectral density matrix Gyy_half given the
     spectral density matrix Gyy.
@@ -113,7 +100,6 @@ end
 
 **Alternative inputs**
 - `y::VecOrMat{Real}`: Output signal
-- `yref::VecOrMat{Real}`: Reference signal
 - `freq::AbstractVector`: Frequency vector (Hz)
 - `fs`: Sampling frequency (Hz)
 - `bs`: Block size used to compute the cross-correlation matrix
@@ -128,7 +114,7 @@ end
 
 [3] R. Brincker and C. E. Ventura. "Introduction to operational modal analysis". Wiley, 2015.
 """
-function half_psd(Gyy, freq::AbstractVector)
+@views function half_psd(Gyy, freq::AbstractVector)
     # Initialization
     ndg = ndims(Gyy)
     if ndg == 3
@@ -154,7 +140,7 @@ function half_psd(Gyy, freq::AbstractVector)
     Ryy = similar(freq, N)
 
     # Compute half power spectral density matrix
-    n_half = ceil(Int, N/2)
+    n_half = iseven(N) ? N ÷ 2 + 1 : (N + 1) ÷ 2
     win = flattri(n_half, 0.5)
     for j in 1:ni
         for i in 1:no
@@ -180,13 +166,14 @@ function half_psd(Gyy, freq::AbstractVector)
     return Gyy_half[:, :, fidx]
 end
 
-function half_psd(y, yref, freq, fs, bs)
-    # Compute cross-correlation matrices
-    Ryy = xcorr(y, yref, bs)
+@views function half_psd(y, freq, fs, bs)
+    # Compute cross-correlation matrices - Take only positive lags
+    n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
+    Ryy_pos = xcorr(y, n_half)
 
-    # Take only positive lags
-    n_half = ceil(Int, bs/2)
-    Ryy_pos = Ryy[:, :, 1:n_half]
+    # # Take only positive lags
+    # n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
+    # Ryy_pos = Ryy[:, :, 1:n_half]
 
     # Compute half power spectral density matrix
     df = freq[2] - freq[1] # Frequency resolution
@@ -260,9 +247,9 @@ function convert_Gyy(Gyy, freq; type = :dis)
         # Avoid division by zero
         ωf = ωf == 0. ? ω[2] : ωf
         if type == :vel
-            @. Gyy_conv[:, :, f] /= -ωf^2
+            Gyy_conv[:, :, f] /= -ωf^2
         elseif type == :acc
-            @. Gyy_conv[:, :, f] /= ωf^4
+            Gyy_conv[:, :, f] /= ωf^4
         end
     end
 

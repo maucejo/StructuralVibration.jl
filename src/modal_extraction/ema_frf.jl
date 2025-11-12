@@ -4,9 +4,9 @@
 Reconstruct a frequency response function (FRF) from its residues and poles.
 
 **Inputs**
-- `res::Array{Complex, 3}`: Residues corresponding to each pole
+- `res::AbstractArray{Complex, 3}`: Residues corresponding to each pole
 - `poles::Vector{Complex}`: Poles extracted from the FRF
-- `freq::Vector{Float64}`: Frequency vector
+- `freq::AbstractArray`: Frequency vector
 - `lr::Matrix{Complex, 2}`: Lower residuals (default: zeros)
 - `ur::Matrix{Complex, 2}`: Upper residuals (default: zeros)
 - `type::Symbol`: Type of FRF to reconstruct
@@ -17,7 +17,7 @@ Reconstruct a frequency response function (FRF) from its residues and poles.
 **Output**
 - `H_rec::Array{Complex, 3}`: Reconstructed FRF
 """
-function frf_reconstruction(res::Array{T, 3}, poles::Vector{T}, freq; lr = zeros(eltype(res), size(res)[2:end]), ur = zeros(eltype(res), size(res)[2:end]), type = :dis) where {T <: Complex}
+function frf_reconstruction(res, poles::Vector{T}, freq::AbstractArray; lr = zeros(eltype(res), size(res)[2:end]), ur = zeros(eltype(res), size(res)[2:end]), type = :dis) where {T <: Complex}
 
     # Initialization
     ω = 2π*freq
@@ -50,15 +50,15 @@ end
 Compute lower and upper residuals of a frequency response function (FRF) given its residues and poles.
 
 **Inputs**
-- `prob::Union{EMASdofProblem, EMAMdofProblem}`: Structure containing FRF data and frequency vector
-- `res::Array{Complex, 3}`: Residues corresponding to each pole
+- `prob::EMAProblem`: Structure containing FRF data and frequency vector
+- `res`: Residues corresponding to each pole
 - `poles::Vector{T}`: Poles extracted from the FRF
 
 **Outputs**
 - `lr::Matrix{Complex, 2}`: Lower residuals
 - `ur::Matrix{Complex, 2}`: Upper residuals
 """
-function compute_residuals(prob:: Union{EMASdofProblem, EMAMdofProblem}, res::Array{T, 3}, poles::Vector{T}) where {T <: Complex}
+function compute_residuals(prob:: EMAProblem, res, poles::Vector{T}) where {T <: Complex}
 
     # Initialization
     (; frf, freq) = prob
