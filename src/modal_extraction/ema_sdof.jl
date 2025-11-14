@@ -1,110 +1,3 @@
-abstract type MdofProblem end
-abstract type SdofModalExtraction end
-struct PeakPicking <: SdofModalExtraction end
-struct CircleFit <: SdofModalExtraction end
-struct LSFit <: SdofModalExtraction end
-
-"""
-    EMAProblem(frf, freq; frange, type_frf)
-
-Data structure defining the inputs for EMA modal extraction methods.
-
-**Constructor parameters**
-- `frf::Array{Complex, 3}`: 3D FRF matrix (array nm x ne x nf)
-- `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
-- `frange::Vector{Real}`: Frequency range for analysis (default: [freq[1], freq[end]])
-- `type_frf::Symbol`: Type of FRF used in the analysis
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
-
-**Fields**
-- `frf::Array{Complex, 3}`: 3D admittance matrix (array nm x ne x nf)
-- `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
-- `type_frf::Symbol`: Type of FRF used in the analysis
-
-**Note**
-The FRF is internally converted to admittance if needed.
-"""
-@show_data struct EMAProblem{C <: Complex, R <: Real} <: MdofProblem
-    frf::Array{C, 3}
-    freq::AbstractArray{R}
-    type_frf::Symbol
-
-    function EMAProblem(frf::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
-
-        # Correct frange to avoid division by zero
-        frange[1] == 0. ? frange[1] = 1. : nothing
-
-        # FRF post-processing - Frequency range reduction
-        fidx = @. frange[1] ≤ freq ≤ frange[2]
-        ω = 2π*freq[fidx]
-        frf_red = frf[:, :, fidx]
-
-        # Conversion to admittance
-        if type_frf == :vel
-            for (f, ωf) in enumerate(ω)
-                frf_red[:, :, f] ./= (1im*ωf)
-            end
-        elseif type_frf == :acc
-            for (f, ωf) in enumerate(ω)
-                frf_red[:, :, f] ./= -ωf^2
-            end
-        end
-
-        return new{C, R}(frf_red, freq[fidx], type_frf)
-    end
-end
-
-"""
-    AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e)
-
-Structure containing the input data for automatic experimental modal analysis using Sdof methods
-
-**Fields**
-* `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector
-* `alg::SdofModalExtraction`: Method to extract the poles
-    * `PeakPicking`: Peak picking method (default)
-    * `CircleFit`: Circle fitting method
-    * `LSFit`: Least squares fitting method
-* `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
-    * `dpi[1]`: Driving point index on the measurement mesh
-    * `dpi[2]`: Driving point index on the excitation mesh
-* `idx_m::AbstractArray{Int}`: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)
-* `idx_e::AbstractArray{Int}`: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)
-"""
-@show_data struct AutoEMASdofProblem
-    prob::EMAProblem
-    alg::SdofModalExtraction
-    dpi:: Vector{Int}
-    idx_m::AbstractArray{Int}
-    idx_e::AbstractArray{Int}
-
-    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2)) = new(prob, alg, dpi, idx_m, idx_e)
-end
-
-"""
-    EMASdofSolution(poles, ms, ci, res, lr, ur)
-
-Structure containing the solution of the automatic experimental modal analysis using Mdof methods
-
-**Fields**
-* `poles::Vector{Complex}`: Extracted poles
-* `ms::AbstractArray{Real}`: Mode shapes
-* `ci::Vector{Complex}`: Scaling constants for each mode
-* `res::AbstractArray{Complex}`: Residues for each mode
-* `lr::Matrix{Complex}`: Lower residual
-* `ur::Matrix{Complex}`: Upper residual
-"""
-@show_data struct EMASolution{Tp <: Complex, Tm <: Real}
-    poles::Vector{Tp}
-    ms::AbstractArray{Tm}
-    ci::Vector{Tp}
-    res::AbstractArray{Tp}
-    lr::Matrix{Tp}
-    ur::Matrix{Tp}
-end
-
 """
     poles_extraction(prob::EMAProblem, alg)
     poles_extraction(prob::MdofProblem, order, alg; stabdiag, weighting)
@@ -136,19 +29,19 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction)
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
-    nm, ne, nf = size(frf)
-    Hr = reshape(frf, nm*ne, nf)
+    no, ni, nf = size(frf)
+    Hr = reshape(frf, no*ni, nf)
 
     # Estimate the number of peaks in the FRF
     npeak = 0
-    np = zeros(Int, nm*ne)
+    np = zeros(Int, no*ni)
     for (k, Hv) in enumerate(eachrow(Hr))
         np[k] = length(findmaxima(abs.(Hv)).indices)
         npeak = max(npeak, np[k])
     end
 
     # Initialization
-    pk = similar(frf, nm*ne, npeak)
+    pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
         p = compute_poles(Hv, freq, alg)

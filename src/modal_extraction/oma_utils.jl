@@ -303,3 +303,44 @@ function block_toeplitz(R::Array{Float64, 3}, nbr::Int)
 
     return T
 end
+
+"""
+    oma_modal_parameters(A, C, dt, freq, stabdiag)
+
+Extract modal parameters from system matrices A and C.
+
+**Inputs**
+- `A::Matrix{Complex}`: System matrix
+- `C::Matrix{Complex}`: Output matrix
+- `dt::Real`: Time step
+- `freq::AbstractVector{Float64}`: Frequency vector
+- `stabdiag::Bool`: Whether to compute stabilization diagram
+
+**Outputs**
+- `poles::Vector{Complex}`: Extracted poles
+- `ms::Array{Complex, 2}`: Extracted mode shapes
+"""
+function oma_modal_parameters(A, C, dt, freq, stabdiag)
+    # Eigen decomposition of system matrix
+    eigvals, eigvecs = eigen(A)
+
+    # Extract poles and mode shapes
+    p = log.(eigvals)/dt
+
+    # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
+    valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
+    idx_valid_poles = findall(in(conj.(valid_poles)), p)
+    p_valid = p[idx_valid_poles]
+    idx_sort_poles = sortperm(p_valid, by = abs)
+    p_sort = p_valid[idx_sort_poles]
+
+    # Check if poles are in frange
+    fn = poles2modal(p_sort)[1]
+    fidx = @. freq[1] ≤ fn ≤ freq[end]
+    poles = p_sort[fidx]
+
+    # Extract mode shapes
+    ms = C*eigvecs[:, idx_valid_poles[idx_sort_poles[fidx]]]
+
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles, ms
+end

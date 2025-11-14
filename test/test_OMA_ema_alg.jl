@@ -1,4 +1,5 @@
 using StructuralVibration
+@usingany CairoMakie
 
 # Structure parameters of the beam
 L = 1.        # Length
@@ -58,6 +59,12 @@ y = solve(prob).u
 # OMA problem definition
 prob_oma = OMAProblem(y, t, sample_rate, block_size)
 
-p_lsce = poles_extraction(prob_oma, 20, LSCE())
-p_lscf = poles_extraction(prob_mdof, 20, LSCF())
-p_plscf = poles_extraction(prob_mdof, 20, PLSCF())
+p_lsce = poles_extraction(prob_oma, 30, LSCE())
+p_lscf = poles_extraction(prob_oma, 50, LSCF())
+p_plscf = poles_extraction(prob_oma, 50, PLSCF())
+
+# EMA-MDOF pole stability analysis
+sol_stab = stabilization(prob_oma, 30, LSCE())
+
+# Plot stabilization diagram
+stabilization_plot(sol_stab)

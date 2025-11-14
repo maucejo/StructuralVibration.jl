@@ -1,66 +1,6 @@
-## Structure definition for method selection
-abstract type MdofModalExtraction end
-struct LSCE <: MdofModalExtraction end
-struct LSCF <: MdofModalExtraction end
-struct PLSCF <: MdofModalExtraction end
-
-"""
-    AutoEMAMdofProblem(prob, dpi, method; modetype)
-
-Structure containing the input data for automatic experimental modal analysis using Mdof methods
-
-**Fields**
-* `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
-* `order::Int`: Model order (number of poles to extract)
-* `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
-    * `dpi[1]`: Driving point index on the measurement mesh
-    * `dpi[2]`: Driving point index on the excitation mesh
-* `alg::MdofModalExtraction`: Method to extract the poles
-    * `LSCE`: Least Squares Complex Exponential method
-    * `LSCF``: Least Squares Complex Frequency method (default)
-    * `PLSCF`: Polyreference Least Squares Complex Frequency method
-* `modetype::Symbol`: Type of mode shapes to extract
-    * `:real`: Real mode shapes (default)
-    * `:complex`: Complex mode shapes
-"""
-@show_data struct AutoEMAMdofProblem
-    prob::EMAProblem
-    order::Int
-    dpi:: Vector{Int}
-    alg::MdofModalExtraction
-
-    AutoEMAMdofProblem(prob::EMAProblem, order::Int, dpi::Vector{Int} = [1, 1], alg::MdofModalExtraction = LSCF()) = new(prob, order, dpi, alg)
-end
-
-"""
-    StabilizationAnalysis(prob, poles, modefn, mode_stabfn, mode_stabdr)
-
-Data structure summarizing the results of the stabilization analysis.
-
-**Fields**
-- `prob::MdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
-- `frange::Vector{Real}`: Frequency range used for the stabilization analysis
-- `poles::Vector{Vector{Complex}}`: Vector of vectors containing extracted poles at each model order
-- `modefn::Matrix{Real}`: Matrix containing the natural frequencies (useful for plotting)
-- `mode_stabfn::Matrix{Bool}`: Matrix indicating the stability of natural frequencies
-- `mode_stabdr::Matrix{Bool}`: Matrix indicating the stability of damping ratios
-
-**Note**
-
-This structure is returned by the `stabilization` function after performing a stabilization diagram analysis and used by `stabilization_plot` for visualization.
-"""
-@show_data struct StabilizationAnalysis{Tp <: Complex, Tf <: Real}
-    prob::MdofProblem           # EMA-MDOF problem containing FRF data and frequency vector
-    poles::Vector{Vector{Tp}}   # Extracted poles at each model order
-    modefn::Matrix{Tf}          # Natural frequencies (used for plotting)
-    mode_stabfn::BitMatrix      # Stability of natural frequencies
-    mode_stabdr::BitMatrix      # Stability of damping ratios
-end
-
-## Functions for modal extraction
 """
     poles_extraction(prob::EMAProblem, alg)
-    poles_extraction(prob::MdofProblem, order, alg; stabdiag, weighting)
+    poles_extraction(prob::MdofProblem, order, alg; stabdiag)
 
 Extract poles from the Bode diagram fitting method
 
@@ -77,7 +17,6 @@ Extract poles from the Bode diagram fitting method
         * `PLSCF`: Polyreference Least Squares Complex Frequency method
         * `LSCE`: Least Squares Complex Exponential method (only for Mdof methods)
 * `stabdiag::Bool`: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)
-* `weighting::Bool`: Boolean to indicate whether to apply weighting of the FRF (Not applicable to Sdof methods and LSCE, default: true)
 
 **Outputs**
 * `poles`: Vector of extracted complex poles
@@ -85,9 +24,9 @@ Extract poles from the Bode diagram fitting method
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::MdofProblem, order::Int, alg::MdofModalExtraction = LSCF(); stabdiag = false, weighting = true)
+function poles_extraction(prob::MdofProblem, order::Int, alg::MdofModalExtraction = LSCF(); stabdiag = false)
 
-    return compute_poles(prob, order, alg, stabdiag = stabdiag, weighting = weighting)
+    return compute_poles(prob, order, alg, stabdiag = stabdiag)
 end
 
 """
@@ -100,15 +39,11 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
 - `order::Int`: Model order (number of poles to extract)
 - `alg::LSCE`: Modal extraction method
 - `stabdiag`: Boolean to indicate the function is used to build a stability diagram (default: false)
-- `weighting`: Boolean to indicate whether to apply weighting of the FRF (default: true)
 
 **Output**
 - `poles`: Vector of extracted complex poles
-
-**Note**
-The weighting parameter is not used in the LSCE method.
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false, weighting = true)
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false)
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -123,8 +58,8 @@ The weighting parameter is not used in the LSCE method.
     fsred = 2.56*(freq[end]-freq[1])
 
     # Impulse function calculation
-    nm, ne, nf = size(frf)
-    FRF = reshape(frf, (nm*ne, nf))
+    no, ni, nf = size(frf)
+    FRF = reshape(frf, (no*ni, nf))
     Hk = impulse_response(FRF, freq, fsred)
 
     # Model order and number of samples
@@ -133,8 +68,8 @@ The weighting parameter is not used in the LSCE method.
 
     # Preallocation
     H0 = similar(Hk, nsamples, n+1)
-    A = similar(Hk, nsamples*nm*ne, n)
-    b = similar(Hk, nsamples*nm*ne)
+    A = similar(Hk, nsamples*no*ni, n)
+    b = similar(Hk, nsamples*no*ni)
     for (k, hk) in enumerate(eachrow(Hk))
         # Hankel matrix construction
         H0 .= Hankel(hk[1:nsamples], hk[nsamples:nsamples+n])
@@ -151,24 +86,7 @@ The weighting parameter is not used in the LSCE method.
     V = roots(Polynomial(α))
     p = log.(V)*fsred
 
-    # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
-    valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
-    p_valid = intersect(p, conj.(valid_poles))
-    sort!(p_valid, by = abs)
-
-    # To avoid modifying the stability of the dynamic system in case of frequency offset, we set real(poles_new) = real(poles_old). This means that dn_new = dn_old * fn_old / fn_new.
-    fn, ξn = poles2modal(p_valid)
-    if freq[1] != 0.
-        @. ξn *= fn / (fn + freq[1])
-        fn .+= freq[1]
-    end
-
-    # Keep only the poles within frange
-    fidx = @. freq[1] ≤ fn ≤ freq[end]
-    poles = modal2poles(fn[fidx], ξn[fidx])
-
-    # If Stability diagram
-    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
+    return poles_validity(p, order, freq, stabdiag)
 end
 
 """
@@ -181,7 +99,6 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 - `order::Int`: Model order (number of poles to extract)
 - `alg::LSCF`: Modal extraction method
 - `stabdiag`: Boolean to indicate the function is used to build a stability diagram (default: false)
-- `weighting`: Boolean to indicate if the weighting based on the variance of each FRF is applied (default: true)
 
 **Output**
 - `poles`: Vector of extracted complex poles
@@ -190,7 +107,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false, weighting = true)
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false)
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -202,8 +119,8 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
     end
 
     # FRF post-processing - Reshape FRF matrix
-    (nm, ne, nf) = size(frf)
-    FRF = reshape(frf, (nm*ne, nf))  # each row = one FRF across frequencies
+    (no, ni, nf) = size(frf)
+    FRF = reshape(frf, (no*ni, nf))  # each row = one FRF across frequencies
 
     # LSCF computation - stable numerics
     ω = 2(freq .- freq[1])                # Reduced angular frequency
@@ -224,17 +141,13 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 
     # Process each FRF (each row of FRF is length nf)
     for Hk in eachrow(FRF)
-        # ensure H is a column-like vector of length nf
-        # Compute weighting scalar for this FRF (keep original behavior)
-        vk = weighting ? only(varest(Hk)) : 1.
-
+        # Build Yk, Sk, Tk
         @. Yk = -Hk*X0
         Sk .= real(X0'Yk)
         Tk .= real(Yk'Yk)
 
         # Accumulate robust contribution to M
-        # Use real parts since final M is real symmetric
-        M .+= (Tk .- Sk'*(Rk\Sk))/vk
+        M .+= (Tk .- Sk'*(Rk\Sk))
     end
 
     # Extract submatrices for denominator solve
@@ -251,19 +164,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
         return fill(complex(NaN, NaN), order)
     end
 
-    # Poles filtering (keep negative real part and negative imag to pick one of conjugates)
-    valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
-    poles = intersect(p, conj.(valid_poles))
-    sort!(poles, by = abs)
-
-    # Frequency offset correction (restore original frequency offset)
-    if freq[1] != 0. && !isempty(poles)
-        fn, ξn = poles2modal(poles)
-        poles .= modal2poles(fn .+ freq[1], @. ξn * fn / (fn + freq[1]))
-    end
-
-    # Return format based on stabdiag flag
-    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
+    return poles_validity(p, order, freq, stabdiag)
 end
 
 """
@@ -277,7 +178,6 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 - `alg::PLSCF`: Modal extraction method
 - `frange`: Frequency range for analysis (default: [freq[1], freq[end]])
 - `stabdiag`: Boolean to indicate the function is used to build a stability diagram (default: false)
-- `weighting`: Boolean to indicate if the weighting based on the variance of each FRF is applied (default: true)
 
 **Output**
 - `poles`: Vector of extracted complex poles
@@ -286,7 +186,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::PLSCF; stabdiag = false, weighting = true) :: Vector{eltype(prob.frf)}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::PLSCF; stabdiag = false)
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -298,10 +198,10 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
     end
 
     # FRF post-processing - Reshape FRF matrix
-    (nm, ne, nf) = size(frf)
-    if ne > nm
+    (no, ni, nf) = size(frf)
+    if ni > no
         frf = permutedims(frf, (2, 1, 3))
-        (nm, ne, nf) = size(frf)
+        (no, ni, nf) = size(frf)
     end
 
     # pLSCF computation
@@ -311,30 +211,21 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
     nmodel = order + 1
 
     # Reduced normal equation computation
-    Ω0 = cispi.(-ω*modelOrder'*Δt)
-    # Precompute R0
-    X0 = similar(Ω0, nf, ne*nmodel)
-    for f in 1:nf
-        X0[f, :] .= kron(Ω0[f, :], I(ne))
-    end
+    X0 = cispi.(-ω*modelOrder'*Δt)
     R0 = real(X0'X0)
 
     # Preallocation
-    M = zeros(eltype(freq), ne*nmodel, ne*nmodel)
-    Y0 = similar(Ω0, nf, ne*nmodel)
-    H0 = similar(Ω0, ne, nf)
-    S0 = similar(M)
+    M = zeros(eltype(freq), ni*nmodel, ni*nmodel)
+    Y0 = similar(X0, nf, ni*nmodel)
+    H0 = similar(X0, ni, nf)
+    S0 = similar(X0, nmodel, ni*nmodel)
     T0 = similar(M)
-    vk = ones(ne)
 
-    for i in 1:nm
+    for i in 1:no
         H0 .= frf[i, :, :]
-        if weighting
-            vk .= varest(H0)
-        end
 
         for f in 1:nf
-            Y0[f, :] .= -kron(Ω0[f, :], H0[:, f])
+            Y0[f, :] .= -kron(X0[f, :], H0[:, f])
         end
 
         # Build R0, S0, T0
@@ -342,67 +233,67 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
         T0 .= real(Y0'Y0)
 
         # Accumulation of M
-        M .+= (T0 .- S0'*(R0\S0))./vk
+        M .+= (T0 .- S0'*(R0\S0))
     end
 
     # Computation of the coefficients of the denominator
-    A = -M[1:order*ne, 1:order*ne]
-    b = M[1:order*ne, (order*ne + 1):nmodel*ne]
+    A = -M[1:order*ni, 1:order*ni]
+    b = M[1:order*ni, (order*ni + 1):nmodel*ni]
     α = A\b
 
     # Construct the companion matrix
-    Id = I(ne*(order - 1))
-    Ze = zeros(ne*(order - 1), ne)
+    Id = I(ni*(order - 1))
+    Ze = zeros(ni*(order - 1), ni)
     C = vcat(hcat(Ze, Id), -α')
 
     # Pole calculation
-    p = similar(frf, ne*order)
+    p = similar(frf, ni*order)
     try
         p .= -log.(eigvals(C))/Δt
     catch e
         return fill(complex(NaN, NaN), order)
     end
 
-    # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
-    valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
-    poles = intersect(p, conj.(valid_poles))
-
-    # To avoid modifying the stability of the dynamic system in case of frequency offset, we set real(poles_new) = real(poles_old). This means that dn_new = dn_old * fn_old / fn_new.
-    if freq[1] != 0.
-        fn, ξn = poles2modal(poles)
-        poles .= modal2poles(fn .+ freq[1], @. ξn*fn/(fn + freq[1]))
-    end
-    sort!(poles, by = abs)
-
-    # If Stability diagram
-    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
+    return poles_validity(p, order, freq, stabdiag)
 end
 
 ## Function for stabilization diagram analysis
 """
-    stabilization(prob, max_order, method; weighting, stabcrit)
+    stabilization(prob, max_order, method; stabcrit)
 
-Perform stabilization diagram analysis using the specified modal extraction method (LSCE, LSCF, or PLSCF).
+Perform stabilization diagram analysis using the specified modal extraction method.
 
 **Inputs**
 - `prob::MdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
 - `max_order::Int`: Maximum model order for the stabilization analysis
-- `alg::MdofModalExtraction`: Modal extraction algorithm to use
-    - `LSCE()`: Least Squares Complex Exponential method
-    - `LSCF()`: Least Squares Complex Frequency method (default)
-    - `PLSCF()`: Polyreference Least Squares Complex Frequency method
+- `alg::Union{MdofModalExtraction, OMAModalExtraction}`: Modal extraction algorithm
+    - EMA algorithms:
+        - `LSCE()`: Least Squares Complex Exponential method
+        - `LSCF()`: Least Squares Complex Frequency method (default)
+        - `PLSCF()`: Polyreference Least Squares Complex Frequency method
+    - OMA algorithms:
+        - `CovSSI()`: Covariance-based SSI method
+        - `DataSSI()`: Data-based SSI method
 - `frange`: Frequency range for analysis (default: [freq[1], freq[end]])
-- `weighting`: Boolean to indicate if the weighting based on the variance of each FRF is applied (default: true)
 - `stabcrit`: Vector containing the stability criteria for natural frequencies and damping ratios (default: [0.01, 0.05])
 
 **Output**
 - `sol::EMAMdofStabilization`: Data structure containing the results of the stabilization analysis
 """
-function stabilization(prob::MdofProblem, max_order::Int, alg::MdofModalExtraction = LSCF(); weighting = true, stabcrit = [0.01, 0.05])
+function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalExtraction, OMAModalExtraction} = LSCF(); stabcrit = [0.01, 0.05])
+
+    # Extract FRF and frequency from problem
+    if prob isa EMAProblem
+        frf = prob.frf
+    elseif prob isa OMAProblem
+        frf = prob.halfspec
+    else
+        error("Unsupported problem type for LSCF method.")
+    end
 
     # Initialization
     max_order += 1 # For having stability information from order 1 to max_order
-    poles = [similar(prob.frf, i) for i in 1:max_order]
+    poles = [similar(frf, i) for i in 1:max_order]
     fn = [similar(prob.freq, i) for i in 1:max_order]
     dr = [similar(prob.freq, i) for i in 1:max_order]
     modefn = fill(NaN, max_order, max_order)
@@ -410,7 +301,7 @@ function stabilization(prob::MdofProblem, max_order::Int, alg::MdofModalExtracti
     mode_stabdr = falses(max_order, max_order)
 
     for order in 1:max_order
-        poles[order] .= compute_poles(prob, order, alg, stabdiag = true, weighting = weighting)
+        poles[order] .= compute_poles(prob, order, alg, stabdiag = true)
 
         fne, dre = poles2modal(poles[order])
         fn[order] .= fne
