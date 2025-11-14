@@ -1,0 +1,47 @@
+---
+title: List of references
+format:
+  html:
+    toc: true
+    number-sections: false
+---
+
+This section provides a list of references useful to understand and deepen the concepts and methods implemented in the `StructuralVibration.jl` package.
+
+## Vibration theory
+
+[1] M. Géradin and D. Rixen, *Mechanical vibrations: Theory and aplication to structural dynamics*, 3rd edition, Wiley, 2015.
+
+[2] R. D. Blevins, *Formulas for natural frequency and mode shape*, Van Nostrand Reinhold Co, 1979.
+
+[3] W. J. Bottega, *Engineering vibrations*, Taylor & Francis, 2006.
+
+[4] W. T. Thomson, *Theory of vibration with applications*, 4th edition, Chapman & Hall, 1993.
+
+[5] L. Meirovitch, *Fundamentals of vibrations*, McGraw-Hill, 2001.
+
+[6] S. Graham Kelly, *Fundamentals of mechanical vibrations*, 2nd edition, McGraw-Hill, 2000.
+
+[7] A. W. Leissa and M. S. Qatu, *Vibration of continuous systems*, McGraw-Hill, 2011.
+
+[8] C. W. de Silva, *Vibration: Fundamentals and practice*, CRC Press, 2000.
+
+[9] D. J. Inman, *Engineering vibrations*, 4th edition, Pearson, 2014.
+
+[10] J.-L. Guyader, *Vibration in continuous media*, ISTE Ltd, 2006.
+
+
+
+## Experimental techniques
+
+[1] A. Brandt, *Noise and Vibration Analysis: Signal analysis and experimental procedures*, Wiley, 2010.
+
+[2] R. Brincker and C. Ventura, *Introduction to Operational Modal Analysis*, Wiley, 2015.
+
+[3] J. He and Z.-F. Fu, *Modal Analysis*, Butterworth-Heinemann, 2001.
+
+[4] P. Avitabile, *Modal Testing: A practitioner's guide*, Wiley, 2018.
+
+[5] C. Rainieri and G. Fabbrocino, *Operational modal analysis of civil engineering structures: An introduction and guide for applications*, Springer, 2014.
+
+[6] D. J. Ewins, *Modal testing: Theory, practice and application*, 2nd edition, Research Studies Press, 2000.

@@ -31,7 +31,7 @@ freq = 1.:0.1:fmax
 prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
-prob_mdof = EMAMdofProblem(H, freq)
+prob_mdof = EMAProblem(H, freq)
 p_lsce = poles_extraction(prob_mdof, 20, LSCE())
 p_lscf = poles_extraction(prob_mdof, 20, LSCF())
 p_plscf = poles_extraction(prob_mdof, 20, PLSCF())
@@ -45,7 +45,7 @@ stabilization_plot(sol_stab)
 # Mode shape extraction
 dpi = [1, 2]
 res = mode_residues(prob_mdof, p_lsce)
-ϕid, ci = modeshape_extraction(res, p_lsce, dpi = dpi, modetype = :real)
+ϕid, ci = modeshape_extraction(res, p_lsce, LSCE(), dpi = dpi, modetype = :real)
 ϕr = c2r_modeshape(ϕid)
 
 # Automatic EMA-MDOF procedure
@@ -55,8 +55,8 @@ fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ϕn_ema = sol_ema.ms
 
 # FRF reconstruction - without residuals
-H_mdof = frf_reconstruction(res, p_lscf, freq)
+H_mdof = frf_reconstruction(res, p_lsce, freq)
 
 # FRF reconstruction - with residuals
-lr, ur = compute_residuals(prob_mdof, res, p_lscf)
-H_mdof2 = frf_reconstruction(res, p_lscf, freq, lr = lr, ur = ur)
+lr, ur = compute_residuals(prob_mdof, res, p_lsce)
+H_mdof2 = frf_reconstruction(res, p_lsce, freq, lr = lr, ur = ur)

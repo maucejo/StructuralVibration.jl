@@ -4,7 +4,7 @@
 Reconstruct a frequency response function (FRF) from its residues and poles.
 
 **Inputs**
-- `res::AbstractArray{Complex, 3}`: Residues corresponding to each pole
+- `res::Array{Complex, 3}`: Residues corresponding to each pole
 - `poles::Vector{Complex}`: Poles extracted from the FRF
 - `freq::AbstractArray`: Frequency vector
 - `lr::Matrix{Complex, 2}`: Lower residuals (default: zeros)
@@ -17,7 +17,7 @@ Reconstruct a frequency response function (FRF) from its residues and poles.
 **Output**
 - `H_rec::Array{Complex, 3}`: Reconstructed FRF
 """
-function frf_reconstruction(res, poles::Vector{T}, freq::AbstractArray; lr = zeros(eltype(res), size(res)[2:end]), ur = zeros(eltype(res), size(res)[2:end]), type = :dis) where {T <: Complex}
+function frf_reconstruction(res::Array{T, 3}, poles::Vector{T}, freq::AbstractArray; lr = zeros(eltype(res), size(res)[2:end]), ur = zeros(eltype(res), size(res)[2:end]), type = :dis) where {T <: Complex}
 
     # Initialization
     ω = 2π*freq
@@ -51,14 +51,14 @@ Compute lower and upper residuals of a frequency response function (FRF) given i
 
 **Inputs**
 - `prob::EMAProblem`: Structure containing FRF data and frequency vector
-- `res`: Residues corresponding to each pole
-- `poles::Vector{T}`: Poles extracted from the FRF
+- `res::Array{Complex, 3}`: Residues corresponding to each pole
+- `poles::Vector{Complex}`: Poles extracted from the FRF
 
 **Outputs**
 - `lr::Matrix{Complex, 2}`: Lower residuals
 - `ur::Matrix{Complex, 2}`: Upper residuals
 """
-function compute_residuals(prob:: EMAProblem, res, poles::Vector{T}) where {T <: Complex}
+function compute_residuals(prob:: EMAProblem, res::Array{T, 3}, poles::Vector{T}) where {T <: Complex}
 
     # Initialization
     (; frf, freq) = prob
@@ -103,24 +103,26 @@ Compute the mode residues from mode shapes and poles.
 
 **Output**
 - `res::Array{Complex, 3}`: Residues corresponding to each pole
+- `ci::Vector{Complex}`: Scaling constants for each mode
 
 **Note**
 The mode shapes are supposed to be real and mass-normalized.
 """
-function mode2residues(ms, poles, idx_m, idx_e)
+@views function mode2residues(ms, poles, idx_m, idx_e)
     nm = length(idx_m)
     ne = length(idx_e)
     n_modes = length(poles)
 
     fn, ξn = poles2modal(poles)
     Ωn = @. 2π*fn*√(1 - ξn^2)
+    ci = @. 1/(2im*Ωn)
 
     res = zeros(eltype(poles), n_modes, nm, ne)
-    for (i, mes) in enumerate(idx_m)
-        for (j, exc) in enumerate(idx_e)
-            res[:, i, j] .= ms[mes, :].*ms[exc, :]./(2im*Ωn)
+    for (j, exc) in enumerate(idx_e)
+        for (i, mes) in enumerate(idx_m)
+            res[:, i, j] .= ci.*ms[mes, :].*ms[exc, :]
         end
     end
 
-    return res
+    return res, ci
 end

@@ -20,6 +20,8 @@ website:
         file: signal_processing/index.qmd
       - text: "Visualization"
         file: visualization/index.qmd
+      - text: "References"
+        file: references/index.qmd
     right:
       - icon: github
         href: https://github.com/maucejo/StructuralVibration.jl
@@ -49,9 +51,7 @@ website:
     - title: "Modal extraction"
       contents:
         - modal_extraction/index.qmd
-        # - modal_extraction/sdof_methods.qmd
-        # - modal_extraction/mdof_methods.qmd
-        # - modal_extraction/frf_reconstruction.qmd
+        - modal_extraction/oma.qmd
         - modal_extraction/indicators.qmd
 
     - title: "Signal processing"
@@ -63,6 +63,10 @@ website:
     - title: "Visualization"
       contents:
         - visualization/index.qmd
+
+    - title: "References"
+      contents:
+        - references/index.qmd
 
   page-footer:
     center: "2025 Mathieu Aucejo &#8729; Powered by [![](/assets/logo/quarto.png){width=4mm}](https://quarto.org) and [![](/assets/logo/julia.svg){width=4mm}](https://julialang.org)"

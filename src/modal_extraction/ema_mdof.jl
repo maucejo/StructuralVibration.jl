@@ -112,7 +112,7 @@ The weighting parameter is not used in the LSCE method.
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
-    elseif prob isa OMAMdofProblem
+    elseif prob isa OMAProblem
         frf = prob.halfspec
         freq = prob.freq
     else
@@ -194,7 +194,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
-    elseif prob isa OMAMdofProblem
+    elseif prob isa OMAProblem
         frf = prob.halfspec
         freq = prob.freq
     else
@@ -290,7 +290,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
-    elseif prob isa OMAMdofProblem
+    elseif prob isa OMAProblem
         frf = prob.halfspec
         freq = prob.freq
     else
@@ -484,7 +484,7 @@ Compute residues of a frequency response function (FRF) given its poles.
 **Output**
 - `res`: Residues corresponding to each pole
 """
-@views function mode_residues(prob, poles)
+function mode_residues(prob, poles)
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -551,9 +551,9 @@ Extract mode shapes using Sdof approximation
 **References**
 [1] M. Géradin and D. J. Rixen. "Mechanical Vibrations: Theory and Application to Structural Dynamics". 3rd. Edition, Wiley, 2015.
 
-[2] C. Ranieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+[2] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 """
-@views function modeshape_extraction(residues, poles::Vector{T}, alg::MdofModalExtraction; dpi = [1, 1], modetype = :emac) where {T <: Complex}
+function modeshape_extraction(residues, poles::Vector{T}, alg::MdofModalExtraction; dpi = [1, 1], modetype = :emac) where {T <: Complex}
 
     # Data preparation
     np, nm, ne = size(residues)

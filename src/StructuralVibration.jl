@@ -32,7 +32,7 @@ module StructuralVibration
 
     # Structs - Modal extraction
     export AutoEMAMdofProblem, AutoEMASdofProblem, EMAProblem,
-           EMASolution, OMAMdofProblem, OMAProblem, StabilizationAnalysis
+           EMASolution, OMAProblem, StabilizationAnalysis
 
     export CircleFit, CovSSI, DataSSI, LSCE, LSCF, LSFit, PeakPicking, PLSCF
 
@@ -52,7 +52,7 @@ module StructuralVibration
 
     # Modal extraction
     export cmif, comac, compute_residuals, convert_Gyy, ecomac, frac,
-           frf_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization, psd_from_tf, half_psd, xcorr
+           frf_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization, psd_from_tf, half_psd, xcorr
 
     # Signal processing
     export bartlett, bartlett_hann, blackman, blackman_harris, blackman_nuttall,
@@ -88,6 +88,7 @@ module StructuralVibration
     include("modal_extraction/ema_frf.jl")
     include("modal_extraction/ema_utils.jl")
     include("modal_extraction/oma_utils.jl")
+    include("modal_extraction/oma_mdof.jl")
 
     # Include files - Sdof
     include("models/sdof_mdof.jl")

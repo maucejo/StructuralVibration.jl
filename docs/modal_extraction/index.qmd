@@ -69,10 +69,12 @@ H_{pq}(\omega) \approx \frac{\phi_i(x_p)\phi_i(x_q)}{\omega_i^2 - \omega^2 + j\e
 $$
 
 ::: {.callout-note}
+
 One can note that the modal damping factor $\eta_i$ is related to the damping ratio $\xi_i$ by the relation:
 $$
 \eta_i = 2\xi_i.
 $$
+
 :::
 
 ### Poles extraction
@@ -252,6 +254,7 @@ $$
     \Phi_i(x_N)\Phi_i(x_1) & \ldots & \ldots & \Phi_i(x_N)^2
   \end{bmatrix},
 $$
+
 where $\omega_i$ and $\eta_i$ have been determined using the peak picking method or the circle fit method.
 
 To determine the mode shapes from the knowledge of a column $q$ (or a row $p$), proceed as follows:
@@ -293,6 +296,7 @@ When sampling the IRF at a sampling period $T_s$, one obtains the following disc
 $$
 h_{oi}[m] = 2 Re\left(\sum_{k = 1}^n c_k z_k^m\right) \text{ with } z_k = e^{\lambda_k T_s},
 $$
+
 for $m = 0, 1, \ldots, 2n$, ($n$ is the model order). According to the Prony's method, the poles $\lambda_k$ can be calculated from the roots of the following characteristic polynomial:
 $$
 \sum_{m = 0}^{2n} \beta_m z_k^m = 0 \text{ with } \beta_{2n} = 1.
@@ -340,10 +344,12 @@ According to Guillaume et al. [^3], the transfer function between an output $o$ 
 $$
 \widehat{H}_k(\omega) = \frac{N_k(\omega)}{d(\omega)},
 $$
+
 where $k = 1, \ldots, n_o n_i$ ($k = (o - 1) n_i + i$). Here, $N_k(\omega)$ is the $k$-th element of the numerator matrix defined as:
 $$
 N_k(\omega) = \mathbf{\Omega}(\omega)^T \boldsymbol{\beta}_k,
 $$
+
 while $d(\omega)$ is the common denominator polynomial defined as:
 $$
 d(\omega) = \mathbf{\Omega}(\omega)^T \boldsymbol{\alpha}.
@@ -353,12 +359,14 @@ In the previous equations, $\mathbf{\Omega}(\omega)$ is the vector of polynomial
 $$
 \mathbf{\Omega}(\omega)^T = [1, \Omega_1(\omega), \ldots, \Omega_n(\omega)] \text{ with } \Omega_n(\omega) = \exp(-i\omega n T_s),
 $$
+
 where $n$ is the order of the denominator polynomial (a.k.a the model order) and $T_s$ is the sampling period. The vectors $\boldsymbol{\beta}_k$ and $\boldsymbol{\alpha}$ contain the coefficients of the numerator and denominator polynomials, respectively.
 
 Based on the previous formulation of the FRFs, the LSCF method consists in estimating the coefficients of the numerator $\boldsymbol{\beta}_k$ and denominator $\boldsymbol{\alpha}$ polynomials by minimizing the following functional:
 $$
 J(\boldsymbol{\theta}) = \sum_{k=1}^{n_o n_i} \sum_{j=1}^{n_f} \left| W_k(\omega_j)\left[H_k(\omega_j) d(\omega_j) - N_k(\omega_j)\right] \right|^2,
 $$
+
 where $\boldsymbol{\theta} = [\boldsymbol{\beta}_1^T, \ldots, \boldsymbol{\beta}_{n_o n_i}^T, \boldsymbol{\alpha}^T]^T$ is the vector of unknown parameters to be estimated, $H_k(\omega_j)$ is the measured FRF at frequency $\omega_j$, $n_f$ is the number of frequency lines used for the identification and $W_k(\omega_j)$ is an arbitrary weighting function. In the package, two weighting functions can be use: either a unitary weighting function is used, i.e. $W_k(\omega_j) = 1$ or the inverse of the noise variance estimate on each measured FRF is used, i.e. $W_k(\omega_j) = 1/\sigma_k$.
 
 The poles of the transfer function are obtained from the roots of the characteristic polynomial associated with the denominator polynomial $d(\omega)$, which are computed after having estimated the coefficients $\boldsymbol{\alpha}$ as the argument of the minimum of the functional $J(\boldsymbol{\theta})$ (see Ref. [2] for details).
@@ -372,11 +380,13 @@ The pLSCF method is an extension of the LSCF method that makes it possible to ta
 In this approach, the transfer function $\widehat{\mathbf{H}}_o(\omega) \in \mathbb{C}^{1 \times n_i}$ between an output $o$ ($o = 1, \ldots, n_o$) and a set of $n_i$ inputs can be modeled in the frequency domain as:
 $$
 \widehat{\mathbf{H}}_o(\omega) = \mathbf{N}_o(\omega) \mathbf{D}(\omega)^{-1},
-$$,
+$$
+
 where $\mathbf{N}_o(\omega) \in \mathbb{C}^{1 \times n_i}$ is the numerator matrix defined as:
 $$
 \mathbf{N}_o(\omega) = \mathbf{\Omega}(\omega)^T \boldsymbol{\beta}_o,
 $$
+
 while $\mathbf{D}(\omega) \in \mathbb{C}^{n_i \times n_i}$ is the denominator matrix defined as:
 $$
 \mathbf{D}(\omega) = \mathbf{\Omega}(\omega)^T \boldsymbol{\alpha}.
@@ -419,6 +429,7 @@ Once the poles of the system have been identified using one of the Mdof methods 
 $$
 H_{pq}(\omega) = \sum_{i = 1}^n \left(\frac{{}_iR_{pq}}{j\omega - \lambda_i} + \frac{{}_iR_{pq}^\ast}{j\omega - \lambda_i^\ast}\right),
 $$
+
 where $R_{k, pq}$ is the residue associated with the pole $\lambda_k$.
 
 At a frequency line $\omega$, the previous equation can be rewritten in matrix form as:
@@ -466,6 +477,7 @@ From the estimated residues, the mode shapes can be extracted using the followin
 $$
 {}_iR_{pq} = c_i \phi_{p,i} \phi_{q,i},
 $$
+
 where $c_i$ is a scaling factor, $\phi_{p,i}$ (resp. nd $\phi_{q,i}$) is the $p$-th (resp. $q$-th) component of the mode shape associated with the $i$-th mode.
 
 To solve for the mode shapes, a collocated measurement is required, i.e. $p = q$. Thus, the mode shape components can be obtained as:
@@ -482,6 +494,7 @@ From the identified modal parameters (poles and residues), it is possible to rec
 $$
 H_{pq}(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
 $$
+
 where:
 
 * $\lambda_i = -\xi_i + j\,\Omega_i$ is the pole related to the mode $i$, with:
@@ -496,6 +509,7 @@ In practice, however, the reconstructed FRF may not perfectly match the experime
 $$
 H_{pq}(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right] - \frac{L_{pq}}{\omega^2} + U_{pq},
 $$
+
 where $L_{pq}$ and $U_{pq}$ are the lower and upper residuals, respectively. These residuals can be computed using the `compute_residuals` function.
 
 ::: {.callout-note}
@@ -506,7 +520,8 @@ Finally, when only real mode shapes are available, it is possible to compute the
 $$
 {}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q),
 $$
-where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = \frac{1}{2jM_i\Omega_i}$ is the normalization constant of the mode shape of the mode $i$. Here, $M_i = 1$, since the mode shapes are mass-normalized. during the extraction process.
+
+where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = \frac{1}{2jM_i\Omega_i}$ is the normalization constant of the mode shape of the mode $i$. Here, $M_i = 1$, since the mode shapes are mass-normalized. during the extraction process. -->
 
 ## API
 
@@ -671,16 +686,16 @@ beam = Beam(L, S, Iz, E, ρ)
 fmax = 500.
 
 ωn, kn = modefreq(beam, 2fmax)
-ϕexc = modeshape(beam, kn, xexc)
-ϕm = modeshape(beam, kn, xm)
+ms_exc = modeshape(beam, kn, xexc)
+ms_m = modeshape(beam, kn, xm)
 
 # FRF calculation
 freq = 1.:0.1:fmax
-prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
+prob = ModalFRFProblem(ωn, ξ, freq, ms_m, ms_exc)
 H = solve(prob; ismat = true).u
 ```
 
-### SDOF methods
+### Sdof methods
 
 #### Modes extraction
 
@@ -688,24 +703,22 @@ H = solve(prob; ismat = true).u
 #| output: false
 # Natural frequencies and damping ratios extraction
 prob_sdof = EMAProblem(H, freq)
-fn_pp, ξn_pp = poles2modal(poles_extraction(prob_sdof, PeakPicking()))
-fn_cf, ξn_cf = poles2modal(poles_extraction(prob_sdof, CircleFit()))
-fn_lsf, ξn_lsf = poles2modal(poles_extraction(prob_sdof, LSFit()))
+poles_pp = poles_extraction(prob_sdof, PeakPicking())
+poles_cf = poles_extraction(prob_sdof, CircleFit())
+poles_lsf = poles_extraction(prob_sdof, LSFit())
 
 # Mode shape extraction
 dpi = [1, 2]
-ϕid = modeshape_extraction(prob_sdof, modal2poles(fn_pp, ξn_pp), PeakPicking(), dpi = dpi)
-
-# Automatic EMA
-prob_ema = AutoEMASdofProblem(prob_sdof, LSFit(), dpi = dpi, idx_m = [2], idx_e = 1:21)
-sol_ema = solve(prob_ema)
-fn_ema, ξn_ema = poles2modal(sol_ema.poles)
-ϕn_ema = sol_ema.ms
+ms_id = modeshape_extraction(prob_sdof, poles_pp, PeakPicking(), dpi = dpi)
 ```
 
 ```{julia}
 #| echo: false
 # Natural frequencies and damping ratios
+fn_pp, ξn_pp = poles2modal(poles_pp)
+fn_cf, ξn_cf = poles2modal(poles_cf)
+fn_lsf, ξn_lsf = poles2modal(poles_lsf)
+
 fig_f = Figure()
 ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
 ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
@@ -730,22 +743,195 @@ ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
 ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
 ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
 
-lines!(ax_mode1, xexc, ϕexc[:, 1], label = "Reference")
-lines!(ax_mode1, xexc, ϕid[:, 1], linestyle = :dash, label = "Estimated")
+lines!(ax_mode1, xexc, ms_exc[:, 1], label = "Reference")
+lines!(ax_mode1, xexc, ms_id[:, 1], linestyle = :dash, label = "Estimated")
 xlims!(ax_mode1, 0, L)
 axislegend(ax_mode1, position = :cb)
 
-lines!(ax_mode2, xexc, ϕexc[:, 2], label = "Reference")
-lines!(ax_mode2, xexc, ϕid[:, 2], linestyle = :dash, label = "Estimated")
+lines!(ax_mode2, xexc, ms_exc[:, 2], label = "Reference")
+lines!(ax_mode2, xexc, ms_id[:, 2], linestyle = :dash, label = "Estimated")
 xlims!(ax_mode2, 0, L)
 
-lines!(ax_mode3, xexc, ϕexc[:, 3], label = "Reference")
-lines!(ax_mode3, xexc, ϕid[:, 3], linestyle = :dash, label = "Estimated")
+lines!(ax_mode3, xexc, ms_exc[:, 3], label = "Reference")
+lines!(ax_mode3, xexc, ms_id[:, 3], linestyle = :dash, label = "Estimated")
 xlims!(ax_mode3, 0, L)
 
-lines!(ax_mode4, xexc, ϕexc[:, 4], label = "Reference")
-lines!(ax_mode4, xexc, ϕid[:, 4], linestyle = :dash, label = "Estimated")
+lines!(ax_mode4, xexc, ms_exc[:, 4], label = "Reference")
+lines!(ax_mode4, xexc, ms_id[:, 4], linestyle = :dash, label = "Estimated")
 xlims!(ax_mode4, 0, L)
 
 display(fig_mode);
+```
+
+#### FRF reconstruction
+
+```{julia}
+#| output: false
+# Computation of the mode residues
+res_pp = mode2residues(ms_id, poles_pp, [2], 1:21)[1]
+
+# FRF reconstruction - without residuals
+H_sdof = frf_reconstruction(res_pp, poles_pp, freq)
+
+# FRF reconstruction - with residuals
+lr, ur = compute_residuals(prob_sdof, res_pp, poles_pp)
+H_sdof2 = frf_reconstruction(res_pp, poles_pp, freq, lr = lr, ur = ur)
+```
+
+```{julia}
+#| echo: false
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)", title = "FRF Reconstruction using Sdof method")
+lines!(ax, freq, 20log10.(abs.(H[1, 2, :])), label = "Original FRF")
+lines!(ax, freq, 20log10.(abs.(H_sdof[1, 2, :])); linestyle = :dash, label = "Reconstructed FRF (no residuals)")
+lines!(ax, freq, 20log10.(abs.(H_sdof2[1, 2, :])); linestyle = :dot, label = "Reconstructed FRF (with residuals)")
+xlims!(ax, freq[1], freq[end])
+axislegend(ax; position = :rt)
+
+display(fig);
+```
+
+#### Automatic Sdof EMA
+
+```julia
+prob_ema = AutoEMASdofProblem(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
+sol_ema = solve(prob_ema)
+fn_ema, ξn_ema = poles2modal(sol_ema.poles)
+ms_ema = sol_ema.ms
+```
+
+### Mdof methods
+
+#### Poles extraction
+
+```{julia}
+# EMA problem
+prob_mdof = EMAProblem(H, freq)
+
+# Poles extraction
+order = 10 # Model order
+p_lsce = poles_extraction(prob_mdof, order, LSCE())
+p_lscf = poles_extraction(prob_mdof, order, LSCF())
+p_plscf = poles_extraction(prob_mdof, order, PLSCF())
+
+# Stabilization diagram analysis using the LSCF method
+stab = stabilization(prob_mdof, order, LSCF())
+
+# Visualization of the stabilization diagram
+stabilization_plot(stab)
+```
+```{julia}
+#| echo: false
+# Natural frequencies and damping ratios
+
+fn_lsce, dr_lsce = poles2modal(p_lsce)
+fn_lscf, dr_lscf = poles2modal(p_lscf)
+fn_plscf, dr_plscf = poles2modal(p_plscf)
+
+fig_f = Figure()
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
+
+scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f1, 1:4, fn_lsce, markersize = 20, label = "LSCE")
+scatter!(ax_f1, 1:4, fn_lscf, marker = :star4, markersize = 15, label = "LSCF")
+scatter!(ax_f1, 1:4, fn_plscf, marker = :circle, markersize = 10, label = "PLSCF")
+axislegend(ax_f1, position = :lt)
+
+scatter!(ax_f2, 1:4, 100ξ*ones(4), marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f2, 1:4, 100dr_lsce, markersize = 20, label = "LSCE")
+scatter!(ax_f2, 1:4, 100dr_lscf, marker = :star4, markersize = 15, label = "LSCF")
+scatter!(ax_f2, 1:4, 100dr_plscf, marker = :circle, markersize = 10, label = "PLSCF")
+
+display(fig_f);
+```
+
+#### Mode shape extraction
+
+```{julia}
+#| output: false
+
+# Driving point indices
+dpi = [1, 2]
+
+# Computation of the mode residues
+res = mode_residues(prob_mdof, p_lscf)
+
+# Extraction of the mode shapes
+ms_est = modeshape_extraction(res, p_lscf, LSCF(), dpi = dpi, modetype = :emar)[1]
+
+# Convert to real mode shapes
+ms_est_real = c2r_modeshape(ms_est)
+```
+
+```{julia}
+#| echo: false
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+
+lines!(ax_mode1, xexc, ms_exc[:, 1], label = "Reference")
+lines!(ax_mode1, xexc, ms_est_real[:, 1], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, xexc, ms_exc[:, 2], label = "Reference")
+lines!(ax_mode2, xexc, ms_est_real[:, 2], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, xexc, ms_exc[:, 3], label = "Reference")
+lines!(ax_mode3, xexc, ms_est_real[:, 3], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, xexc, ms_exc[:, 4], label = "Reference")
+lines!(ax_mode4, xexc, ms_est_real[:, 4], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
+```
+
+#### FRF reconstruction
+
+```{julia}
+#| output: false
+# Problem definition
+prob_mdof = EMAProblem(H, freq)
+
+# Poles extraction using the Least-Squares Complex Frequency-domain method
+poles_lscf = poles_extraction(prob_mdof, 20, LSCF())
+
+# Residues extraction
+res_lscf = mode_residues(prob_mdof, poles_lscf)
+
+# FRF reconstruction - without residuals
+H_mdof = frf_reconstruction(res_lscf, poles_lscf, freq)
+
+# FRF reconstruction - with residuals
+lr, ur = compute_residuals(prob_mdof, res_lscf, poles_lscf)
+H_mdof2 = frf_reconstruction(res_lscf, poles_lscf, freq, lr = lr, ur = ur)
+```
+
+```{julia}
+#| echo: false
+fig1 = Figure()
+ax1 = Axis(fig1[1, 1], xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)", title = "FRF Reconstruction using Mdof method")
+lines!(ax1, freq, 20log10.(abs.(H[1, 2, :])), label = "Original FRF")
+lines!(ax1, freq, 20log10.(abs.(H_mdof[1, 2, :])); linestyle = :dash, label = "Reconstructed FRF (no residuals)")
+lines!(ax1, freq, 20log10.(abs.(H_mdof2[1, 2, :])); linestyle = :dot, label = "Reconstructed FRF (with residuals)")
+xlims!(ax1, freq[1], freq[end])
+axislegend(ax1; position = :rt)
+
+display(fig1);
+```
+
+#### Automatic Mdof EMA
+
+```julia
+prob_ema = AutoEMAMdofProblem(prob_mdof, order, dpi, LSCF())
+sol_ema = solve(prob_ema)
+fn_ema, ξn_ema = poles2modal(sol_ema.poles)
+ms_ema = sol_ema.ms
 ```
