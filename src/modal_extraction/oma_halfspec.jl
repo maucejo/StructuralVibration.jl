@@ -50,7 +50,7 @@ end
 Compute lower and upper residuals of a half-spectrum given its residues and poles.
 
 **Inputs**
-- `prob::OMAMdofProblem`: Structure containing half-spectrum data and frequency vector
+- `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
 - `res::Array{Complex, 3}`: Residues corresponding to each pole
 - `poles::Vector{T}`: Poles extracted from the half-spectrum
 
@@ -58,7 +58,7 @@ Compute lower and upper residuals of a half-spectrum given its residues and pole
 - `lr::Matrix{Complex, 2}`: Lower residuals
 - `ur::Matrix{Complex, 2}`: Upper residuals
 """
-function compute_residuals(prob:: OMAMdofProblem, res::Array{T, 3}, poles::Vector{T}) where {T <: Complex}
+function compute_residuals(prob:: OMAProblem, res::Array{T, 3}, poles::Vector{T}) where {T <: Complex}
 
     # Initialization
     (; frf, freq) = prob

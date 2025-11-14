@@ -13,13 +13,14 @@ E = 2.1e11  # Young's modulus
 ξ = 0.01    # Damping ratio
 
 # Mesh
-xexc = 0:0.05:L
+Δx = 0.01
+xexc = Δx:0.05:(L - Δx)
 xm = xexc[2]
 
 # Mode calculation - Simply supported boundary conditions
 beam = Beam(L, S, Iz, E, ρ)
-fmax = 500.
 
+fmax = 500.
 ωn, kn = modefreq(beam, 2fmax)
 ϕexc = modeshape(beam, kn, xexc)
 ϕm = modeshape(beam, kn, xm)
@@ -38,7 +39,7 @@ prob = ModalFRFProblem(ωn, ξ, freq_calc, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
 # Acquisition parameters
-nblocks = 5
+nblocks = 1
 tb = fft_params.t
 dt = fft_params.dt
 t = tb[1]:dt:(nblocks*(tb[end] + dt) - dt)
@@ -54,14 +55,9 @@ force[2, :] .= x
 prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
 y = solve(prob).u
 
-# Chirp excitation - Excitation CSD matrix
-tukeywin(x) = tukey(x, 0.5)
-Gxx = csd(force, force, block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
+# OMA problem definition
+prob_oma = OMAProblem(y, t, sample_rate, block_size)
 
-# Chirp excitation - Output CSD matrix
-Gyy = csd(y[2, :], y[2, :], block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
-Gyy2 = vec(psd_from_tf(H, Gxx[:, :, id_start:id_end]))
-
-# Half power spectral density from FRF and excitation PSD
-Syy = vec(half_psd(y[2, :], freq_calc, sample_rate, block_size))
-SYY = vec(half_psd(Gyy[id_start:id_end], freq_calc))
+p_lsce = poles_extraction(prob_oma, 20, LSCE())
+p_lscf = poles_extraction(prob_mdof, 20, LSCF())
+p_plscf = poles_extraction(prob_mdof, 20, PLSCF())

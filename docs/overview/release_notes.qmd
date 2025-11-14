@@ -22,10 +22,10 @@ format:
   - Rename `EMAMdofStabilization` structure to `StabilizationAnalysis` for clarity and generality
   - `dpi` argument of `modeshape_extraction` function is now passed as keyword arguments instead of positional arguments (for both Sdof and Mdof methods)
   - `type` argument argument of `modeshape_extraction` function (Mdof methods) has been renamed to `modetype` for clarity
-  - Add `OMAMdofProblem` structure to perform Operational Modal Analysis (OMA) using EMA-based algorithms on half-spectrum data
-  - Add `solve` function for `OMAMdofProblem` to extract modal parameters using Covariance-based SSI (`CovSSI`) and Data-based SSI (`DataSSI`) methods
+  - Add `OMAProblem` structure to perform Operational Modal Analysis (OMA)
+  - Add `modes_extraction` function for `OMAProblem` to extract modal parameters using Covariance-based SSI (`CovSSI`) and Data-based SSI (`DataSSI`) methods
   - Add `halfspec_reconstruction` function to reconstruct half-spectrum from extracted modal parameters from residues and poles for OMA and EMA-based methods
-  - Add `compute_residuals` function for `OMAMdofProblem` to compute the lower and upper residuals of the half-spectrum
+  - Add `compute_residuals` function for `OMAProblem` to compute the lower and upper residuals of the half-spectrum
 
 ## v1.0.0
 

@@ -31,7 +31,7 @@ The FRF is internally converted to admittance if needed.
     freq::AbstractArray{R}
     type_frf::Symbol
 
-    function EMAProblem(frf::Array{C,3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
+    function EMAProblem(frf::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
 
         # Correct frange to avoid division by zero
         frange[1] == 0. ? frange[1] = 1. : nothing

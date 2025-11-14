@@ -128,8 +128,8 @@ end
     end
 
     df = freq[2] - freq[1]                # Frequency resolution
-    # fs = 2.56*(freq[end] - freq[1])     # Effective sampling frequency
-    fs = 2.56*freq[end]
+    fs = 2.56*(freq[end] - freq[1])       # Effective sampling frequency
+    # fs = 2.56*freq[end]
     freq_g = (0.:df:(fs - df)) .+ freq[1] # Frequency vector for Gyy_half
 
     Gyy_half = similar(Gyy, no, ni, length(freq_g))
@@ -171,10 +171,6 @@ end
     n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
     Ryy_pos = xcorr(y, n_half)
 
-    # # Take only positive lags
-    # n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
-    # Ryy_pos = Ryy[:, :, 1:n_half]
-
     # Compute half power spectral density matrix
     df = freq[2] - freq[1] # Frequency resolution
     freq_g = (0.:df:(fs - df)) # Frequency vector for Gyy_half
@@ -182,11 +178,11 @@ end
         ni = 1
         no = 1
     else
-        ni = size(y, 1)
-        no = size(yref, 1)
+        no = size(y, 1)
+        ni = no
     end
 
-    Gyy_half = similar(complex.(Ryy), ni, no, length(freq_g))
+    Gyy_half = similar(complex.(Ryy_pos), no, ni, length(freq_g))
     Ryy_ij = similar(Ryy_pos, n_half)
 
     # Windowing
@@ -254,4 +250,56 @@ function convert_Gyy(Gyy, freq; type = :dis)
     end
 
     return ndg == 3 ? Gyy_conv : vec(Gyy_conv)
+end
+
+"""
+    block_hankel(y, nbr)
+
+Constructs the past and future block Hankel matrices for SSI-DATA.
+
+**Inputs**
+- `y::Matrix{Float64}`: Matrix of measured outputs (channels × samples)
+- `nbr::Int`: Number of block rows
+
+**Outputs**
+- `Hp::Matrix{Float64}`: Past block Hankel matrix
+- `Hf::Matrix{Float64}`: Future block Hankel matrix
+
+**References**
+[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+"""
+function block_hankel(y::Matrix{Float64}, nbr::Int)
+    nm, nt = size(y)
+    nc = nt - 2nbr + 1 # Number of columns of Hankel matrices
+
+    H = similar(y, nm*2nbr, nc) # Full Hankel matrix
+    for i = 1:2nbr
+        H[(i-1)*nm+1:i*nm, :] .= y[:, i:i+nc-1]/sqrt(nc)
+    end
+
+    return H
+end
+
+"""
+    block_toeplitz(R, nbr)
+
+Constructs a block Toeplitz matrix from correlation matrices.
+
+**Inputs**
+- `R::Array{Float64, 3}`: Correlation matrices of size (
+- `nbr::Int`: Number of block rows
+
+**Output**
+- `T::Matrix{Float64}`: Block Toeplitz matrix
+"""
+function block_toeplitz(R::Array{Float64, 3}, nbr::Int)
+    nm = size(R, 1)
+    T = zeros(nm*nbr, nm*nbr)
+    for j in 1:nbr
+        for i in 1:nbr
+            T[(i-1)*nm+1:i*nm, (j-1)*nm+1:j*nm] .= R[:, :, i + j - 1]
+        end
+    end
+
+    return T
 end

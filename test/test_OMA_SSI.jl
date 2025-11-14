@@ -38,7 +38,7 @@ prob = ModalFRFProblem(ωn, ξ, freq_calc, ϕm, ϕexc)
 H = solve(prob; ismat = true).u
 
 # Acquisition parameters
-nblocks = 5
+nblocks = 1
 tb = fft_params.t
 dt = fft_params.dt
 t = tb[1]:dt:(nblocks*(tb[end] + dt) - dt)
@@ -54,14 +54,7 @@ force[2, :] .= x
 prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
 y = solve(prob).u
 
-# Chirp excitation - Excitation CSD matrix
-tukeywin(x) = tukey(x, 0.5)
-Gxx = csd(force, force, block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
-
-# Chirp excitation - Output CSD matrix
-Gyy = csd(y[2, :], y[2, :], block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
-Gyy2 = vec(psd_from_tf(H, Gxx[:, :, id_start:id_end]))
-
-# Half power spectral density from FRF and excitation PSD
-Syy = vec(half_psd(y[2, :], freq_calc, sample_rate, block_size))
-SYY = vec(half_psd(Gyy[id_start:id_end], freq_calc))
+# OMA problem definition
+prob_oma = OMAProblem(y, t, sample_rate, block_size)
+p_dssi, ms_dssi = modes_extraction(prob_oma, 10, DataSSI())
+p_cssi, ms_cssi = modes_extraction(prob_oma, 10, CovSSI())

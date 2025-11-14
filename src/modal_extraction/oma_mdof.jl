@@ -3,77 +3,88 @@ struct CovSSI <: OMAModalExtraction end
 struct DataSSI <: OMAModalExtraction end
 
 """
-    OMAMdofProblem(Gyy, freq; frange, type_frf)
+    OMAProblem(Gyy, freq; frange, type_data)
 
-Data structure defining the inputs for EMA-MDOF modal extraction methods.
+Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
 
 **Constructor parameters**
-- `Gyy::Array{Complex, 3}`: 3D power spectral density matrix (array nm x ne x nf)
-- `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
-- `frange::Vector{Real}`: Frequency range for analysis (default: [freq[1], freq[end]])
-- `type_spec::Symbol`: Type of spectral density used in the analysis
-    * `:dis`: Displacement (default)
-    * `:vel`: Velocity
-    * `:acc`: Acceleration
+- `Gyy::Array{Complex, 3}`: Power spectral density matrix of size (no, no, nf),
+       where no is the number of outputs and nf is the number of frequency points.
+- `freq::AbstractArray{Real}`: Frequency vector corresponding to the PSD matrix
+- `frange::AbstractVector{Real}`: Frequency range to consider for analysis (default: full range)
+- `type_data::Symbol`: Type of measured data
+    - `:dis`: Displacement (default)
+    - `:vel`: Velocity
+    - `:acc`: Acceleration
+
+**Alternative constructor parameters**
+- `y::AbstractMatrix{Real}`: Matrix of measured outputs (channels x samples)
+- `t::AbstractArray{Real}`: Time vector corresponding to the measurements
+- `fs::Real`: Sampling frequency (Hz)
+- `bs::Int`: Block size for PSD estimation
+- `frange::AbstractVector{Real}`: Frequency range to consider for analysis (default: [0., fs/2.56])
+- `type_data::Symbol`: Type of measured data
+    - `:dis`: Displacement (default)
+    - `:vel`: Velocity
+    - `:acc`: Acceleration
 
 **Fields**
-- `halfspec::Array{Complex, 3}`: 3D admittance matrix (array nm x ne x nf)
-- `freq::AbstractArray{Real}`: Vector of frequency values (Hz)
-- `type_spec::Symbol`: Type of spectral density used in the analysis
-
-**Note**
+- `y::AbstractMatrix{Real}`: Matrix of measured outputs (channels x samples)
+- `t::AbstractArray{Real}`: Time vector corresponding to the measurements
+- `halfspec::Array{Complex, 3}`: Half power spectral density matrix
+- `freq::AbstractArray{Real}`: Frequency vector corresponding to the half-spectrum
+- `type_data::Symbol`: Type of measured data (:dis, :vel, :acc
 """
-@show_data struct OMAMdofProblem{C <: Complex, R <: Real} <: MdofProblem
+@show_data struct OMAProblem{C <: Complex, R <: Real} <: MdofProblem
+    y::Matrix{R}
+    t::AbstractArray{R}
     halfspec::Array{C, 3}
     freq::AbstractArray{R}
-    type_spec::Symbol
+    type_data::Symbol
 
-    function OMAMdofProblem(Gyy::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_spec = :dis) where {C <: Complex, R <: Real}
+    function OMAProblem(Gyy::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_data = :dis) where {C <: Complex, R <: Real}
 
         # Correct frange to avoid division by zero
         frange[1] == 0. ? frange[1] = 1. : nothing
 
         # FRF post-processing - Frequency range reduction
         fidx = @. frange[1] ≤ freq ≤ frange[2]
-        ω = 2π*freq[fidx]
+        freq_red = freq[fidx]
+
+        ω = 2π*freq_red
         Gyy_red = Gyy[:, :, fidx]
 
         # Conversion to admittance
         for (f, ωf) in enumerate(ω)
-            if type_spec == :vel
+            if type_data == :vel
                 Gyy_red[:, :, f] ./= -ωf^2
-            elseif type_spec == :acc
+            elseif type_data == :acc
                 Gyy_red[:, :, f] ./= ωf^4
             end
         end
 
-        return new{C, R}(Gyy_red, freq[fidx], type_spec)
+        # Compute half power spectral density
+        halfspec = half_psd(Gyy_red, freq_red)
+
+        return new{C, R}(Matrix{typeof(freq)(undef, 0, 0)}, similar(freq, 0), halfspec, freq_red, type_data)
     end
-end
 
-"""
-    OMAProblem(y, yref = y, t)
-
-Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
-
-**Fields**
-- `y::AbstractMatrix`: Measured output response - dimensions nm x nt
-- `yref::AbstractMatrix`: Reference output responses - dimensions nr x nt (default: y)
-- `t::AbstractArray`: Time vector (nt)
-"""
-@show_data struct OMAProblem{C <: Complex, R <: Real}
-    y::AbstratctMatrix{R}
-    yref::AbstractMatrix{R}
-    t::AbstractArray{R}
-    halfspec::Array{C, 3}
-    freq::AbstractArray{R}
-
-    function OMAProblem(y::AbstractMatrix{R}, yref::AbstractMatrix{R} = y, t::AbstractArray{R}, freq::AbstractArray{R}, fs, bs) where {R <: Real}
+    function OMAProblem(y::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], type_data = :dis) where {R <: Real}
 
         # Compute half power spectral density matrix
-        halspec = half_psd(y, yref, freq, fs, bs)
+        df = fs/bs # Frequency resolution
+        freq = (0.:df:(fs - df))
 
-        return new{C, R}(y, yref, t, halspec, freq)
+        # Correct frange to avoid division by zero
+        frange[1] == 0. ? frange[1] = 1. : nothing
+
+        # FRF post-processing - Frequency range reduction
+        fidx = @. frange[1] ≤ freq ≤ frange[2]
+        freq_red = freq[fidx]
+
+        halfspec = half_psd(y, freq_red, fs, bs)
+
+        return new{Complex{R}, R}(y, t, halfspec, freq_red, type_data)
     end
 end
 
@@ -93,14 +104,19 @@ Extract poles from half-spectrum data using Operational Modal Analysis (OMA) met
 
 **Output**
 - `poles::Vector{Complex}`: Extracted poles
+
+**References**
+[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+
+
 """
 function poles_extraction(prob::OMAProblem, order::Int, method::OMAModalExtraction = CovSSI(); stabdiag = false)
 
-    return solve_modes(prob, order, method, stabdiag = stabdiag)[1]
+    return modes_extraction(prob, order, method, stabdiag = stabdiag)[1]
 end
 
 """
-    solve_modes(prob, order, alg = CovSSI(); stabdiag)
+    modes_extraction(prob, order, alg = CovSSI(); stabdiag)
 
 Extract modal parameters from Covariance-based SSI method.
 
@@ -114,11 +130,61 @@ Extract modal parameters from Covariance-based SSI method.
 - `poles::Vector{Complex}`: Extracted poles
 - `ms::Array{Complex, 2}`: Extracted mode shapes
 """
-function solve_modes(prob::OMAProblem, order::Int, alg::CovSSI; stabdiag = false)
+function modes_extraction(prob::OMAProblem, order::Int, alg::CovSSI; stabdiag = false)
 
     # Unpack problem data
-    (; y, yref) = prob
+    (; y, t, freq) = prob
+    dt = t[2] - t[1]
 
+    # Initialization
+    nm = size(y, 1)
+    nbr = ceil(Int, order/nm)    # number of block rows
+    nbr < 10 ? nbr = 10 : nothing
+
+    # Compute correlation functions
+    R = xcorr(y, 2nbr)
+
+    # Block Toeplitz matrix
+    T = block_toeplitz(R, nbr)
+
+    # Singular Value Decomposition of the block Toeplitz matrix
+    F_svd = svd(T)
+    U = F_svd.U[:, 1:order]
+    S = Diagonal(F_svd.S[1:order])
+
+    # Observability matrix
+    Obs = U*sqrt.(S)
+
+    # Output matrix
+    C = Obs[1:nm, :]
+
+    # System matrix
+    Obs_up = Obs[1:end-nm, :]
+    Obs_low = Obs[nm+1:end, :]
+    A = Obs_up\Obs_low
+
+    # Eigen decomposition of system matrix
+    eigvals, eigvecs = eigen(A)
+
+    # Extract poles and mode shapes
+    p = log.(eigvals)/dt
+
+    # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
+    valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
+    idx_valid_poles = findall(in(conj.(valid_poles)), p)
+    p_valid = p[idx_valid_poles]
+    idx_sort_poles = sortperm(p_valid, by = abs)
+    p_sort = p_valid[idx_sort_poles]
+
+    # Check if poles are in frange
+    fn = poles2modal(p_sort)[1]
+    fidx = @. freq[1] ≤ fn ≤ freq[end]
+    poles = p_sort[fidx]
+
+    # Extract mode shapes
+    ms = C*eigvecs[:, idx_valid_poles[idx_sort_poles[fidx]]]
+
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles, ms
 end
 
 """
@@ -136,36 +202,64 @@ Extract modal parameters from Data-based SSI method.
 - `poles::Vector{Complex}`: Extracted poles
 - `ms::Array{Complex, 2}`: Extracted mode shapes
 """
-function solve_modes(prob::OMAProblem, order::Int, alg::DataSSI; stabdiag = false)
+function modes_extraction(prob::OMAProblem, order::Int, alg::DataSSI; stabdiag = false)
 
-end
+    # Unpack problem data
+    (; y, t, freq) = prob
+    dt = t[2] - t[1]
 
-"""
-    build_hankel(y, nbr)
-
-Constructs the past and future block Hankel matrices for SSI-DATA.
-
-**Inputs**
-- `y::Matrix{Float64}`: Matrix of measured outputs (channels × samples)
-- `nbr::Int`: number of block rows
-
-**Outputs**
-- `Hp::Matrix{Float64}`: Past block Hankel matrix
-- `Hf::Matrix{Float64}`: Future block Hankel matrix
-
-**References**
-[1] C. Ranieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
-"""
-function build_hankel(y::Matrix{Float64}, nbr::Int)
+    # Initialization
     nm, nt = size(y)
-    nc = nt - 2nbr + 1 # number of columns of Hankel matrices
+    nbr = 2order    # number of block rows
+    nbr < 10 ? nbr = 10 : nothing
+    nt < 2nbr - 1 && throw(ArgumentError("Order too high for the number of samples."))
 
-    Yp = similar(y, nm*n, nc) # Past Hankel matrix
-    Yf = similar(Hp)          # Future Hankel matrix
-    for row = 1:nbr
-        Yp[(row-1)*nm+1:row*nm, :] .= y[:, row:row+nc-1]
-        Yf[(row-1)*nm+1:row*nm, :] .= y[:, row+nbr:row+nbr+nc-1]
-    end
+    # Block Hankel matrices
+    H = block_hankel(y, nbr)
 
-    return Yp, Yf
+    # Projection matrix from LQ decomposition
+    F_lq = lq(H)
+    L = F_lq.L[nm*nbr+1:end, 1:nm*nbr]
+    Q = Matrix(F_lq.Q)[1:nm*nbr, :]
+    Proj = L*Q
+
+    # Singular Value Decomposition of the projection matrix
+    F_svd = svd(Proj)
+    U = F_svd.U[:, 1:order]
+    S = Diagonal(F_svd.S[1:order])
+
+    # Observability matrix
+    Obs = U*sqrt.(S)
+
+    # Output matrix
+    C = Obs[1:nm, :]
+
+    # System matrix
+    Obs_up = Obs[1:end-nm, :]
+    Obs_low = Obs[nm+1:end, :]
+    A = Obs_up\Obs_low
+
+    # Eigen decomposition of system matrix
+    eigvals, eigvecs = eigen(A)
+
+    # Extract poles and mode shapes
+    p = log.(eigvals)/dt
+
+    # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
+    valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
+    idx_valid_poles = findall(in(conj.(valid_poles)), p)
+    p_valid = p[idx_valid_poles]
+    idx_sort_poles = sortperm(p_valid, by = abs)
+    p_sort = p_valid[idx_sort_poles]
+
+    # Check if poles are in frange
+    fn = poles2modal(p_sort)[1]
+    fidx = @. freq[1] ≤ fn ≤ freq[end]
+    poles = p_sort[fidx]
+
+    # Extract mode shapes
+    ms = C*eigvecs[:, idx_valid_poles[idx_sort_poles[fidx]]]
+
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles, ms
+
 end
