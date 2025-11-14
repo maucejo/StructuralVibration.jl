@@ -167,7 +167,7 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif)
     # FRF post-processing - Frequency range reduction
     if prob isa EMAProblem
         (; frf, freq, type_frf) = prob
-    elseif prob isa OMAMdofProblem
+    elseif prob isa OMAProblem
         frf = prob.halfspec
         freq = prob.freq
         indicator = :psif

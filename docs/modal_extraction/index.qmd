@@ -367,7 +367,7 @@ $$
 J(\boldsymbol{\theta}) = \sum_{k=1}^{n_o n_i} \sum_{j=1}^{n_f} \left| W_k(\omega_j)\left[H_k(\omega_j) d(\omega_j) - N_k(\omega_j)\right] \right|^2,
 $$
 
-where $\boldsymbol{\theta} = [\boldsymbol{\beta}_1^T, \ldots, \boldsymbol{\beta}_{n_o n_i}^T, \boldsymbol{\alpha}^T]^T$ is the vector of unknown parameters to be estimated, $H_k(\omega_j)$ is the measured FRF at frequency $\omega_j$, $n_f$ is the number of frequency lines used for the identification and $W_k(\omega_j)$ is an arbitrary weighting function. In the package, two weighting functions can be use: either a unitary weighting function is used, i.e. $W_k(\omega_j) = 1$ or the inverse of the noise variance estimate on each measured FRF is used, i.e. $W_k(\omega_j) = 1/\sigma_k$.
+where $\boldsymbol{\theta} = [\boldsymbol{\beta}_1^T, \ldots, \boldsymbol{\beta}_{n_o n_i}^T, \boldsymbol{\alpha}^T]^T$ is the vector of unknown parameters to be estimated, $H_k(\omega_j)$ is the measured FRF at frequency $\omega_j$, $n_f$ is the number of frequency lines used for the identification and $W_k(\omega_j)$ is an arbitrary weighting function. In the package, a unitary weighting function is used, i.e. $W_k(\omega_j) = 1$.
 
 The poles of the transfer function are obtained from the roots of the characteristic polynomial associated with the denominator polynomial $d(\omega)$, which are computed after having estimated the coefficients $\boldsymbol{\alpha}$ as the argument of the minimum of the functional $J(\boldsymbol{\theta})$ (see Ref. [2] for details).
 

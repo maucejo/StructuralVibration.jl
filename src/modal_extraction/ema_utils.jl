@@ -62,3 +62,38 @@ function impulse_response(H, freq, fs)
 
     return irfft(H_padded, N, nd)
 end
+
+"""
+    poles_validity(poles, freq, stabdiag)
+
+Check the validity of extracted poles and retain only those within the specified frequency range. Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
+
+**Inputs**
+- `raw_poles::Vector{Complex}`: Extracted poles
+- `order::Int`: Model order of the system
+- `freq::Vector{Float64}`: Frequency vector
+- `stabdiag::Bool`: Whether to compute stabilization diagram
+
+**Output**
+- `poles::Vector{Complex}`: Validated poles within the frequency range
+"""
+function poles_validity(raw_poles, order, freq, stabdiag)
+    # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
+    valid_poles = raw_poles[@. imag(raw_poles) < 0. && real(raw_poles) ≤ 0. && !isreal(raw_poles)]
+    p_valid = intersect(raw_poles, conj.(valid_poles))
+    sort!(p_valid, by = abs)
+
+    # To avoid modifying the stability of the dynamic system in case of frequency offset, we set real(poles_new) = real(poles_old). This means that dn_new = dn_old * fn_old / fn_new.
+    fn, ξn = poles2modal(p_valid)
+    if freq[1] != 0.
+        @. ξn *= fn / (fn + freq[1])
+        fn .+= freq[1]
+    end
+
+    # Keep only the poles within frange
+    fidx = @. freq[1] ≤ fn ≤ freq[end]
+    poles = modal2poles(fn[fidx], ξn[fidx])
+
+    # If Stability diagram
+    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
+end

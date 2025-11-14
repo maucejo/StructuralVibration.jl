@@ -82,6 +82,7 @@ module StructuralVibration
     include("signal_processing/signal.jl")
 
     # Include files - Modal extraction
+    include("modal_extraction/modal_analysis_types.jl")
     include("modal_extraction/ema_sdof.jl")
     include("modal_extraction/ema_indicators.jl")
     include("modal_extraction/ema_mdof.jl")
