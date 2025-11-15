@@ -90,7 +90,7 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
 end
 
 """
-    compute_poles(prob, order, alg = LSCF(); stabdiag, weighting)
+    compute_poles(prob, order, alg = LSCF(); stabdiag)
 
 Perform Least Squares Complex Frequency (LSCF) method to extract complex poles from Frequency Response Function (FRF) data.
 
@@ -168,7 +168,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 end
 
 """
-    compute_poles(prob, order, alg = PLSCF(); stabdiag, weighting)
+    compute_poles(prob, order, alg = PLSCF(); stabdiag)
 
 Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract complex poles from Frequency Response Function (FRF) data.
 
@@ -239,7 +239,18 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
     # Computation of the coefficients of the denominator
     A = -M[1:order*ni, 1:order*ni]
     b = M[1:order*ni, (order*ni + 1):nmodel*ni]
-    α = A\b
+
+    # Check condition number for better numerical stability
+    if cond(A) > 1e12
+        # Use SVD for better stability
+        F = svd(A)
+        # Filter out very small singular values
+        tol = maximum(F.S) * eps(eltype(F.S)) * max(size(A)...)
+        inv_S = [s > tol ? 1/s : 0.0 for s in F.S]
+        α = F.V * Diagonal(inv_S) * F.U' * b
+    else
+        α = A\b
+    end
 
     # Construct the companion matrix
     Id = I(ni*(order - 1))
@@ -301,7 +312,11 @@ function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalEx
     mode_stabdr = falses(max_order, max_order)
 
     for order in 1:max_order
-        poles[order] .= compute_poles(prob, order, alg, stabdiag = true)
+        try
+            poles[order] .= poles_extraction(prob, order, alg, stabdiag = true)
+        catch e
+            poles[order] .= fill(complex(NaN, NaN), order)
+        end
 
         fne, dre = poles2modal(poles[order])
         fn[order] .= fne

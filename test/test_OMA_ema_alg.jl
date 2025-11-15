@@ -36,8 +36,6 @@ id_start = 1
 id_end = length(fft_params.freq) - 0
 freq = fft_params.freq
 freq_calc = freq[id_start:id_end]
-prob = ModalFRFProblem(ωn, ξ, freq_calc, ϕm, ϕexc)
-H = solve(prob; ismat = true).u
 
 # Acquisition parameters
 nblocks = 1
@@ -57,7 +55,8 @@ prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zer
 y = solve(prob).u
 
 # OMA problem definition
-prob_oma = OMAProblem(y, t, sample_rate, block_size)
+tukeywin(x) = tukey(x, 0.5)
+prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin)
 
 p_lsce = poles_extraction(prob_oma, 30, LSCE())
 p_lscf = poles_extraction(prob_oma, 50, LSCF())

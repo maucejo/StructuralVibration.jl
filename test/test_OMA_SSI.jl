@@ -1,4 +1,5 @@
 using StructuralVibration
+@usingany CairoMakie
 
 # Structure parameters of the beam
 L = 1.        # Length
@@ -34,8 +35,6 @@ id_start = 1
 id_end = length(fft_params.freq) - 0
 freq = fft_params.freq
 freq_calc = freq[id_start:id_end]
-prob = ModalFRFProblem(ωn, ξ, freq_calc, ϕm, ϕexc)
-H = solve(prob; ismat = true).u
 
 # Acquisition parameters
 nblocks = 1
@@ -55,6 +54,16 @@ prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zer
 y = solve(prob).u
 
 # OMA problem definition
-prob_oma = OMAProblem(y, t, sample_rate, block_size)
+tukeywin(x) = tukey(x, 0.5)
+prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin)
 p_dssi, ms_dssi = modes_extraction(prob_oma, 10, DataSSI())
-p_cssi, ms_cssi = modes_extraction(prob_oma, 10, CovSSI())
+# p_cssi, ms_cssi = modes_extraction(prob_oma, 10, CovSSI())
+
+p_dssi = poles_extraction(prob_oma, 28, DataSSI(), stabdiag = true)
+p_cssi = poles_extraction(prob_oma, 50, CovSSI(), stabdiag = true)
+
+# EMA-MDOF pole stability analysis
+sol_stab = stabilization(prob_oma, 50, DataSSI())
+
+# Plot stabilization diagram
+stabilization_plot(sol_stab)

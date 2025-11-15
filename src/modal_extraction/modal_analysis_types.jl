@@ -200,6 +200,8 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
     - `:dis`: Displacement (default)
     - `:vel`: Velocity
     - `:acc`: Acceleration
+- `win::Function`: Window function for PSD estimation (default: hanning)
+- `overlap::Real`: Overlap ratio for PSD estimation (default: 0.5)
 
 **Fields**
 - `y::AbstractMatrix{Real}`: Matrix of measured outputs (channels x samples)
@@ -211,6 +213,7 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
 @show_data struct OMAProblem{C <: Complex, R <: Real} <: MdofProblem
     y::Matrix{R}
     t::AbstractArray{R}
+    fullspec::Array{C, 3}
     halfspec::Array{C, 3}
     freq::AbstractArray{R}
     type_data::Symbol
@@ -239,14 +242,15 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
         # Compute half power spectral density
         halfspec = half_psd(Gyy_red, freq_red)
 
-        return new{C, R}(Matrix{typeof(freq)(undef, 0, 0)}, similar(freq, 0), halfspec, freq_red, type_data)
+        return new{C, R}(Matrix{typeof(freq)(undef, 0, 0)}, similar(freq, 0), Gyy_red, halfspec, freq_red, type_data)
     end
 
-    function OMAProblem(y::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], type_data = :dis) where {R <: Real}
+    function OMAProblem(y::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], type_data = :dis, win = hanning, overlap = 0.5) where {R <: Real}
 
         # Compute half power spectral density matrix
-        df = fs/bs # Frequency resolution
-        freq = (0.:df:(fs - df))
+        # df = fs/bs # Frequency resolution
+        # freq = (0.:df:(fs - df))
+        Gyy, freq = csd(y, y, bs, win, fs = fs, overlap = overlap)
 
         # Correct frange to avoid division by zero
         frange[1] == 0. ? frange[1] = 1. : nothing
@@ -257,6 +261,6 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
 
         halfspec = half_psd(y, freq_red, fs, bs)
 
-        return new{Complex{R}, R}(y, t, halfspec, freq_red, type_data)
+        return new{Complex{R}, R}(y, t, Gyy[:, :, fidx], halfspec, freq_red, type_data)
     end
 end

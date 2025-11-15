@@ -168,11 +168,7 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif)
     if prob isa EMAProblem
         (; frf, freq, type_frf) = prob
     elseif prob isa OMAProblem
-        frf = prob.halfspec
-        freq = prob.freq
-        indicator = :psif
-    elseif prob isa OMAProblem
-        frf = prob.halfspec
+        frf = prob.fullspec
         freq = prob.freq
         indicator = :psif
     end

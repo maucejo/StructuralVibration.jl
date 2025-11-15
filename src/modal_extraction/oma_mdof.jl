@@ -44,8 +44,8 @@ function modes_extraction(prob::OMAProblem, order::Int, alg::CovSSI; stabdiag = 
     dt = t[2] - t[1]
 
     # Initialization
-    nm = size(y, 1)
-    nbr = ceil(Int, order/nm)    # number of block rows
+    no = size(y, 1)
+    nbr = ceil(Int, order/no)    # number of block rows
     nbr < 10 ? nbr = 10 : nothing
 
     # Compute correlation functions
@@ -54,46 +54,10 @@ function modes_extraction(prob::OMAProblem, order::Int, alg::CovSSI; stabdiag = 
     # Block Toeplitz matrix
     T = block_toeplitz(R, nbr)
 
-    # Singular Value Decomposition of the block Toeplitz matrix
-    F_svd = svd(T)
-    U = F_svd.U[:, 1:order]
-    S = Diagonal(F_svd.S[1:order])
+    # Compute system matrices A and C from block Toeplitz matrix
+    A, C = compute_ss_matrix(T, no, order)
 
-    # Observability matrix
-    Obs = U*sqrt.(S)
-
-    # Output matrix
-    C = Obs[1:nm, :]
-
-    # System matrix
-    Obs_up = Obs[1:end-nm, :]
-    Obs_low = Obs[nm+1:end, :]
-    A = Obs_up\Obs_low
-
-    # # Eigen decomposition of system matrix
-    # eigvals, eigvecs = eigen(A)
-
-    # # Extract poles and mode shapes
-    # p = log.(eigvals)/dt
-
-    # # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
-    # valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
-    # idx_valid_poles = findall(in(conj.(valid_poles)), p)
-    # p_valid = p[idx_valid_poles]
-    # idx_sort_poles = sortperm(p_valid, by = abs)
-    # p_sort = p_valid[idx_sort_poles]
-
-    # # Check if poles are in frange
-    # fn = poles2modal(p_sort)[1]
-    # fidx = @. freq[1] ≤ fn ≤ freq[end]
-    # poles = p_sort[fidx]
-
-    # # Extract mode shapes
-    # ms = C*eigvecs[:, idx_valid_poles[idx_sort_poles[fidx]]]
-
-    # return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles, ms
-
-    return oma_modal_parameters(A, C, dt, freq, stabdiag)
+    return oma_modal_parameters(A, C, dt, order, freq, stabdiag)
 end
 
 """
@@ -111,14 +75,14 @@ Extract modal parameters from Data-based SSI method.
 - `poles::Vector{Complex}`: Extracted poles
 - `ms::Array{Complex, 2}`: Extracted mode shapes
 """
-function modes_extraction(prob::OMAProblem, order::Int, alg::DataSSI; stabdiag = false)
+@views function modes_extraction(prob::OMAProblem, order::Int, alg::DataSSI; stabdiag = false)
 
     # Unpack problem data
     (; y, t, freq) = prob
     dt = t[2] - t[1]
 
     # Initialization
-    nm, nt = size(y)
+    no, nt = size(y)
     nbr = 2order    # number of block rows
     nbr < 10 ? nbr = 10 : nothing
     nt < 2nbr - 1 && throw(ArgumentError("Order too high for the number of samples."))
@@ -126,50 +90,28 @@ function modes_extraction(prob::OMAProblem, order::Int, alg::DataSSI; stabdiag =
     # Block Hankel matrices
     H = block_hankel(y, nbr)
 
-    # Projection matrix from LQ decomposition
-    F_lq = lq(H)
-    L = F_lq.L[nm*nbr+1:end, 1:nm*nbr]
-    Q = Matrix(F_lq.Q)[1:nm*nbr, :]
-    Proj = L*Q
+    # Projection matrix from LQ decomposition)
+    # F_lq = lq(H)
+    # L = F_lq.L[no*nbr+1:end, 1:no*nbr]
+    # Q = Matrix(F_lq.Q)[1:no*nbr, :]
+    # Proj = L*Q
 
-    # Singular Value Decomposition of the projection matrix
-    F_svd = svd(Proj)
-    U = F_svd.U[:, 1:order]
-    S = Diagonal(F_svd.S[1:order])
+    # Projection matrix from past and future matrices
+    Yp = H[1:no*nbr, :]
+    Yf = H[no*nbr+1:end, :]
+    # SVD of Yp for stable pseudo-inverse
+    svd_tol = 1e-12
+    Up, Sp, Vp = svd(Yp*Yp')
+    tol = svd_tol * Sp[1]
+    r = count(s -> s > tol, Sp)
+    Sp_inv = Diagonal(1.0 ./ Sp[1:r])
+    Yp_pinv = Vp[:, 1:r] * Sp_inv * Up[:, 1:r]'
 
-    # Observability matrix
-    Obs = U*sqrt.(S)
+    # Projection of future onto past
+    Proj = Yf * Yp' * Yp_pinv * Yp
 
-    # Output matrix
-    C = Obs[1:nm, :]
+    # Compute system matrices A and C from projection matrix
+    A, C = compute_ss_matrix(Proj, no, order)
 
-    # System matrix
-    Obs_up = Obs[1:end-nm, :]
-    Obs_low = Obs[nm+1:end, :]
-    A = Obs_up\Obs_low
-
-    # # Eigen decomposition of system matrix
-    # eigvals, eigvecs = eigen(A)
-
-    # # Extract poles and mode shapes
-    # p = log.(eigvals)/dt
-
-    # # Poles that do not appear as pairs of complex conjugate numbers with a positive real part or that are purely real are suppressed. For complex conjugate poles, only the pole with a positive imaginary part is retained.
-    # valid_poles = p[@. imag(p) < 0. && real(p) ≤ 0. && !isreal(p)]
-    # idx_valid_poles = findall(in(conj.(valid_poles)), p)
-    # p_valid = p[idx_valid_poles]
-    # idx_sort_poles = sortperm(p_valid, by = abs)
-    # p_sort = p_valid[idx_sort_poles]
-
-    # # Check if poles are in frange
-    # fn = poles2modal(p_sort)[1]
-    # fidx = @. freq[1] ≤ fn ≤ freq[end]
-    # poles = p_sort[fidx]
-
-    # # Extract mode shapes
-    # ms = C*eigvecs[:, idx_valid_poles[idx_sort_poles[fidx]]]
-
-    # return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles, ms
-
-    return oma_modal_parameters(A, C, dt, freq, stabdiag)
+    return oma_modal_parameters(A, C, dt, order, freq, stabdiag)
 end

@@ -1,40 +1,53 @@
 """
+    xcorr(y, yref, N)
     xcorr(y, N)
 
 Compute the cross-correlation matrix R of a signal y up to lag N-1.
 
 **Inputs**
 - `y::VecOrMat{Real}`: Input signal
+- `yref::VecOrMat{Real}`: Reference input signal
 - `N`: Number of lags
 
 **Output**
 - `R`: Cross-correlation matrix of size (ny, ny, N), where ny
          is the number of signals (ny = 1 if y is a vector)
 
-
+**Note**
+- xcorr(y, N) = xcorr(y, y, N)
 """
-@views function xcorr(y, N)
+@views function xcorr(y, yref, N)
     ndy = ndims(y)
+    ndyref = ndims(yref)
+
+    ndy != ndyref && throw(ArgumentError("Input signals must have the same number of dimensions"))
 
     if ndy == 1
         ny = 1
+        nyref = 1
         nt = length(y)
+        ntref = length(yref)
     else
         ny, nt = size(y)
+        nyref, ntref = size(yref)
     end
 
-    R = similar(y, ny, ny, N)
+    nt != ntref && throw(ArgumentError("Input signals must have the same number of samples"))
+
+    R = similar(y, ny, nyref, N)
 
     for k in 1:N
         if ndy == 1
-            R[:, :, k] .= (y[1:nt - k + 1] ⋅ y[k:nt]) / (nt - k)
+            R[:, :, k] .= (y[1:nt - k + 1] ⋅ yref[k:nt]) / (nt - k)
         else
-            R[:, :, k] .= (y[:, 1:nt - k + 1] * y[:, k:nt]') / (nt - k)
+            R[:, :, k] .= (y[:, 1:nt - k + 1] * yref[:, k:nt]') / (nt - k)
         end
     end
 
     return R
 end
+
+xcorr(y, N) = xcorr(y, y, N)
 
 """
     psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
@@ -87,6 +100,7 @@ end
 
 """
     half_psd(Gyy, freq)
+    half_psd(y, yref, freq, fs, bs)
     half_psd(y, freq, fs, bs)
 
     Compute the half power spectral density matrix Gyy_half given the
@@ -100,6 +114,7 @@ end
 
 **Alternative inputs**
 - `y::VecOrMat{Real}`: Output signal
+- `yref::VecOrMat{Real}`: Reference output signal
 - `freq::AbstractVector`: Frequency vector (Hz)
 - `fs`: Sampling frequency (Hz)
 - `bs`: Block size used to compute the cross-correlation matrix
@@ -146,7 +161,7 @@ end
         for i in 1:no
             # Step 1: IFFT to get the correlation function
             if ndg == 3
-                Gyy_ij .= Gyy[i, j, :]
+                Gyy_ij .= @view Gyy[i, j, :]
             else
                 Gyy_ij .= Gyy
             end
@@ -166,10 +181,15 @@ end
     return Gyy_half[:, :, fidx]
 end
 
-@views function half_psd(y, freq, fs, bs)
+@views function half_psd(y, yref, freq, fs, bs)
+    ndy = ndims(y)
+    ndyref = ndims(yref)
+
+    ndy != ndyref && throw(ArgumentError("Input signals must have the same number of dimensions"))
+
     # Compute cross-correlation matrices - Take only positive lags
     n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
-    Ryy_pos = xcorr(y, n_half)
+    Ryy_pos = xcorr(y, yref, n_half)
 
     # Compute half power spectral density matrix
     df = freq[2] - freq[1] # Frequency resolution
@@ -179,7 +199,7 @@ end
         no = 1
     else
         no = size(y, 1)
-        ni = no
+        ni = size(yref, 1)
     end
 
     Gyy_half = similar(complex.(Ryy_pos), no, ni, length(freq_g))
@@ -206,6 +226,8 @@ end
 
     return Gyy_half[:, :, fidx]/n_half
 end
+
+half_psd(y, freq, fs, bs) = half_psd(y, y, freq, fs, bs)
 
 """
     convert_Gyy(Gyy, freq; type = :dis)
@@ -269,12 +291,12 @@ Constructs the past and future block Hankel matrices for SSI-DATA.
 [1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 """
 function block_hankel(y::Matrix{Float64}, nbr::Int)
-    nm, nt = size(y)
+    no, nt = size(y)
     nc = nt - 2nbr + 1 # Number of columns of Hankel matrices
 
-    H = similar(y, nm*2nbr, nc) # Full Hankel matrix
+    H = similar(y, no*2nbr, nc) # Full Hankel matrix
     for i = 1:2nbr
-        H[(i-1)*nm+1:i*nm, :] .= y[:, i:i+nc-1]/sqrt(nc)
+        H[(i-1)*no+1:i*no, :] .= y[:, i:i+nc-1]/sqrt(nc)
     end
 
     return H
@@ -293,11 +315,11 @@ Constructs a block Toeplitz matrix from correlation matrices.
 - `T::Matrix{Float64}`: Block Toeplitz matrix
 """
 function block_toeplitz(R::Array{Float64, 3}, nbr::Int)
-    nm = size(R, 1)
-    T = zeros(nm*nbr, nm*nbr)
+    no = size(R, 1)
+    T = zeros(no*nbr, no*nbr)
     for j in 1:nbr
         for i in 1:nbr
-            T[(i-1)*nm+1:i*nm, (j-1)*nm+1:j*nm] .= R[:, :, i + j - 1]
+            T[(i-1)*no+1:i*no, (j-1)*no+1:j*no] .= R[:, :, i + j - 1]
         end
     end
 
@@ -320,7 +342,7 @@ Extract modal parameters from system matrices A and C.
 - `poles::Vector{Complex}`: Extracted poles
 - `ms::Array{Complex, 2}`: Extracted mode shapes
 """
-function oma_modal_parameters(A, C, dt, freq, stabdiag)
+function oma_modal_parameters(A, C, dt, order, freq, stabdiag)
     # Eigen decomposition of system matrix
     eigvals, eigvecs = eigen(A)
 
@@ -343,4 +365,37 @@ function oma_modal_parameters(A, C, dt, freq, stabdiag)
     ms = C*eigvecs[:, idx_valid_poles[idx_sort_poles[fidx]]]
 
     return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles, ms
+end
+
+"""
+    compute_ss_matrix(M, no, order)
+
+Compute system matrices A and C from matrix M.
+
+**Inputs**
+- `M::Matrix{Complex}`: Input matrix
+- `no::Int`: Number of outputs
+- `order::Int`: Order of the system
+
+**Outputs**
+- `A::Matrix{Complex}`: System matrix
+- `C::Matrix{Complex}`: Output matrix
+"""
+function compute_ss_matrix(M, no, order)
+    F_svd = svd(M)
+    U = F_svd.U[:, 1:order]
+    S = Diagonal(F_svd.S[1:order])
+
+    # Observability matrix
+    Obs = U*sqrt.(S)
+
+    # Output matrix
+    C = Obs[1:no, :]
+
+    # System matrix
+    Obs_up = Obs[1:end-no, :]
+    Obs_low = Obs[no+1:end, :]
+    A = Obs_up\Obs_low
+
+    return A, C
 end

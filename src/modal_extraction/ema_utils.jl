@@ -92,7 +92,9 @@ function poles_validity(raw_poles, order, freq, stabdiag)
 
     # Keep only the poles within frange
     fidx = @. freq[1] ≤ fn ≤ freq[end]
-    poles = modal2poles(fn[fidx], ξn[fidx])
+    p = modal2poles(fn[fidx], ξn[fidx])
+
+    poles = length(p) ≤ order ? p : p[1:order]
 
     # If Stability diagram
     return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
