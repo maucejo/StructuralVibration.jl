@@ -156,11 +156,15 @@ Plot stabilization diagram for EMA-MDOF pole stability analysis.
 * `indicator`: Indicator to plot
     * `:psif` : Power spectrum indicator function (default)
     * `:cmif` : Complex mode indicator function
+* `display_poles`: Vector of Bool to choose which poles to display
+    * `display_poles[1]` : Stable in frequency and damping (default: true)
+    * `display_poles[2]` : Stable in frequency but not stable in damping (default: true)
+    * `display_poles[3]` : Not stable in frequency (default: true)
 
 **Output**
 * `fig`: Figure
 """
-function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif)
+function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif; display_poles = [true, true, true])
     # Extract data for the selected indicator
     (; prob, poles, modefn, mode_stabfn, mode_stabdr) = stab
 
@@ -188,16 +192,6 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif)
     Nmodes = length(poles[end])
     max_orders = 1:Nmodes
     model_orders = one.(max_orders)*max_orders'
-
-    # Stable in frequency but not stable in damping
-    isstabf = @. (mode_stabfn[:] && !mode_stabdr[:])
-
-    # Stable in frequency and damping
-    isstab = (mode_stabfn[:] .&& mode_stabdr[:])
-
-    # Not stable in frequency
-    isnotstab = .!mode_stabfn[:]
-
     fn = modefn[:]
     orders = model_orders[:]
 
@@ -214,9 +208,27 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif)
         ylabel = "Model order"
     )
     # scatter!(ax_poles, poles_scatter)
-    scatter!(ax_poles, Point2f.(fn[isstab], orders[isstab]), color = :green, marker = :star4, label = "Stable freq. & damp.")
-    scatter!(ax_poles, Point2f.(fn[isstabf], orders[isstabf]), color = :blue, label = "Stable freq.")
-    scatter!(ax_poles, Point2f.(fn[isnotstab], orders[isnotstab]), color = :red, marker = :xcross, label = "Not stable")
+    if display_poles[1]
+        # Stable in frequency and damping
+        isstab = (mode_stabfn[:] .&& mode_stabdr[:])
+
+        scatter!(ax_poles, Point2f.(fn[isstab], orders[isstab]), color = :green, marker = :star4, label = "Stable freq. & damp.")
+    end
+
+    if display_poles[2]
+        # Stable in frequency but not stable in damping
+        isstabf = @. (mode_stabfn[:] && !mode_stabdr[:])
+
+        scatter!(ax_poles, Point2f.(fn[isstabf], orders[isstabf]), color = :blue, label = "Stable freq.")
+    end
+
+    if display_poles[3]
+        # Not stable in frequency
+        isnotstab = .!mode_stabfn[:]
+
+        scatter!(ax_poles, Point2f.(fn[isnotstab], orders[isnotstab]), color = :red, marker = :xcross, label = "Not stable")
+    end
+
     xlims!(ax_poles, minimum(freq), maximum(freq))
 
     # Indicator

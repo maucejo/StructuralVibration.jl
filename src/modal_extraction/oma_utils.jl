@@ -10,38 +10,32 @@ Compute the cross-correlation matrix R of a signal y up to lag N-1.
 - `N`: Number of lags
 
 **Output**
-- `R`: Cross-correlation matrix of size (ny, ny, N), where ny
+- `R`: Cross-correlation matrix of size (ny, nyref, N), where ny
          is the number of signals (ny = 1 if y is a vector)
 
 **Note**
 - xcorr(y, N) = xcorr(y, y, N)
 """
 @views function xcorr(y, yref, N)
-    ndy = ndims(y)
-    ndyref = ndims(yref)
-
-    ndy != ndyref && throw(ArgumentError("Input signals must have the same number of dimensions"))
-
-    if ndy == 1
-        ny = 1
-        nyref = 1
-        nt = length(y)
-        ntref = length(yref)
-    else
-        ny, nt = size(y)
-        nyref, ntref = size(yref)
+    # Work with proper matrices
+    if y isa Vector
+        y = reshape(y, 1, :)
     end
+
+    if yref isa Vector
+        yref = reshape(yref, 1, :)
+    end
+
+    # Check sizes
+    ny, nt = size(y)
+    nyref, ntref = size(yref)
 
     nt != ntref && throw(ArgumentError("Input signals must have the same number of samples"))
 
+    # Compute cross-correlation matrices
     R = similar(y, ny, nyref, N)
-
     for k in 1:N
-        if ndy == 1
-            R[:, :, k] .= (y[1:nt - k + 1] ⋅ yref[k:nt]) / (nt - k)
-        else
-            R[:, :, k] .= (y[:, 1:nt - k + 1] * yref[:, k:nt]') / (nt - k)
-        end
+        R[:, :, k] .= (y[:, 1:nt - k + 1] * yref[:, k:nt]') / (nt - k)
     end
 
     return R
@@ -131,16 +125,11 @@ end
 """
 @views function half_psd(Gyy, freq::AbstractVector)
     # Initialization
-    ndg = ndims(Gyy)
-    if ndg == 3
-        no, ni, nf = size(Gyy)
-    elseif ndg == 1
-        no = 1
-        ni = 1
-        nf = length(Gyy)
-    else
-        throw(ArgumentError("Gyy must be a 1D or 3D array"))
+    if Gyy isa Vector
+        Gyy = reshape(Gyy, 1, 1, length(Gyy))
     end
+
+    no, ni, nf = size(Gyy)
 
     df = freq[2] - freq[1]                # Frequency resolution
     fs = 2.56*(freq[end] - freq[1])       # Effective sampling frequency
@@ -160,11 +149,7 @@ end
     for j in 1:ni
         for i in 1:no
             # Step 1: IFFT to get the correlation function
-            if ndg == 3
-                Gyy_ij .= @view Gyy[i, j, :]
-            else
-                Gyy_ij .= Gyy
-            end
+            Gyy_ij .= Gyy[i, j, :]
 
             Ryy .= impulse_response(Gyy_ij, freq, fs)
 
@@ -182,11 +167,6 @@ end
 end
 
 @views function half_psd(y, yref, freq, fs, bs)
-    ndy = ndims(y)
-    ndyref = ndims(yref)
-
-    ndy != ndyref && throw(ArgumentError("Input signals must have the same number of dimensions"))
-
     # Compute cross-correlation matrices - Take only positive lags
     n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
     Ryy_pos = xcorr(y, yref, n_half)
@@ -194,14 +174,8 @@ end
     # Compute half power spectral density matrix
     df = freq[2] - freq[1] # Frequency resolution
     freq_g = (0.:df:(fs - df)) # Frequency vector for Gyy_half
-    if ndims(y) == 1
-        ni = 1
-        no = 1
-    else
-        no = size(y, 1)
-        ni = size(yref, 1)
-    end
 
+    no, ni = size(Ryy_pos)[1:2]
     Gyy_half = similar(complex.(Ryy_pos), no, ni, length(freq_g))
     Ryy_ij = similar(Ryy_pos, n_half)
 
@@ -247,16 +221,8 @@ Convert a power spectral density matrix Gyy to displacement type
 - `Gyy_conv`: Converted power spectral density matrix
 """
 function convert_Gyy(Gyy, freq; type = :dis)
-    ndg = ndims(Gyy)
-    if ndg == 3
-        no, ni, nf = size(Gyy)
-    elseif ndg == 1
-        no = 1
-        ni = 1
-        nf = length(Gyy)
-        Gyy = reshape(Gyy,  (no, ni, length(Gyy)))
-    else
-        throw(ArgumentError("Gyy must be a 1D or 3D array"))
+    if Gyy isa Vector
+        Gyy = reshape(Gyy, 1, 1, length(Gyy))
     end
 
     Gyy_conv = copy(Gyy)
@@ -271,16 +237,17 @@ function convert_Gyy(Gyy, freq; type = :dis)
         end
     end
 
-    return ndg == 3 ? Gyy_conv : vec(Gyy_conv)
+    return Gyy_conv
 end
 
 """
-    block_hankel(y, nbr)
+    block_hankel(y, yref, nbr)
 
 Constructs the past and future block Hankel matrices for SSI-DATA.
 
 **Inputs**
 - `y::Matrix{Float64}`: Matrix of measured outputs (channels × samples)
+- `yref::Matrix{Float64}`: Matrix of reference outputs (ref channels × samples)
 - `nbr::Int`: Number of block rows
 
 **Outputs**
@@ -290,16 +257,22 @@ Constructs the past and future block Hankel matrices for SSI-DATA.
 **References**
 [1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 """
-function block_hankel(y::Matrix{Float64}, nbr::Int)
+function block_hankel(y::Matrix{Float64}, yref::Matrix{Float64}, nbr::Int)
     no, nt = size(y)
+    nref, ntref = size(yref)
+
+    nt ≠ ntref && throw(ArgumentError("Input signals must have the same number of samples."))
+
     nc = nt - 2nbr + 1 # Number of columns of Hankel matrices
 
-    H = similar(y, no*2nbr, nc) # Full Hankel matrix
-    for i = 1:2nbr
-        H[(i-1)*no+1:i*no, :] .= y[:, i:i+nc-1]/sqrt(nc)
+    Yp = similar(y, nref*nbr, nc) # Past-Hankel matrix
+    Yf = similar(y, no*nbr, nc)   # Future-Hankel matrix
+    for i = 1:nbr
+        Yp[(i-1)*nref+1:i*nref, :] .= yref[:, i:i+nc-1]/sqrt(nc)
+        Yf[(i-1)*no+1:i*no, :] .= y[:, i+nbr:i+nbr+nc-1]/sqrt(nc)
     end
 
-    return H
+    return Yp, Yf
 end
 
 """
@@ -308,18 +281,18 @@ end
 Constructs a block Toeplitz matrix from correlation matrices.
 
 **Inputs**
-- `R::Array{Float64, 3}`: Correlation matrices of size (
+- `R::Array{Float64, 3}`: Correlation matrices
 - `nbr::Int`: Number of block rows
 
 **Output**
 - `T::Matrix{Float64}`: Block Toeplitz matrix
 """
 function block_toeplitz(R::Array{Float64, 3}, nbr::Int)
-    no = size(R, 1)
-    T = zeros(no*nbr, no*nbr)
+    no, ni = size(R)[1:2]
+    T = zeros(no*nbr, ni*nbr)
     for j in 1:nbr
         for i in 1:nbr
-            T[(i-1)*no+1:i*no, (j-1)*no+1:j*no] .= R[:, :, i + j - 1]
+            T[(i-1)*no+1:i*no, (j-1)*ni+1:j*ni] .= R[:, :, i + j - 1]
         end
     end
 

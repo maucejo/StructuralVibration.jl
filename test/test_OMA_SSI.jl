@@ -19,7 +19,7 @@ xm = xexc[2]
 
 # Mode calculation - Simply supported boundary conditions
 beam = Beam(L, S, Iz, E, ρ)
-fmax = 500.
+fmax = 2000.
 
 ωn, kn = modefreq(beam, 2fmax)
 ϕexc = modeshape(beam, kn, xexc)
@@ -51,19 +51,22 @@ force = zeros(length(xexc), length(t))
 force[2, :] .= x
 
 prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
-y = solve(prob).u
+y = solve(prob).ddu
 
 # OMA problem definition
+# idx_ref = 1:length(xexc)
+idx_ref = [2, 5, 10]
 tukeywin(x) = tukey(x, 0.5)
-prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin)
+# prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin)
+prob_oma = OMAProblem(y, y[idx_ref, :], t, sample_rate, block_size, win = tukeywin)
 p_dssi, ms_dssi = modes_extraction(prob_oma, 10, DataSSI())
-# p_cssi, ms_cssi = modes_extraction(prob_oma, 10, CovSSI())
+p_cssi, ms_cssi = modes_extraction(prob_oma, 50, CovSSI())
 
 p_dssi = poles_extraction(prob_oma, 28, DataSSI(), stabdiag = true)
-p_cssi = poles_extraction(prob_oma, 50, CovSSI(), stabdiag = true)
+p_cssi = poles_extraction(prob_oma, 100, CovSSI(), stabdiag = true)
 
 # EMA-MDOF pole stability analysis
-sol_stab = stabilization(prob_oma, 50, DataSSI())
+sol_stab = stabilization(prob_oma, 50, CovSSI())
 
 # Plot stabilization diagram
-stabilization_plot(sol_stab)
+stabilization_plot(sol_stab, display_poles = [true, false, false])
