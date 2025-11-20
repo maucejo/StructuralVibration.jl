@@ -125,16 +125,22 @@ The package provides the following features:
 
 ### Modal analysis
 
-- **Modal extraction - SDOF methods**
+- **Experimental Modal Analysis - SDOF methods**
     - Peak picking method
     - Circle fit method
     - Least-squares fit method
 
-- **Modal extraction - MDOF methods**
+- **Experimental Modal Analysis - MDOF methods**
     - Least-squares complex exponential (LSCE)
     - Least-squares complex frequency (LSCF)
     - Polyreference least-squares complex frequency (PLSCF)
     - Stabilization diagram
+
+- **Operational Modal Analysis - EMA-based methods**
+    - EMA-based approaches (LSCE, LSCF, PLSCF)
+    - Stochastic Subspace Identification (SSI)
+        - Covariance-driven SSI (CovSSI)
+        - Data-driven SSI (DataSSI)
 
 - **Analysis indicators**
     - Modal Overlap Factor (MOF)
@@ -150,8 +156,8 @@ The package provides the following features:
     - Power Spectrum indicator function (PSIF)
 
 - **Modal synthesis**
-    - Estimation of the FRF residuals
-    - Reconstruct FRF from modal parameters
+    - Estimation of the FRF/Half-spectrum residuals
+    - Reconstruct FRF/Half-spectrum from modal parameters
 
 ### Visualization
 
@@ -166,23 +172,22 @@ The package provides the following features:
 
 # Project direct dependencies
 
-```python
-Project StructuralVibration v1.0.0
+```julia
+Project StructuralVibration v1.1.0
 Status
   [717857b8] DSP v0.8.4
   [7a1cc6ca] FFTW v1.10.0
-  [442a2c76] FastGaussQuadrature v1.0.2
+  [442a2c76] FastGaussQuadrature v1.1.0
   [a98d9a8b] Interpolations v0.15.1
-  [37e2e46d] LinearAlgebra v1.12.0
   [429524aa] Optim v1.13.2
   [18e31ff7] Peaks v0.5.3
   [f27b6e38] Polynomials v4.1.0
-  [aea7be01] PrecompileTools v1.3.3
   [92933f4c] ProgressMeter v1.11.0
-  [9a3f8284] Random v1.11.0
+  [aed68c70] SkipNan v0.2.0
   [276daf66] SpecialFunctions v2.6.1
   [10745b16] Statistics v1.11.1
-  [c751599d] ToeplitzMatrices v0.8.5
+  [37e2e46d] LinearAlgebra v1.12.0
+  [9a3f8284] Random v1.11.0
 ```
 :::
 
@@ -191,21 +196,21 @@ Status
 # Julia version and machine information
 
 ```julia
-Julia Version 1.12.0
-Commit b907bd0600f (2025-10-07 15:42 UTC)
+Julia Version 1.12.1
+Commit ba1e628ee49 (2025-10-17 13:02 UTC)
 Build Info:
   Official https://julialang.org release
 Platform Info:
-  OS: macOS (arm64-apple-darwin22.4.0)
+  OS: macOS (arm64-apple-darwin24.0.0)
   CPU: 16 × Apple M4 Max
   WORD_SIZE: 64
   LLVM: libLLVM-18.1.7 (ORCJIT, apple-m4)
   GC: Built with stock GC
 Threads: 1 default, 1 interactive, 1 GC (on 12 virtual cores)
 Environment:
+  JULIA_PKG_SERVER = https://juliahub.com
   JULIA_EDITOR = code
   JULIA_VSCODE_REPL = 1
-  JULIA_PKG_SERVER = https://juliahub.com
 ```
 :::
 

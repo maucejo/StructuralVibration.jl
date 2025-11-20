@@ -1,7 +1,7 @@
 # StructuralVibration.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://maucejo.github.io/StructuralVibration.jl/)
-[![Generic badge](https://img.shields.io/badge/Version-1.0.0-cornflowerblue.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-1.1.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
@@ -113,16 +113,22 @@ The package provides the following features:
 
 ### Modal analysis
 
-- **Modal extraction - SDOF methods**
+- **Experimental Modal Analysis - SDOF methods**
     - Peak picking method
     - Circle fit method
     - Least-squares fit method
 
-- **Modal extraction - MDOF methods**
+- **Experimental Modal Analysis - MDOF methods**
     - Least-squares complex exponential (LSCE)
     - Least-squares complex frequency (LSCF)
     - Polyreference least-squares complex frequency (PLSCF)
     - Stabilization diagram
+
+- **Operational Modal Analysis - EMA-based methods**
+    - EMA-based approaches (LSCE, LSCF, PLSCF)
+    - Stochastic Subspace Identification (SSI)
+        - Covariance-driven SSI (CovSSI)
+        - Data-driven SSI (DataSSI)
 
 - **Analysis indicators**
     - Modal Overlap Factor (MOF)
@@ -138,8 +144,8 @@ The package provides the following features:
     - Power Spectrum indicator function (PSIF)
 
 - **Modal synthesis**
-    - Estimation of the FRF residuals
-    - Reconstruct FRF from modal parameters
+    - Estimation of the FRF/Half-spectrum residuals
+    - Reconstruct FRF/Half-spectrum from modal parameters
 
 ### Visualization
 

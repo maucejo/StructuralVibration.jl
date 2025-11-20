@@ -26,7 +26,7 @@ format:
   - Add `modes_extraction` function for `OMAProblem` to extract modal parameters using Covariance-based SSI (`CovSSI`) and Data-based SSI (`DataSSI`) methods
   - Add `halfspec_reconstruction` function to reconstruct half-spectrum from extracted modal parameters from residues and poles for OMA and EMA-based methods
   - Add `compute_residuals` function for `OMAProblem` to compute the lower and upper residuals of the half-spectrum
-  - Add `diplay_poles` argument to `stabilization_plot` function to choose which poles to display in the stabilization diagram plot
+  - Add `display_poles` argument to `stabilization_plot` function to choose which poles to display in the stabilization diagram plot
 
 ## v1.0.0
 

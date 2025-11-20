@@ -1,6 +1,6 @@
 name = "StructuralVibration"
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Mathieu Aucejo <79322171+maucejo@users.noreply.github.com> and contributors"]
 
 [deps]
@@ -17,7 +17,6 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SkipNan = "aed68c70-c8b0-4309-8cd1-d392a74f991a"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-ToeplitzMatrices = "c751599d-da0a-543b-9d20-d0a503d91d24"
 
 [weakdeps]
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
@@ -42,7 +41,6 @@ SpecialFunctions = "2.5.0"
 Statistics = "1.11.1"
 Test = "1.11.0"
 TestItems = "1.0.0"
-ToeplitzMatrices = "0.8.5"
 julia = "1.10"
 
 [extras]

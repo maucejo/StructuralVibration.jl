@@ -60,8 +60,8 @@ Gxx = csd(force, force, block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1
 
 # Chirp excitation - Output CSD matrix
 Gyy = csd(y[2, :], y[2, :], block_size, tukeywin, fs = sample_rate, overlap = 0.5)[1]
-Gyy2 = vec(psd_from_tf(H, Gxx[:, :, id_start:id_end]))
+Gyy2 = vec(csd_from_tf(H, Gxx[:, :, id_start:id_end]))
 
 # Half power spectral density from FRF and excitation PSD
-Syy = vec(half_psd(y[2, :], freq_calc, sample_rate, block_size))
-SYY = vec(half_psd(Gyy[id_start:id_end], freq_calc))
+Syy = vec(half_csd(y[2, :], freq_calc, sample_rate, block_size))
+SYY = vec(half_csd(Gyy[id_start:id_end], freq_calc))

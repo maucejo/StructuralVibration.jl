@@ -1,6 +1,6 @@
 """
     poles_extraction(prob::EMAProblem, alg)
-    poles_extraction(prob::MdofProblem, order, alg; stabdiag, weighting)
+    poles_extraction(prob::MdofProblem, order, alg; stabdiag)
 
 Extract poles from the Bode diagram fitting method
 
@@ -17,7 +17,6 @@ Extract poles from the Bode diagram fitting method
         * `PLSCF`: Polyreference Least Squares Complex Frequency method
         * `LSCE`: Least Squares Complex Exponential method (only for Mdof methods)
 * `stabdiag::Bool`: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)
-* `weighting::Bool`: Boolean to indicate whether to apply weighting of the FRF (Not applicable to Sdof methods and LSCE, default: true)
 
 **Outputs**
 * `poles`: Vector of extracted complex poles

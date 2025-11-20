@@ -394,7 +394,7 @@ function mode_residues(prob, poles)
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
-    elseif prob isa OMAMdofProblem
+    elseif prob isa OMAProblem
         frf = prob.halfspec
         freq = prob.freq
     else
@@ -453,11 +453,14 @@ Extract mode shapes using Sdof approximation
 **Note**
 - If the number of measurement points is less than the number of excitation points, the mode shapes are estimated at the excitation points (roving hammer test). Otherwise, the mode shapes are estimated at the measurement points (roving accelerometer test).
 - The `alg` argument is here for performing multiple dispatch but is not used in the function.
+- If `modetype` is set to `:oma`, the mode shapes correspond to the first left singular vectors of the residues matrices (see Ref. [2]).
 
 **References**
 [1] M. Géradin and D. J. Rixen. "Mechanical Vibrations: Theory and Application to Structural Dynamics". 3rd. Edition, Wiley, 2015.
 
 [2] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+
+[3] P. Verboven. "Frequency-domain system identification for modal analysis". PhD thesis, Katholieke Universiteit Leuven, 2002.
 """
 function modeshape_extraction(residues, poles::Vector{T}, alg::MdofModalExtraction; dpi = [1, 1], modetype = :emac) where {T <: Complex}
 
@@ -491,9 +494,49 @@ function modeshape_extraction(residues, poles::Vector{T}, alg::MdofModalExtracti
             @. ci /= 2im*ωn*√(1. - ξn^2)
             ms ./= sqrt.(transpose(ci))
         end
-    else # OMA - See Ref. [2]
+    else # OMA - See Ref. [2, 3]
         for i in 1:np
-            ms[:, i] .= svd(Res[:, i, :]).U[:, 1]
+            # Compute SVD of the residue matrix
+            F = svd(Res[:, i, :])
+
+            # Filter significant singular values (relative threshold)
+            S_norm = F.S / maximum(F.S)
+            significant_idx = findall(S_norm .≥ 0.01)  # Adjustalble threshold
+
+            # Initialize best candidate
+            best_idx = 1
+
+            # If first mode, use energy criterion
+            # Otherwise, use orthogonality with previous modes
+            if i == 1
+                # For first mode, select based on energy distribution
+                # (mode shapes should not be too localized)
+                for idx in significant_idx
+                    candidate = F.U[:, idx]
+                    energy_spread = std(abs.(candidate)) / mean(abs.(candidate))
+
+                    if energy_spread > 0.3  # Adjustable threshold
+                        best_idx = idx
+                        break
+                    end
+                end
+            else
+                # For subsequent modes, check orthogonality with previous modes
+                for idx in significant_idx
+                    candidate = F.U[:, idx]
+
+                    # Compute MAC with all previous modes
+                    mac_prev = [mac(candidate, ms[:, j]) for j in 1:(i-1)]
+
+                    # Select mode with the lowest MAC to previous modes
+                    if maximum(mac_prev) < 0.3  # Orthogonality
+                        best_idx = idx
+                        break
+                    end
+                end
+            end
+
+            ms[:, i] .= F.U[:, best_idx]
         end
     end
 

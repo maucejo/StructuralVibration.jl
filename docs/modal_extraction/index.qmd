@@ -33,7 +33,7 @@ EMA is a family of **inverse methods** attempting to determine the modal charact
 To identify the modal parameters of a structure or mechanical system, EMA relies on the measurement of the structure's transfer function matrix. By definition, the transfer function $H_{pq}(\omega)$ can be seen as the frequency response of the system at a point $x_p$ to an excitation of unit amplitude at a point $x_q$. Classically, the transfer function matrix (here the admittance) is given by the relation
 
 $$
-H_{pq}(\omega) = \sum_{i = 1}^{+\infty} \frac{\phi_i(x_p)\, \phi_i(x_q)}{M_i(\omega_i^2 - \omega^2 + 2j\xi_i\omega_i\omega)} = \sum_{i = 1}^{+\infty} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
+H_{pq}(\omega) = \sum_{i = 1}^{+\infty} \frac{\phi_i(x_p)\, \phi_i(x_q)}{M_i(\omega_i^2 - \omega^2 + 2j\xi_i\omega_i\omega)} = \sum_{i = 1}^{+\infty} \left[\frac{{}_i R_{pq}}{j\omega - \lambda_i} + \frac{{}_i R_{pq}^\ast}{j\omega - \lambda_i^\ast}\right],
 $$
 where:
 
