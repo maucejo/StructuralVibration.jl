@@ -1,7 +1,7 @@
 """
     poles_extraction(prob, order, method; stabdiag)
 
-Extract poles from half-spectrum data using Operational Modal Analysis (OMA) methods.
+Extract poles using Stochastic System Identification methods.
 
 **Inputs**
 - `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
@@ -27,19 +27,28 @@ function poles_extraction(prob::OMAProblem, order::Int, method::OMAModalExtracti
 end
 
 """
-    modes_extraction(prob, order, alg = CovSSI(); stabdiag)
+    modes_extraction(prob, order, method; stabdiag)
 
-Extract modal parameters from Covariance-based SSI method.
+Extract modes using Stochastic System Identification methods.
 
 **Inputs**
 - `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
 - `order::Int`: Order of the system to identify
-- `alg::CovSSI`: OMA method to use for modal extraction
+- `method::OMAModalExtraction`: OMA method to use for pole extraction
+    - `CovSSI`: Covariance-based SSI (default)
+    - `DataSSI`: Data-based SSI
 - `stabdiag::Bool`: Whether to compute stabilization diagram (default: false)
 
-**Outputs**
+**Output**
 - `poles::Vector{Complex}`: Extracted poles
-- `ms::Array{Complex, 2}`: Extracted mode shapes
+- `ms::Matrix{Complex}`: Extracted modal parameters
+
+**References**
+[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+
+[2] P. Peeters and G. De Roeck. "Reference-based stochastic subspace identification for output-only modal analysis". Mechanical Systems and Signal Processing, 13(6):855-878, 1999.
+
+[3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
 """
 function modes_extraction(prob::OMAProblem, order::Int, alg::CovSSI; stabdiag = false)
 
@@ -65,21 +74,6 @@ function modes_extraction(prob::OMAProblem, order::Int, alg::CovSSI; stabdiag = 
     return oma_modal_parameters(A, C, dt, order, freq, stabdiag)
 end
 
-"""
-    solve_modes(prob, order, alg = DataSSI(); stabdiag)
-
-Extract modal parameters from Data-based SSI method.
-
-**Inputs**
-- `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
-- `order::Int`: Order of the system to identify
-- `alg::DataSSI`: OMA method to use for modal extraction
-- `stabdiag::Bool`: Whether to compute stabilization diagram (default: false)
-
-**Outputs**
-- `poles::Vector{Complex}`: Extracted poles
-- `ms::Array{Complex, 2}`: Extracted mode shapes
-"""
 @views function modes_extraction(prob::OMAProblem, order::Int, alg::DataSSI; stabdiag = false)
 
     # Unpack problem data

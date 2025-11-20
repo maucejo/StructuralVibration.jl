@@ -183,34 +183,30 @@ end
 Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
 
 **Constructor parameters**
-- `Gyy::Array{Complex, 3}`: Power spectral density matrix of size (no, no, nf),
-       where no is the number of outputs and nf is the number of frequency points.
-- `freq::AbstractArray{Real}`: Frequency vector corresponding to the PSD matrix
+- `Gyy::Array{Complex, 3}`: Cross-spectral density matrix of size (no, nref, nf),
+- `freq::AbstractArray{Real}`: Frequency vector corresponding to the CSD matrix
 - `frange::AbstractVector{Real}`: Frequency range to consider for analysis (default: full range)
-- `type_data::Symbol`: Type of measured data
-    - `:dis`: Displacement (default)
-    - `:vel`: Velocity
-    - `:acc`: Acceleration
 
 **Alternative constructor parameters**
-- `y::AbstractMatrix{Real}`: Matrix of measured outputs (channels x samples)
+- `y::AbstractMatrix{Real}`: Matrix of measured outputs (no x nt)
+- `yref::AbstractMatrix{Real}`: Matrix of reference outputs (nref x nt)
 - `t::AbstractArray{Real}`: Time vector corresponding to the measurements
 - `fs::Real`: Sampling frequency (Hz)
-- `bs::Int`: Block size for PSD estimation
+- `bs::Int`: Block size for CSD estimation
 - `frange::AbstractVector{Real}`: Frequency range to consider for analysis (default: [0., fs/2.56])
-- `type_data::Symbol`: Type of measured data
-    - `:dis`: Displacement (default)
-    - `:vel`: Velocity
-    - `:acc`: Acceleration
-- `win::Function`: Window function for PSD estimation (default: hanning)
-- `overlap::Real`: Overlap ratio for PSD estimation (default: 0.5)
+- `win::Function`: Window function for CSD estimation (default: hanning)
+- `overlap::Real`: Overlap ratio for CSD estimation (default: 0.5)
 
 **Fields**
-- `y::AbstractMatrix{Real}`: Matrix of measured outputs (channels x samples)
+- `y::AbstractMatrix{Real}`: Matrix of measured outputs (no x nt)
+- `yref::AbstractMatrix{Real}`: Matrix of reference outputs (nref x nt)
 - `t::AbstractArray{Real}`: Time vector corresponding to the measurements
-- `halfspec::Array{Complex, 3}`: Half power spectral density matrix
+- `fullspec::Array{Complex, 3}`: Full cross-spectral density matrix
+- `halfspec::Array{Complex, 3}`: Half spectral density matrix
 - `freq::AbstractArray{Real}`: Frequency vector corresponding to the half-spectrum
-- `type_data::Symbol`: Type of measured data (:dis, :vel, :acc
+
+**Note**
+- `OMAProblem(y, t, ...) = OMAProblem(y, y, t, ...)`
 """
 @show_data struct OMAProblem{C <: Complex, R <: Real} <: MdofProblem
     y::Matrix{R}
@@ -219,9 +215,8 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
     fullspec::Array{C, 3}
     halfspec::Array{C, 3}
     freq::AbstractArray{R}
-    type_data::Symbol
 
-    function OMAProblem(Gyy::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_data = :dis) where {C <: Complex, R <: Real}
+    function OMAProblem(Gyy::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]]) where {C <: Complex, R <: Real}
 
         # Correct frange to avoid division by zero
         frange[1] == 0. ? frange[1] = 1. : nothing
@@ -233,22 +228,13 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
         ω = 2π*freq_red
         Gyy_red = Gyy[:, :, fidx]
 
-        # Conversion to admittance
-        for (f, ωf) in enumerate(ω)
-            if type_data == :vel
-                Gyy_red[:, :, f] ./= -ωf^2
-            elseif type_data == :acc
-                Gyy_red[:, :, f] ./= ωf^4
-            end
-        end
+        # Compute half spectrum
+        halfspec = half_csd(Gyy_red, freq_red)
 
-        # Compute half power spectral density
-        halfspec = half_psd(Gyy_red, freq_red)
-
-        return new{C, R}(Matrix{typeof(freq)(undef, 0, 0)}, Matrix{typeof(freq)(undef, 0, 0)}, similar(freq, 0), Gyy_red, halfspec, freq_red, type_data)
+        return new{C, R}(Matrix{typeof(freq)(undef, 0, 0)}, Matrix{typeof(freq)(undef, 0, 0)}, similar(freq, 0), Gyy_red, halfspec, freq_red)
     end
 
-    function OMAProblem(y::Matrix{R}, yref::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], type_data = :dis, win = hanning, overlap = 0.5) where {R <: Real}
+    function OMAProblem(y::Matrix{R}, yref::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], win = hanning, overlap = 0.5) where {R <: Real}
 
         # Compute half power spectral density matrix
         Gyy, freq = csd(y, yref, bs, win, fs = fs, overlap = overlap)
@@ -259,11 +245,13 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
         # FRF post-processing - Frequency range reduction
         fidx = @. frange[1] ≤ freq ≤ frange[2]
         freq_red = freq[fidx]
+        Gyy_red = Gyy[:, :, fidx]
 
-        halfspec = half_psd(y, yref, freq_red, fs, bs)
+        # Compute half spectrum
+        halfspec = half_csd(y, yref, freq_red, fs, bs)
 
-        return new{Complex{R}, R}(y, yref, t, Gyy[:, :, fidx], halfspec, freq_red, type_data)
+        return new{Complex{R}, R}(y, yref, t, Gyy_red, halfspec, freq_red)
     end
 
-    OMAProblem(y::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], type_data = :dis, win = hanning, overlap = 0.5) where {R <: Real} = OMAProblem(y, y, t, fs, bs; frange = frange, type_data = type_data, win = win, overlap = overlap)
+    OMAProblem(y::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], win = hanning, overlap = 0.5) where {R <: Real} = OMAProblem(y, y, t, fs, bs; frange = frange, win = win, overlap = overlap)
 end

@@ -44,28 +44,26 @@ end
 xcorr(y, N) = xcorr(y, y, N)
 
 """
-    psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
+    csd_from_tf(H, Gxx; id_input, id_output)
 
-Compute the output power spectral density matrix Gyy given the
-frequency response function matrix H and the input power spectral density
+Compute the output cross-spectral density matrix Gyy given the
+frequency response function matrix H and the input cross-spectral density
 matrix Gxx.
 
 **Inputs**
 - `H::Array{Complex, 3}`: Frequency response function matrix of size (no, ni, nf),
-       where ni is the number of inputs, no is the number of outputs,
-       and nf is the number of frequency points.
 - `Gxx`: Input power spectral density matrix of size (ni, ni, nf)
 - `id_input::AbstractVector`: Indices of input channels to consider (default: all inputs)
 - `id_output::AbstractVector`: Indices of output channels to consider (default: `id_input`)
 
 **Output**
-- `Gyy::Array{Complex, 3}`: Output power spectral density matrix of size (ni, no, nf)
+- `Gyy::Array{Complex, 3}`: Output cross-spectral density matrix of size (ni, no, nf)
 
 **References**
 
 [1] B. Peeters and H. Van der Auweraer, "PolyMax: A revolution in operational modal analysis". In Proceedings of the 1st International Operational Modal Analysis Conference (IOMAC), Copenhagen, Denmark, 2005.
 """
-@views function psd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
+@views function csd_from_tf(H::Array{C, 3}, Gxx; id_input = 1:size(H, 1), id_output = id_input) where {C <: Complex}
     ni = length(id_input)
     no = length(id_output)
     nf = size(H, 3)
@@ -83,9 +81,9 @@ matrix Gxx.
 
         if ndg == 3
             Gxx_f .= Gxx[:, :, f]
-            Gyy[:, :, f] .= Hi * Gxx_f * Ho'
+            Gyy[:, :, f] .= Ho * Gxx_f * Hi'
         else
-            Gyy[:, :, f] .= Hi * Gxx * Ho'
+            Gyy[:, :, f] .= Ho * Gxx * Hi'
         end
     end
 
@@ -114,16 +112,17 @@ end
 - `bs`: Block size used to compute the cross-correlation matrix
 
 **Output**
-- `Gyy_half::Array{Complex, 3}`: Half power spectral density matrix
+- `Gyy_half::Array{Complex, 3}`: Half-spectrum matrix
 
 **References**
+
 [1] S. Chauhan. "Parameter estimation algorithms in operational modal analysis". In Proceedings of the 6th International Operational Modal Analysis Conference (IOMAC), Gijon, Spain, 2015.
 
 [2] B. Peeters and H. Van der Auweraer, "PolyMax: A revolution in operational modal analysis". In Proceedings of the 1st International Operational Modal Analysis Conference (IOMAC), Copenhagen, Denmark, 2005.
 
 [3] R. Brincker and C. E. Ventura. "Introduction to operational modal analysis". Wiley, 2015.
 """
-@views function half_psd(Gyy, freq::AbstractVector)
+@views function half_csd(Gyy, freq::AbstractVector)
     # Initialization
     if Gyy isa Vector
         Gyy = reshape(Gyy, 1, 1, length(Gyy))
@@ -163,53 +162,66 @@ end
 
     fidx = freq[1] .<= freq_g .<= freq[end]
 
-    return Gyy_half[:, :, fidx]
+    return Gyy_half[:, :, fidx]/rms(win)
 end
 
-@views function half_psd(y, yref, freq, fs, bs)
+@views function half_csd(y, yref, freq, fs, bs)
+    if y isa Vector
+        y = reshape(y, 1, :)
+    end
+
+    if yref isa Vector
+        yref = reshape(yref, 1, :)
+    end
+
+    no = size(y, 1)
+    ni = size(yref, 1)
+
     # Compute cross-correlation matrices - Take only positive lags
+    nblocks = size(y, 2) ÷ bs
     n_half = iseven(bs) ? bs ÷ 2 + 1 : (bs + 1) ÷ 2
-    Ryy_pos = xcorr(y, yref, n_half)
 
     # Compute half power spectral density matrix
     df = freq[2] - freq[1] # Frequency resolution
     freq_g = (0.:df:(fs - df)) # Frequency vector for Gyy_half
 
-    no, ni = size(Ryy_pos)[1:2]
-    Gyy_half = similar(complex.(Ryy_pos), no, ni, length(freq_g))
-    Ryy_ij = similar(Ryy_pos, n_half)
-
     # Windowing
     win = flattri(n_half, 0.5)
 
     Npad = bs - n_half
-    for j in 1:ni
-        for i in 1:no
-            # Step 1: FFT to get the half power spectral density
-            Ryy_ij .= Ryy_pos[i, j, :]
+    Ryy_block = similar(y, no, ni, n_half)
+    Gyy_half = zeros(Complex{eltype(y)}, no, ni, length(freq_g))
+    Ryy_ij = similar(Ryy_block, n_half)
+    for b in 1:nblocks
+        Ryy_block .= xcorr(y[:, (b-1)*bs+1:b*bs], yref[:, (b-1)*bs+1:b*bs], n_half)
+        for j in 1:ni
+            for i in 1:no
+                # Step 1: FFT to get the half power spectral density
+                Ryy_ij .= Ryy_block[i, j, :]
 
-            # Step 1.1: Apply windowing
-            Ryy_ij .*= win
+                # Step 1.1: Apply windowing
+                Ryy_ij .*= win
 
-            # Step 1.2: Zero-pad to N points and FFT
-            Gyy_half[i, j, :] .= fft([Ryy_ij; zeros(Npad)])
+                # Step 1.2: Zero-pad to N points and FFT
+                Gyy_half[i, j, :] .+= fft([Ryy_ij; zeros(Npad)])
+            end
         end
     end
 
     fidx = freq[1] .<= freq_g .<= freq[end]
 
-    return Gyy_half[:, :, fidx]/n_half
+    return Gyy_half[:, :, fidx]/(n_half*nblocks*rms(win))
 end
 
-half_psd(y, freq, fs, bs) = half_psd(y, y, freq, fs, bs)
+half_csd(y, freq, fs, bs) = half_csd(y, y, freq, fs, bs)
 
 """
-    convert_Gyy(Gyy, freq; type = :dis)
+    convert_csd(Gyy, freq; type = :dis)
 
-Convert a power spectral density matrix Gyy to displacement type
+Convert a cross-spectral density matrix to displacement type
 
 **Inputs**
-- `Gyy`: Power spectral density matrix of size (ni, no, nf),
+- `Gyy`: Cross-spectral density matrix of size (ni, no, nf),
          where ni is the number of inputs, no is the number of outputs,
          and nf is the number of frequency points.
 - `freq::AbstractVector`: Frequency vector (Hz)
@@ -218,9 +230,9 @@ Convert a power spectral density matrix Gyy to displacement type
     - `:vel`: velocity
     - `:acc`: acceleration
 **Output**
-- `Gyy_conv`: Converted power spectral density matrix
+- `Gyy_conv`: Converted cross-spectral density matrix
 """
-function convert_Gyy(Gyy, freq; type = :dis)
+function convert_csd(Gyy, freq; type = :dis)
     if Gyy isa Vector
         Gyy = reshape(Gyy, 1, 1, length(Gyy))
     end

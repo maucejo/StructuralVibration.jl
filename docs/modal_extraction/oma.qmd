@@ -16,3 +16,618 @@ execute:
 using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
+
+Operational Modal Analysis (OMA) is a technique used to extract modal parameters of a structure based solely on its response measurements, without requiring knowledge of the input excitation forces. This is particularly useful in scenarios where it is difficult or impossible to measure the input forces, such as in ambient vibration testing of large structures.
+
+From an algorithmic perspective, OMA can be performed using various methods, including EMA-based algorithms or specific OMA techniques such as Stochastic Subspace Identification techniques. In `StructuralVibration.jl`, the following methods are implemented for OMA:
+
+- Mdof EMA-based methods ;
+
+- Stochastic Subspace Identification methods.
+
+## EMA-based methods for OMA
+
+### General principle
+
+The EMA-based methods for OMA in `StructuralVibration.jl` leverage the existing Mdof EMA algorithms to extract modal parameters from response-only data. For applying these methods, one has to replace the Frequency Response Function by the so-called positive half-spectrum of the response signals.
+
+To obtain the half-spectrum, we start from the full cross-spectral density (CSD) matrix between the output responses $\mathbf{y}$, which is given by:
+$$
+\mathbf{G}_{yy}(\omega) = \mathbf{H}(\omega) \mathbf{G}_{ff}(\omega) \mathbf{H}^H(\omega),
+$$
+where $\mathbf{H}(\omega)$ is the Frequency Response Function matrix of the system, $\mathbf{G}_{ff}(\omega)$ is the cross-spectral density matrix of the input forces, and $^H$ denotes the Hermitian transpose.
+
+Generally, OMA relies on the assumption that the input excitation are random white noise processes, implying that $\mathbf{G}_{ff}(\omega) = \mathbf{I}$. Under this assumption, a component of the cross-spectral density matrix $G_{pq}(\omega)$ can be expressed under the poles-residues form as[^1][^2]:
+$$
+G_{pq}(\omega) = \sum_{i=1}^{n} \left( \frac{{}_iR_{pq}}{j\omega - \lambda_i} + \frac{{}_iR_{pq}^\ast}{j\omega - \lambda_i^\ast} + \frac{{}_iS_{pq}}{-j\omega - \lambda_i} + \frac{{}_iS_{pq}^\ast}{-j\omega - \lambda_i^\ast} \right),
+$$
+where $\lambda_i$ and (${}_iR_{pq}$, ${}_iS_{pq}$) are the system poles and residues, respectively.
+
+[^1]: R. Brincker and L. Zhang. "Frequency domain decomposition revisited". In PProceedings of the 3rd International Operational Modal Analysis conference (IOMAC), Portonovo, Italy, 2009.
+
+[^2]: B. Peeters and H. Van der Auweraer. "Polymax: A revolution in operational modal analysis". In Proceedings of the 1st International Operational Modal Analysis conference (IOMAC), Copenhagen, Denmark, 2005.
+
+From this definition, the half-spectrum $G_{pq}^+(\omega)$ is defined as the sum of the first two terms in the above expression[^3]:
+$$
+G_{pq}^+(\omega) = \sum_{i=1}^{n} \left( \frac{{}_iR_{pq}}{j\omega - \lambda_i} + \frac{{}_iR_{pq}^\ast}{j\omega - \lambda_i^\ast} \right).
+$$
+
+[^3]: R. Brincker and C. Ventura. "Introduction to Operational Modal Analysis". Wiley, 2015.
+
+In `StructuralVibration.jl`, the half-spectrum can be computed using the `half_csd` function, which can proceed in two different ways. These approaches can be summarized as follows:
+
+- First approach - Post-processing of the full CSD matrix:
+  1. Compute the correlation matrix $\mathbf{R}_{yy}(\tau)$ of the response signals by applying an inverse Fourier transform to the CSD matrix $\mathbf{G}_{yy}(\omega)$.
+
+  2. Keep only the positive time lags of the correlation matrix $\mathbf{R}_{yy}^+(\tau)$.
+
+  3. Multiply $\mathbf{R}_{yy}^+(\tau)$ by a flat triangular window and zero-pad the negative time lags of the correlation matrix to obtain a full matrix of the same size as the original correlation matrix (See Ref. [3]). The resulting signal is noted $\tilde{\mathbf{R}}_{yy}^+(\tau)$.
+
+  4. Compute the half-spectrum $\mathbf{G}_{yy}^+(\omega)$ by applying a Fourier transform to $\tilde{\mathbf{R}}_{yy}^+(\tau)$.
+
+- Second approach - Direct computation from time-domain signals:
+
+  1. Compute the discrete directe correlation matrix $\mathbf{R}^+_k$ of the response signals directly from the time-domain data, considering only the positive time lags, using the following formula:
+  $$
+  \mathbf{R}^+_k = \frac{1}{N - k} \sum_{n=1}^{N-k} \mathbf{y}_n \mathbf{y}_{n+k}^T
+  $$
+  where $N$ is the total number of samples.
+
+  2. Multiply $\mathbf{R}_k^+$ by a flat triangular window and zero-pad the signal to obtain $\tilde{\mathbf{R}}_k^+$.
+
+  3. Compute the half-spectrum $\mathbf{G}_{yy}^+(\omega)$ by applying a Fourier transform to $\tilde{\mathbf{R}}_k^+$.
+
+:::{.callout-note}
+If the length of the time signals are longer than the block size used for the FFT computation, the half-spectrum is computed for each block and then averaged over all blocks.
+:::
+
+### Modal parameters extraction
+
+Once the half-spectrum is computed, the existing Mdof EMA methods in `StructuralVibration.jl` can be directly applied to extract the poles from the half-spectrum data. More details on the usage of these methods can be found in the [Mdof EMA documentation](index.qmd). Regarding the extraction of mode shapes in OMA using EMA-based methods, a procedure similar to the one used in EMA can't be followed since the input forces are unknown. In this case, it is generally assumed that the rank of the residues is equal to 1, allowing to extract the mode shapes from the residues using a Singular Value Decomposition (SVD). Specifically, for a given mode $i$, the residue matrix ${}_i\mathbf{R}$ can be decomposed as:
+$$
+{}_i\mathbf{R} = \mathbf{U}_i\, \mathbf{S}_i\, \mathbf{V}_i^H,
+$$
+
+where $\mathbf{U}_i$ and $\mathbf{V}_i$ are the matrices containing the left and right singular vectors, respectively, and $\mathbf{S}_i$ is the diagonal matrix of singular values. The mode shape $\boldsymbol{\phi}_i$ is then approximated by the first left singular vector corresponding to the highest singular value:
+$$
+\boldsymbol{\phi}_i \approx \mathbf{U}_{i,1}
+$$
+
+where $\mathbf{U}_{i,1}$ is the first column of $\mathbf{U}_i$. However, this assumption may not always hold true, especially in cases where the input excitation is not perfectly white noise or when multiple modes are closely spaced. In this case, more than one singular singular value may be significant, and the mode shape extraction may require additional considerations. In `StructuralVibration.jl`, the following procedure is adopted to extract the mode shapes from the residues:
+
+1. For each mode $i$, compute the SVD of the residue matrix ${}_i\mathbf{R}$ to obtain $\mathbf{U}_i$, $\mathbf{S}_i$.
+
+2. Filter the singular values in $\mathbf{S}_i$ based on a predefined threshold to determine the number $j$ of significant singular values. Here, the threshold is set to 1% of the largest singular value.
+
+3. For the first mode, select $\boldsymbol{\phi}_i = \mathbf{U}_{i,j}$ as the mode shape, based on energy considerations. The selected singular vector corresponds to the highest energy spread. Generally, this will be the first singular vector.
+
+4. For subsequent modes, select the singular vector $\mathbf{U}_{i,j}$ that minimizes the Modal Assurance Criterion (MAC) with respect to the previously extracted mode shapes, ensuring orthogonality and consistency among the extracted modes.
+
+### Half-spectrum reconstruction
+
+From the identified modal parameters (poles and residues), it is possible to reconstruct the half_spectrum of the system under study using the `half_csd_reconstruction` function. This function implements the following relation for a number $M$ of identified modes:
+
+$$
+G_{pq}^+(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
+$$
+
+However, as for the FRF reconstruction in EMA, the reconstructed half-spectrum may not perfectly match the original half-spectrum due to modeling errors and noise in the data. To To account for this, it is common to include lower and upper residuals in the FRF reconstruction. This means that the admittance matrix can be expressed as:
+$$
+G_{pq}^+(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right] + \frac{L_{pq}}{j\omega} + j\omega\, U_{pq},
+$$
+
+where $L_{pq}$ and $U_{pq}$ are the lower and upper residuals, respectively. These residuals can be computed using the `compute_residuals` function.
+
+::: {.callout-note}
+As indicated by Peeters and Van der Auweraer in Ref. [2], the lower and upper residuals are independent of the output quantity. More precisely, this means that the residuals terms are always of the form:
+$$
+\text{res}_{pq} = \frac{L_{pq}}{j\omega} + j\omega\, U_{pq}.
+$$
+:::
+
+## Stochastic Subspace Identification methods
+
+Stochastic Subspace Identification (SSI) methods are a class of techniques used in Operational Modal Analysis (OMA) to extract modal parameters from output-only data. These methods are based on the concept of subspace identification, which involves constructing a state-space model of the system from the measured response data. From a mathematical standpoint, the goal is to identify the system matrices $(\mathbf{A}, \mathbf{C})$ of the state-space representation:
+$$
+\begin{aligned}
+\dot{\mathbf{x}}_{k+1} &= \mathbf{A}\, \mathbf{x}_k + \mathbf{w}_k \\
+\mathbf{y}_k &= \mathbf{C}\, \mathbf{x}_k + \mathbf{v}_k
+\end{aligned}
+$$
+where $\mathbf{x}_k$ is the state vector, $\mathbf{y}_k$ is the output vector, and $\mathbf{w}_k$ and $\mathbf{v}_k$ are process and measurement noise, respectively. Here, the system matrix $\mathbf{A}$ is the discrete-time state transition matrix that contains information about the system dynamics. If a ZOH discretization is considered, the relationship between the continuous-time system matrix $\mathbf{A}_c$ and the discrete-time system matrix $\mathbf{A}$ is given by:
+$$
+\mathbf{A} = e^{\mathbf{A}_c T_s}
+$$
+where $T_s$ is the sampling period. The eigenvalues of $\mathbf{A}$ can be used to extract the continuous-time poles $\lambda_i$ of the system using the following relation:
+$$
+\lambda_i = \frac{\ln(\mu_i)}{T_s}
+$$
+where $\mu_i$ are the eigenvalues of $\mathbf{A}$.
+
+The mode shapes $\boldsymbol{\phi}_i$ can be obtained from the output matrix $\mathbf{C}$ and the eigenvectors of $\mathbf{A}$ using the following relation:
+$$
+\boldsymbol{\phi}_i = \mathbf{C}\, \boldsymbol{\psi}_i
+$$
+where $\boldsymbol{\psi}_i$ are the eigenvectors of $\mathbf{A}$.
+
+### Covariance-driven Stochastic Subspace Identification
+
+Covariance-driven Stochastic Subspace Identification (Cov-SSI) is a method that utilizes the covariance of the output data to identify the system matrices. The key steps involved in Cov-SSI are as follows:
+
+1. Compute the covariance matrices $\mathbf{R}_i$ of the output data at different time lags $i$:
+  $$
+  \mathbf{R}_i = \frac{1}{N - i} \sum_{n = 0}^{N-i} \mathbf{y}_n\, \mathbf{y}_{n+i}^T
+  $$
+
+::: {.callout-note}
+If a set of reference signals $\mathbf{y}_{ref}$ is provided, the cross-covariance matrices between the output signals and the reference signals are computed instead:
+$$
+\mathbf{R}_i = \frac{1}{N - i} \sum_{n=0}^{N-i} \mathbf{y}_n\, {\mathbf{y}_{n+i}^\text{ref}}^T
+$$
+:::
+
+2. Construct a block Toeplitz matrix from the covariance matrices:
+
+  $$
+  \mathbf{T} = \begin{bmatrix}
+  \mathbf{R}_i & \mathbf{R}_{i-1} & \cdots & \mathbf{R}_1 \\
+  \mathbf{R}_{i+1} & \mathbf{R}_i & \ddots & \mathbf{R}_2 \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \mathbf{R}_{2i-1} & \mathbf{R}_{2i-2} & \cdots & \mathbf{R}_i
+  \end{bmatrix}
+  $$
+
+3. Compute the observability matrix $\mathbf{O}$ from the SVD of $\mathbf{T}$:
+  $$
+  \mathbf{O} = \begin{bmatrix}
+  \mathbf{C} \\
+  \mathbf{C} \mathbf{A} \\
+  \mathbf{C} \mathbf{A}^2 \\
+  \vdots \\
+  \mathbf{C} \mathbf{A}^{i-1}
+  \end{bmatrix}
+  = \mathbf{U}_n\, \mathbf{S}_n^{1/2},
+  $$
+  where $\mathbf{U}_n$ and $\mathbf{S}_n$ are the matrices containing the first $n$ left singular vectors and singular values, respectively.
+
+4. Extract the system matrices $\mathbf{A}$ and $\mathbf{C}$ from the Observability matrix
+   - The output matrix $\mathbf{C}$ is obtained from the first block row of $\mathbf{O}$.
+   - The system matrix $\mathbf{A}$ is obtained by solving the following equation:
+  $$
+  \mathbf{O}_\text{up}\, \mathbf{A} = \mathbf{O}_\text{down}
+  $$
+  where $\mathbf{O}_\text{up}$ and $\mathbf{O}_\text{down}$ are derived from the observability matrix removing the last and first block rows, respectively.
+
+### Data-driven Stochastic Subspace Identification
+
+Data-driven Stochastic Subspace Identification (Data-SSI) is a method that directly utilizes the output data to identify the system matrices without explicitly computing the covariance matrices. The key steps involved in Data-SSI are as follows:
+
+1. Construct a block Hankel matrix from the output data:
+  $$
+  \mathbf{H} = \frac{1}{\sqrt{j}}\begin{bmatrix}
+  \mathbf{y}_0 & \mathbf{y}_1 & \cdots & \mathbf{y}_{j-1} \\
+  \mathbf{y}_1 & \mathbf{y}_2 & \cdots & \mathbf{y}_j \\
+  \cdots & \cdots & \cdots & \cdots \\
+  \mathbf{y}_{i - 1} & \mathbf{y}_i & \cdots & \mathbf{y}_{i+j-2} \\
+  \hline
+  \mathbf{y}_i & \mathbf{y}_{i+1} & \cdots & \mathbf{y}_{i+j-1} \\
+  \mathbf{y}_{i+1} & \mathbf{y}_{i+2} & \cdots & \mathbf{y}_{i+j} \\
+  \cdots & \cdots & \cdots & \cdots \\
+  \mathbf{y}_{2i - 1} & \mathbf{y}_{2i} & \cdots & \mathbf{y}_{2i+j-2}
+  \end{bmatrix} = \begin{bmatrix}
+  \mathbf{Y}_p \\
+  \hline
+  \mathbf{Y}_f
+  \end{bmatrix}
+  $$
+
+    where $i$ is the number of block rows and $j$ is the number of columns of the Hankel matrix and $\mathbf{Y}_p$ and $\mathbf{Y}_f$ are the past and future output data matrices. respectively.
+
+::: {.callout-note}
+If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matrix $\mathbf{Y}_p$ is constructed using the reference signals instead of the output signals.
+:::
+
+2. Construct the projection of the future output data onto the past output data:
+  $$
+  \mathbf{P} = \mathbf{Y}_f\, \mathbf{Y}_p^T\, (\mathbf{Y}_p\, \mathbf{Y}_p^T)^+\, \mathbf{Y}_p
+  $$
+
+3. Compute the observability matrix $\mathbf{O}$ from the SVD of $\mathbf{P}$.
+
+4. Extract the system matrices $\mathbf{A}$ and $\mathbf{C}$ from the observability matrix as described in the Cov-SSI method.
+
+## API
+
+**Data types**
+
+::: {.api}
+```{julia}
+#| echo: false
+@doc OMAProblem
+```
+:::
+
+**Related functions**
+
+::: {.api}
+**xcorr**
+
+---
+```{julia}
+#| echo: false
+@doc xcorr
+```
+:::
+
+::: {.api}
+**half_csd**
+
+---
+```{julia}
+#| echo: false
+@doc half_csd
+```
+:::
+
+::: {.api}
+**csd_from_tf**
+
+---
+```{julia}
+#| echo: false
+@doc csd_from_tf
+```
+:::
+
+::: {.api}
+**convert_csd**
+
+---
+```{julia}
+#| echo: false
+@doc convert_csd
+```
+:::
+
+::: {.api}
+**poles_extraction**
+
+---
+```{julia}
+#| echo: false
+@doc poles_extraction(::OMAProblem, order::Int, method::StructuralVibration.OMAModalExtraction)
+```
+:::
+
+::: {.api}
+**modes_extraction**
+
+---
+```{julia}
+#| echo: false
+@doc modes_extraction
+```
+:::
+
+::: {.api}
+**half_csd_reconstruction**
+
+---
+```{julia}
+#| echo: false
+@doc half_csd_reconstruction
+```
+:::
+
+::: {.api}
+**compute_residuals**
+
+---
+```{julia}
+#| echo: false
+@doc compute_residuals(::OMAProblem)
+```
+:::
+
+## Example
+
+### Data preparation
+
+```{julia}
+#| output: false
+# Structure parameters of the beam
+L = 1.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+Iz = b*h^3/12 # Moment of inertia
+
+# Material parameters
+E = 2.1e11  # Young's modulus
+ρ = 7850.   # Density
+ξ = 0.01    # Damping ratio
+
+# Mesh
+x = 0:0.05:L
+
+# Acquisition parameters
+sample_rate = 4096
+block_size = 4096
+fft_params = FFTParameters(sample_rate, block_size)
+
+freq = fft_params.freq
+t = fft_params.t
+dt = fft_params.dt
+
+# Mode calculation - Simply supported boundary conditions
+beam = Beam(L, S, Iz, E, ρ)
+ωn, kn = modefreq(beam, 2freq[end])
+ms_ref = modeshape(beam, kn, x)
+
+# Chirp excitation
+F0 = 10.
+chirp = SweptSine(F0, t[1], 0.8t[end], freq[1], freq[end], zero_end = true)
+force = zeros(length(x), length(t))
+force[2, :] .= excitation(chirp, t)
+
+# Response calculation
+prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t, ismodal = true)
+y = solve(prob).u
+```
+
+### EMA-based OMA
+
+#### Poles extraction using LSCF
+```{julia}
+# OMA problem definition
+tukeywin(x) = tukey(x, 0.5)
+prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin, frange = [1., 1000.])
+
+# EMA-MDOF pole stability analysis
+sol_stab = stabilization(prob_oma, 30, LSCF())
+
+# Extraction of stable poles
+stab_poles = sol_stab.poles[end][.!isnan.(sol_stab.poles[end])]
+
+# Plot stabilization diagram
+stabilization_plot(sol_stab)
+```
+
+```{julia}
+#| echo: false
+# Natural frequencies and damping ratios
+fn_lscf, dr_lscf = poles2modal(stab_poles)
+
+fig_f = Figure()
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
+
+scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f1, 1:6, fn_lscf, markersize = 20, label = "LSCF")
+axislegend(ax_f1, position = :lt)
+
+scatter!(ax_f2, 1:6, 100ξ*ones(6), marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f2, 1:6, 100dr_lscf, markersize = 20, label = "LSCF")
+
+display(fig_f);
+```
+
+#### Mode shapes extraction
+```{julia}
+#| output: false
+
+# Computation of the mode residues
+res = mode_residues(prob_oma, stab_poles)
+
+# Extraction of the mode shapes
+ms_ema = modeshape_extraction(res, stab_poles, LSCF(), modetype = :oma)[1]
+
+# Convert to real mode shapes
+ms_ema_real = c2r_modeshape(ms_ema)
+
+# Mode shape scaling for comparison using the modal scale factor
+scaling = msf(ms_ref[:, 1:size(ms_ema_real, 2)], ms_ema_real)
+ms_ema_scaled = ms_ema_real .* scaling'
+```
+
+```{julia}
+#| echo: false
+
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+
+lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
+lines!(ax_mode1, x, ms_ema_scaled[:, 1], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, x, ms_ref[:, 2], label = "Reference")
+lines!(ax_mode2, x, ms_ema_scaled[:, 2], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, x, ms_ref[:, 3], label = "Reference")
+lines!(ax_mode3, x, ms_ema_scaled[:, 3], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, x, ms_ref[:, 6], label = "Reference")
+lines!(ax_mode4, x, ms_ema_scaled[:, 6], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
+```
+
+#### Half-spectrum reconstruction
+
+```{julia}
+#| output: false
+
+# Half-spectrum reconstruction - without residuals
+Syy = half_csd_reconstruction(res, stab_poles, prob_oma.freq)
+
+# Half-spectrum reconstruction - with residuals
+lr, ur = compute_residuals(prob_oma, res, stab_poles)
+Syy2 = half_csd_reconstruction(res, stab_poles, prob_oma.freq, lr = lr, ur = ur)
+```
+
+```{julia}
+#| echo: false
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Half-spectrum (dB, ref: 1 m²)", title = "FRF Reconstruction using Sdof method")
+lines!(ax, prob_oma.freq, 10log10.(abs.(prob_oma.halfspec[2, 2, :])), label = "Original Half-spectrum")
+lines!(ax, prob_oma.freq, 10log10.(abs.(Syy[2, 2, :])); linestyle = :dash, label = "Reconstructed Half-spectrum (no residuals)")
+lines!(ax, prob_oma.freq, 10log10.(abs.(Syy2[2, 2, :])); linestyle = :dot, label = "Reconstructed Half-spectrum (with residuals)")
+xlims!(ax, prob_oma.freq[1], prob_oma.freq[end])
+axislegend(ax; position = :rt)
+
+display(fig);
+```
+
+### Covariance-driven Stochastic Subspace Identification
+
+```{julia}
+# Stabilization analysis
+sol_stab_cssi = stabilization(prob_oma, 30, CovSSI())
+
+# Plot stabilization diagram
+stabilization_plot(sol_stab_cssi)
+```
+
+
+```{julia}
+#| output: false
+
+# Extraction of stable modes
+p_cssi, ms_cssi = modes_extraction(prob_oma, 30, CovSSI())
+ms_cssi_real = c2r_modeshape(ms_cssi)
+
+# Mode shape scaling for comparison using the modal scale factor
+scaling = msf(ms_ref[:, 1:size(ms_cssi_real, 2)], ms_cssi_real)
+ms_cssi_scaled = ms_cssi_real .* scaling'
+```
+
+```{julia}
+#| echo: false
+
+# Natural frequencies and damping ratios
+fn_cssi, dr_cssi = poles2modal(p_cssi)
+
+fig_f = Figure()
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
+
+scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f1, 1:6, fn_cssi, markersize = 20, label = "Cov-SSI")
+axislegend(ax_f1, position = :lt)
+
+scatter!(ax_f2, 1:6, 100ξ*ones(6), marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f2, 1:6, 100dr_cssi, markersize = 20, label = "Cov-SSI")
+
+display(fig_f);
+```
+
+```{julia}
+#| echo: false
+
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+
+lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
+lines!(ax_mode1, x, ms_cssi_scaled[:, 1], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, x, ms_ref[:, 2], label = "Reference")
+lines!(ax_mode2, x, ms_cssi_scaled[:, 2], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, x, ms_ref[:, 3], label = "Reference")
+lines!(ax_mode3, x, ms_cssi_scaled[:, 3], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, x, ms_ref[:, 4], label = "Reference")
+lines!(ax_mode4, x, ms_cssi_scaled[:, 4], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
+```
+
+### Data-driven Stochastic Subspace Identification
+
+```{julia}
+# Stabilization analysis
+sol_stab_dssi = stabilization(prob_oma, 30, DataSSI())
+
+# Plot stabilization diagram
+stabilization_plot(sol_stab_dssi)
+```
+
+
+```{julia}
+#| output: false
+
+# Extraction of stable modes
+p_dssi, ms_dssi = modes_extraction(prob_oma, 30, DataSSI())
+ms_dssi_real = c2r_modeshape(ms_dssi)
+
+# Mode shape scaling for comparison using the modal scale factor
+scaling = msf(ms_ref[:, 1:size(ms_dssi_real, 2)], ms_dssi_real)
+ms_dssi_scaled = ms_dssi_real .* scaling'
+```
+
+```{julia}
+#| echo: false
+
+# Natural frequencies and damping ratios
+fn_dssi, dr_dssi = poles2modal(p_dssi)
+
+fig_f = Figure()
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
+
+scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f1, 1:6, fn_dssi, markersize = 20, label = "Data-SSI")
+axislegend(ax_f1, position = :lt)
+
+scatter!(ax_f2, 1:6, 100ξ*ones(6), marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f2, 1:6, 100dr_dssi, markersize = 20, label = "Cov-SSI")
+
+display(fig_f);
+```
+
+```{julia}
+#| echo: false
+
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+
+lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
+lines!(ax_mode1, x, ms_dssi_scaled[:, 1], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, x, ms_ref[:, 2], label = "Reference")
+lines!(ax_mode2, x, ms_dssi_scaled[:, 2], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, x, ms_ref[:, 3], label = "Reference")
+lines!(ax_mode3, x, ms_dssi_scaled[:, 3], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, x, ms_ref[:, 4], label = "Reference")
+lines!(ax_mode4, x, ms_dssi_scaled[:, 4], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
+```

@@ -51,7 +51,7 @@ force = zeros(length(xexc), length(t))
 force[2, :] .= x
 
 prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
-y = solve(prob).ddu
+y = solve(prob).u
 
 # OMA problem definition
 # idx_ref = 1:length(xexc)
@@ -63,10 +63,10 @@ p_dssi, ms_dssi = modes_extraction(prob_oma, 10, DataSSI())
 p_cssi, ms_cssi = modes_extraction(prob_oma, 50, CovSSI())
 
 p_dssi = poles_extraction(prob_oma, 28, DataSSI(), stabdiag = true)
-p_cssi = poles_extraction(prob_oma, 100, CovSSI(), stabdiag = true)
+p_cssi = poles_extraction(prob_oma, 30, CovSSI(), stabdiag = true)
 
 # EMA-MDOF pole stability analysis
-sol_stab = stabilization(prob_oma, 50, CovSSI())
+sol_stab = stabilization(prob_oma, 30, CovSSI())
 
 # Plot stabilization diagram
 stabilization_plot(sol_stab, display_poles = [true, false, false])

@@ -25,7 +25,7 @@ function mof(fn, dr)
         end
     end
 
-    return mof
+    return length(mof) == 1 ? mof[1] : mof
 end
 
 ## Mode complexity
@@ -49,6 +49,10 @@ This indicator is a weighted percentage of the degrees of freedom of the respons
 [1] M+P Analyzer manual. Rev. 5.1. 2017
 """
 function mov(poles, ms, ci)
+    if ms isa Vector
+        ms = reshape(ms, :, 1)
+    end
+
     n, m = size(ms)
     mov = zeros(m)
     s = zeros(n)
@@ -64,7 +68,7 @@ function mov(poles, ms, ci)
         mov[i] = sum(s.*abs2.(phi))/sum(abs2, phi)
     end
 
-    return mov
+    return length(mov) == 1 ? mov[1] : mov
 end
 
 """
@@ -87,6 +91,10 @@ This indicator aims to measure the complexity of a mode. Its value ranges from 0
 [2] M+P Analyzer manual. Rev. 5.1. 2017
 """
 function mpc(ms)
+    if ms isa Vector
+        ms = reshape(ms, :, 1)
+    end
+
     mpc = zeros(size(ms, 2))
 
     phi = ms .- mean(ms, dims = 1)
@@ -105,7 +113,7 @@ function mpc(ms)
         mpc[i] = ((λ1 - λ2)/(λ1 + λ2))^2
     end
 
-    return mpc
+    return length(mpc) == 1 ? mpc[1] : mpc
 end
 
 """
@@ -128,6 +136,10 @@ This indicator aims to measure the complexity of a mode. Its value ranges from 1
 [2] M+P Analyzer manual. Rev. 5.1. 2017
 """
 function mcf(ms)
+    if ms isa Vector
+        ms = reshape(ms, :, 1)
+    end
+
     mcf = zeros(size(ms, 2))
 
     phi_r = real(ms)
@@ -141,7 +153,7 @@ function mcf(ms)
         mcf[i] = 1 - ((Sxx - Syy)^2 + 4Sxy^2)/(Sxx + Syy)^2
     end
 
-    return mcf
+    return length(mcf) == 1 ? mcf[1] : mcf
 end
 
 """
@@ -164,6 +176,9 @@ This indicator aims to measure the complexity of a mode. Its value is close to 0
 [2] A. C. Dederichs and O. Oiseth. Experimental comparison of automatic operational modal analysis algorithms for application to long-span road bridges. Mechanical Systems and Signal Processing. 199: 110485. 2023
 """
 function mpd(ms)
+    if ms isa Vector
+        ms = reshape(ms, :, 1)
+    end
 
     n, m = size(ms)
     mpd = zeros(m)
@@ -183,7 +198,7 @@ function mpd(ms)
         mpd[i] = sum(num)/den
     end
 
-    return mpd
+    return length(mpd) == 1 ? mpd[1] : mpd
 end
 
 ## Correlation functions
@@ -204,6 +219,14 @@ Compute the modal scale factor between experimental and theoretical mode shapes.
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
 function msf(ms_exp, ms_th)
+    if ms_exp isa Vector
+        ms_exp = reshape(ms_exp, :, 1)
+    end
+
+    if ms_th isa Vector
+        ms_th = reshape(ms_th, :, 1)
+    end
+
     ne, me = size(ms_exp)
     nt, mt = size(ms_th)
 
@@ -219,7 +242,7 @@ function msf(ms_exp, ms_th)
         msf[i] = num/den
     end
 
-    return msf
+    return length(msf) == 1 ? msf[1] : msf
 end
 
 """
@@ -239,6 +262,14 @@ Compute the coordinate modal assurance criterion (COMAC) between experimental an
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
 function comac(ms_exp, ms_th)
+    if ms_exp isa Vector
+        ms_exp = reshape(ms_exp, :, 1)
+    end
+
+    if ms_th isa Vector
+        ms_th = reshape(ms_th, :, 1)
+    end
+
     ne, me = size(ms_exp)
     nt, mt = size(ms_th)
 
@@ -247,14 +278,15 @@ function comac(ms_exp, ms_th)
     end
 
     # Scale experimental mode shapes w.r.t. theoretical ones
-    ms_exp .*= transpose(msf(ms_exp, ms_th))
+    ms_exp ./= transpose(msf(ms_exp, ms_th))
 
     num = sum(abs2, ms_exp.*ms_th, dims = 2)
     den = sum(abs2, ms_th, dims = 2) .* sum(abs2, ms_exp, dims = 2)
 
-    return num./den
-end
+    comac = num./den
 
+    return length(comac) == 1 ? comac[1] : comac
+end
 
 """
     ecomac(ms_exp, ms_th)
@@ -274,6 +306,14 @@ Compute the enhanced coordinate modal assurance criterion (eCOMAC) between exper
 [2] G. Martin, E. Balmes and T. Chancelier. Improved Modal Assurance Criterion using a quantification of identification errors per mode/sensor. Proceedings of ISMA 2014, pp. 2509-2519. 2014.
 """
 function ecomac(ms_exp, ms_th)
+    if ms_exp isa Vector
+        ms_exp = reshape(ms_exp, :, 1)
+    end
+
+    if ms_th isa Vector
+        ms_th = reshape(ms_th, :, 1)
+    end
+
     ne, me = size(ms_exp)
     nt, mt = size(ms_th)
 
@@ -282,9 +322,11 @@ function ecomac(ms_exp, ms_th)
     end
 
     # Scale experimental mode shapes w.r.t. theoretical ones
-    ms_exp .*= transpose(msf(ms_exp, ms_th))
+    ms_exp ./= transpose(msf(ms_exp, ms_th))
 
-    return mean(abs, ms_th .- ms_exp, dims = 2)/2.
+    ecomac = mean(abs, ms_th .- ms_exp, dims = 2)/2
+
+    return length(ecomac) == 1 ? ecomac[1] : ecomac
 end
 
 """
@@ -293,8 +335,8 @@ end
 Compute the modal assurance criterion (MAC) between experimental and theoretical mode shapes.
 
 **Inputs**
-- `ms_exp`: Experimental mode shapes (nmes x nmodes array)
-- `ms_th`: Theoretical mode shapes (nmes x nmodes array)
+- `ms_exp`: Experimental mode shapes (nmes x nmodes array) if `ms_th` is a matrix
+- `ms_th`: Theoretical mode shapes (nmes x nmodes array) if `ms_th` is a matrix
 
 **Output**
 - `mac`: Modal assurance criterion values (nmodes x nmodes array)
@@ -304,6 +346,14 @@ Compute the modal assurance criterion (MAC) between experimental and theoretical
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
 function mac(ms_exp, ms_th)
+    if ms_exp isa Vector
+        ms_exp = reshape(ms_exp, :, 1)
+    end
+
+    if ms_th isa Vector
+        ms_th = reshape(ms_th, :, 1)
+    end
+
     ne, me = size(ms_exp)
     nt, mt = size(ms_th)
 
@@ -318,10 +368,8 @@ function mac(ms_exp, ms_th)
         mac[i, j] = num/real(den)
     end
 
-
-    return mac
+    return sum(size(mac)) == 2 ? mac[1, 1] : mac
 end
-
 
 """
     frac(frf_exp, frf_th)
@@ -386,7 +434,7 @@ function cmif(frf; type = :dis)
         end
     end
 
-    return cmif
+    return size(cmif, 1) == 1 ? vec(cmif) : cmif
 end
 
 """
@@ -407,5 +455,5 @@ Compute the power spectrum indicator function (PSIF).
 function psif(frf)
     n = ndims(frf)
 
-    return sum(abs2, frf, dims = 1:n-1)[:]
+    return vec(sum(abs2, frf, dims = 1:n-1))
 end
