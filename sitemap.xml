@@ -5,12 +5,8 @@
     <lastmod>2025-10-23T14:10:24.443Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/modal_extraction/frf_reconstruction.html</loc>
-    <lastmod>2025-10-23T16:50:29.706Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/modal_extraction/sdof_methods.html</loc>
-    <lastmod>2025-10-23T11:48:15.098Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/modal_extraction/oma.html</loc>
+    <lastmod>2025-11-20T13:21:55.082Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/other.html</loc>
@@ -18,11 +14,11 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/overview/installation.html</loc>
-    <lastmod>2025-10-30T15:34:38.831Z</lastmod>
+    <lastmod>2025-11-20T13:21:54.982Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/index.html</loc>
-    <lastmod>2025-10-24T08:36:04.123Z</lastmod>
+    <lastmod>2025-11-20T13:21:55.068Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/models/index.html</loc>
@@ -45,6 +41,10 @@
     <lastmod>2025-05-14T12:54:10.000Z</lastmod>
   </url>
   <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/references/index.html</loc>
+    <lastmod>2025-11-20T13:21:55.020Z</lastmod>
+  </url>
+  <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/frequency_solvers.html</loc>
     <lastmod>2025-04-02T12:58:42.000Z</lastmod>
   </url>
@@ -62,11 +62,11 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/overview/release_notes.html</loc>
-    <lastmod>2025-10-23T12:36:48.952Z</lastmod>
+    <lastmod>2025-11-20T13:21:55.082Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/index.html</loc>
-    <lastmod>2025-10-20T13:55:58.297Z</lastmod>
+    <lastmod>2025-11-20T13:21:54.986Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/noise.html</loc>
@@ -74,10 +74,6 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/modal_extraction/index.html</loc>
-    <lastmod>2025-10-21T14:02:29.276Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/modal_extraction/mdof_methods.html</loc>
-    <lastmod>2025-10-23T10:49:53.045Z</lastmod>
+    <lastmod>2025-11-20T13:21:55.082Z</lastmod>
   </url>
 </urlset>
