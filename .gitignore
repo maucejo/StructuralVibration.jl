@@ -5,3 +5,4 @@
 /src/unsused
 .vscode
 .DS_Store
+/docs/.DS_Store
