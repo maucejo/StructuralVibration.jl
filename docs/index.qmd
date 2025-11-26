@@ -12,7 +12,7 @@ format:
 
 <br/>
 
-[![Generic badge](https://img.shields.io/badge/Version-1.1.0-cornflowerblue.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-1.1.1-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
@@ -173,7 +173,7 @@ The package provides the following features:
 # Project direct dependencies
 
 ```julia
-Project StructuralVibration v1.1.0
+Project StructuralVibration v1.1.1
 Status
   [717857b8] DSP v0.8.4
   [7a1cc6ca] FFTW v1.10.0

@@ -216,6 +216,12 @@ Compute the modal scale factor between experimental and reference mode shapes.
 **Reference**
 
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
+
+[2] M. Rades. Comparison of vibration properties: Comparison of modal properties. Encyclopedia of Vibration. pp. 265-273. 2007.
+
+**Note**
+
+The modal scale factor is computed as the least squares error estimate of the proportionality constant between the corresponding elements of each modal vector
 """
 function msf(ms_exp, ms_ref)
     if ms_exp isa Vector
@@ -234,8 +240,8 @@ function msf(ms_exp, ms_ref)
 
     msf = zeros(me)
     for (i, (pe, pr)) in enumerate(zip(eachcol(ms_exp), eachcol(ms_ref)))
-        num = pe'conj(pr)
-        den = pe'conj(pe)
+        num = pe'pr
+        den = pe'pe
         msf[i] = num/den
     end
 
