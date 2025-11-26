@@ -955,7 +955,7 @@ spectral density matrix Gyy.</code></pre>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ms_ema_real <span class="op">=</span> <span class="fu">c2r_modeshape</span>(ms_ema)</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Mode shape scaling for comparison using the modal scale factor</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ms_ref[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ms_ema_real, <span class="fl">2</span>)], ms_ema_real)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ms_ema_real, ms_ref[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ms_ema_real, <span class="fl">2</span>)])</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ms_ema_scaled <span class="op">=</span> ms_ema_real <span class="op">.*</span> scaling<span class="op">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="30" class="cell" data-execution_count="1">
@@ -999,7 +999,7 @@ spectral density matrix Gyy.</code></pre>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ms_cssi_real <span class="op">=</span> <span class="fu">c2r_modeshape</span>(ms_cssi)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Mode shape scaling for comparison using the modal scale factor</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ms_ref[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ms_cssi_real, <span class="fl">2</span>)], ms_cssi_real)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ms_cssi_real, ms_ref[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ms_cssi_real, <span class="fl">2</span>)])</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ms_cssi_scaled <span class="op">=</span> ms_cssi_real <span class="op">.*</span> scaling<span class="op">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="40" class="cell" data-execution_count="1">
@@ -1031,7 +1031,7 @@ spectral density matrix Gyy.</code></pre>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ms_dssi_real <span class="op">=</span> <span class="fu">c2r_modeshape</span>(ms_dssi)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Mode shape scaling for comparison using the modal scale factor</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ms_ref[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ms_dssi_real, <span class="fl">2</span>)], ms_dssi_real)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ms_dssi_real, ms_ref[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ms_dssi_real, <span class="fl">2</span>)])</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ms_dssi_scaled <span class="op">=</span> ms_dssi_real <span class="op">.*</span> scaling<span class="op">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="48" class="cell" data-execution_count="1">
