@@ -203,14 +203,13 @@ end
 
 ## Correlation functions
 """
-    msf(ms_exp, ms_th)
+    msf(ms_exp, ms_ref)
 
-Compute the modal scale factor between experimental and theoretical mode shapes.
+Compute the modal scale factor between experimental and reference mode shapes.
 
 **Inputs**
 - `ms_exp`: Experimental mode shapes (nmes x nmodes array)
-- `ms_th`: Theoretical mode shapes (nmes x nmodes array)
-
+- `ms_ref`: Reference mode shapes (nmes x nmodes array)
 **Output**
 - `msf`: Modal scale factors (nmodes array)
 
@@ -218,27 +217,25 @@ Compute the modal scale factor between experimental and theoretical mode shapes.
 
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
-function msf(ms_exp, ms_th)
+function msf(ms_exp, ms_ref)
     if ms_exp isa Vector
         ms_exp = reshape(ms_exp, :, 1)
     end
 
-    if ms_th isa Vector
-        ms_th = reshape(ms_th, :, 1)
+    if ms_ref isa Vector
+        ms_ref = reshape(ms_ref, :, 1)
     end
 
     ne, me = size(ms_exp)
-    nt, mt = size(ms_th)
-
-    if (ne != nt) || (me != mt)
-        throw(DimensionMismatchError("Experimental and theoretical mode shapes must have the same dimensions"))
+    nr, mr = size(ms_ref)
+    if (ne != nr) || (me != mr)
+        throw(DimensionMismatchError("Experimental and reference mode shapes must have the same dimensions"))
     end
 
     msf = zeros(me)
-    for (i, (pe, pt)) in enumerate(zip(eachcol(ms_exp), eachcol(ms_th)))
-
-        num = pt'conj(pe)
-        den = pt'conj(pt)
+    for (i, (pe, pr)) in enumerate(zip(eachcol(ms_exp), eachcol(ms_ref)))
+        num = pe'conj(pr)
+        den = pe'conj(pe)
         msf[i] = num/den
     end
 
@@ -246,14 +243,13 @@ function msf(ms_exp, ms_th)
 end
 
 """
-    comac(ms_exp, ms_th)
+    comac(ms_exp, ms_ref)
 
-Compute the coordinate modal assurance criterion (COMAC) between experimental and theoretical mode shapes.
+Compute the coordinate modal assurance criterion (COMAC) between experimental and reference mode shapes.
 
 **Inputs**
 - `ms_exp`: Experimental mode shapes (nmes x nmodes array)
-- `ms_th`: Theoretical mode shapes (nmes x nmodes array)
-
+- `ms_ref`: Reference mode shapes (nmes x nmodes array)
 **Output**
 - `comac`: Coordinate modal assurance criterion values (nmes array)
 
@@ -261,27 +257,26 @@ Compute the coordinate modal assurance criterion (COMAC) between experimental an
 
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
-function comac(ms_exp, ms_th)
+function comac(ms_exp, ms_ref)
     if ms_exp isa Vector
         ms_exp = reshape(ms_exp, :, 1)
     end
 
-    if ms_th isa Vector
-        ms_th = reshape(ms_th, :, 1)
+    if ms_ref isa Vector
+        ms_ref = reshape(ms_ref, :, 1)
     end
 
     ne, me = size(ms_exp)
-    nt, mt = size(ms_th)
+    nr, mr = size(ms_ref)
 
-    if (ne != nt) || (me != mt)
-        throw(DimensionMismatch("Experimental and theoretical mode shapes must have the same dimensions"))
+    if (ne != nr) || (me != mr)
+        throw(DimensionMismatch("Experimental and reference mode shapes must have the same dimensions"))
     end
 
-    # Scale experimental mode shapes w.r.t. theoretical ones
-    ms_exp ./= transpose(msf(ms_exp, ms_th))
-
-    num = sum(abs2, ms_exp.*ms_th, dims = 2)
-    den = sum(abs2, ms_th, dims = 2) .* sum(abs2, ms_exp, dims = 2)
+    # Scale experimental mode shapes w.r.t. reference ones
+    ms_exp .*= transpose(msf(ms_exp, ms_ref))
+    num = sum(abs2, ms_exp.*ms_ref, dims = 2)
+    den = sum(abs2, ms_ref, dims = 2) .* sum(abs2, ms_exp, dims = 2)
 
     comac = num./den
 
@@ -289,14 +284,13 @@ function comac(ms_exp, ms_th)
 end
 
 """
-    ecomac(ms_exp, ms_th)
+    ecomac(ms_exp, ms_ref)
 
-Compute the enhanced coordinate modal assurance criterion (eCOMAC) between experimental and theoretical mode shapes.
+Compute the enhanced coordinate modal assurance criterion (eCOMAC) between experimental and reference mode shapes.
 
 **Inputs**
 - `ms_exp`: Experimental mode shapes (nmes x nmodes array)
-- `ms_th`: Theoretical mode shapes (nmes x nmodes array)
-
+- `ms_ref`: Reference mode shapes (nmes x nmodes array)
 **Output**
 - `ecomac`: Enhanced coordinate modal assurance criterion values (nmes array)
 
@@ -305,38 +299,37 @@ Compute the enhanced coordinate modal assurance criterion (eCOMAC) between exper
 
 [2] G. Martin, E. Balmes and T. Chancelier. Improved Modal Assurance Criterion using a quantification of identification errors per mode/sensor. Proceedings of ISMA 2014, pp. 2509-2519. 2014.
 """
-function ecomac(ms_exp, ms_th)
+function ecomac(ms_exp, ms_ref)
     if ms_exp isa Vector
         ms_exp = reshape(ms_exp, :, 1)
     end
 
-    if ms_th isa Vector
-        ms_th = reshape(ms_th, :, 1)
+    if ms_ref isa Vector
+        ms_ref = reshape(ms_ref, :, 1)
     end
 
     ne, me = size(ms_exp)
-    nt, mt = size(ms_th)
+    nr, mr = size(ms_ref)
 
-    if (ne != nt) || (me != mt)
-        throw(DimensionMismatch("Experimental and theoretical mode shapes must have the same dimensions"))
+    if (ne != nr) || (me != mr)
+        throw(DimensionMismatch("Experimental and reference mode shapes must have the same dimensions"))
     end
 
-    # Scale experimental mode shapes w.r.t. theoretical ones
-    ms_exp ./= transpose(msf(ms_exp, ms_th))
-
-    ecomac = mean(abs, ms_th .- ms_exp, dims = 2)/2
+    # Scale experimental mode shapes w.r.t. reference ones
+    ms_exp .*= transpose(msf(ms_exp, ms_ref))
+    ecomac = mean(abs, ms_ref .- ms_exp, dims = 2)/2
 
     return length(ecomac) == 1 ? ecomac[1] : ecomac
 end
 
 """
-    mac(ms_exp, ms_th)
+    mac(ms_exp, ms_ref)
 
-Compute the modal assurance criterion (MAC) between experimental and theoretical mode shapes.
+Compute the modal assurance criterion (MAC) between experimental and reference mode shapes.
 
 **Inputs**
-- `ms_exp`: Experimental mode shapes (nmes x nmodes array) if `ms_th` is a matrix
-- `ms_th`: Theoretical mode shapes (nmes x nmodes array) if `ms_th` is a matrix
+- `ms_exp`: Experimental mode shapes (nmes x nmodes array) if `ms_exp` is a matrix
+- `ms_ref`: Reference mode shapes (nmes x nmodes array) if `ms_ref` is a matrix
 
 **Output**
 - `mac`: Modal assurance criterion values (nmodes x nmodes array)
@@ -345,26 +338,26 @@ Compute the modal assurance criterion (MAC) between experimental and theoretical
 
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
-function mac(ms_exp, ms_th)
+function mac(ms_exp, ms_ref)
     if ms_exp isa Vector
         ms_exp = reshape(ms_exp, :, 1)
     end
 
-    if ms_th isa Vector
-        ms_th = reshape(ms_th, :, 1)
+    if ms_ref isa Vector
+        ms_ref = reshape(ms_ref, :, 1)
     end
 
     ne, me = size(ms_exp)
-    nt, mt = size(ms_th)
+    nr, mr = size(ms_ref)
 
-    if (ne != nt)
-        throw(DimensionMismatch("The number of degrees of freedom of the experimental and theoretical mode shapes must be the same"))
+    if (ne != nr)
+        throw(DimensionMismatch("The number of degrees of freedom of the experimental and reference mode shapes must be the same"))
     end
 
-    mac = zeros(mt, me)
-    for i in 1:mt, j in 1:me
-        num = abs2(ms_exp[:, j]'ms_th[:, i])
-        den = (ms_exp[:, j]'ms_exp[:, j]) * (ms_th[:, i]'ms_th[:, i])
+    mac = zeros(mr, me)
+    for i in 1:mr, j in 1:me
+        num = abs2(ms_exp[:, j]'ms_ref[:, i])
+        den = (ms_exp[:, j]'ms_exp[:, j]) * (ms_ref[:, i]'ms_ref[:, i])
         mac[i, j] = num/real(den)
     end
 
@@ -372,13 +365,13 @@ function mac(ms_exp, ms_th)
 end
 
 """
-    frac(frf_exp, frf_th)
+    frac(frf_exp, frf_ref)
 
-Compute the frequency response assurance criterion (FRAC) between experimental and theoretical frequency response functions.
+Compute the frequency response assurance criterion (FRAC) between experimental and reference frequency response functions.
 
 **Inputs**
 - `frf_exp`: Experimental frequency response functions (nmes x nexc x nf array
-- `frf_th`: Theoretical frequency response functions (nmes x nexc x nf array)
+- `frf_ref`: Reference frequency response functions (nmes x nexc x nf array)
 
 **Output**
 - `frac`: Frequency response assurance criterion values (nmes x nexc array)
@@ -387,19 +380,19 @@ Compute the frequency response assurance criterion (FRAC) between experimental a
 
 [1] R. J. Allemang. The modal assurance criterion twenty years of use and abuse. Sound & Vibration. 37 (8): 14-23. 2003
 """
-function frac(frf_exp, frf_th)
+function frac(frf_exp, frf_ref)
     ne, me, nfe = size(frf_exp)
-    nt, mt, nft = size(frf_th)
+    nr, mr, nfr = size(frf_ref)
 
-    if (ne != nt) || (me != mt) || (nfe != nft)
-        throw(DimensionMismatch("Experimental and theoretical FRFs must have the same dimensions"))
+    if (ne != nr) || (me != mr) || (nfe != nfr)
+        throw(DimensionMismatch("Experimental and reference FRFs must have the same dimensions"))
     end
 
     frac = zeros(ne, me)
     for i in 1:ne, j in 1:me
-        num = abs2(frf_exp[i, j, :]'frf_th[i, j, :])
-        den = (frf_exp[i, j, :]'frf_exp[i, j, :]) * (frf_th[i, j, :]'frf_th[i, j, :])
-        frac[i, j] = num/real(den)
+        num = abs2(frf_exp[i, j, :]'frf_ref[i, j, :])
+        den = (frf_exp[i, j, :]'frf_exp[i, j, :]) * (frf_ref[i, j, :]'frf_ref[i, j, :])
+        frac[i, j] .= num/real(den)
     end
 
     return frac

@@ -426,7 +426,7 @@ ms_ema = modeshape_extraction(res, stab_poles, LSCF(), modetype = :oma)[1]
 ms_ema_real = c2r_modeshape(ms_ema)
 
 # Mode shape scaling for comparison using the modal scale factor
-scaling = msf(ms_ref[:, 1:size(ms_ema_real, 2)], ms_ema_real)
+scaling = msf(ms_ema_real, ms_ref[:, 1:size(ms_ema_real, 2)])
 ms_ema_scaled = ms_ema_real .* scaling'
 ```
 
@@ -453,8 +453,8 @@ lines!(ax_mode3, x, ms_ref[:, 3], label = "Reference")
 lines!(ax_mode3, x, ms_ema_scaled[:, 3], linestyle = :dash, label = "Estimated")
 xlims!(ax_mode3, 0, L)
 
-lines!(ax_mode4, x, ms_ref[:, 6], label = "Reference")
-lines!(ax_mode4, x, ms_ema_scaled[:, 6], linestyle = :dash, label = "Estimated")
+lines!(ax_mode4, x, ms_ref[:, 4], label = "Reference")
+lines!(ax_mode4, x, ms_ema_scaled[:, 4], linestyle = :dash, label = "Estimated")
 xlims!(ax_mode4, 0, L)
 
 display(fig_mode);
@@ -505,7 +505,7 @@ p_cssi, ms_cssi = modes_extraction(prob_oma, 30, CovSSI())
 ms_cssi_real = c2r_modeshape(ms_cssi)
 
 # Mode shape scaling for comparison using the modal scale factor
-scaling = msf(ms_ref[:, 1:size(ms_cssi_real, 2)], ms_cssi_real)
+scaling = msf(ms_cssi_real, ms_ref[:, 1:size(ms_cssi_real, 2)])
 ms_cssi_scaled = ms_cssi_real .* scaling'
 ```
 
@@ -578,7 +578,7 @@ p_dssi, ms_dssi = modes_extraction(prob_oma, 30, DataSSI())
 ms_dssi_real = c2r_modeshape(ms_dssi)
 
 # Mode shape scaling for comparison using the modal scale factor
-scaling = msf(ms_ref[:, 1:size(ms_dssi_real, 2)], ms_dssi_real)
+scaling = msf(ms_dssi_real, ms_ref[:, 1:size(ms_dssi_real, 2)])
 ms_dssi_scaled = ms_dssi_real .* scaling'
 ```
 
