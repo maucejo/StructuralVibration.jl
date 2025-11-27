@@ -686,7 +686,18 @@
     "href": "overview/release_notes.html",
     "title": "Release Notes",
     "section": "",
-    "text": "Minor bug fix in msf function.",
+    "text": "Add ToeplitzMatrices packages to compute the Hankel matrix in LSCE.",
+    "crumbs": [
+      "Overview",
+      "Release Notes"
+    ]
+  },
+  {
+    "objectID": "overview/release_notes.html#v1.1.2",
+    "href": "overview/release_notes.html#v1.1.2",
+    "title": "Release Notes",
+    "section": "",
+    "text": "Add ToeplitzMatrices packages to compute the Hankel matrix in LSCE.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -696,8 +707,8 @@
     "objectID": "overview/release_notes.html#v1.1.1",
     "href": "overview/release_notes.html#v1.1.1",
     "title": "Release Notes",
-    "section": "",
-    "text": "Minor bug fix in msf function.",
+    "section": "v1.1.1",
+    "text": "v1.1.1\n\nMinor bug fix in msf function.",
     "crumbs": [
       "Overview",
       "Release Notes"
