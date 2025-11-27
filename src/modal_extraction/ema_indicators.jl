@@ -198,7 +198,7 @@ function mpd(ms)
         mpd[i] = sum(num)/den
     end
 
-    return length(mpd) == 1 ? mpd[1] : mpd
+    return length(mpd) == 1 ? only(mpd) : mpd
 end
 
 ## Correlation functions
@@ -245,7 +245,7 @@ function msf(ms_exp, ms_ref)
         msf[i] = num/den
     end
 
-    return length(msf) == 1 ? msf[1] : msf
+    return length(msf) == 1 ? only(msf) : msf
 end
 
 """
@@ -286,7 +286,7 @@ function comac(ms_exp, ms_ref)
 
     comac = num./den
 
-    return length(comac) == 1 ? comac[1] : comac
+    return length(comac) == 1 ? only(comac) : comac
 end
 
 """
@@ -325,7 +325,7 @@ function ecomac(ms_exp, ms_ref)
     ms_exp .*= transpose(msf(ms_exp, ms_ref))
     ecomac = mean(abs, ms_ref .- ms_exp, dims = 2)/2
 
-    return length(ecomac) == 1 ? ecomac[1] : ecomac
+    return length(ecomac) == 1 ? only(ecomac) : ecomac
 end
 
 """
@@ -367,7 +367,7 @@ function mac(ms_exp, ms_ref)
         mac[i, j] = num/real(den)
     end
 
-    return sum(size(mac)) == 2 ? mac[1, 1] : mac
+    return sum(size(mac)) == 2 ? only(mac) : mac
 end
 
 """
