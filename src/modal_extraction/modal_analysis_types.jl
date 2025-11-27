@@ -42,7 +42,7 @@ The FRF is internally converted to admittance if needed.
 """
 @show_data struct EMAProblem{C <: Complex, R <: Real} <: MdofProblem
     frf::Array{C, 3}
-    freq::AbstractArray{R}
+    freq::Vector{R}
     type_frf::Symbol
 
     function EMAProblem(frf::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]], type_frf = :dis) where {C <: Complex, R <: Real}
@@ -211,10 +211,10 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
 @show_data struct OMAProblem{C <: Complex, R <: Real} <: MdofProblem
     y::Matrix{R}
     yref::Matrix{R}
-    t::AbstractArray{R}
+    t::Vector{R}
     fullspec::Array{C, 3}
     halfspec::Array{C, 3}
-    freq::AbstractArray{R}
+    freq::Vector{R}
 
     function OMAProblem(Gyy::Array{C, 3}, freq::AbstractArray{R}; frange = [freq[1], freq[end]]) where {C <: Complex, R <: Real}
 
@@ -231,7 +231,7 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
         # Compute half spectrum
         halfspec = half_csd(Gyy_red, freq_red)
 
-        return new{C, R}(Matrix{typeof(freq)(undef, 0, 0)}, Matrix{typeof(freq)(undef, 0, 0)}, similar(freq, 0), Gyy_red, halfspec, freq_red)
+        return new{C, R}(Matrix{eltype(freq)}(undef, 0, 0), Matrix{eltype(freq)}(undef, 0, 0), similar(freq_red, 0), Gyy_red, halfspec, freq_red)
     end
 
     function OMAProblem(y::Matrix{R}, yref::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], win = hanning, overlap = 0.5) where {R <: Real}
@@ -250,7 +250,7 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
         # Compute half spectrum
         halfspec = half_csd(y, yref, freq_red, fs, bs)
 
-        return new{Complex{R}, R}(y, yref, t, Gyy_red, halfspec, freq_red)
+        return new{Complex{R}, R}(y, yref, collect(t), Gyy_red, halfspec, freq_red)
     end
 
     OMAProblem(y::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], win = hanning, overlap = 0.5) where {R <: Real} = OMAProblem(y, y, t, fs, bs; frange = frange, win = win, overlap = overlap)

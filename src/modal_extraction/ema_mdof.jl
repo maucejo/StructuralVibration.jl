@@ -43,7 +43,7 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
 **Output**
 - `poles`: Vector of extracted complex poles
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false)
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false) :: Vector{ComplexF64}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -107,7 +107,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false)
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false) :: Vector{ComplexF64}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -186,7 +186,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::PLSCF; stabdiag = false)
+@views function compute_poles(prob::MdofProblem, order::Int, alg::PLSCF; stabdiag = false) :: Vector{ComplexF64}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
