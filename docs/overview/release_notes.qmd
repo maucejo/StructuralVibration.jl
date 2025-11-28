@@ -6,6 +6,10 @@ format:
     number-sections: false
 ---
 
+## v1.1.4
+
+- Add `linkxaxes!` function in `stabilization_plot` to link x-axes of poles and indicator plots when zooming.
+
 ## v1.1.3
 
 - Solve some type instability issues in Modal extraction functions.
