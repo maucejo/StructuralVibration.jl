@@ -1,28 +1,28 @@
 module StructuralVibration
 
        using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim,
-              Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
+             Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
 
        using DSP: conv, filt, filtfilt, remez, rms
 
        # Structs - Models
-       export Bar, Beam, ContinuousStateSpace, DiscreteStateSpace, Mdof, Membrane,
-              Plate, Rod, Sdof, Strings
+       export Bar, Beam, ContinuousStateSpace, DiscreteStateSpace, Mdof,
+              Membrane, Plate, Rod, Sdof, Strings
 
        # Structs - FE and discrete models
        export MdofMesh, OneDMesh
 
        # Structs - Excitations
-       export ColoredNoise, GaussianPulse, HalfSine, Hammer, HaverSine, Rectangle,
-              SineWave, SmoothRect, SweptSine, Triangle
+       export ColoredNoise, GaussianPulse, HalfSine, Hammer, HaverSine,
+              Rectangle, SineWave, SmoothRect, SweptSine, Triangle
 
        # Structs - Problems
        export DirectFRFProblem, DirectFreqProblem, DirectTimeProblem,
               ForcedModalTimeProblem, FreeModalTimeProblem, HarmonicModalTimeProblem,ModalFRFProblem, ModalFreqProblem, SdofForcedTimeProblem, SdofFreeTimeProblem, SdofFrequencyProblem, SdofFRFProblem, SdofHarmonicTimeProblem, StateSpaceFreqProblem, StateSpaceFRFProblem, StateSpaceModalFRFProblem, StateSpaceModalFreqProblem, StateSpaceTimeProblem
 
        # Structs - Time solvers
-       export CentralDiff, FoxGoodwin, GeneralizedAlpha, HHT, LinearAcceleration,
-              MidPoint, Newmark, RK4, WBZ
+       export CentralDiff, FoxGoodwin, GeneralizedAlpha, HHT,
+              LinearAcceleration, MidPoint, Newmark, RK4, WBZ
 
        # Structs - Noise estimation
        export BayesEst, DerricoEst, GCVEst, LCurveEst
@@ -45,8 +45,8 @@ module StructuralVibration
        export apply_bc, assembly, eigenmode, modefreq, modeshape,
               modal_damping_matrix, modal_effective_mass, modal_matrices, rayleigh_damping_matrix, selection_matrix
 
-       export acn, agwn, anti_alias, denoising, estimated_SNR, mgwn, mixed_noise,
-              varest
+       export acn, agwn, anti_alias, denoising, estimated_SNR, mgwn,
+              mixed_noise, varest
 
        export c2d, c2r_modeshape, modal_parameters, ss_model, ss_modal_model
 
@@ -61,8 +61,8 @@ module StructuralVibration
        export detrend, gradient
 
        # Functions for plotting
-       export bode_plot, nyquist_plot, stabilization_plot, sv_plot, theme_choice,
-              waterfall_plot
+       export bode_plot, nyquist_plot, stabilization_plot, sv_plot,
+              theme_choice, waterfall_plot
 
        # Include files - Utils
        include("utils/macro_utils.jl")

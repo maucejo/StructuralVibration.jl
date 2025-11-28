@@ -37,7 +37,7 @@ p_lscf = poles_extraction(prob_mdof, 20, LSCF())
 p_plscf = poles_extraction(prob_mdof, 20, PLSCF())
 
 # EMA-MDOF pole stability analysis
-sol_stab = stabilization(prob_mdof, 20, PLSCF())
+sol_stab = stabilization(prob_mdof, 20, LSCF())
 
 # Plot stabilization diagram
 stabilization_plot(sol_stab)

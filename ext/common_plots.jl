@@ -241,8 +241,13 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif; disp
         ytickcolor = :red,
         ylabel = indicator_name,
         yaxisposition = :right,
+        xticklabelsvisible = false,
+        xticksvisible = false,
         yscale = log10
     )
+
+    linkxaxes!(ax_poles, ax_indicator)
+
     if indicator == :psif
         lines!(ax_indicator, freq, indicator_data, color = (:gray, 0.5))
     else
