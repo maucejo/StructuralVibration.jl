@@ -12,6 +12,8 @@ format:
 
 - Remove `ismat` argument from `solve` function of `DirectFRFProblem` and `ModalFRFProblem`. The output FRF is now always returned as a 3D array with dimensions (no. outputs, no. inputs, no. frequencies).
 
+- Add `progress` argument to `stabilization` function to control the display of the progress bar during stabilization analysis.
+
 ## v1.1.4
 
 - Add `linkxaxes!` function in `stabilization_plot` to link x-axes of poles and indicator plots when zooming.
