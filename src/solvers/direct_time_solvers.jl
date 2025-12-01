@@ -249,7 +249,7 @@ function solve(prob::DirectTimeProblem, alg::CentralDiff; progress = true)
 
     D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
 
-    p = Progress(nt - 1, desc = "Direct Time Problem - Central difference...", showspeed = true)
+    p = Progress(nt - 1, desc = "Direct Time Problem - Central difference...", showspeed = true) : nothing
     @views @inbounds for n in 1:nt-1
         progress ? next!(p) : nothing
 
@@ -295,7 +295,7 @@ function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
     lu!(M)
     A[:, 1] = M\rhs0
 
-    p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", showspeed = true)
+    p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", showspeed = true) : nothing
     @views @inbounds for n = 1:nt-1
         progress ? next!(p) : nothing
 

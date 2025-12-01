@@ -291,7 +291,7 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 **Output**
 - `sol::EMAMdofStabilization`: Data structure containing the results of the stabilization analysis
 """
-function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalExtraction, OMAModalExtraction} = LSCF(); stabcrit = [0.01, 0.05])
+function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalExtraction, OMAModalExtraction} = LSCF(); stabcrit = [0.01, 0.05], progress = true)
 
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
@@ -311,7 +311,9 @@ function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalEx
     mode_stabfn = falses(max_order, max_order)
     mode_stabdr = falses(max_order, max_order)
 
+    p = Progress(max_order, desc = "Stabilization analysis: ", showspeed = true)
     for order in 1:max_order
+        progress ? next!(p) : nothing
         try
             poles[order] .= poles_extraction(prob, order, alg, stabdiag = true)
         catch e
