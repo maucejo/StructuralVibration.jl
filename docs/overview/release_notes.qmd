@@ -8,6 +8,8 @@ format:
 
 ## v1.2.0
 
+**Breaking changes**
+
 - Remove `ismat` argument from `solve` function of `DirectFRFProblem` and `ModalFRFProblem`. The output FRF is now always returned as a 3D array with dimensions (no. outputs, no. inputs, no. frequencies).
 
 ## v1.1.4
