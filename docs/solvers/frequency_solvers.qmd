@@ -77,7 +77,7 @@ $$
 ---
 ```{julia}
 #| echo: false
-@doc solve(problem::DirectFRFProblem)
+@doc solve(problem::ModalFRFProblem)
 ```
 :::
 
@@ -97,11 +97,11 @@ C = modal_damping_matrix(M, ω, ξ, Φ)
 freq = 0.01:0.001:1.
 
 prob_frf = DirectFRFProblem(K, M, C, freq)
-H_direct = solve(prob_frf, ismat = true).u
+H_direct = solve(prob_frf).u
 
 # Problem definition - Case 2 - Modal
 prob_frf_modal = ModalFRFProblem(ω, ξ, freq, Φ, Φ)
-H_modal = solve(prob_frf_modal, ismat = true).u
+H_modal = solve(prob_frf_modal).u
 ```
 
 ```{julia}
@@ -206,7 +206,7 @@ prob_freq = DirectFreqProblem(K, M, C, F, freq)
 y_freq = solve(prob_freq).u
 
 # Problem definition - Case 2 - Modal
-prob_freq_modal = ModalFreqProblem(ω, ξ, Φ'*F, freq, Φ)
+prob_freq_modal = ModalFreqProblem(ω, ξ, Φ'F, freq, Φ)
 y_freq_modal = solve(prob_freq_modal).u
 ```
 

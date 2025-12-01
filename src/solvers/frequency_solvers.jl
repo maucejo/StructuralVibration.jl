@@ -118,7 +118,7 @@ Structure containing the solution of the frequency response problem
 * `u`: Transfer function matrix
 """
 @show_data struct FRFSolution{T <: Complex}
-    u::Union{Array{T, 3}, Vector{Matrix{T}}}
+    u::Array{T, 3}
 end
 
 """
@@ -134,8 +134,8 @@ Structure containing the solution of the frequency response problem
 end
 
 """
-    solve(prob::DirectFRF; type = :dis, ismat = false, progress = true)
-    solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)
+    solve(prob::DirectFRFProblem; type = :dis, progress = true)
+    solve(prob::ModalFRFProblem; type = :dis, progress = true)
 
 Computes the FRF matrix by direct or modal approach
 
@@ -145,14 +145,12 @@ Computes the FRF matrix by direct or modal approach
     * `:dis`: Admittance (default)
     * `:vel`: Mobility
     * `:acc`: Accelerance
-* `ismat`: Return the FRF matrix as a 3D array (default = false)
-* `progress`: Show progress bar (default = true)
 
 **Output**
 * `sol`: Solution of the problem
     * `u`: FRF matrix
 """
-function solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)
+function solve(prob::ModalFRFProblem; type = :dis, progress = true)
     # Initialisation
     (; ωn, ξn, freq, ϕo, ϕe) = prob
     n = length(ωn)
@@ -160,7 +158,7 @@ function solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = tru
     no = size(ϕo, 1)
     nf = length(freq)
 
-    FRF = [similar(ωn, Complex{eltype(ωn)}, no, ne) for _ in 1:nf]
+    FRF = similar(ωn, Complex{eltype(ωn)}, no, ne, nf)
     M = Diagonal(similar(ωn, Complex{eltype(ωn)}, n))
     indm = diagind(M)
 
@@ -170,42 +168,19 @@ function solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = tru
         progress ? next!(p) : nothing
 
         @. M[indm] = 1/(ωn^2 - ω^2 + 2im*ξn*ωn*ω)
-        FRF[f] .= ϕo*M*ϕe'
+        FRF[:, :, f] .= ϕo*M*ϕe'
 
         if type == :vel
-            FRF[f] .*= 1im*ω
+            FRF[:, :, f] .*= 1im*ω
         elseif type == :acc
-            FRF[f] .*= -ω^2
+            FRF[:, :, f] .*= -ω^2
         end
-    end
-
-    if ismat
-        return FRFSolution(reshape(reduce(hcat, FRF), no, ne, :))
     end
 
     return FRFSolution(FRF)
 end
 
-"""
-    solve(prob::DirectFRF; type = :dis, ismat = false, progress = true)
-    solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)
-
-Computes the FRF matrix by direct or modal approach
-
-**Inputs**
-* `prob`: Structure containing the problem data
-* `type`: Type of FRF to compute
-    * `:dis`: Admittance (default)
-    * `:vel`: Mobility
-    * `:acc`: Accelerance
-* `ismat`: Return the FRF matrix as a 3D array (default = false)
-* `progress`: Show progress bar (default = true)
-
-**Output**
-* `sol`: Solution of the problem
-    * `u`: FRF matrix
-"""
-function solve(prob::DirectFRFProblem; type = :dis, ismat = false, progress = true)
+function solve(prob::DirectFRFProblem; type = :dis, progress = true)
 
     # Initialisation
     (; K, M, C, freq, So, Se) = prob
@@ -214,7 +189,7 @@ function solve(prob::DirectFRFProblem; type = :dis, ismat = false, progress = tr
     Ndofs = size(K, 1)
     nf = length(freq)
 
-    FRF = [similar(K, Complex{eltype(K)}, no, ne) for _ in 1:nf]
+    FRF = similar(K, Complex{eltype(K)}, no, ne, nf)
     D = similar(K, Complex{eltype(K)}, Ndofs, Ndofs)
 
     ωf = 2π*freq
@@ -223,17 +198,13 @@ function solve(prob::DirectFRFProblem; type = :dis, ismat = false, progress = tr
         progress ? next!(p) : nothing
 
         D .= (K + 1im*ω*C  - ω^2*M)\Se'
-        FRF[f] .= So*D
+        FRF[:, :,f] .= So*D
 
         if type == :vel
-            FRF[f] .*= 1im*ω
+            FRF[:, :, f] .*= 1im*ω
         elseif type == :acc
-            FRF[f] .*= -ω^2
+            FRF[:, :, f] .*= -ω^2
         end
-    end
-
-    if ismat
-        return FRFSolution(reshape(reduce(hcat, FRF), no, ne, :))
     end
 
     return FRFSolution(FRF)

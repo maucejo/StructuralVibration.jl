@@ -6,6 +6,10 @@ format:
     number-sections: false
 ---
 
+## v1.2.0
+
+- Remove `ismat` argument from `solve` function of `DirectFRFProblem` and `ModalFRFProblem`. The output FRF is now always returned as a 3D array with dimensions (no. outputs, no. inputs, no. frequencies).
+
 ## v1.1.4
 
 - Add `linkxaxes!` function in `stabilization_plot` to link x-axes of poles and indicator plots when zooming.
