@@ -622,7 +622,7 @@ modeshape(model::Beam, kn, x, bc = :SS)</code></pre>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> IG</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Tension for string</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">100</span>.</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">5000</span>.</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Material</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> <span class="fl">2.1e11</span></span>
@@ -631,20 +631,25 @@ modeshape(model::Beam, kn, x, bc = :SS)</code></pre>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ρ <span class="op">=</span> <span class="fl">7800</span>.</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation parameters</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">2000</span>.</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.9</span>]</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of the data types</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>bar <span class="op">=</span> <span class="fu">Bar</span>(L, S, E, ρ)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>rod <span class="op">=</span> <span class="fu">Rod</span>(L, IG, J, G, ρ)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>strings <span class="op">=</span> <span class="fu">Strings</span>(L, S, T, ρ)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ωn, kn <span class="op">=</span> <span class="fu">modefreq</span>(bar, fmax)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>ϕn <span class="op">=</span> <span class="fu">modeshape</span>(bar, kn, x, <span class="op">:</span>CC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.9</span>]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of the data types</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>bar <span class="op">=</span> <span class="fu">Bar</span>(L, S, E, ρ)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>rod <span class="op">=</span> <span class="fu">Rod</span>(L, IG, J, G, ρ)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>strings <span class="op">=</span> <span class="fu">Strings</span>(L, S, T, ρ)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fu">Beam</span>(L, S, Iz, E, ρ)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>ω_bar, k_bar <span class="op">=</span> <span class="fu">modefreq</span>(bar, <span class="fl">10_000</span>.)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ω_rod, k_rod <span class="op">=</span> <span class="fu">modefreq</span>(rod, <span class="fl">10_000</span>.)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ω_strings, k_strings <span class="op">=</span> <span class="fu">modefreq</span>(strings, <span class="fl">100</span>.)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>ω_beam, k_beam <span class="op">=</span> <span class="fu">modefreq</span>(beam, <span class="fl">2000</span>.)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>ϕ_bar <span class="op">=</span> <span class="fu">modeshape</span>(bar, k_bar, x, <span class="op">:</span>CC)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>ϕ_rod <span class="op">=</span> <span class="fu">modeshape</span>(rod, k_rod, x, <span class="op">:</span>FF)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>ϕ_strings <span class="op">=</span> <span class="fu">modeshape</span>(strings, k_strings, x, <span class="op">:</span>CC)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>ϕ_beam <span class="op">=</span> <span class="fu">modeshape</span>(beam, k_beam, x, <span class="op">:</span>SS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="d-models" class="level3" data-number="1.2">
@@ -766,6 +771,8 @@ modefreq(model::Membrane, fmax)</code></pre>
 </li>
 <li><p><code>kmn</code>: Matrix of modal wave numbers</p>
 </li>
+<li><p><code>ind</code>: Matrix of modal indices (m, n)</p>
+</li>
 </ul>
 
 
@@ -815,18 +822,21 @@ modeshape(model::Membrane, kpq, x, y)</code></pre>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ν <span class="op">=</span> <span class="fl">0.33</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation parameters</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">1000</span>.</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>fmax <span class="op">=</span> <span class="fl">500</span>.</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>xp <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.5</span>]</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>yp <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.3</span>]</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialization of the data types</span></span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plate <span class="op">=</span> <span class="fu">Plate</span>(Lp, bp, hp, E, ρ, ν)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ωn, kn <span class="op">=</span> <span class="fu">modefreq</span>(plate, fmax)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ϕn <span class="op">=</span> <span class="fu">modeshape</span>(plate, kn, xp, yp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>membrane <span class="op">=</span> <span class="fu">Membrane</span>(Lp, bp, ρ<span class="op">*</span>hp, <span class="fl">100</span>.)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the natural frequencies</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ω_plate, k_plate <span class="op">=</span> <span class="fu">modefreq</span>(plate, fmax)[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>]</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ω_membrane, k_membrane <span class="op">=</span> <span class="fu">modefreq</span>(membrane, fmax)[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the corresponding mode shapes</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ϕ_plate <span class="op">=</span> <span class="fu">modeshape</span>(plate, k_plate, xp, yp)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>ϕ_membrane <span class="op">=</span> <span class="fu">modeshape</span>(membrane, k_membrane, xp, yp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 </section>
@@ -1168,7 +1178,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>mdof <span class="op">=</span> <span class="fu">Mdof</span>(k_mdof, m_mdof, c_mdof)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of a MdofMesh</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>mdof_mesh <span class="op">=</span> <span class="fu">MdofMesh</span>(mdof, bc <span class="op">=</span> <span class="op">:</span>CF)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>mdof_mesh <span class="op">=</span> <span class="fu">MdofMesh</span>(mdof, <span class="op">:</span>CF)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># System assembly</span></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>K_mdof, M_mdof, C_mdof <span class="op">=</span> <span class="fu">assembly</span>(mdof)</span>
@@ -1232,7 +1242,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 </li>
 <li><p><code>L</code>: Length of the beam</p>
 </li>
-<li><p><code>Nodes</code>: Nodes of the mesh</p>
+<li><p><code>Nodes</code>: Node coordinates</p>
 </li>
 <li><p><code>Elt</code>: Elements of the mesh</p>
 </li>
@@ -1654,8 +1664,8 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from system matrices</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λss)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>, <span class="op">:</span>])</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λ)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>])</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ωn, ϕn <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>

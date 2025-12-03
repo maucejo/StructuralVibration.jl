@@ -636,7 +636,7 @@ Note
 <hr>
 <div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">ForcedModalTimeProblem(K, M, ξn, u0, t, F, n = size(K, 1); ismodal = false)</code></pre>
+<div class="markdown"><pre><code class="language-julia">ForcedModalTimeProblem(K, M, ξn, F, u0, t,  n = size(K, 1); ismodal = false)</code></pre>
 <p>Structure containing data for modal time solver for computing the forced response due to an arbitrary excitation</p>
 <p><strong>Fields</strong></p>
 <ul>
@@ -805,8 +805,6 @@ h_1(t) &amp; &amp; &amp; &amp; \\
 </li>
 <li><p><code>ismodal::Bool</code>: Flag to indicate if the problem contains modal data</p>
 </li>
-<li><p><code>ismat::Bool</code>: Flag to indicate if the output should be a matrix</p>
-</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -833,7 +831,7 @@ h_1(t) &amp; &amp; &amp; &amp; \\
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">1e-2</span><span class="op">:</span><span class="fl">30</span>.</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Impulse response matrix</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(K, M, ξ, t, ismat <span class="op">=</span> <span class="cn">true</span>).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(K, M, ξ, t).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">

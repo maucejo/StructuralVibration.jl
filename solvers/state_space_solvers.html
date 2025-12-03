@@ -572,7 +572,7 @@ Note
 </li>
 <li><p><code>Se</code>: Selection matrix for excitation points</p>
 </li>
-<li><p><code>n</code>: Number of modes to keep in the modal basis</p>
+<li><p><code>n</code>: Number of mode pairs to keep in the modal basis (default = size(css.Ac, 2) ÷ 2)</p>
 </li>
 </ul>
 
@@ -587,8 +587,8 @@ Note
 <hr>
 <div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">solve(prob::StateSpaceFRFProblem; type = :dis, ismat = false, progress = true)
-solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = true)</code></pre>
+<div class="markdown"><pre><code class="language-julia">solve(prob::StateSpaceFRFProblem; type = :dis, progress = true)
+solve(prob::StateSpaceModalFRFProblem; type = :dis, progress = true)</code></pre>
 <p>Computes the FRF matrix by direct or modal method</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -603,8 +603,6 @@ solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = tr
 <li><p><code>:acc</code>: Accelerance</p>
 </li>
 </ul>
-</li>
-<li><p><code>ismat</code>: Return the FRF matrix as a 3D array (default = false)</p>
 </li>
 <li><p><code>progress</code>: Show progress bar (default = true)</p>
 </li>
@@ -644,11 +642,11 @@ solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = tr
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 1 - Direct</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">StateSpaceFRFProblem</span>(css, freq)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>H_direct <span class="op">=</span> <span class="fu">solve</span>(prob_frf, ismat <span class="op">=</span> <span class="cn">true</span>).u</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>H_direct <span class="op">=</span> <span class="fu">solve</span>(prob_frf).u</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>prob_frf_modal <span class="op">=</span> <span class="fu">StateSpaceModalFRFProblem</span>(css, freq)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>H_modal <span class="op">=</span> <span class="fu">solve</span>(prob_frf_modal, ismat <span class="op">=</span> <span class="cn">true</span>).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>H_modal <span class="op">=</span> <span class="fu">solve</span>(prob_frf_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="24" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -707,7 +705,7 @@ solve(prob::StateSpaceModalFRFProblem; type = :dis, ismat = false, progress = tr
 </li>
 <li><p><code>So</code>: Selection matrix for observation points</p>
 </li>
-<li><p><code>n</code>: Number of modes to keep in the modal basis</p>
+<li><p><code>n</code>: Number of mode pairs to keep in the modal basis (default = size(css.Ac, 2) ÷ 2)</p>
 </li>
 </ul>
 

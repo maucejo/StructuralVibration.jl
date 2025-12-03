@@ -385,8 +385,8 @@ Note
 <hr>
 <div id="8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">solve(prob::DirectFRF; type = :dis, ismat = false, progress = true)
-solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)</code></pre>
+<div class="markdown"><pre><code class="language-julia">solve(prob::DirectFRFProblem; type = :dis, progress = true)
+solve(prob::ModalFRFProblem; type = :dis, progress = true)</code></pre>
 <p>Computes the FRF matrix by direct or modal approach</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -401,10 +401,6 @@ solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)</code>
 <li><p><code>:acc</code>: Accelerance</p>
 </li>
 </ul>
-</li>
-<li><p><code>ismat</code>: Return the FRF matrix as a 3D array (default = false)</p>
-</li>
-<li><p><code>progress</code>: Show progress bar (default = true)</p>
 </li>
 </ul>
 <p><strong>Output</strong></p>
@@ -438,11 +434,11 @@ solve(prob::ModalFRFProblem; type = :dis, ismat = false, progress = true)</code>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">0.01</span><span class="op">:</span><span class="fl">0.001</span><span class="op">:</span><span class="fl">1</span>.</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>prob_frf <span class="op">=</span> <span class="fu">DirectFRFProblem</span>(K, M, C, freq)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>H_direct <span class="op">=</span> <span class="fu">solve</span>(prob_frf, ismat <span class="op">=</span> <span class="cn">true</span>).u</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>H_direct <span class="op">=</span> <span class="fu">solve</span>(prob_frf).u</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>prob_frf_modal <span class="op">=</span> <span class="fu">ModalFRFProblem</span>(ω, ξ, freq, Φ, Φ)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>H_modal <span class="op">=</span> <span class="fu">solve</span>(prob_frf_modal, ismat <span class="op">=</span> <span class="cn">true</span>).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>H_modal <span class="op">=</span> <span class="fu">solve</span>(prob_frf_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="12" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -580,7 +576,7 @@ solve(prob::ModalFreqProblem, type = :dis, progress = true)</code></pre>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>y_freq <span class="op">=</span> <span class="fu">solve</span>(prob_freq).u</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem definition - Case 2 - Modal</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>prob_freq_modal <span class="op">=</span> <span class="fu">ModalFreqProblem</span>(ω, ξ, Φ<span class="ch">'*F, freq, Φ)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>prob_freq_modal <span class="op">=</span> <span class="fu">ModalFreqProblem</span>(ω, ξ, Φ<span class="ch">'F, freq, Φ)</span></span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>y_freq_modal <span class="op">=</span> <span class="fu">solve</span>(prob_freq_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="22" class="cell" data-execution_count="1">

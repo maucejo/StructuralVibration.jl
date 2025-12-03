@@ -180,7 +180,10 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#v1.1.2" id="toc-v1.1.2" class="nav-link active" data-scroll-target="#v1.1.2">v1.1.2</a></li>
+  <li><a href="#v1.2.0" id="toc-v1.2.0" class="nav-link active" data-scroll-target="#v1.2.0">v1.2.0</a></li>
+  <li><a href="#v1.1.4" id="toc-v1.1.4" class="nav-link" data-scroll-target="#v1.1.4">v1.1.4</a></li>
+  <li><a href="#v1.1.3" id="toc-v1.1.3" class="nav-link" data-scroll-target="#v1.1.3">v1.1.3</a></li>
+  <li><a href="#v1.1.2" id="toc-v1.1.2" class="nav-link" data-scroll-target="#v1.1.2">v1.1.2</a></li>
   <li><a href="#v1.1.1" id="toc-v1.1.1" class="nav-link" data-scroll-target="#v1.1.1">v1.1.1</a></li>
   <li><a href="#v1.1.0" id="toc-v1.1.0" class="nav-link" data-scroll-target="#v1.1.0">v1.1.0</a></li>
   <li><a href="#v1.0.0" id="toc-v1.0.0" class="nav-link" data-scroll-target="#v1.0.0">v1.0.0</a></li>
@@ -214,6 +217,35 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="v1.2.0" class="level2">
+<h2 class="anchored" data-anchor-id="v1.2.0">v1.2.0</h2>
+<p><strong>Minor changes</strong></p>
+<ul>
+<li><p>Fix bugs in <code>eigenmode</code> function for state-space models.</p></li>
+<li><p>Fix bugs in <code>comac</code> function.</p></li>
+</ul>
+<p><strong>Breaking changes</strong></p>
+<ul>
+<li><p>Change <code>PLSCF</code> algorithm name to <code>pLSCF</code> in <code>poles_extraction</code> function.</p></li>
+<li><p>Remove <code>ismat</code> argument from <code>solve</code> function of <code>DirectFRFProblem</code>, <code>ModalFRFProblem</code>, <code>StateSpaceFRFProblem</code> and <code>StateSpaceModalFRFProblem</code>. The output FRF is now always returned as a 3D array with dimensions (no. outputs, no. inputs, no. frequencies).</p></li>
+<li><p>Remove <code>ismat</code> argument from <code>impulse_response</code> function for modal time solvers. The output is now always returned as a 3D array with dimensions (no. dofs, no. dofs, no. frequencies).</p></li>
+<li><p>Add <code>progress</code> argument to <code>stabilization</code> function to control the display of the progress bar during stabilization analysis.</p></li>
+<li><p>Add <code>width</code>, <code>min_prom</code> and <code>max_prom</code> arguments to <code>poles_extraction</code> function and <code>AutoEMASdofProblem</code> to specify the half-width of the peaks and the minimum and maximum peak prominence for pole extraction methods.</p></li>
+<li><p>Add <code>peaksplot</code> to visualization functions to inspect peak detection in pole extraction methods.</p></li>
+</ul>
+</section>
+<section id="v1.1.4" class="level2">
+<h2 class="anchored" data-anchor-id="v1.1.4">v1.1.4</h2>
+<ul>
+<li>Add <code>linkxaxes!</code> function in <code>stabilization_plot</code> to link x-axes of poles and indicator plots when zooming.</li>
+</ul>
+</section>
+<section id="v1.1.3" class="level2">
+<h2 class="anchored" data-anchor-id="v1.1.3">v1.1.3</h2>
+<ul>
+<li>Solve some type instability issues in Modal extraction functions.</li>
+</ul>
+</section>
 <section id="v1.1.2" class="level2">
 <h2 class="anchored" data-anchor-id="v1.1.2">v1.1.2</h2>
 <ul>
