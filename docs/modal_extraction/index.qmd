@@ -93,6 +93,8 @@ The peak picking method is a simple and effective way to extract the natural fre
 
     They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using `Peaks.jl`.
 
+    To check the peak detection, one can use the `peaksplot` function from `StructuralVibration.jl` (see [Peaks plot](../visualization/index.qmd#peaks-plot) for more details).
+
 2. **Estimation of modal damping factors**
 
     To estimate the value of the damping factor for mode $i$, the half power bandwidth method is used. This procedure, valid for low damping ($\eta_i < 0.1$), first determines the frequencies $\omega_1$ and $\omega_2$ such that:
@@ -421,7 +423,7 @@ When carrying out an EMA, the main question that arises is how many modes (or, m
 
 The stabilisation diagram is a fundamental EMA tool as it provides a clear and concise presentation of the poles of the system under study. The idea is to adjust the transfer function model by increasing the number of poles and displaying the results on a graph. Broadly speaking, increasing the order of the model (i.e. the number of poles) causes the true vibration modes to converge to a stable value, whereas the numerical modes appear inconsistently or randomly on the graph. Thus, as the poles converge to stable ones, markers appear on the graph to indicate the identified poles, as the order of the model is gradually increased. The selection of poles is generally based on the stability of natural frequencies, modal damping and/or mode shapes, moving from a model order $n$ to an order $n + 1$. In this package, the stability of the natural frequencies and damping ratios is used to identify the physical poles of the system. The stability criterion is set to 1% for the natural frequencies and 5% for the damping ratios, following common practice in the EMA field.
 
-In `StructuralVibration.jl`, the stabilization diagram can be obtained using the `stabilization` function along with any of the Mdof methods described above. The identified stable poles can then be visualized using the `stabilization_plot` function. The `stabilization` function returns an `StabilizationAnalysis` structure that contains all the information related to the stabilization analysis, which allows the user to manually select the appropriate poles and to further analyze (e.g. by using quality and analysis indicators) and visualize the results.
+In `StructuralVibration.jl`, the stabilization diagram can be obtained using the `stabilization` function along with any of the Mdof methods described above. The identified stable poles can then be visualized using the `stabilization_plot` function (see [Stabilization plot](../visualization/index.qmd#stabilization-plot)). The `stabilization` function returns an `StabilizationAnalysis` structure that contains all the information related to the stabilization analysis, which allows the user to manually select the appropriate poles and to further analyze (e.g. by using quality and analysis indicators) and visualize the results.
 
 ### Mode shape extraction
 
@@ -756,6 +758,13 @@ H = solve(prob).u
 ```
 
 ### Sdof methods
+
+#### Peak detection checking
+
+```{julia}
+Habs_dB = 20log10.(abs.(H[1, 2, :]))
+peaksplot(freq, Habs_dB, xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)")
+```
 
 #### Modes extraction
 

@@ -17,7 +17,9 @@ Extract poles from the Bode diagram fitting method
         * `PLSCF`: Polyreference Least Squares Complex Frequency method
         * `LSCE`: Least Squares Complex Exponential method (only for Mdof methods)
 * `stabdiag::Bool`: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)
-* `width::Int`: Half-width of the peaks (only for Sdof methods, default: 5)
+* `width::Int`: Half-width of the peaks (only for Sdof methods, default: 1)
+* `min_prom::Real`: Minimum peak prominence (only for Sdof methods, default: 0. dB)
+* `max_prom::Real`: Maximum peak prominence (only for Sdof methods, default: Inf)
 
 **Outputs**
 * `poles`: Vector of extracted complex poles
@@ -25,7 +27,7 @@ Extract poles from the Bode diagram fitting method
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width = 5)
+function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int = 1, min_prom = 0., max_prom = Inf)
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -44,7 +46,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width = 5)
     pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
-        p = compute_poles(Hv, freq, alg, width)
+        p = compute_poles(Hv, freq, alg, width, min_prom, max_prom)
 
         nk = length(p)
         pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
@@ -60,7 +62,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width = 5)
 end
 
 """
-    compute_poles(H, freq, alg::PeakPicking, width)
+    compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom)
 
 Extract poles from the peak picking method
 
@@ -68,11 +70,13 @@ Extract poles from the peak picking method
 * `H::Array{Complex, 3}`: Frequency response function
 * `freq::AbstractArray`: Frequency vector
 * `width::Int`: Half-width of the peaks
+* `min_prom::Real`: Minimum peak prominence
+* `max_prom::Real`: Maximum peak prominence
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function compute_poles(H, freq, alg::PeakPicking, width)
+function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom)
     # Find peaks in the FRF
     Habs = abs.(H)
     pks = findmaxima(Habs, width)
@@ -80,7 +84,9 @@ function compute_poles(H, freq, alg::PeakPicking, width)
     if isempty(pks.indices)
         return Complex{eltype(freq)}[]
     end
-    pks = peakproms!(pks) |> peakwidths!
+
+    # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+    pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
 
     # Estimation of natural frequencies and damping ratios
     ftemp = freq[pks.indices]
@@ -88,13 +94,17 @@ function compute_poles(H, freq, alg::PeakPicking, width)
     ξn = similar(ftemp)
 
     # Damping ratios estimation from the half-bandwidth method
+    next = 5
     nfreq_itp = 250
     freq_left = similar(fn, nfreq_itp)
     freq_right = similar(freq_left)
     Hleft = similar(freq_left)
     Hright = similar(freq_left)
     for (n, (f, idmax, Hmax, edg)) in enumerate(zip(ftemp, pks.indices, pks.heights, pks.edges))
-        edge1, edge2 = round.(Int, edg) .+ [-5, 5]
+        edge1 = floor(Int, edg[1])
+        edge2 = ceil(Int, edg[2])
+        edge1 = edge1 - next >= 1 ? edge1 - next : 1
+        edge2 = edge2 + next <= length(freq) ? edge2 + next : length(freq)
 
         # Left side of the peak
         itp_left = linear_interpolation(freq[edge1:idmax], Habs[edge1:idmax])
@@ -121,7 +131,7 @@ function compute_poles(H, freq, alg::PeakPicking, width)
 end
 
 """
-    compute_poles(H, freq, alg::CircleFit, width)
+    compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom)
 
 Extract poles from the Bode diagram circle fitting method
 
@@ -129,24 +139,29 @@ Extract poles from the Bode diagram circle fitting method
 * `H::Array{Complex, 3}`: Frequency response function
 * `freq::AbstractArray`: Frequency vector
 * `width::Int`: Half-width of the peaks
+* `min_prom::Real`: Minimum peak prominence
+* `max_prom::Real`: Maximum peak prominence
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function compute_poles(H, freq, alg::CircleFit, width)
+function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom)
 
     # Find peaks in the FRF
-    pks = findmaxima(abs.(H))
+    pks = findmaxima(abs.(H), width)
     # Peaks not found
     if isempty(pks.indices)
         return Complex{eltype(freq)}[]
     end
-    pks = peakproms!(pks) |> peakwidths!
+
+    # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+    pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
 
     # Estimation of natural frequencies and damping ratios
     fn = similar(freq[pks.indices])
     ξn = similar(fn)
 
+    next = 5
     nfreq_itp = 500
     ReH_itp = similar(fn, nfreq_itp)
     ImH_itp = similar(ReH_itp)
@@ -155,7 +170,11 @@ function compute_poles(H, freq, alg::CircleFit, width)
     θ = similar(ReH_itp)
     for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
-        edge1, edge2 = round.(Int, edg) .+ [-5, 5]
+        edge1 = floor(Int, edg[1])
+        edge2 = ceil(Int, edg[2])
+        edge1 = edge1 - next >= 1 ? edge1 - next : 1
+        edge2 = edge2 + next <= length(freq) ? edge2 + next : length(freq)
+
         freqs = freq[edge1:edge2]
 
         # Real and imaginary parts of the frequency response function
@@ -194,7 +213,7 @@ function compute_poles(H, freq, alg::CircleFit, width)
 end
 
 """
-    compute_poles(H, freq, alg::LSFit, width)
+    compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom)
 
 Extract poles from the Bode diagram least squares fitting method
 
@@ -202,6 +221,8 @@ Extract poles from the Bode diagram least squares fitting method
 * `H::Array{Complex, 3}`: Frequency response function
 * `freq::AbstractArray`: Frequency vector
 * `width::Int`: Half-width of the peaks
+* `min_prom::Real`: Minimum peak prominence
+* `max_prom::Real`: Maximum peak prominence
 
 **Outputs**
 * `poles`: Extracted poles
@@ -209,19 +230,22 @@ Extract poles from the Bode diagram least squares fitting method
 **Reference**
 [1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
-function compute_poles(H, freq, alg::LSFit, width)
+function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom)
     # Find peaks in the FRF
     pks = findmaxima(abs.(H), width)
     # Peaks not found
     if isempty(pks.indices)
         return Complex{eltype(freq)}[]
     end
-    pks = peakproms!(pks) |> peakwidths!
+
+    # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+    pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
 
     # Estimation of natural frequencies and damping ratios
     fn = freq[pks.indices]
     ξn = similar(fn)
 
+    next = 5
     nfreq_itp = 500
     freq_itp = similar(fn, nfreq_itp)
     ReH_itp = similar(freq_itp)
@@ -235,7 +259,11 @@ function compute_poles(H, freq, alg::LSFit, width)
     res = similar(b, 3)
      for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
-        edge1, edge2 = round.(Int, edg) .+ [-5, 5]
+        edge1 = floor(Int, edg[1])
+        edge2 = ceil(Int, edg[2])
+        edge1 = edge1 - next >= 1 ? edge1 - next : 1
+        edge2 = edge2 + next <= length(freq) ? edge2 + next : length(freq)
+
         freqs = freq[edge1:edge2]
 
         # Real and imaginary parts of the frequency response function

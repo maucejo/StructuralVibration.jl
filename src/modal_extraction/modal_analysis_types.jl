@@ -224,17 +224,21 @@ Structure containing the input data for automatic experimental modal analysis us
     * `dpi[2]`: Driving point index on the excitation mesh
 * `idx_m::AbstractArray{Int}`: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)
 * `idx_e::AbstractArray{Int}`: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)
-* `width::Int`: Half-width of the peaks (default: 5)
+* `width::Int`: Half-width of the peaks (default: 1)
+* `min_prom::Real`: Minimum peak prominence (default: 0.)
+* `max_prom::Real`: Maximum peak prominence (default: Inf)
 """
-@show_data struct AutoEMASdofProblem
+@show_data struct AutoEMASdofProblem{R <: Real}
     prob::EMAProblem
     alg::SdofModalExtraction
     dpi:: Vector{Int}
     idx_m::AbstractArray{Int}
     idx_e::AbstractArray{Int}
     width::Int
+    min_prom::R
+    max_prom::R
 
-    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 5) = new(prob, alg, dpi, idx_m, idx_e, width)
+    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom)
 end
 
 ## Structures for EMA-MDOF modal extraction

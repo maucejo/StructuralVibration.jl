@@ -23,7 +23,9 @@ format:
 
 - Add `progress` argument to `stabilization` function to control the display of the progress bar during stabilization analysis.
 
-- Add `width` argument to `poles_extraction` function and `AutoEMASdofProblem` to specify the half-width of the peaks for pole extraction methods.
+- Add `width`, `min_prom` and `max_prom` arguments to `poles_extraction` function and `AutoEMASdofProblem` to specify the half-width of the peaks and the minimum and maximum peak prominence for pole extraction methods.
+
+- Add `peaksplot` to visualization functions to inspect peak detection in pole extraction methods.
 
 ## v1.1.4
 

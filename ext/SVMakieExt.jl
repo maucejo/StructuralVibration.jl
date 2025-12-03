@@ -1,8 +1,8 @@
 module SVMakieExt
-    using StructuralVibration, Makie, DSP
+    using StructuralVibration, Makie, DSP, Peaks
 
     import StructuralVibration: sv_plot, bode_plot, nyquist_plot,
-        stabilization_plot, waterfall_plot, theme_choice
+        peaksplot, stabilization_plot, waterfall_plot, theme_choice
 
     include("./common_plots.jl")
 end

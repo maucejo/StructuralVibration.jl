@@ -127,6 +127,45 @@ waterfall_plot(x, y, z, xlim = [-0.1, 2π + 0.1], ylim = [-0.1, 1.1])
 
 ![](../assets/images/waterfall.png){width=85%}
 
+## Stabilization plot
+
+The stabilization plot is used in the context of the modal analysis to plot the [Stabilization diagram](../modal_extraction/index.qmd).
+
+::: {.api}
+**stabilization_plot**
+
+---
+```{julia}
+#| echo: false
+@doc stabilization_plot
+```
+:::
+
+Examples of stabilization plot can be found in the [Modal extraction](../modal_extraction/index.qmd) documentation.
+
+## Peaks plot
+
+The peaks plot is used to visualize the peak detection of a given function. It is a useful tool to define the parameters of the peak detection algorithm use to extract the poles using [Sdof methods](../modal_extraction/index.qmd).
+
+::: {.api}
+**peaksplot**
+
+---
+```{julia}
+#| echo: false
+@doc peaksplot
+```
+:::
+
+```{julia}
+# Signal used in Peaks.jl package documentation
+T = 1/25
+t = 0:T:23
+
+y = 3sinpi.(0.1t) + 2sinpi.(0.2t) + sinpi.(0.6t)
+peaksplot(t, y)
+```
+
 ## SV plot
 
 The SV plot (for _StructuralVibration plot_) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.

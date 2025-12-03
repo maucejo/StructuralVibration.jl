@@ -6,8 +6,8 @@ format:
     number-sections: true
 engine: julia
 execute:
-  freeze: false
-  cache: false
+  freeze: auto
+  cache: true
 ---
 
 ```{julia}

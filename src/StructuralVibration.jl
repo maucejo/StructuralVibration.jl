@@ -63,7 +63,7 @@ module StructuralVibration
        export detrend, gradient
 
        # Functions for plotting
-       export bode_plot, nyquist_plot, stabilization_plot, sv_plot,
+       export bode_plot, nyquist_plot, peaksplot, stabilization_plot, sv_plot,
               theme_choice, waterfall_plot
 
        # Include files - Utils

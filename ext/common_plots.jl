@@ -147,7 +147,7 @@ function sv_plot(x, y...; lw = 1., xscale = identity, yscale = identity, axis_ti
 end
 
 """
-    stabilization_plot(stab::StabilizationAnalysis, indicator)
+    stabilization_plot(stab::StabilizationAnalysis, indicator; display_poles)
 
 Plot stabilization diagram for EMA-MDOF pole stability analysis.
 
@@ -258,12 +258,43 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif; disp
     xlims!(ax_indicator, minimum(freq), maximum(freq))
 
     Legend(fig[1, 1], ax_poles, orientation = :horizontal)
+
     return fig
 end
 
 """
-    bode_plot(freq, y...; lw = 1., xlab = "Frequency (Hz)",
-              ylab = "Magnitude (dB)", xscale = identity,
+    peaksplot(x, y; width = 5, min_prom = 0., max_prom = Inf,
+              xlabel = "x", ylabel = "y")
+
+Plot data with detected peaks.
+
+**Inputs**
+* `x`: x-axis values
+* `y`: y-axis values
+* `width`: Half-width of the peaks (default: 1)
+* `min_prom`: Minimum peak prominence (default: 0.)
+* `max_prom`: Maximum peak prominence (default: Inf)
+* `xlabel`: x-axis label
+* `ylabel`: y-axis label
+
+**Output**
+* `fig`: Figure
+"""
+function peaksplot(x, y; width = 1, min_prom = 0., max_prom = Inf, xlabel = "x", ylabel = "y")
+    pks = findmaxima(y, width)
+    pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
+
+    fig = Figure()
+    ax = Axis(fig[1,1], xlabel = xlabel, ylabel = ylabel)
+    lines!(ax, x, y)
+    scatter!(ax, x[pks.indices], y[pks.indices], color = :red, marker = :star4)
+    xlims!(ax, minimum(x), maximum(x))
+
+    return fig
+end
+
+"""
+    bode_plot(freq, y...; lw = 1., xlabel = "Frequency (Hz)", xscale = identity,
               axis_tight = true, isdeg = false, layout = :vertical,
               ref_dB = 1., legend = (active = false, position = :rt, entry = " "))
 
@@ -273,7 +304,7 @@ Plot Bode diagram of a frequency response or a FRF.
 * `freq`: Frequency range of interest
 * `y`: Frequency response or FRF
 * `lw`: Line width
-* `xlab`: x-axis label
+* `xlabel`: x-axis label
 * `xscale`: x-axis scale (default: :log)
 * `axis_tight`: Tight axis (default: false)
 * `isdeg`: Phase in degrees (default: false)
