@@ -107,8 +107,8 @@ function mpc(ms)
         Syy = pi'pi
         Sxy = pr'pi
 
-        λ1 = (Sxx + Syy)/2 + sqrt(((Sxx - Syy)/2)^4 + Sxy^2)
-        λ2 = (Sxx + Syy)/2 - sqrt(((Sxx - Syy)/2)^4 + Sxy^2)
+        λ1 = (Sxx + Syy)/2 + sqrt(((Sxx - Syy)/2)^2 + Sxy^2)
+        λ2 = (Sxx + Syy)/2 - sqrt(((Sxx - Syy)/2)^2 + Sxy^2)
 
         mpc[i] = ((λ1 - λ2)/(λ1 + λ2))^2
     end
@@ -195,7 +195,7 @@ function mpd(ms)
         @. num = abs(phi)*acos((S[:, 1]*V22 - S[:, 2]*V12)/(sqrt(V12^2 + V22^2)*abs(phi)))
         den = sum(abs, phi)
 
-        mpd[i] = sum(num)/den
+        mpd[i] = real(sum(skipnan(num))/den)
     end
 
     return length(mpd) == 1 ? only(mpd) : mpd
@@ -238,7 +238,7 @@ function msf(ms_exp, ms_ref)
         throw(DimensionMismatchError("Experimental and reference mode shapes must have the same dimensions"))
     end
 
-    msf = zeros(me)
+    msf = similar(ms_exp, me)
     for (i, (pe, pr)) in enumerate(zip(eachcol(ms_exp), eachcol(ms_ref)))
         num = pe'pr
         den = pe'pe
@@ -280,13 +280,16 @@ function comac(ms_exp, ms_ref)
     end
 
     # Scale experimental mode shapes w.r.t. reference ones
-    ms_exp .*= transpose(msf(ms_exp, ms_ref))
-    num = sum(abs2, ms_exp.*ms_ref, dims = 2)
-    den = sum(abs2, ms_ref, dims = 2) .* sum(abs2, ms_exp, dims = 2)
+    ms_exp_scaled = ms_exp .* msf(ms_exp, ms_ref)'
 
-    comac = num./den
+    comac = zeros(ne)
+    for (p, (phi, psi)) in enumerate(zip(eachrow(ms_exp_scaled), eachrow(ms_ref)))
+        num =  abs2(dot(phi, conj.(psi)))
+        den = abs(dot(psi, conj.(psi))) * abs(dot(phi, conj.(phi)))
+        comac[p] = real(num/den)
+    end
 
-    return length(comac) == 1 ? only(comac) : comac
+    return length(comac) == 1 ? only(comac) : vec(comac)
 end
 
 """
@@ -322,10 +325,10 @@ function ecomac(ms_exp, ms_ref)
     end
 
     # Scale experimental mode shapes w.r.t. reference ones
-    ms_exp .*= transpose(msf(ms_exp, ms_ref))
-    ecomac = mean(abs, ms_ref .- ms_exp, dims = 2)/2
+    ms_exp_scaled = ms_exp .* msf(ms_exp, ms_ref)'
+    ecomac = mean(abs, ms_ref .- ms_exp_scaled, dims = 2)/2
 
-    return length(ecomac) == 1 ? only(ecomac) : ecomac
+    return length(ecomac) == 1 ? only(ecomac) : vec(ecomac)
 end
 
 """
@@ -398,10 +401,10 @@ function frac(frf_exp, frf_ref)
     for i in 1:ne, j in 1:me
         num = abs2(frf_exp[i, j, :]'frf_ref[i, j, :])
         den = (frf_exp[i, j, :]'frf_exp[i, j, :]) * (frf_ref[i, j, :]'frf_ref[i, j, :])
-        frac[i, j] .= num/real(den)
+        frac[i, j] = num/real(den)
     end
 
-    return frac
+    return ne == 1 || me == 1 ? vec(frac) : frac
 end
 
 ## Indicator functions

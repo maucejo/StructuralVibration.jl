@@ -171,7 +171,7 @@ IG = 2Iz
 J = IG
 
 # Tension for string
-T = 100.
+T = 5000.
 
 # Material
 E = 2.1e11
@@ -180,7 +180,6 @@ G = E/(1 - 2*ν)
 ρ = 7800.
 
 # Computation parameters
-fmax = 2000.
 x = [0.1, 0.9]
 
 # Initialization of the data types
@@ -190,10 +189,16 @@ strings = Strings(L, S, T, ρ)
 beam = Beam(L, S, Iz, E, ρ)
 
 # Computation of the natural frequencies
-ωn, kn = modefreq(bar, fmax)
+ω_bar, k_bar = modefreq(bar, 10_000.)
+ω_rod, k_rod = modefreq(rod, 10_000.)
+ω_strings, k_strings = modefreq(strings, 100.)
+ω_beam, k_beam = modefreq(beam, 2000.)
 
 # Computation of the corresponding mode shapes
-ϕn = modeshape(bar, kn, x, :CC)
+ϕ_bar = modeshape(bar, k_bar, x, :CC)
+ϕ_rod = modeshape(rod, k_rod, x, :FF)
+ϕ_strings = modeshape(strings, k_strings, x, :CC)
+ϕ_beam = modeshape(beam, k_beam, x, :SS)
 ```
 
 ### 2D models
@@ -294,18 +299,21 @@ E = 2.1e11
 ν = 0.33
 
 # Computation parameters
-fmax = 1000.
+fmax = 500.
 xp = [0.1, 0.5]
 yp = [0.1, 0.3]
 
 # Initialization of the data types
 plate = Plate(Lp, bp, hp, E, ρ, ν)
+membrane = Membrane(Lp, bp, ρ*hp, 100.)
 
 # Computation of the natural frequencies
-ωn, kn = modefreq(plate, fmax)
+ω_plate, k_plate = modefreq(plate, fmax)[1:2]
+ω_membrane, k_membrane = modefreq(membrane, fmax)[1:2]
 
 # Computation of the corresponding mode shapes
-ϕn = modeshape(plate, kn, xp, yp)
+ϕ_plate = modeshape(plate, k_plate, xp, yp)
+ϕ_membrane = modeshape(membrane, k_membrane, xp, yp)
 ```
 
 ## Discrete models
@@ -495,7 +503,7 @@ c_mdof = [0.1, 0.1]
 mdof = Mdof(k_mdof, m_mdof, c_mdof)
 
 # Definition of a MdofMesh
-mdof_mesh = MdofMesh(mdof, bc = :CF)
+mdof_mesh = MdofMesh(mdof, :CF)
 
 # System assembly
 K_mdof, M_mdof, C_mdof = assembly(mdof)
@@ -772,8 +780,8 @@ c_ss = [0.67 -0.11; -0.11 0.39]
 # Continuous-time state space from system matrices
 css = ss_model(k_ss, m_ss, c_ss)
 λ, Ψ = eigenmode(css.Ac)
-ω, ξ = modal_parameters(λss)
-Ψr = c2r_modeshape(Ψ[1:2:end, :])
+ω, ξ = modal_parameters(λ)
+Ψr = c2r_modeshape(Ψ[1:2, 2:2:end])
 
 # Continuous-time state space from modal information
 ωn, ϕn = eigenmode(k_ss, m_ss)

@@ -6,8 +6,8 @@ format:
     number-sections: true
 engine: julia
 execute:
-  freeze: auto
-  cache: true
+  freeze: false
+  cache: false
 ---
 
 ```{julia}
@@ -355,7 +355,7 @@ K = [6. -2.; -2. 4.]
 t = 0.:1e-2:30.
 
 # Impulse response matrix
-h = impulse_response(K, M, ξ, t, ismat = true).u;
+h = impulse_response(K, M, ξ, t).u;
 ```
 
 ```{julia}

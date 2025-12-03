@@ -68,7 +68,7 @@ function polyfit(x, y, order::Int = 1)
         orders = 0:order
         A = [xi^ordj for xi in x, ordj in reverse(orders)]
 
-        return (A'A)\(A'y)
+        return A\y
     end
 end
 

@@ -296,11 +296,11 @@ freq = 0.01:0.001:1.
 
 # Problem definition - Case 1 - Direct
 prob_frf = StateSpaceFRFProblem(css, freq)
-H_direct = solve(prob_frf, ismat = true).u
+H_direct = solve(prob_frf).u
 
 # Problem definition - Case 2 - Modal
 prob_frf_modal = StateSpaceModalFRFProblem(css, freq)
-H_modal = solve(prob_frf_modal, ismat = true).u
+H_modal = solve(prob_frf_modal).u
 ```
 
 ```{julia}

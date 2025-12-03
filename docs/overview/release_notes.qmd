@@ -8,11 +8,22 @@ format:
 
 ## v1.2.0
 
+**Minor changes**
+
+- Fix bugs in `eigenmode` function for state-space models.
+- Fix bugs in `comac` function.
+
 **Breaking changes**
 
-- Remove `ismat` argument from `solve` function of `DirectFRFProblem` and `ModalFRFProblem`. The output FRF is now always returned as a 3D array with dimensions (no. outputs, no. inputs, no. frequencies).
+- Change `PLSCF` algorithm name to `pLSCF` in `poles_extraction` function.
+
+- Remove `ismat` argument from `solve` function of `DirectFRFProblem`, `ModalFRFProblem`, `StateSpaceFRFProblem` and `StateSpaceModalFRFProblem`. The output FRF is now always returned as a 3D array with dimensions (no. outputs, no. inputs, no. frequencies).
+
+- Remove `ismat` argument from `impulse_response` function for modal time solvers. The output is now always returned as a 3D array with dimensions (no. dofs, no. dofs, no. frequencies).
 
 - Add `progress` argument to `stabilization` function to control the display of the progress bar during stabilization analysis.
+
+- Add `width` argument to `poles_extraction` function and `AutoEMASdofProblem` to specify the half-width of the peaks for pole extraction methods.
 
 ## v1.1.4
 

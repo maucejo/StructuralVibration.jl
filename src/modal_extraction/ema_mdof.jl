@@ -104,7 +104,6 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 - `poles`: Vector of extracted complex poles
 
 **Reference**
-
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
 @views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false) :: Vector{ComplexF64}
@@ -168,14 +167,14 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 end
 
 """
-    compute_poles(prob, order, alg = PLSCF(); stabdiag)
+    compute_poles(prob, order, alg = pLSCF(); stabdiag)
 
 Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract complex poles from Frequency Response Function (FRF) data.
 
 **Inputs**
 - `prob`: EMAMdofProblem containing FRF data and frequency vector
 - `order::Int`: Model order (number of poles to extract)
-- `alg::PLSCF`: Modal extraction method
+- `alg::pLSCF`: Modal extraction method
 - `frange`: Frequency range for analysis (default: [freq[1], freq[end]])
 - `stabdiag`: Boolean to indicate the function is used to build a stability diagram (default: false)
 
@@ -186,7 +185,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::PLSCF; stabdiag = false) :: Vector{ComplexF64}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::pLSCF; stabdiag = false) :: Vector{ComplexF64}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -270,7 +269,7 @@ end
 
 ## Function for stabilization diagram analysis
 """
-    stabilization(prob, max_order, method; stabcrit)
+    stabilization(prob, max_order, method; stabcrit, progress)
 
 Perform stabilization diagram analysis using the specified modal extraction method.
 
@@ -287,11 +286,12 @@ Perform stabilization diagram analysis using the specified modal extraction meth
         - `DataSSI()`: Data-based SSI method
 - `frange`: Frequency range for analysis (default: [freq[1], freq[end]])
 - `stabcrit`: Vector containing the stability criteria for natural frequencies and damping ratios (default: [0.01, 0.05])
+- `progress::Bool`: Boolean to indicate whether to show progress bar (default: false)
 
 **Output**
 - `sol::EMAMdofStabilization`: Data structure containing the results of the stabilization analysis
 """
-function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalExtraction, OMAModalExtraction} = LSCF(); stabcrit = [0.01, 0.05], progress = true)
+function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalExtraction, OMAModalExtraction} = LSCF(); stabcrit = [0.01, 0.05], progress = false)
 
     # Extract FRF and frequency from problem
     if prob isa EMAProblem

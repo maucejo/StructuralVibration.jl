@@ -169,7 +169,7 @@ Structure containing the impulse response of a multi-degrees of freedom (Mdof) s
 * `u`: Impulse response matrix
 """
 @show_data struct ModalImpulseSolution{T <: Real}
-    u::Union{Array{T, 3}, Vector{Matrix{T}}}
+    u::Array{T, 3}
 end
 
 
@@ -412,13 +412,12 @@ Compute the impulse response of a multi-degrees of freedom (Mdof) system using t
 * `t`: Time points at which to evaluate the response
 * `n`: Number of modes to retain in the modal basis
 * `ismodal::Bool`: Flag to indicate if the problem contains modal data
-* `ismat::Bool`: Flag to indicate if the output should be a matrix
 
 **Output**
 * `sol`: ModalImpulseSolution
     * `u`: Impulse response matrix
 """
-function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false, ismat = false)
+function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false)
     if !ismodal
         ωn, Φn = eigenmode(K, M, n)
         fn = ωn/2π
@@ -441,7 +440,7 @@ function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false, ismat =
         error("The number of damping ratios must be equal to n")
     end
 
-    h = [similar(K) for _ in 1:nt]
+    h = similar(K, ndofs, ndofs, nt)
     hsdof = similar(t)
 
     for (fm, ξm, Φm) in zip(fn, ξn, eachcol(Φn))
@@ -450,12 +449,8 @@ function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false, ismat =
         hsdof .= impulse_response(sdof, t)
 
         for (i, hi) in enumerate(hsdof)
-            h[i] .= Φm*hi*Φm'
+            h[:, :, i] .= Φm*hi*Φm'
         end
-    end
-
-    if ismat
-        return ModalImpulseSolution(reshape(reduce(hcat, h), ndofs, ndofs, :))
     end
 
     return ModalImpulseSolution(h)

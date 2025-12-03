@@ -577,6 +577,66 @@ where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = 
 ```
 :::
 
+::: {.api}
+**PeakPicking**
+
+---
+```{julia}
+#| echo: false
+@doc PeakPicking
+```
+:::
+
+::: {.api}
+**CircleFit**
+
+---
+```{julia}
+#| echo: false
+@doc CircleFit
+```
+:::
+
+::: {.api}
+**LSFit**
+
+---
+```{julia}
+#| echo: false
+@doc LSFit
+```
+:::
+
+::: {.api}
+**LSCE**
+
+---
+```{julia}
+#| echo: false
+@doc LSCE
+```
+:::
+
+::: {.api}
+**LSCF**
+
+---
+```{julia}
+#| echo: false
+@doc LSCF
+```
+:::
+
+::: {.api}
+**pLSCF**
+
+---
+```{julia}
+#| echo: false
+@doc pLSCF
+```
+:::
+
 **Related functions**
 
 ::: {.api}
@@ -692,7 +752,7 @@ ms_m = modeshape(beam, kn, xm)
 # FRF calculation
 freq = 1.:0.1:fmax
 prob = ModalFRFProblem(ωn, ξ, freq, ms_m, ms_exc)
-H = solve(prob; ismat = true).u
+H = solve(prob).u
 ```
 
 ### Sdof methods
@@ -812,7 +872,7 @@ prob_mdof = EMAProblem(H, freq)
 order = 10 # Model order
 p_lsce = poles_extraction(prob_mdof, order, LSCE())
 p_lscf = poles_extraction(prob_mdof, order, LSCF())
-p_plscf = poles_extraction(prob_mdof, order, PLSCF())
+p_plscf = poles_extraction(prob_mdof, order, pLSCF())
 
 # Stabilization diagram analysis using the LSCF method
 stab = stabilization(prob_mdof, order, LSCF())
@@ -835,7 +895,7 @@ ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel =
 scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
 scatter!(ax_f1, 1:4, fn_lsce, markersize = 20, label = "LSCE")
 scatter!(ax_f1, 1:4, fn_lscf, marker = :star4, markersize = 15, label = "LSCF")
-scatter!(ax_f1, 1:4, fn_plscf, marker = :circle, markersize = 10, label = "PLSCF")
+scatter!(ax_f1, 1:4, fn_plscf, marker = :circle, markersize = 10, label = "pLSCF")
 axislegend(ax_f1, position = :lt)
 
 scatter!(ax_f2, 1:4, 100ξ*ones(4), marker = :rect, markersize = 25, label = "Reference")

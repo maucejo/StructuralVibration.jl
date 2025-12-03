@@ -2,7 +2,7 @@ abstract type NoiseEstimation end
 abstract type OptimFamily <: NoiseEstimation end
 
 """
-    BayesEst
+    BayesianEst
 
 Bayesian noise estimation
 
@@ -11,10 +11,10 @@ Bayesian noise estimation
     * `:invgamma`: Inverse gamma distribution (default)
     * `:uniform`: Uniform distribution
 """
-@show_data struct BayesEst <: OptimFamily
+@show_data struct BayesianEst <: OptimFamily
     prior :: Symbol
 
-    BayesEst(prior = :invgamma) = new(prior)
+    BayesianEst(prior = :invgamma) = new(prior)
 end
 
 """
@@ -112,7 +112,7 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
 end
 
 # Default method
-varest(x) = varest(x, BayesEst())
+varest(x) = varest(x, BayesianEst())
 
 """
     varest_bayesian(x, method::OptimFamily)
@@ -131,7 +131,7 @@ Estimates the noise variance of a signal `x` using Bayesian denoising.
 """
 function varest_optim(x, method::OptimFamily)
     varestfun = let
-        if method isa BayesEst
+        if method isa BayesianEst
             x -> varest_bayesian(x, method.prior)
         elseif method isa GCVEst
             varest_gcv
@@ -145,7 +145,7 @@ function varest_optim(x, method::OptimFamily)
         noisevar = [varestfun(x)]
     elseif ndim == 2
         nx = size(x, 1)
-        noisevar = similar(x, nx)
+        noisevar = similar(real(x), nx)
         @views for (idx, xi) in enumerate(eachrow(x))
              noisevar[idx] = varestfun(xi)
         end

@@ -27,7 +27,7 @@ fmax = 500.
 # FRF calculation
 freq = 1.:0.1:fmax
 prob = ModalFRFProblem(ωn, ξ, freq, ϕm, ϕexc)
-H = solve(prob; ismat = true).u
+H = solve(prob).u
 
 # Natural frequencies and damping ratios extraction
 prob_sdof = EMAProblem(H, freq)

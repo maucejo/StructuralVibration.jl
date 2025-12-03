@@ -247,6 +247,20 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 ```
 :::
 
+::: {.api}
+```{julia}
+#| echo: false
+@doc CovSSI
+```
+:::
+
+::: {.api}
+```{julia}
+#| echo: false
+@doc DataSSI
+```
+:::
+
 **Related functions**
 
 ::: {.api}

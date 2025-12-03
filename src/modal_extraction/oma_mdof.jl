@@ -89,7 +89,7 @@ end
     # Block Hankel matrices
     Yp, Yf = block_hankel(y, yref, nbr)
 
-    # Projection matrix from LQ decomposition)
+    ## Projection matrix from LQ decomposition)
     # H = [Yp; Yf]
     # F_lq = lq(H)
     # L = F_lq.L[no*nbr+1:end, 1:no*nbr]

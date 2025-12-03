@@ -62,6 +62,7 @@ Computes the natural frequencies of a simply supported rectangular plate or a cl
 **Outputs**
 * `ωmn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
 * `kmn`: Matrix of modal wave numbers
+* `ind`: Matrix of modal indices (m, n)
 """
 function modefreq(model::TwoDStructure, fmax)
    (; L, b, m, D) = model
@@ -134,4 +135,5 @@ function modeshape(p::TwoDStructure, kpq, x, y)
         @. ϕ[i, :] = sin(kpq[1, :]*xi).*sin(kpq[2, :]*yi)/sqrt(Mn)
     end
 
+    return ϕ
 end

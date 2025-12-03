@@ -3,3 +3,6 @@ DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 ShareAdd = "27c01619-3163-4fe3-a204-36d38c32eb7d"
 StructuralVibration = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
+
+[sources]
+StructuralVibration = {path = ".."}

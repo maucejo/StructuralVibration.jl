@@ -6,7 +6,7 @@ Reconstruct a frequency response function (FRF) from its residues and poles.
 **Inputs**
 - `res::Array{Complex, 3}`: Residues corresponding to each pole
 - `poles::Vector{Complex}`: Poles extracted from the FRF
-- `freq::AbstractRange`: Frequency vector
+- `freq`: Frequency vector
 - `lr::Matrix{Complex, 2}`: Lower residuals (default: zeros)
 - `ur::Matrix{Complex, 2}`: Upper residuals (default: zeros)
 - `type::Symbol`: Type of FRF to reconstruct
@@ -17,7 +17,7 @@ Reconstruct a frequency response function (FRF) from its residues and poles.
 **Output**
 - `H_rec::Array{Complex, 3}`: Reconstructed FRF
 """
-function frf_reconstruction(res::Array{T, 3}, poles::Vector{T}, freq::AbstractRange; lr = zeros(eltype(res), size(res)[2:end]), ur = zeros(eltype(res), size(res)[2:end]), type = :dis) where {T <: Complex}
+function frf_reconstruction(res::Array{T, 3}, poles::Vector{T}, freq; lr = zeros(eltype(res), size(res)[2:end]), ur = zeros(eltype(res), size(res)[2:end]), type = :dis) where {T <: Complex}
 
     # Initialization
     ω = 2π*freq

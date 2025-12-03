@@ -1,4 +1,6 @@
 module StructuralVibration
+       using DispatchDoctor
+       @stable begin
 
        using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim,
              Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
@@ -25,7 +27,7 @@ module StructuralVibration
               LinearAcceleration, MidPoint, Newmark, RK4, WBZ
 
        # Structs - Noise estimation
-       export BayesEst, DerricoEst, GCVEst, LCurveEst
+       export BayesianEst, DerricoEst, GCVEst, LCurveEst
 
        # Structs - Noise denoising
        export BayesDenoising, GCVDenoising, KalmanDenoising, LCurveDenoising
@@ -34,7 +36,7 @@ module StructuralVibration
        export AutoEMAMdofProblem, AutoEMASdofProblem, EMAProblem,
               EMASolution, OMAProblem, StabilizationAnalysis
 
-       export CircleFit, CovSSI, DataSSI, LSCE, LSCF, LSFit, PeakPicking, PLSCF
+       export CircleFit, CovSSI, DataSSI, LSCE, LSCF, LSFit, PeakPicking, pLSCF
 
        # Structs - Signal processing
        export FFTParameters
@@ -116,4 +118,6 @@ module StructuralVibration
 
        # Include files - Precompilation
        # include("precompilation/precompilation.jl")
+end
+
 end

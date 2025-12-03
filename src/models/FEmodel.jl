@@ -18,7 +18,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 **Fields**
 * `xmin`: Starting position of the beam
 * `L`: Length of the beam
-* `Nodes`: Nodes of the mesh
+* `Nodes`: Node coordinates
 * `Elt`: Elements of the mesh
 * `Ndof_per_node``: Number of degrees of freedom per node
 * `elem_size`: Size of the elements
@@ -28,7 +28,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 @show_data struct OneDMesh{T <: Real}
     xmin::T
     L::T
-    Nodes::Matrix{T}
+    Nodes::Vector{T}
     Elt::Matrix{Int}
     Ndof_per_node::Int
     elem_size::T
@@ -37,13 +37,12 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 
     function OneDMesh(model::OneDStructure, xmin::T, Nelt::Int, bc::Symbol = :CC) where T
         Nnodes = Nelt + 1
-        Nodes = similar(Int[], Nnodes, 2)
+        Nodes = similar([xmin], Nnodes)
         Elt = similar(Int[], Nelt, 3)
         elem_size = model.L/Nelt
 
         for i = 1:Nnodes
-            Nodes[i, 1] = i
-            Nodes[i, 2] = xmin + (i - 1)*elem_size
+            Nodes[i] = xmin + (i - 1)*elem_size
         end
 
         for i = 1:Nelt

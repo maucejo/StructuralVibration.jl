@@ -126,7 +126,7 @@ Computes the eigen of a continuous-time state-space model
 
 **Inputs**
 * `Ac`: Continuous-time state-space matrix
-* `n`: Number of eigen to keep in the modal basis
+* `n`: Number of mode pairs to keep in the modal basis (default: size(Ac, 1) ÷ 2)
 
 *Note: `n` is the number of mode pairs to keep in the basis*
 
@@ -135,17 +135,12 @@ Computes the eigen of a continuous-time state-space model
 * `Ψ`: Eigenvectors
 """
 
-function eigenmode(Ac, n::Int = size(Ac, 1))
+function eigenmode(Ac, n::Int = size(Ac, 1) ÷ 2)
 
     λ, Ψ = eigen(Ac)
+    sort_idx = sortperm(abs.(λ))
 
-    λn = similar(Ac, Complex{eltype(Ac)}, n)
-    Ψn = similar(Ac, Complex{eltype(Ac)}, size(Ψ, 1)::Int, n)
-
-    λn .= λ[1:n]
-    Ψn .= Ψ[:, 1:n]
-
-    return λn, Ψn
+    return λ[sort_idx][1:2n], Ψ[:, sort_idx][:, 1:2n]
 end
 
 """
@@ -161,8 +156,7 @@ Computes the natural angular frequencies and damping ratios from the complex eig
 * `ξn`: Damping ratios
 """
 function modal_parameters(λ)
-
-    λn = λ[1:2:end]
+    λn = λ[2:2:end]
     ωn = abs.(λn)
     ξn = -real(λn)./ωn
 

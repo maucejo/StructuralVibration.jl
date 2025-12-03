@@ -1,5 +1,5 @@
 """
-    poles_extraction(prob::EMAProblem, alg)
+    poles_extraction(prob::EMAProblem, alg; width)
     poles_extraction(prob::MdofProblem, order, alg; stabdiag)
 
 Extract poles from the Bode diagram fitting method
@@ -17,6 +17,7 @@ Extract poles from the Bode diagram fitting method
         * `PLSCF`: Polyreference Least Squares Complex Frequency method
         * `LSCE`: Least Squares Complex Exponential method (only for Mdof methods)
 * `stabdiag::Bool`: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)
+* `width::Int`: Half-width of the peaks (only for Sdof methods, default: 5)
 
 **Outputs**
 * `poles`: Vector of extracted complex poles
@@ -24,7 +25,7 @@ Extract poles from the Bode diagram fitting method
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction)
+function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width = 5)
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -35,7 +36,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction)
     npeak = 0
     np = zeros(Int, no*ni)
     for (k, Hv) in enumerate(eachrow(Hr))
-        np[k] = length(findmaxima(abs.(Hv)).indices)
+        np[k] = length(findmaxima(abs.(Hv), width).indices)
         npeak = max(npeak, np[k])
     end
 
@@ -43,7 +44,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction)
     pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
-        p = compute_poles(Hv, freq, alg)
+        p = compute_poles(Hv, freq, alg, width)
 
         nk = length(p)
         pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
@@ -59,21 +60,22 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction)
 end
 
 """
-    compute_poles(H, freq, alg::PeakPicking)
+    compute_poles(H, freq, alg::PeakPicking, width)
 
-Extract poles from the Bode diagram peak picking method
+Extract poles from the peak picking method
 
 **Inputs**
-* `H`: Frequency response function
-* `freq`: Frequency vector
+* `H::Array{Complex, 3}`: Frequency response function
+* `freq::AbstractArray`: Frequency vector
+* `width::Int`: Half-width of the peaks
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function compute_poles(H, freq, alg::PeakPicking)
+function compute_poles(H, freq, alg::PeakPicking, width)
     # Find peaks in the FRF
     Habs = abs.(H)
-    pks = findmaxima(Habs)
+    pks = findmaxima(Habs, width)
     # Peaks not found
     if isempty(pks.indices)
         return Complex{eltype(freq)}[]
@@ -119,18 +121,19 @@ function compute_poles(H, freq, alg::PeakPicking)
 end
 
 """
-    compute_poles(H, freq, alg::CircleFit)
+    compute_poles(H, freq, alg::CircleFit, width)
 
 Extract poles from the Bode diagram circle fitting method
 
 **Inputs**
-* `H`: Frequency response function
-* `freq`: Frequency vector
+* `H::Array{Complex, 3}`: Frequency response function
+* `freq::AbstractArray`: Frequency vector
+* `width::Int`: Half-width of the peaks
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function compute_poles(H, freq, alg::CircleFit)
+function compute_poles(H, freq, alg::CircleFit, width)
 
     # Find peaks in the FRF
     pks = findmaxima(abs.(H))
@@ -191,24 +194,24 @@ function compute_poles(H, freq, alg::CircleFit)
 end
 
 """
-    compute_poles(H, freq, alg::LSFit)
+    compute_poles(H, freq, alg::LSFit, width)
 
 Extract poles from the Bode diagram least squares fitting method
 
 **Inputs**
-* `H`: Frequency response function
-* `freq`: Frequency vector
+* `H::Array{Complex, 3}`: Frequency response function
+* `freq::AbstractArray`: Frequency vector
+* `width::Int`: Half-width of the peaks
 
 **Outputs**
 * `poles`: Extracted poles
 
-**Source**
+**Reference**
 [1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
-
 """
-function compute_poles(H, freq, alg::LSFit)
+function compute_poles(H, freq, alg::LSFit, width)
     # Find peaks in the FRF
-    pks = findmaxima(abs.(H))
+    pks = findmaxima(abs.(H), width)
     # Peaks not found
     if isempty(pks.indices)
         return Complex{eltype(freq)}[]
@@ -394,10 +397,10 @@ Solve automatically experimental modal analysis problem using Sdof or Mdof metho
 """
 function solve(prob_ema::AutoEMASdofProblem)
     # Unpack problem data
-    (; prob, alg, dpi, idx_m, idx_e) = prob_ema
+    (; prob, alg, dpi, idx_m, idx_e, width) = prob_ema
 
     # Extraction of natural frequencies and damping ratios
-    poles = poles_extraction(prob, alg)
+    poles = poles_extraction(prob, alg, width = width)
 
     # Extraction of mode shapes
     phi = modeshape_extraction(prob, poles, alg, dpi = dpi)

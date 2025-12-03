@@ -45,9 +45,9 @@ A Bode plot is a graph of the magnitude and phase of a transfer function versus 
 ```{julia}
 # Initialize a Sdof type
 m = 1.
-f₀ = 10.
+f0 = 10.
 ξ = 0.01
-sdof = Sdof(m, f₀, ξ)
+sdof = Sdof(m, f0, ξ)
 
 # Computation parameters
 freq = 1.:0.01:30.

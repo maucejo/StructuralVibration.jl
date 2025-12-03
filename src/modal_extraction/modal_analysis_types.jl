@@ -2,19 +2,134 @@ abstract type MdofProblem end
 
 # Experimental Modal Analysis (EMA) - Sdof
 abstract type SdofModalExtraction end
+
+"""
+    PeakPicking
+
+Peak picking method for Sdof modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
+"""
 struct PeakPicking <: SdofModalExtraction end
+
+"""
+    PeakPicking
+
+Circle fitting method for Sdof modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
+"""
 struct CircleFit <: SdofModalExtraction end
+
+"""
+    LSFit
+
+Least squares fitting method for Sdof modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+[1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
+"""
 struct LSFit <: SdofModalExtraction end
 
 # Experimental Modal Analysis (EMA) - Mdof
 abstract type MdofModalExtraction end
+
+"""
+    LSCE
+
+Least Squares Complex Exponential method for Mdof modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] D. L. Brown, R. J. Allemang, Ray Zimmerman and M. Mergeay. "Parameter Estimation Techniques for Modal Analysis". SAE Transactions, vol. 88, pp. 828-846, 1979.
+"""
 struct LSCE <: MdofModalExtraction end
+
+"""
+    LSCF
+
+Least Squares Complex Frequency method for Mdof modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] P. Guillaume, P. Verboven, S. Vanlanduit, H. Van der Auweraer, and B. Peeters, "A poly-reference implementation of the least-squares complex frequency-domain estimator". In Proceedings of IMAC XXI. Kissimmee, FL, 2003.
+
+[2] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
+"""
 struct LSCF <: MdofModalExtraction end
-struct PLSCF <: MdofModalExtraction end
+
+"""
+    pLSCF
+
+Polyreference Least Squares Complex Frequency method for Mdof modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] P. Guillaume, P. Verboven, S. Vanlanduit, H. Van der Auweraer, and B. Peeters, "A poly-reference implementation of the least-squares complex frequency-domain estimator". In Proceedings of IMAC XXI. Kissimmee, FL, 2003.
+
+[2] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
+"""
+struct pLSCF <: MdofModalExtraction end
 
 # Operational Modal Analysis (OMA)
 abstract type OMAModalExtraction end
+
+"""
+    CovSSI
+
+Covariance-driven Stochastic Subspace Identification method for OMA modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+
+[2] P. Peeters and G. De Roeck. "Reference-based stochastic subspace identification for output-only modal analysis". Mechanical Systems and Signal Processing, 13(6):855-878, 1999.
+
+[3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
+"""
 struct CovSSI <: OMAModalExtraction end
+
+"""
+    DataSSI
+
+Data-driven Stochastic Subspace Identification method for OMA modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+
+[2] P. Peeters and G. De Roeck. "Reference-based stochastic subspace identification for output-only modal analysis". Mechanical Systems and Signal Processing, 13(6):855-878, 1999.
+
+[3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
+"""
 struct DataSSI <: OMAModalExtraction end
 
 ## Common structures for EMA
@@ -94,7 +209,7 @@ end
 
 ## Structures for EMA-SDOF modal extraction
 """
-    AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e)
+    AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width)
 
 Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
@@ -109,6 +224,7 @@ Structure containing the input data for automatic experimental modal analysis us
     * `dpi[2]`: Driving point index on the excitation mesh
 * `idx_m::AbstractArray{Int}`: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)
 * `idx_e::AbstractArray{Int}`: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)
+* `width::Int`: Half-width of the peaks (default: 5)
 """
 @show_data struct AutoEMASdofProblem
     prob::EMAProblem
@@ -116,8 +232,9 @@ Structure containing the input data for automatic experimental modal analysis us
     dpi:: Vector{Int}
     idx_m::AbstractArray{Int}
     idx_e::AbstractArray{Int}
+    width::Int
 
-    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2)) = new(prob, alg, dpi, idx_m, idx_e)
+    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 5) = new(prob, alg, dpi, idx_m, idx_e, width)
 end
 
 ## Structures for EMA-MDOF modal extraction
