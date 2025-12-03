@@ -426,7 +426,7 @@ function solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
     ns = nstate ÷ 2
     nf = length(freq)
 
-    y::Matrix{Complex} = similar(Ac, Complex{eltype(Ac)}, no, nf)
+    y = similar(Ac, Complex{eltype(Ac)}, no, nf)
     M = similar(Ac, Complex{eltype(Ac)}, nstate, nu)
 
     if type == :acc
@@ -498,7 +498,7 @@ function solve(prob::StateSpaceModalFreqProblem; type = :dis, progress = true)
         D .= So*Bc[ns+1:end, :]
     end
 
-    y::Matrix{Complex} = similar(λ, no, nf)
+    y = similar(λ, no, nf)
     M = Diagonal(similar(λ, 2n))
     indm = diagind(M)
 

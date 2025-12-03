@@ -1,4 +1,4 @@
-using StructuralVibration
+using StructuralVibration, LinearAlgebra
 
 ## Free response
 # Structural parameters
