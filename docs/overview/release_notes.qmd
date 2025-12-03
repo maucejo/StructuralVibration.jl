@@ -11,6 +11,7 @@ format:
 **Minor changes**
 
 - Fix bugs in `eigenmode` function for state-space models.
+
 - Fix bugs in `comac` function.
 
 **Breaking changes**
