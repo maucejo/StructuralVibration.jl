@@ -38,16 +38,12 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
     # Estimate the number of peaks in the FRF
     if !isempty(pks_indices)
         npeak = length(pks_indices)
-        # keeprow = trues(no*ni)
     else
         npeak = 0
-        np = zeros(Int, no*ni)
         for (k, Hv) in enumerate(eachrow(Hr))
-            np[k] = length(findmaxima(abs.(Hv), width).indices)
-            npeak = max(npeak, np[k])
+            np = length(findmaxima(abs.(Hv), width).indices)
+            npeak = max(npeak, np)
         end
-
-        # keeprow = np .== npeak
     end
 
     # Initialization
@@ -61,7 +57,6 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
         nk = length(p)
         poles .= [p; fill(complex(NaN, NaN), npeak - nk)]
         if any(isnan.(poles))
-            println(k)
             keeprow[k] = false
         end
 
