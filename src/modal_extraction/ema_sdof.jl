@@ -38,7 +38,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
     # Estimate the number of peaks in the FRF
     if !isempty(pks_indices)
         npeak = length(pks_indices)
-        keeprow = trues(no*ni)
+        # keeprow = trues(no*ni)
     else
         npeak = 0
         np = zeros(Int, no*ni)
@@ -47,17 +47,25 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
             npeak = max(npeak, np[k])
         end
 
-        keeprow = np .== npeak
+        # keeprow = np .== npeak
     end
 
     # Initialization
     pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
+    keeprow = trues(no*ni)
+    poles = similar(frf, Complex{eltype(freq)}, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
         p = compute_poles(Hv, freq, alg, width, min_prom, max_prom, pks_indices)
 
         nk = length(p)
-        pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
+        poles .= [p; fill(complex(NaN, NaN), npeak - nk)]
+        if any(isnan.(poles))
+            println(k)
+            keeprow[k] = false
+        end
+
+        pk[k, :] .= poles
     end
 
     # Average the results from different FRFs
@@ -89,18 +97,23 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks
     Habs = abs.(H)
 
     if !isempty(pks_indices)
-        pks = (indices = pks_indices, heights = Habs[pks_indices], data = Habs)
-
         # No peaks
-        if var(pks.heights) == 0.
+        if var(Habs) == 0.
             return Complex{eltype(freq)}[]
         end
 
+        pks = (indices = pks_indices, heights = Habs[pks_indices], data = Habs)
         # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
         pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
+
+        # Peaks not found - Compute the relative prominence to the peak heights
+        if any(pks.proms .< 0.15pks.heights)
+            return Complex{eltype(freq)}[]
+        end
     else
         # Find peaks in the FRF
         pks = findmaxima(Habs, width)
+
         # Peaks not found
         if isempty(pks.indices)
             return Complex{eltype(freq)}[]
