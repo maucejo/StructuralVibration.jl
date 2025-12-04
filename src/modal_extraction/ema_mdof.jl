@@ -128,7 +128,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
     nmodel = order + 1
 
     # Build basis matrix X0 (nf x nmodel), complex
-    # Use the same basis as original: exp.(-1im*ω*modelOrder'*Δt)
+    # Use the same basis as original: exp.(-1im*ω*modelOrder'*Δt) with ω = 2π*(f - f1)
     X0 = cispi.(-ω*modelOrder'*Δt)  # nf x nmodel
     Rk = real(X0'X0)
 

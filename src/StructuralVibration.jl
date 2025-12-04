@@ -54,7 +54,7 @@ module StructuralVibration
 
        # Modal extraction
        export cmif, comac, compute_residuals, convert_csd, ecomac, frac,
-              frf_reconstruction, half_csd_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, poles_extraction, poles2modal, psif, stabilization, csd_from_tf, half_csd, xcorr
+              frf_reconstruction, half_csd_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, ods, poles_extraction, poles2modal, psif, stabilization, csd_from_tf, half_csd, xcorr
 
        # Signal processing
        export bartlett, bartlett_hann, blackman, blackman_harris,
@@ -93,6 +93,7 @@ module StructuralVibration
        include("modal_extraction/oma_utils.jl")
        include("modal_extraction/oma_mdof.jl")
        include("modal_extraction/oma_halfspec.jl")
+       include("modal_extraction/ods.jl")
 
        # Include files - Sdof
        include("models/sdof_mdof.jl")

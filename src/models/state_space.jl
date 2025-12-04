@@ -194,7 +194,7 @@ function c2r_modeshape(Ψ)
         # Angle of maximum correlation line
         θ = atan(p[1])
 
-        ϕ[:, i] .= real(Ψi*exp(-1im*θ))
+        ϕ[:, i] .= real(Ψi*cis(-θ))
     end
 
     return ϕ
