@@ -148,12 +148,12 @@ Examples of stabilization plot can be found in the [Modal extraction](../modal_e
 The peaks plot is used to visualize the peak detection of a given function. It is a useful tool to define the parameters of the peak detection algorithm use to extract the poles using [Sdof methods](../modal_extraction/index.qmd).
 
 ::: {.api}
-**peaksplot**
+**peaks_plot**
 
 ---
 ```{julia}
 #| echo: false
-@doc peaksplot
+@doc peaks_plot
 ```
 :::
 
@@ -163,7 +163,7 @@ T = 1/25
 t = 0:T:23
 
 y = 3sinpi.(0.1t) + 2sinpi.(0.2t) + sinpi.(0.6t)
-peaksplot(t, y)
+peaks_plot(t, y)
 ```
 
 ## SV plot

@@ -263,7 +263,7 @@ function stabilization_plot(stab::StabilizationAnalysis, indicator = :psif; disp
 end
 
 """
-    peaksplot(x, y; width = 5, min_prom = 0., max_prom = Inf,
+    peaks_plot(x, y; width = 5, min_prom = 0., max_prom = Inf,
               xlabel = "x", ylabel = "y")
 
 Plot data with detected peaks.
@@ -280,14 +280,14 @@ Plot data with detected peaks.
 **Output**
 * `fig`: Figure
 """
-function peaksplot(x, y; width = 1, min_prom = 0., max_prom = Inf, xlabel = "x", ylabel = "y")
+function peaks_plot(x, y; width = 1, min_prom = 0., max_prom = Inf, xlabel = "x", ylabel = "y")
     pks = findmaxima(y, width)
     pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
 
     fig = Figure()
     ax = Axis(fig[1,1], xlabel = xlabel, ylabel = ylabel)
     lines!(ax, x, y)
-    scatter!(ax, x[pks.indices], y[pks.indices], color = :red, marker = :star4)
+    scatter!(ax, x[pks.indices], y[pks.indices], color = :red, marker = :star4, markersize = 10.)
     xlims!(ax, minimum(x), maximum(x))
 
     return fig

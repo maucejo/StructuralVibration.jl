@@ -763,7 +763,7 @@ H = solve(prob).u
 
 ```{julia}
 Habs_dB = 20log10.(abs.(H[1, 2, :]))
-peaksplot(freq, Habs_dB, xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)")
+peaks_plot(freq, Habs_dB, xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)")
 ```
 
 #### Modes extraction

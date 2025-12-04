@@ -209,7 +209,7 @@ end
 
 ## Structures for EMA-SDOF modal extraction
 """
-    AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width)
+    AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
 
 Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
@@ -227,6 +227,7 @@ Structure containing the input data for automatic experimental modal analysis us
 * `width::Int`: Half-width of the peaks (default: 1)
 * `min_prom::Real`: Minimum peak prominence (default: 0.)
 * `max_prom::Real`: Maximum peak prominence (default: Inf)
+* `pks_indices::Vector{Int}`: Predefined peak indices (default: empty vector)
 """
 @show_data struct AutoEMASdofProblem{R <: Real}
     prob::EMAProblem
@@ -237,8 +238,9 @@ Structure containing the input data for automatic experimental modal analysis us
     width::Int
     min_prom::R
     max_prom::R
+    pks_indices::Vector{Int}
 
-    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom)
+    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf, pks_indices::Vector{Int} = Int[]) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
 end
 
 ## Structures for EMA-MDOF modal extraction

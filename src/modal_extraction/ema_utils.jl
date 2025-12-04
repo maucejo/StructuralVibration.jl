@@ -99,3 +99,157 @@ function poles_validity(raw_poles, order, freq, stabdiag)
     # If Stability diagram
     return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
 end
+
+"""
+    peak_proms!(pks; min = 0., max = Inf)
+
+Compute the prominence of peaks and filter them based on minimum and maximum prominence.
+
+**Inputs**
+- `pks`: A NamedTuple containing peak information with fields:
+    - `indices`: Indices of the peaks
+    - `heights`: Heights of the peaks
+    - `data`: The original data array from which peaks were identified
+- `min`: Minimum prominence threshold (default: 0.)
+- `max`: Maximum prominence threshold (default: Inf)
+
+**Output**
+- `pks`: Filtered `pks` to include only peaks with prominence within the specified range. The structure will also include a new field `proms` containing the computed prominences.
+"""
+function peak_proms!(pks; min = 0., max = Inf)
+    data = pks.data
+
+    n = length(data)
+    npreaks = length(pks.indices)
+    prominences = similar(data, npreaks)
+
+    for (i, (idx, peak_height)) in enumerate(zip(pks.indices, pks.heights))
+        # Find left base
+        left_min = peak_height
+        for j in idx-1:-1:1
+            left_min = minimum([left_min, data[j]])
+            if j > 1 && data[j] < data[j-1] && data[j] < data[j+1]
+                break
+            end
+        end
+
+        # Find right base
+        right_min = peak_height
+        for j in idx+1:n
+            right_min = minimum([right_min, data[j]])
+            if j < n && data[j] < data[j-1] && data[j] < data[j+1]
+                break
+            end
+        end
+
+        # Prominence is the height above the highest of the two bases
+        base = maximum([left_min, right_min])
+        prominences[i] = peak_height - base
+    end
+
+    # Filter peaks by prominence
+    valid_mask = (prominences .≥ min) .& (prominences .≤ max)
+    # Update pks in place
+    filtered_pks = (
+        indices = pks.indices[valid_mask],
+        heights = pks.heights[valid_mask],
+        proms = prominences[valid_mask],
+        data = data
+    )
+
+    return merge(pks, filtered_pks)
+end
+
+"""
+    peak_widths(pks; relheight = 0.5, min = 0., max = Inf)
+
+Compute the widths of peaks at a specified relative height and filter them based on minimum and maximum width.
+
+**Inputs**
+- `pks`: A NamedTuple containing peak information with fields:
+    - `indices`: Indices of the peaks
+    - `heights`: Heights of the peaks
+    - `proms`: Prominences of the peaks
+    - `data`: The original data array from which peaks were identified
+- `relheight`: Relative height at which to measure the width (default: 0.5)
+- `min`: Minimum width threshold (default: 0.)
+- `max`: Maximum width threshold (default: Inf)
+
+**Output**
+- `pks`: Filtered `pks` to include only peaks with widths within the
+specified range. The structure will also include new fields `widths` and `edges` containing the computed widths and their corresponding left and right edges.
+"""
+function peak_widths!(pks; relheight = 0.5, min = 0., max = Inf)
+    data = pks.data
+    proms = pks.proms
+    n = length(data)
+    npeaks = length(pks.indices)
+
+    widths = similar(proms, npeaks)
+    left_edges = similar(proms, npeaks)
+    right_edges = similar(proms, npeaks)
+
+    for (i, (idx, peak_height, prom)) in enumerate(zip(pks.indices, pks.heights, proms))
+        # Reference height based on prominence and relative height
+        ref_height = peak_height - prom * relheight
+
+        # Find left edge (where signal crosses reference height)
+        left_idx = idx
+        for j in idx-1:-1:1
+            if data[j] ≤ ref_height
+                # Linear interpolation for sub-sample precision
+                if j < idx - 1
+                    # Interpolate between j and j+1
+                    t = (ref_height - data[j]) / (data[j+1] - data[j])
+                    left_idx = j + t
+                else
+                    left_idx = j
+                end
+                break
+            end
+            if j == 1
+                left_idx = 1.
+            end
+        end
+
+        # Find right edge (where signal crosses reference height)
+        right_idx = idx
+        for j in idx+1:n
+            if data[j] ≤ ref_height
+                # Linear interpolation for sub-sample precision
+                if j > idx + 1
+                    # Interpolate between j-1 and j
+                    t = (ref_height - data[j]) / (data[j-1] - data[j])
+                    right_idx = j - 1 + t
+                else
+                    right_idx = j
+                end
+                break
+            end
+            if j == n
+                right_idx = float(n)
+            end
+        end
+
+        widths[i] = right_idx - left_idx
+        left_edges[i] = left_idx
+        right_edges[i] = right_idx
+    end
+
+    # Filter peaks by width
+    valid_mask = (widths .≥ min) .& (widths .≤ max)
+
+    filtered_edges = [(left_edges[i], right_edges[i]) for i in findall(valid_mask)]
+
+    # Update pks in place
+    filtered_pks = (
+        indices = pks.indices[valid_mask],
+        heights = pks.heights[valid_mask],
+        proms = pks.proms[valid_mask],
+        widths = widths[valid_mask],
+        edges = filtered_edges,
+        data = data
+    )
+
+    return merge(pks, filtered_pks)
+end

@@ -6,6 +6,14 @@ format:
     number-sections: false
 ---
 
+## v1.3.0
+
+**New features**
+
+- Add `pks_indices` argument to `AutoEMASdofProblem` and `poles_extraction` function to specify the indices of peaks to consider during pole extraction using Sdof methods.
+
+- `peaksplot` is renamed to `peaks_plot` to avoid name conflict with the `peaksplot` function from `Peaks.jl`.
+
 ## v1.2.0
 
 **Minor changes**

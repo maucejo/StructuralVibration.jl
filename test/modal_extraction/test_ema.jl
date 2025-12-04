@@ -1,4 +1,4 @@
-using StructuralVibration
+using StructuralVibration, Peaks, Statistics
 @usingany CairoMakie
 
 # Structure parameters of the beam
@@ -38,6 +38,11 @@ poles_pp = poles_extraction(prob_sdof, PeakPicking())
 poles_cf = poles_extraction(prob_sdof, CircleFit())
 poles_lsf = poles_extraction(prob_sdof, LSFit())
 
+pks = findmaxima(vec(mean(abs, H, dims = 2)))
+poles_pp2 = poles_extraction(prob_sdof, PeakPicking(), pks_indices = pks.indices)
+poles_cf2 = poles_extraction(prob_sdof, CircleFit(), pks_indices = pks.indices)
+poles_lsf2 = poles_extraction(prob_sdof, LSFit(), pks_indices = pks.indices)
+
 # Mode shape extraction
 dpi = [1, 2]
 ms_id = modeshape_extraction(prob_sdof, poles_pp, PeakPicking(), dpi = dpi)
@@ -64,6 +69,7 @@ prob_mdof = EMAProblem(H, freq)
 
 # Poles extraction
 order = 10 # Model order
+
 p_lsce = poles_extraction(prob_mdof, order, LSCE())
 p_lscf = poles_extraction(prob_mdof, order, LSCF())
 p_plscf = poles_extraction(prob_mdof, order, pLSCF())

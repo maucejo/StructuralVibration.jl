@@ -1,5 +1,5 @@
 """
-    poles_extraction(prob::EMAProblem, alg; width)
+    poles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices)
     poles_extraction(prob::MdofProblem, order, alg; stabdiag)
 
 Extract poles from the Bode diagram fitting method
@@ -20,6 +20,7 @@ Extract poles from the Bode diagram fitting method
 * `width::Int`: Half-width of the peaks (only for Sdof methods, default: 1)
 * `min_prom::Real`: Minimum peak prominence (only for Sdof methods, default: 0. dB)
 * `max_prom::Real`: Maximum peak prominence (only for Sdof methods, default: Inf)
+* `pks_indices::Vector{Int}`: Indices of peaks to consider (only for Sdof methods, default: empty vector)
 
 **Outputs**
 * `poles`: Vector of extracted complex poles
@@ -27,7 +28,7 @@ Extract poles from the Bode diagram fitting method
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int = 1, min_prom = 0., max_prom = Inf)
+function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -35,25 +36,31 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
     Hr = reshape(frf, no*ni, nf)
 
     # Estimate the number of peaks in the FRF
-    npeak = 0
-    np = zeros(Int, no*ni)
-    for (k, Hv) in enumerate(eachrow(Hr))
-        np[k] = length(findmaxima(abs.(Hv), width).indices)
-        npeak = max(npeak, np[k])
+    if !isempty(pks_indices)
+        npeak = length(pks_indices)
+        keeprow = trues(no*ni)
+    else
+        npeak = 0
+        np = zeros(Int, no*ni)
+        for (k, Hv) in enumerate(eachrow(Hr))
+            np[k] = length(findmaxima(abs.(Hv), width).indices)
+            npeak = max(npeak, np[k])
+        end
+
+        keeprow = np .== npeak
     end
 
     # Initialization
     pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
-        p = compute_poles(Hv, freq, alg, width, min_prom, max_prom)
+        p = compute_poles(Hv, freq, alg, width, min_prom, max_prom, pks_indices)
 
         nk = length(p)
         pk[k, :] .= [p; fill(complex(NaN, NaN), npeak - nk)]
     end
 
     # Average the results from different FRFs
-    keeprow = np .== npeak
     for i in 1:npeak
         pn[i] = mean(skipnan(pk[keeprow, i]))
     end
@@ -62,7 +69,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
 end
 
 """
-    compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom)
+    compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks_indices)
 
 Extract poles from the peak picking method
 
@@ -72,21 +79,36 @@ Extract poles from the peak picking method
 * `width::Int`: Half-width of the peaks
 * `min_prom::Real`: Minimum peak prominence
 * `max_prom::Real`: Maximum peak prominence
+* `pks_indices::Vector{Int}`: Indices of peaks to consider (default: empty vector)
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom)
+function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks_indices = Int[])
     # Find peaks in the FRF
     Habs = abs.(H)
-    pks = findmaxima(Habs, width)
-    # Peaks not found
-    if isempty(pks.indices)
-        return Complex{eltype(freq)}[]
-    end
 
-    # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
-    pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
+    if !isempty(pks_indices)
+        pks = (indices = pks_indices, heights = Habs[pks_indices], data = Habs)
+
+        # No peaks
+        if var(pks.heights) == 0.
+            return Complex{eltype(freq)}[]
+        end
+
+        # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
+        pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
+    else
+        # Find peaks in the FRF
+        pks = findmaxima(Habs, width)
+        # Peaks not found
+        if isempty(pks.indices)
+            return Complex{eltype(freq)}[]
+        end
+
+        # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+        pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
+    end
 
     # Estimation of natural frequencies and damping ratios
     ftemp = freq[pks.indices]
@@ -131,7 +153,7 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom)
 end
 
 """
-    compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom)
+    compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_indices)
 
 Extract poles from the Bode diagram circle fitting method
 
@@ -141,21 +163,35 @@ Extract poles from the Bode diagram circle fitting method
 * `width::Int`: Half-width of the peaks
 * `min_prom::Real`: Minimum peak prominence
 * `max_prom::Real`: Maximum peak prominence
+* `pks_indices::Vector{Int}`: Indices of peaks to consider (default: empty vector)
 
 **Outputs**
 * `poles`: Extracted poles
 """
-function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom)
+function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_indices = Int[])
 
-    # Find peaks in the FRF
-    pks = findmaxima(abs.(H), width)
-    # Peaks not found
-    if isempty(pks.indices)
-        return Complex{eltype(freq)}[]
+    Habs = abs.(H)
+    if !isempty(pks_indices)
+        pks = (indices = pks_indices, heights = Habs[pks_indices], data = Habs)
+
+        # No peaks
+        if var(pks.heights) == 0.
+            return Complex{eltype(freq)}[]
+        end
+
+        # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
+        pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
+    else
+        # Find peaks in the FRF
+        pks = findmaxima(Habs, width)
+        # Peaks not found
+        if isempty(pks.indices)
+            return Complex{eltype(freq)}[]
+        end
+
+        # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+        pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
     end
-
-    # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
-    pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
 
     # Estimation of natural frequencies and damping ratios
     fn = similar(freq[pks.indices])
@@ -213,7 +249,7 @@ function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom)
 end
 
 """
-    compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom)
+    compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indices)
 
 Extract poles from the Bode diagram least squares fitting method
 
@@ -223,6 +259,7 @@ Extract poles from the Bode diagram least squares fitting method
 * `width::Int`: Half-width of the peaks
 * `min_prom::Real`: Minimum peak prominence
 * `max_prom::Real`: Maximum peak prominence
+* `pks_indices::Vector{Int}`: Indices of peaks to consider (default: empty vector)
 
 **Outputs**
 * `poles`: Extracted poles
@@ -230,12 +267,28 @@ Extract poles from the Bode diagram least squares fitting method
 **Reference**
 [1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
-function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom)
-    # Find peaks in the FRF
-    pks = findmaxima(abs.(H), width)
-    # Peaks not found
-    if isempty(pks.indices)
-        return Complex{eltype(freq)}[]
+function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indices = Int[])
+    Habs = abs.(H)
+    if !isempty(pks_indices)
+        pks = (indices = pks_indices, heights = Habs[pks_indices], data = Habs)
+
+        # No peaks
+        if var(pks.heights) == 0.
+            return Complex{eltype(freq)}[]
+        end
+
+        # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
+        pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
+    else
+        # Find peaks in the FRF
+        pks = findmaxima(Habs, width)
+        # Peaks not found
+        if isempty(pks.indices)
+            return Complex{eltype(freq)}[]
+        end
+
+        # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+        pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
     end
 
     # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
@@ -425,10 +478,10 @@ Solve automatically experimental modal analysis problem using Sdof or Mdof metho
 """
 function solve(prob_ema::AutoEMASdofProblem)
     # Unpack problem data
-    (; prob, alg, dpi, idx_m, idx_e, width) = prob_ema
+    (; prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices) = prob_ema
 
     # Extraction of natural frequencies and damping ratios
-    poles = poles_extraction(prob, alg, width = width)
+    poles = poles_extraction(prob, alg, width = width, min_prom = min_prom, max_prom = max_prom, pks_indices = pks_indices)
 
     # Extraction of mode shapes
     phi = modeshape_extraction(prob, poles, alg, dpi = dpi)
