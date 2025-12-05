@@ -1630,29 +1630,6 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 </div>
 </div>
 </div>
-<div class="api">
-<p><strong>c2r_modeshape</strong></p>
-<hr>
-<div id="60" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">c2r_modeshape(Ψ)</code></pre>
-<p>Converts the complex modes to real modes</p>
-<p><strong>Input</strong></p>
-<ul>
-<li><p><code>Ψ</code>: Complex modes</p>
-</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li><p><code>ϕn</code>: Real modes</p>
-</li>
-</ul>
-
-
-</div>
-</div>
-</div>
-</div>
 </section>
 <section id="example-5" class="level4" data-number="3.1.2">
 <h4 data-number="3.1.2" class="anchored" data-anchor-id="example-5"><span class="header-section-number">3.1.2</span> Example</h4>
@@ -1665,11 +1642,10 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(k_ss, m_ss, c_ss)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>λ, Ψ <span class="op">=</span> <span class="fu">eigenmode</span>(css.Ac)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ω, ξ <span class="op">=</span> <span class="fu">modal_parameters</span>(λ)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Ψr <span class="op">=</span> <span class="fu">c2r_modeshape</span>(Ψ[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>])</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ωn, ϕn <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωn, <span class="fl">0.01</span>, ϕn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous-time state space from modal information</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>ωn, ϕn <span class="op">=</span> <span class="fu">eigenmode</span>(k_ss, m_ss)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>css_modal <span class="op">=</span> <span class="fu">ss_modal_model</span>(ωn, <span class="fl">0.01</span>, ϕn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="discrete-time-models" class="level3" data-number="3.2">
@@ -1728,7 +1704,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>DiscreteStateSpace</strong></p>
 <hr>
-<div id="62" class="cell" data-execution_count="1">
+<div id="60" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">DiscreteStateSpace(Ad, Bd, Bdp)</code></pre>
 <p>Discrete-time state-space model</p>
@@ -1751,7 +1727,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>c2d</strong></p>
 <hr>
-<div id="64" class="cell" data-execution_count="1">
+<div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">c2d(css::ContinuouStateSpace, h::Float64, method::Symbol)</code></pre>
 <p>Converts a continuous-time state-space model to a discrete-time state-space model.</p>

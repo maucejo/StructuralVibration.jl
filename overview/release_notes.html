@@ -180,7 +180,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#v1.2.0" id="toc-v1.2.0" class="nav-link active" data-scroll-target="#v1.2.0">v1.2.0</a></li>
+  <li><a href="#v1.3.0" id="toc-v1.3.0" class="nav-link active" data-scroll-target="#v1.3.0">v1.3.0</a></li>
+  <li><a href="#v1.2.0" id="toc-v1.2.0" class="nav-link" data-scroll-target="#v1.2.0">v1.2.0</a></li>
   <li><a href="#v1.1.4" id="toc-v1.1.4" class="nav-link" data-scroll-target="#v1.1.4">v1.1.4</a></li>
   <li><a href="#v1.1.3" id="toc-v1.1.3" class="nav-link" data-scroll-target="#v1.1.3">v1.1.3</a></li>
   <li><a href="#v1.1.2" id="toc-v1.1.2" class="nav-link" data-scroll-target="#v1.1.2">v1.1.2</a></li>
@@ -217,6 +218,20 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="v1.3.0" class="level2">
+<h2 class="anchored" data-anchor-id="v1.3.0">v1.3.0</h2>
+<p><strong>New features</strong></p>
+<ul>
+<li><p>Add <code>pks_indices</code> argument to <code>AutoEMASdofProblem</code> and <code>poles_extraction</code> function to specify the indices of peaks to consider during pole extraction using Sdof methods.</p></li>
+<li><p><code>peaksplot</code> is renamed to <code>peaks_plot</code> to avoid name conflict with the <code>peaksplot</code> function from <code>Peaks.jl</code>.</p></li>
+<li><p>Add <code>ods</code> to compute Operational Deflection Shapes (ODS) using either the response spectrum or the cross-spectral density matrix.</p></li>
+</ul>
+<p><strong>Breaking changes</strong></p>
+<ul>
+<li><p>Rename <code>c2r_modeshape</code> function to <code>real_normalization</code> for clarity.</p></li>
+<li><p>Sdof EMA methods now take a <code>pks_indices</code> argument to specify the indices of peaks to consider during pole extraction and bypass automatic peak detection.</p></li>
+</ul>
+</section>
 <section id="v1.2.0" class="level2">
 <h2 class="anchored" data-anchor-id="v1.2.0">v1.2.0</h2>
 <p><strong>Minor changes</strong></p>
