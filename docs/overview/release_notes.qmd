@@ -20,6 +20,8 @@ format:
 
 - Rename `c2r_modeshape` function to `real_normalization` for clarity.
 
+- Sdof EMA methods now take a `pks_indices` argument to specify the indices of peaks to consider during pole extraction and bypass automatic peak detection.
+
 ## v1.2.0
 
 **Minor changes**
