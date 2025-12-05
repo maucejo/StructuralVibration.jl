@@ -413,7 +413,7 @@ stabilization_plot(sol_stab)
 fn_lscf, dr_lscf = poles2modal(stab_poles)
 
 fig_f = Figure()
-ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency (Hz)")
 ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
 
 scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
@@ -437,7 +437,7 @@ res = mode_residues(prob_oma, stab_poles)
 ms_ema = modeshape_extraction(res, stab_poles, LSCF(), modetype = :oma)[1]
 
 # Convert to real mode shapes
-ms_ema_real = c2r_modeshape(ms_ema)
+ms_ema_real = real_normalization(ms_ema)
 
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_ema_real, ms_ref[:, 1:size(ms_ema_real, 2)])
@@ -451,8 +451,8 @@ ms_ema_scaled = ms_ema_real .* scaling'
 fig_mode = Figure()
 ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
 ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
-ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
-ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position (m)")
 
 lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
 lines!(ax_mode1, x, ms_ema_scaled[:, 1], linestyle = :dash, label = "Estimated")
@@ -516,7 +516,7 @@ stabilization_plot(sol_stab_cssi)
 
 # Extraction of stable modes
 p_cssi, ms_cssi = modes_extraction(prob_oma, 30, CovSSI())
-ms_cssi_real = c2r_modeshape(ms_cssi)
+ms_cssi_real = real_normalization(ms_cssi)
 
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_cssi_real, ms_ref[:, 1:size(ms_cssi_real, 2)])
@@ -530,7 +530,7 @@ ms_cssi_scaled = ms_cssi_real .* scaling'
 fn_cssi, dr_cssi = poles2modal(p_cssi)
 
 fig_f = Figure()
-ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency (Hz)")
 ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
 
 scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
@@ -550,8 +550,8 @@ display(fig_f);
 fig_mode = Figure()
 ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
 ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
-ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
-ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position (m)")
 
 lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
 lines!(ax_mode1, x, ms_cssi_scaled[:, 1], linestyle = :dash, label = "Estimated")
@@ -589,7 +589,7 @@ stabilization_plot(sol_stab_dssi)
 
 # Extraction of stable modes
 p_dssi, ms_dssi = modes_extraction(prob_oma, 30, DataSSI())
-ms_dssi_real = c2r_modeshape(ms_dssi)
+ms_dssi_real = real_normalization(ms_dssi)
 
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_dssi_real, ms_ref[:, 1:size(ms_dssi_real, 2)])
@@ -603,7 +603,7 @@ ms_dssi_scaled = ms_dssi_real .* scaling'
 fn_dssi, dr_dssi = poles2modal(p_dssi)
 
 fig_f = Figure()
-ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency (Hz)")
 ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
 
 scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
@@ -623,8 +623,8 @@ display(fig_f);
 fig_mode = Figure()
 ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
 ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
-ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
-ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position (m)")
 
 lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
 lines!(ax_mode1, x, ms_dssi_scaled[:, 1], linestyle = :dash, label = "Estimated")

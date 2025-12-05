@@ -278,7 +278,6 @@ The Mdof methods are based on the assumption that the system can be represented 
 1. estimation of the poles of the system to extract the natural frequencies and modal damping ratios,
 2. estimation of the residues to extract the mode shapes.
 
-
 ### Poles extraction
 
 The poles of the system are then obtained as the roots of the characteristic polynomial associated with this polynomial matrix. Three methods are implemented in this package:
@@ -489,6 +488,18 @@ $$
 
 Here, the scaling factors $c_i$ can be computed based on a normalization criterion. In this package, the scaling factors are computed such that the modal mass of each mode shape is equal to one (mass normalization). The mode shapes can then be extracted using the `modeshape_extraction` function.
 
+At this stage, it is important to note that the mode shapes are complex-valued. If the modes are known to be real (after checking the [Mode complexity indicators](indicators.qmd#mode-complexity-indicators)), a real-normalization transformation can be applied to the mode shapes[^5]. Here, we adopt the widely used approach based on the computation of the phase angle that minimizes the imaginary part of the mode shape.
+
+Given a complex mode shape $\boldsymbol{\Psi}_i$, the real-normalized mode shape $\bar{\boldsymbol{\Psi}}_i^{real}$ is obtained as:
+
+$$
+\bar{\boldsymbol{\Psi}}_i^{real} = \Re\left(\boldsymbol{\Psi}_i e^{-j\theta_i}\right),
+$$
+where $\theta_i$ is the phase angle between the real and imaginary parts of the mode shape. This angle is computed from the coefficient (gradient) of the straight line that best fits the points $(\Re(\Psi_k), \Im(\Psi_k))$ for. This procedure is implemented in the `real_normalization` function.
+
+
+[^5]: E. Hiremaglur. "Real-Normalization of Experimental Complex Modal Vectors with Modal Vector Contamination". MS Thesis. University of Cincinnati, 2014.
+
 ## FRF reconstruction
 
 From the identified modal parameters (poles and residues), it is possible to reconstruct the frequency response functions (FRFs) of the system under study using the `frf_reconstruction` function. This function implements the following relation for a number $M$ of identified modes:
@@ -682,6 +693,16 @@ where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = 
 :::
 
 ::: {.api}
+**real_normalization**
+
+---
+```{julia}
+#| echo: false
+@doc real_normalization
+```
+:::
+
+::: {.api}
 **solve**
 
 ---
@@ -789,7 +810,7 @@ fn_cf, ξn_cf = poles2modal(poles_cf)
 fn_lsf, ξn_lsf = poles2modal(poles_lsf)
 
 fig_f = Figure()
-ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency (Hz)")
 ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
 
 scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
@@ -809,8 +830,8 @@ display(fig_f);
 fig_mode = Figure()
 ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
 ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
-ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
-ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position (m)")
 
 lines!(ax_mode1, xexc, ms_exc[:, 1], label = "Reference")
 lines!(ax_mode1, xexc, ms_id[:, 1], linestyle = :dash, label = "Estimated")
@@ -898,7 +919,7 @@ fn_lscf, dr_lscf = poles2modal(p_lscf)
 fn_plscf, dr_plscf = poles2modal(p_plscf)
 
 fig_f = Figure()
-ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency [Hz]")
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency (Hz)")
 ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
 
 scatter!(ax_f1, 1:4, ωn[1:4]/2π, marker = :rect, markersize = 25, label = "Reference")
@@ -930,7 +951,7 @@ res = mode_residues(prob_mdof, p_lscf)
 ms_est = modeshape_extraction(res, p_lscf, LSCF(), dpi = dpi, modetype = :emar)[1]
 
 # Convert to real mode shapes
-ms_est_real = c2r_modeshape(ms_est)
+ms_est_real = real_normalization(ms_est)
 ```
 
 ```{julia}
@@ -939,8 +960,8 @@ ms_est_real = c2r_modeshape(ms_est)
 fig_mode = Figure()
 ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
 ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
-ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position [m]", ylabel = "Value")
-ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position [m]")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position (m)")
 
 lines!(ax_mode1, xexc, ms_exc[:, 1], label = "Reference")
 lines!(ax_mode1, xexc, ms_est_real[:, 1], linestyle = :dash, label = "Estimated")

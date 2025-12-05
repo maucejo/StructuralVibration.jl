@@ -9,7 +9,7 @@ c_ss = [0.67 -0.11; -0.11 0.39]
 css = ss_model(k_ss, m_ss, c_ss)
 λ, Ψ = eigenmode(css.Ac)
 ω, ξ = modal_parameters(λ)
-Ψr = c2r_modeshape(Ψ[1:2, 2:2:end])
+Ψr = real_normalization(Ψ[1:2, 2:2:end])
 
 # Continuous-time state space from modal information
 ωn, ϕn = eigenmode(k_ss, m_ss)

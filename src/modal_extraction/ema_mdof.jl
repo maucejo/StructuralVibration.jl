@@ -572,5 +572,5 @@ function solve(prob_ema::AutoEMAMdofProblem)
 
     phi, ci = modeshape_extraction(res, poles, alg, dpi = dpi, modetype = :emar)
 
-    return EMASolution(poles, c2r_modeshape(phi), ci, res, lr, ur)
+    return EMASolution(poles, real_normalization(phi), ci, res, lr, ur)
 end

@@ -759,16 +759,6 @@ where $\mathbf{\Omega}^2 = \text{diag}(\omega_1^2, \dots, \omega_N^2)$ and $\mat
 ```
 :::
 
-::: {.api}
-**c2r_modeshape**
-
----
-```{julia}
-#| echo: false
-@doc c2r_modeshape
-```
-:::
-
 #### Example
 
 ```julia
@@ -781,7 +771,6 @@ c_ss = [0.67 -0.11; -0.11 0.39]
 css = ss_model(k_ss, m_ss, c_ss)
 λ, Ψ = eigenmode(css.Ac)
 ω, ξ = modal_parameters(λ)
-Ψr = c2r_modeshape(Ψ[1:2, 2:2:end])
 
 # Continuous-time state space from modal information
 ωn, ϕn = eigenmode(k_ss, m_ss)

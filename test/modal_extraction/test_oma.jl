@@ -62,7 +62,7 @@ res = mode_residues(prob_oma, stab_poles)
 ms_ema = modeshape_extraction(res, stab_poles, LSCF(), modetype = :oma)[1]
 
 # Convert to real mode shapes
-ms_ema_real = c2r_modeshape(ms_ema)
+ms_ema_real = real_normalization(ms_ema)
 
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_ema_real, ms_ref[:, 1:size(ms_ema_real, 2)])
@@ -85,7 +85,7 @@ stabilization_plot(sol_stab_cssi)
 
 # Extraction of stable modes
 p_cssi, ms_cssi = modes_extraction(prob_oma, 30, CovSSI())
-ms_cssi_real = c2r_modeshape(ms_cssi)
+ms_cssi_real = real_normalization(ms_cssi)
 
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_cssi_real, ms_ref[:, 1:size(ms_cssi_real, 2)])
@@ -101,7 +101,7 @@ stabilization_plot(sol_stab_dssi)
 
 # Extraction of stable modes
 p_dssi, ms_dssi = modes_extraction(prob_oma, 30, DataSSI())
-ms_dssi_real = c2r_modeshape(ms_dssi)
+ms_dssi_real = real_normalization(ms_dssi)
 
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_dssi_real, ms_ref[:, 1:size(ms_dssi_real, 2)])

@@ -14,6 +14,12 @@ format:
 
 - `peaksplot` is renamed to `peaks_plot` to avoid name conflict with the `peaksplot` function from `Peaks.jl`.
 
+- Add `ods` to compute Operational Deflection Shapes (ODS) using either the response spectrum or the cross-spectral density matrix.
+
+**Breaking changes**
+
+- Rename `c2r_modeshape` function to `real_normalization` for clarity.
+
 ## v1.2.0
 
 **Minor changes**

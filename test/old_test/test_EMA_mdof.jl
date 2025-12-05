@@ -46,7 +46,7 @@ stabilization_plot(sol_stab)
 dpi = [1, 2]
 res = mode_residues(prob_mdof, p_lsce)
 ϕid, ci = modeshape_extraction(res, p_lsce, LSCE(), dpi = dpi, modetype = :real)
-ϕr = c2r_modeshape(ϕid)
+ϕr = real_normalization(ϕid)
 
 # Automatic EMA-MDOF procedure
 prob_ema = AutoEMAMdofProblem(prob_mdof, 20, dpi, LSCE())

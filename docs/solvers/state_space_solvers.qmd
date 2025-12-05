@@ -411,7 +411,7 @@ y_freq_modal = solve(prob_freq_modal).u
 #| echo: false
 fig_y = Figure()
 ax_y1 = Axis(fig_y[1, 1], ylabel = "Displacement (dB)")
-ax_y2 = Axis(fig_y[2, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (dB)", title = "y₂")
+ax_y2 = Axis(fig_y[2, 1], xlabel = "Frequency (Hz)", ylabel = "Displacement (dB)")
 
 lines!(ax_y1, freq, 20log10.(abs.(y_freq[1, :])), label = "y₁ - Direct")
 lines!(ax_y1, freq, 20log10.(abs.(y_freq_modal[1, :])), label = "y₁ - Modal", linestyle = :dash)
@@ -421,6 +421,7 @@ axislegend(ax_y1, position = :rt, backgroundcolor = (:white, 0.5))
 lines!(ax_y2, freq, 20log10.(abs.(y_freq[2, :])), label = "y₂ - Direct")
 lines!(ax_y2, freq, 20log10.(abs.(y_freq_modal[2, :])), label = "y₂ - Modal", linestyle = :dash)
 xlims!(ax_y2, minimum(freq), maximum(freq))
+axislegend(ax_y2, position = :rt, backgroundcolor = (:white, 0.5))
 
 display(fig_y);
 ```

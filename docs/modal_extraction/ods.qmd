@@ -1,0 +1,220 @@
+---
+title: Operational Deflection Shapes
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+An Operational Deflection Shape (ODS) represents the deformation pattern of a structure at a specific frequency when it is subjected to operational forces. Unlike traditional mode shapes, which are derived from theoretical models or controlled experiments, ODSs are obtained from measurements taken while the structure is in operation. This makes them particularly useful for understanding how a structure behaves under real-world conditions. If the structure under consideration is lightly damped, ODSs can approximate mode shapes, providing insights into the dynamic characteristics of the structure.
+
+## Extracting ODS from measured data
+
+The extraction of ODSs from the measured data typically depends on the measured quantities. In `StructuralVibration.jl`, we provide methods to extract ODSs from response spectra and cross-spectral density matrices.
+
+### Extraction from response spectra
+
+When response spectra are available, ODSs can be extracted by identifying the peaks in the spectra corresponding to the frequencies of interest. The ODS $\boldsymbol{\Psi}_k$ at a specific frequency peak $f_k$ is simply given by:
+
+$$
+\boldsymbol{\Psi}_k = \mathbf{y}(f_k),
+$$
+where $\mathbf{y}(f_k)$ is the response spectrum vector at frequency $f_k$.
+
+### Extraction from CSD matrices
+
+When cross-spectral density (CSD) matrices are available, ODSs can be extracted using singular value decomposition (SVD). The CSD matrix $\mathbf{G}(f)$ at some frequency $f$ can be decomposed as[^1]:
+$$
+\mathbf{G}(f) = \boldsymbol{\Phi}\boldsymbol{G}_{qq}(f) \boldsymbol{\Phi}^H,
+$$
+where $\boldsymbol{\Phi}$ is the mode shapes matrix, and $\boldsymbol{G}_{qq}(f)$ is the power spectral density matrix of the modal coordinates. On the other hand, performing SVD on the CSD matrix yields:
+
+$$
+\mathbf{G}(f) = \mathbf{U}(f) \boldsymbol{\Sigma}(f) \mathbf{U}(f)^H,
+$$
+where $\mathbf{U}$ consists of the left singular vectors, and $\boldsymbol{\Sigma}$ is a diagonal matrix containing the singular values. This comparison reveals a connection between the singular vectors and the mode shapes. In fact, near a resonance frequency $f_k$, the largest singular value is associated with the dominant mode at that frequency.
+
+Consequently, the ODS $\boldsymbol{\Psi}_k$ at frequency $f_k$ is given by the first singular vector:
+$$
+\boldsymbol{\Psi}_k = \mathbf{u}_1(f_k).
+$$
+
+[^1]: C. Rainieri and F. Fabbrocino, "Operational modal analysis of civil engineering structures: An introduction and guide for applications" Springer, 2014.
+
+### Real-normalization of ODS
+
+In practice, ODSs are often real-normalized for better interpretability. It consists in converting the complex-valued ODS $\boldsymbol{\Psi}_k$ into a real-valued vector $\bar{\boldsymbol{\Psi}}_k$. This can be achieved using the `real_normalization` function (see [Mode shapes real-normalization](index.qmd#mode-shape-extraction-1)).
+
+### Improve ODS extraction robustness
+
+In an attempt to improve the robustness of the ODS extraction, especially in the presence of noise, an averaging technique can be employed. This involves averaging multiple ODS candidates within a frequency band around each identified peak frequency. The candidates are selected based on a Modal Assurance Criterion (MAC) threshold to ensure they are sufficiently similar to the reference ODS at the peak frequency.
+
+## API
+
+::: {.api}
+**ods**
+
+---
+
+```{julia}
+#| echo: false
+@doc ods
+```
+:::
+
+## Example
+
+### Extracting ODS from response spectra
+
+```{julia}
+#| output: false
+# Structure parameters of the beam
+L = 1.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+Iz = b*h^3/12 # Moment of inertia
+
+# Material parameters
+E = 2.1e11  # Young's modulus
+ρ = 7850.   # Density
+ξ = 0.01    # Damping ratio
+
+# Mesh
+x = 0:0.05:L
+xexc = x[2]
+
+# Mode calculation - Simply supported boundary conditions
+beam = Beam(L, S, Iz, E, ρ)
+fmax = 500.
+
+ωn, kn = modefreq(beam, 2fmax)
+ms_exc = modeshape(beam, kn, xexc)
+ms_m = modeshape(beam, kn, x)
+
+# Response spectrum calculation
+freq = 1.:0.1:fmax
+Fn = repeat(ms_exc', 1, length(freq)) # Frequency-independent force vector
+prob = ModalFreqProblem(ωn, ξ, Fn, freq, ms_m)
+y = solve(prob).u
+
+pks_indices = [225, 929, 2101, 3743]
+ods_complex, freq_peaks = ods(y, freq, pks_indices)
+ods_real = real_normalization(ods_complex)
+
+scaling = msf(ods_real, ms_m[:, 1:size(ods_real, 2)])
+ods_scaled = ods_real .* scaling'
+```
+
+```{julia}
+#| echo: false
+
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode 4", xlabel = "Position (m)")
+
+lines!(ax_mode1, x, ms_m[:, 1], label = "Mode shape")
+lines!(ax_mode1, x, ods_scaled[:, 1], linestyle = :dash, label = "ODS")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, x, ms_m[:, 2], label = "Mode shape")
+lines!(ax_mode2, x, ods_scaled[:, 2], linestyle = :dash, label = "ODS")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, x, ms_m[:, 3], label = "Mode shape")
+lines!(ax_mode3, x, ods_scaled[:, 3], linestyle = :dash, label = "ODS")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, x, ms_m[:, 4], label = "Mode shape")
+lines!(ax_mode4, x, ods_scaled[:, 4], linestyle = :dash, label = "ODS")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
+```
+
+### Extracting ODS from CSD matrices
+
+```{julia}
+#| output: false
+# Acquisition parameters
+sample_rate = 4096
+block_size = 4096
+fft_params = FFTParameters(sample_rate, block_size)
+
+freq = fft_params.freq
+t = fft_params.t
+dt = fft_params.dt
+
+# Mode calculation - Simply supported boundary conditions
+ωn, kn = modefreq(beam, 2freq[end])
+ms_ref = modeshape(beam, kn, x)
+
+# Chirp excitation
+F0 = 10.
+chirp = SweptSine(F0, t[1], 0.8t[end], freq[1], freq[end], zero_end = true)
+force = zeros(length(x), length(t))
+force[2, :] .= excitation(chirp, t)
+
+# Response calculation
+prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t, ismodal = true)
+y = solve(prob).u
+
+tukeywin(x) = tukey(x, 0.5)
+Gyy, freq = csd(y, y, block_size, tukeywin, fs = sample_rate)
+
+frange = [0., 500.]
+freq_idx = freq .>= frange[1] .&& freq .<= frange[2]
+freq = freq[freq_idx]
+Gyy = Gyy[:, :, freq_idx]
+
+pks_indices = [23, 94, 211, 375]
+ods_complex, freq_peaks = ods(Gyy, freq, pks_indices)
+ods_real = real_normalization(ods_complex)
+
+scaling = msf(ods_real, ms_m[:, 1:size(ods_real, 2)])
+ods_scaled = ods_real .* scaling'
+```
+
+```{julia}
+#| echo: false
+
+# Mode shapes
+fig_mode2 = Figure()
+ax2_mode1 = Axis(fig_mode2[1, 1], title = "Mode 1", ylabel = "Value")
+ax2_mode2 = Axis(fig_mode2[1, 2], title = "Mode 2")
+ax2_mode3 = Axis(fig_mode2[2, 1], title = "Mode 3", xlabel = "Position (m)", ylabel = "Value")
+ax2_mode4 = Axis(fig_mode2[2, 2], title = "Mode 4", xlabel = "Position (m)")
+lines!(ax2_mode1, x, ms_ref[:, 1], label = "Mode shape")
+lines!(ax2_mode1, x, ods_scaled[:, 1], linestyle = :dash, label = "ODS")
+xlims!(ax2_mode1, 0, L)
+axislegend(ax2_mode1, position = :cb)
+
+lines!(ax2_mode2, x, ms_ref[:, 2], label = "Mode shape")
+lines!(ax2_mode2, x, ods_scaled[:, 2], linestyle = :dash, label = "ODS")
+xlims!(ax2_mode2, 0, L)
+
+lines!(ax2_mode3, x, ms_ref[:, 3], label = "Mode shape")
+lines!(ax2_mode3, x, ods_scaled[:, 3], linestyle = :dash, label = "ODS")
+xlims!(ax2_mode3, 0, L)
+
+lines!(ax2_mode4, x, ms_ref[:, 4], label = "Mode shape")
+lines!(ax2_mode4, x, ods_scaled[:, 4], linestyle = :dash, label = "ODS")
+xlims!(ax2_mode4, 0, L)
+
+display(fig_mode2);
+```

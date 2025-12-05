@@ -130,6 +130,10 @@ The package provides the following features:
         - Covariance-driven SSI (CovSSI)
         - Data-driven SSI (DataSSI)
 
+- **Operational Modal Analysis - ODS-based methods**
+    - Extraction of Operational Deflection Shapes (ODS) from response spectra
+    - Extraction of Operational Deflection Shapes (ODS) from cross-spectral density matrices
+
 - **Analysis indicators**
     - Modal Overlap Factor (MOF)
     - Mode overcomplexity value (MOV)

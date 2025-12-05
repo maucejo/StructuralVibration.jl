@@ -1588,7 +1588,7 @@
                 ":::\n",
                 "\n",
                 "::: {.api}\n",
-                "**c2r_modeshape**\n",
+                "**real_normalization**\n",
                 "\n",
                 "---"
             ]
@@ -1600,17 +1600,17 @@
             },
             "source": [
                 "#| echo: false\n",
-                "@doc c2r_modeshape"
+                "@doc real_normalization"
             ],
             "outputs": [
                 {
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mc2r_modeshape(Ψ)\u001b[39m\n\n  Converts the complex modes to real modes\n\n  \u001b[1mInput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mΨ\u001b[39m: Complex modes\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mϕn\u001b[39m: Real modes",
-                        "text/markdown": "```julia\nc2r_modeshape(Ψ)\n```\n\nConverts the complex modes to real modes\n\n**Input**\n\n  * `Ψ`: Complex modes\n\n**Output**\n\n  * `ϕn`: Real modes\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">c2r_modeshape&#40;Ψ&#41;</code></pre>\n<p>Converts the complex modes to real modes</p>\n<p><strong>Input</strong></p>\n<ul>\n<li><p><code>Ψ</code>: Complex modes</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>ϕn</code>: Real modes</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nc2r_modeshape(Ψ)\n\\end{verbatim}\nConverts the complex modes to real modes\n\n\\textbf{Input}\n\n\\begin{itemize}\n\\item \\texttt{Ψ}: Complex modes\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{ϕn}: Real modes\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mreal_normalization(Ψ)\u001b[39m\n\n  Converts the complex modes to real modes\n\n  \u001b[1mInput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mΨ\u001b[39m: Complex modes\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mϕn\u001b[39m: Real modes",
+                        "text/markdown": "```julia\nreal_normalization(Ψ)\n```\n\nConverts the complex modes to real modes\n\n**Input**\n\n  * `Ψ`: Complex modes\n\n**Output**\n\n  * `ϕn`: Real modes\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">real_normalization&#40;Ψ&#41;</code></pre>\n<p>Converts the complex modes to real modes</p>\n<p><strong>Input</strong></p>\n<ul>\n<li><p><code>Ψ</code>: Complex modes</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>ϕn</code>: Real modes</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nreal_normalization(Ψ)\n\\end{verbatim}\nConverts the complex modes to real modes\n\n\\textbf{Input}\n\n\\begin{itemize}\n\\item \\texttt{Ψ}: Complex modes\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{ϕn}: Real modes\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1638,7 +1638,7 @@
                 "css = ss_model(k_ss, m_ss, c_ss)\n",
                 "λ, Ψ = eigenmode(css.Ac)\n",
                 "ω, ξ = modal_parameters(λss)\n",
-                "Ψr = c2r_modeshape(Ψ)\n",
+                "Ψr = real_normalization(Ψ)\n",
                 "\n",
                 "# Continuous-time state space from modal information\n",
                 "ωn, ϕn = eigenmode(k_ss, m_ss)\n",

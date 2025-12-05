@@ -11,7 +11,7 @@ format:
 </center>
 
 <br/>
-à
+
 [![Generic badge](https://img.shields.io/badge/Version-1.2.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
@@ -141,6 +141,10 @@ The package provides the following features:
     - Stochastic Subspace Identification (SSI)
         - Covariance-driven SSI (CovSSI)
         - Data-driven SSI (DataSSI)
+
+- **Operational Modal Analysis - ODS-based methods**
+    - Extraction of Operational Deflection Shapes (ODS) from response spectra
+    - Extraction of Operational Deflection Shapes (ODS) from cross-spectral density matrices
 
 - **Analysis indicators**
     - Modal Overlap Factor (MOF)

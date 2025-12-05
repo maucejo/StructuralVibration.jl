@@ -835,7 +835,7 @@
                 "ϕ_est = modeshape_extraction(res, p_lsce, dpi = dpi, modetype = :real)[1]\n",
                 "\n",
                 "# Convert to real mode shapes\n",
-                "ϕ_est_real = c2r_modeshape(ϕ_est)"
+                "ϕ_est_real = real_normalization(ϕ_est)"
             ],
             "outputs": [
                 {

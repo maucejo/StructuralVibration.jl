@@ -50,11 +50,11 @@ module StructuralVibration
        export acn, agwn, anti_alias, denoising, estimated_SNR, mgwn,
               mixed_noise, varest
 
-       export c2d, c2r_modeshape, modal_parameters, ss_model, ss_modal_model
+       export c2d, modal_parameters, ss_model, ss_modal_model
 
        # Modal extraction
-       export cmif, comac, compute_residuals, convert_csd, ecomac, frac,
-              frf_reconstruction, half_csd_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, ods, poles_extraction, poles2modal, psif, stabilization, csd_from_tf, half_csd, xcorr
+       export cmif, comac, compute_residuals, convert_csd, csd_from_tf, ecomac,
+              frac, frf_reconstruction, half_csd, half_csd_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, ods, poles_extraction, poles2modal, psif, real_normalization, stabilization, xcorr
 
        # Signal processing
        export bartlett, bartlett_hann, blackman, blackman_harris,

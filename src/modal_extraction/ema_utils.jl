@@ -36,6 +36,47 @@ function poles2modal(poles)
 end
 
 """
+    real_normalization(Ψ)
+
+Converts the complex modes to real modes
+
+**Input**
+* `Ψ`: Complex modes
+
+**Output**
+* `ϕn`: Real modes
+
+**Reference**
+
+[1] E. Hiremaglur. "Real-Normalization of Experimental Complex Modal Vectors with Modal Vector Contamination". MS Thesis. University of Cincinnati, 2014.
+"""
+function real_normalization(Ψ)
+
+    # Initialization
+    m = size(Ψ, 1)
+    ϕ = similar(real(Ψ))
+    x = similar(ϕ, m)
+    y = similar(x)
+    p = similar(x, 2)
+
+    # Real mode shape calculation
+    for (i, Ψi) in enumerate(eachcol(Ψ))
+        x .= real(Ψi)
+        y .= imag(Ψi)
+
+        # Fit a first order line to the data
+        p .= polyfit(x, y, 1)
+
+        # Angle of maximum correlation line
+        θ = atan(p[1])
+
+        ϕ[:, i] .= real(Ψi*cis(-θ))
+    end
+
+    return ϕ
+end
+
+"""
     impulse_response(H, freq, fs)
 
 Compute the impulse response from a frequency response function (FRF) using IFFT.

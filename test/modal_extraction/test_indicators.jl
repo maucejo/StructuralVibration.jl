@@ -47,7 +47,7 @@ res_lscf = mode_residues(prob_mdof, p_lscf)
 ms, ci = modeshape_extraction(res_lscf, p_lscf, LSCF(), dpi = dpi, modetype = :emar)
 
 # Convert to real mode shapes
-ms_real = c2r_modeshape(ms)
+ms_real = real_normalization(ms)
 
 # FRF reconstruction - with residuals
 lr, ur = compute_residuals(prob_mdof, res_lscf, p_lscf)
