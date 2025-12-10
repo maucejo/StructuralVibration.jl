@@ -28,7 +28,7 @@ Extract poles from the Bode diagram fitting method
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
+function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
 
@@ -40,7 +40,7 @@ function poles_extraction(prob::EMAProblem, alg::SdofModalExtraction; width::Int
         npeak = length(pks_indices)
     else
         npeak = 0
-        for (k, Hv) in enumerate(eachrow(Hr))
+        for Hv in eachrow(Hr)
             np = length(findmaxima(abs.(Hv), width).indices)
             npeak = max(npeak, np)
         end
@@ -368,7 +368,7 @@ Extract mode shapes using Sdof approximation
 **Inputs**
 * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
 * `poles`: Vector of complex poles
-* `alg::SdofModalExtraction` or `alg::MdofModalExtraction`: Modal extraction algorithm
+* `alg::SdofModalExtraction` or `alg::MdofEMA`: Modal extraction algorithm
 * `dpi`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
     * `dpi[2]`: Driving point index on the excitation mesh
@@ -390,7 +390,7 @@ Extract mode shapes using Sdof approximation
 
 [2] C. Ranieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 """
-function modeshape_extraction(prob::EMAProblem, poles::Vector{T}, alg::SdofModalExtraction; dpi = [1, 1]) where {T <: Complex}
+function modeshape_extraction(prob::EMAProblem, poles::Vector{T}, alg::SdofEMA; dpi = [1, 1]) where {T <: Complex}
     # Extract FRF and frequency from problem
     (; frf, freq) = prob
     ω = 2π*freq

@@ -1,7 +1,7 @@
 abstract type MdofProblem end
 
 # Experimental Modal Analysis (EMA) - Sdof
-abstract type SdofModalExtraction end
+abstract type SdofEMA end
 
 """
     PeakPicking
@@ -15,7 +15,7 @@ Peak picking method for Sdof modal extraction
 
 [1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
 """
-struct PeakPicking <: SdofModalExtraction end
+struct PeakPicking <: SdofEMA end
 
 """
     PeakPicking
@@ -29,7 +29,7 @@ Circle fitting method for Sdof modal extraction
 
 [1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
 """
-struct CircleFit <: SdofModalExtraction end
+struct CircleFit <: SdofEMA end
 
 """
     LSFit
@@ -42,10 +42,10 @@ Least squares fitting method for Sdof modal extraction
 **Reference**
 [1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
-struct LSFit <: SdofModalExtraction end
+struct LSFit <: SdofEMA end
 
 # Experimental Modal Analysis (EMA) - Mdof
-abstract type MdofModalExtraction end
+abstract type MdofEMA end
 
 """
     LSCE
@@ -59,7 +59,7 @@ Least Squares Complex Exponential method for Mdof modal extraction
 
 [1] D. L. Brown, R. J. Allemang, Ray Zimmerman and M. Mergeay. "Parameter Estimation Techniques for Modal Analysis". SAE Transactions, vol. 88, pp. 828-846, 1979.
 """
-struct LSCE <: MdofModalExtraction end
+struct LSCE <: MdofEMA end
 
 """
     LSCF
@@ -75,7 +75,7 @@ Least Squares Complex Frequency method for Mdof modal extraction
 
 [2] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-struct LSCF <: MdofModalExtraction end
+struct LSCF <: MdofEMA end
 
 """
     pLSCF
@@ -91,10 +91,27 @@ Polyreference Least Squares Complex Frequency method for Mdof modal extraction
 
 [2] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-struct pLSCF <: MdofModalExtraction end
+struct pLSCF <: MdofEMA end
 
-# Operational Modal Analysis (OMA)
-abstract type OMAModalExtraction end
+# Operational Modal Analysis (OMA) - Sdof
+abstract type SdofOMA end
+
+"""
+    FSDD
+
+Frequency-Spatial Domain Decomposition method for OMA modal extraction
+
+**Fields**
+* `nothing`
+
+**Reference**
+
+[1] L. Zhang, T. Wang and Y. Tamura. "A frequency–spatial domain decomposition (FSDD) method for operational modal analysis". Mechanical Systems and Signal Processing, 24: 1227-1239, 2010.
+"""
+struct FSDD <: SdofOMA end
+
+# Operational Modal Analysis (OMA) - Mdof
+abstract type MdofOMA end
 
 """
     CovSSI
@@ -112,7 +129,7 @@ Covariance-driven Stochastic Subspace Identification method for OMA modal extrac
 
 [3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
 """
-struct CovSSI <: OMAModalExtraction end
+struct CovSSI <: MdofOMA end
 
 """
     DataSSI
@@ -130,7 +147,7 @@ Data-driven Stochastic Subspace Identification method for OMA modal extraction
 
 [3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
 """
-struct DataSSI <: OMAModalExtraction end
+struct DataSSI <: MdofOMA end
 
 ## Common structures for EMA
 """
@@ -231,7 +248,7 @@ Structure containing the input data for automatic experimental modal analysis us
 """
 @show_data struct AutoEMASdofProblem{R <: Real}
     prob::EMAProblem
-    alg::SdofModalExtraction
+    alg::SdofEMA
     dpi:: Vector{Int}
     idx_m::AbstractArray{Int}
     idx_e::AbstractArray{Int}
@@ -240,7 +257,7 @@ Structure containing the input data for automatic experimental modal analysis us
     max_prom::R
     pks_indices::Vector{Int}
 
-    AutoEMASdofProblem(prob::EMAProblem, alg::SdofModalExtraction = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf, pks_indices::Vector{Int} = Int[]) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
+    AutoEMASdofProblem(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf, pks_indices::Vector{Int} = Int[]) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
 end
 
 ## Structures for EMA-MDOF modal extraction
@@ -255,7 +272,7 @@ Structure containing the input data for automatic experimental modal analysis us
 * `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
     * `dpi[2]`: Driving point index on the excitation mesh
-* `alg::MdofModalExtraction`: Method to extract the poles
+* `alg::MdofEMA`: Method to extract the poles
     * `LSCE`: Least Squares Complex Exponential method
     * `LSCF``: Least Squares Complex Frequency method (default)
     * `PLSCF`: Polyreference Least Squares Complex Frequency method
@@ -267,9 +284,9 @@ Structure containing the input data for automatic experimental modal analysis us
     prob::EMAProblem
     order::Int
     dpi:: Vector{Int}
-    alg::MdofModalExtraction
+    alg::MdofEMA
 
-    AutoEMAMdofProblem(prob::EMAProblem, order::Int, dpi::Vector{Int} = [1, 1], alg::MdofModalExtraction = LSCF()) = new(prob, order, dpi, alg)
+    AutoEMAMdofProblem(prob::EMAProblem, order::Int, dpi::Vector{Int} = [1, 1], alg::MdofEMA = LSCF()) = new(prob, order, dpi, alg)
 end
 
 """

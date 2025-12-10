@@ -91,6 +91,7 @@ module StructuralVibration
        include("modal_extraction/ema_frf.jl")
        include("modal_extraction/ema_utils.jl")
        include("modal_extraction/oma_utils.jl")
+       include("modal_extraction/oma_sdof.jl")
        include("modal_extraction/oma_mdof.jl")
        include("modal_extraction/oma_halfspec.jl")
        include("modal_extraction/ods.jl")

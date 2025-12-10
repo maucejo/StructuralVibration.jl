@@ -6,6 +6,12 @@ format:
     number-sections: false
 ---
 
+## v1.4.0
+
+**New features**
+
+- Add `EFDD` method to `mode_extraction` function for modal parameter extraction using the Enhanced Frequency Domain Decomposition (EFDD) method.
+
 ## v1.3.0
 
 **New features**

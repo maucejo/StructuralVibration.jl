@@ -1,6 +1,8 @@
 """
     ods(y, freq, pks_indices)
+    ods(y, freq, pks_indices, min_mac)
     ods(Gyy, freq, pks_indices)
+    ods(Gyy, freq, pks_indices, min_mac; avg_alg)
 
 Compute the operational deflection shapes (ODS) from response spectrum.
 
@@ -9,7 +11,10 @@ Compute the operational deflection shapes (ODS) from response spectrum.
 - `Gyy::Array{Complex, 3}`: Cross-spectral density matrix (n_ouput x n_input x n_frequency)
 - `freq`: Frequency vector (Hz)
 - `pks_indices`: Indices of the peaks in the frequency vector
-- `min_mac` (optional): Minimum MAC value to consider a candidate ODS for averaging
+- `min_mac`: Minimum MAC value to consider a candidate ODS for averaging
+- `avg_alg`: Algorithm used for averaging
+    - `:lin`: Linear averaging
+    - `:sv`: Weighted average using singular value (default)
 
 **Outputs**
 - `ods_mode`: Operational deflection shape
@@ -64,12 +69,9 @@ function ods(y::Matrix{T}, freq, pks_indices, min_mac) where {T <: Complex}
             # Compute the MAC value
             mac_val = mac(candidate, ods_ref)
 
-            if mac_val ≥ min_mac
-                navg += 1
-                c = msf(candidate, ods_ref)
-                # push!(ods_cand, candidate .* c)
-                ods_cand .+= candidate .* c^2
-            end
+            navg += 1
+            c = msf(candidate, ods_ref)
+            ods_cand .+= candidate .* c^2
             lp -= 1
         end
 
@@ -82,11 +84,12 @@ function ods(y::Matrix{T}, freq, pks_indices, min_mac) where {T <: Complex}
             # Compute the MAC value
             mac_val = mac(candidate, ods_ref)
 
-            if mac_val ≥ min_mac
-                navg += 1
-                c = msf(candidate, ods_ref)
-                ods_cand .+= candidate .* c
-            end
+
+            # Alignment for averaging
+            c = msf(candidate, ods_ref)
+            ods_cand .+= candidate .* c
+
+            navg += 1
             rp += 1
         end
 
@@ -103,25 +106,31 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices) where {T <: Complex}
     npeak = length(pks_indices)
     no, ni = size(Gyy)[1:2]
 
-    if no ≤ ni
-        Syy = permutedims(Gyy, (2, 1, 3))
-    else
-        Syy = Gyy
+    if ni > no
+        Gyy = permutedims(Gyy, (2, 1, 3))
     end
 
-    ods_complex = similar(Syy, max(no, ni), npeak)
+    if pks_indices isa Int
+        pks_indices = [pks_indices]
+    end
+
+    ods_complex = similar(Gyy, max(no, ni), npeak)
     for (p, idx_peak) in enumerate(pks_indices)
-        ods_complex[:, p] .= svd(Syy[:, :, idx_peak]).U[:, 1]
+        ods_complex[:, p] .= svd(Gyy[:, :, idx_peak]).U[:, 1]
     end
 
-    return ods_complex ./ maximum(abs.(ods_complex); dims = 1), freq[pks_indices]
+    return ods_complex ./ maximum(abs.(ods_complex), dims = 1), freq[pks_indices]
 end
 
-function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac) where {T <: Complex}
+function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where {T <: Complex}
 
     ods_mode_ref, freq_pks = ods(Gyy, freq, pks_indices)
     ny = size(ods_mode_ref, 1)
-    nf = size(Gyy, 3)
+    no, ni, nf = size(Gyy)
+
+    if ni > no
+        Gyy = permutedims(Gyy, (2, 1, 3))
+    end
 
     if pks_indices isa Int
         pks_indices = [pks_indices]
@@ -135,20 +144,26 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac) where {T <: Complex}
         ods_ref .= ods_mode_ref[:, p]
 
         # Search for all the candidates in a frequency band defined by MAC values
-        navg = 1
+        navg = avg_alg == :sv ? 0. : 1.
         lp = idx_peak - 1
         mac_val = 1.
         while lp ≥ 1 && mac_val ≥ min_mac
             # Define a candidate
-            candidate .= ods(Gyy, freq, lp)[1]
+            F = svd(Gyy[:, :, lp])
+            candidate .= F.U[:, 1]
 
             # Compute the MAC value
             mac_val = mac(candidate, ods_ref)
 
-            if mac_val ≥ min_mac
-                navg += 1
-                c = msf(candidate, ods_ref)
-                ods_cand .+= candidate .* c
+            # Alignement for averaging
+            c = msf(candidate, ods_ref)
+            candidate .*= c
+            if avg_alg == :sv
+                ods_cand .+= candidate .* F.S[1]
+                navg += F.S[1]
+            else
+                ods_cand .+ candidate
+                navg += 1.
             end
             lp -= 1
         end
@@ -157,25 +172,30 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac) where {T <: Complex}
         mac_val = 1.
         while rp ≤ nf && mac_val ≥ min_mac
             # Define a candidate
-            candidate .= ods(Gyy, freq, rp)[1]
+            F = svd(Gyy[:, :, rp])
+            candidate .= F.U[:, 1]
 
             # Compute the MAC value
             mac_val = mac(candidate, ods_ref)
 
-            if mac_val ≥ min_mac
-                navg += 1
-                c = msf(candidate, ods_ref)
-                ods_cand .+= candidate .* c
+            # Alignment for averaging
+            c = msf(candidate, ods_ref)
+            candidate .*= c
+            if avg_alg == :sv
+                ods_cand .+= candidate .* F.S[1]
+                navg += F.S[1]
+            else
+                ods_cand .+ candidate
+                navg += 1.
             end
             rp += 1
         end
 
         # Average all the candidates
-        ods_avg[:, p] .= ods_cand/navg
+        ods_avg[:, p] .= ods_cand / navg
         ods_avg[:, p] ./= maximum(abs.(ods_avg[:, p]))
         fill!(ods_cand, eltype(ods_ref)(0.))
     end
 
     return ods_avg, freq_pks
-
 end

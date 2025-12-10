@@ -24,7 +24,7 @@ Extract poles from the Bode diagram fitting method
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::MdofProblem, order::Int, alg::MdofModalExtraction = LSCF(); stabdiag = false)
+function poles_extraction(prob::MdofProblem, order::Int, alg::MdofEMA = LSCF(); stabdiag = false)
 
     return compute_poles(prob, order, alg, stabdiag = stabdiag)
 end
@@ -276,7 +276,7 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 **Inputs**
 - `prob::MdofProblem`: EMA-MDOF problem containing FRF data and frequency vector
 - `max_order::Int`: Maximum model order for the stabilization analysis
-- `alg::Union{MdofModalExtraction, OMAModalExtraction}`: Modal extraction algorithm
+- `alg::Union{MdofEMA, MdofOMA}`: Modal extraction algorithm
     - EMA algorithms:
         - `LSCE()`: Least Squares Complex Exponential method
         - `LSCF()`: Least Squares Complex Frequency method (default)
@@ -291,7 +291,7 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 **Output**
 - `sol::EMAMdofStabilization`: Data structure containing the results of the stabilization analysis
 """
-function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofModalExtraction, OMAModalExtraction} = LSCF(); stabcrit = [0.01, 0.05], progress = false)
+function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofEMA, MdofOMA} = LSCF(); stabcrit = [0.01, 0.05], progress = false)
 
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
@@ -439,7 +439,7 @@ Extract mode shapes using Sdof approximation
 **Inputs**
 * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
 * `poles`: Vector of complex poles
-* `alg::SdofModalExtraction` or `alg::MdofModalExtraction`: Modal extraction algorithm
+* `alg::SdofModalExtraction` or `alg::MdofEMA`: Modal extraction algorithm
 * `dpi`: Driving point indices - default = [1, 1]
     * `dpi[1]`: Driving point index on the measurement mesh
     * `dpi[2]`: Driving point index on the excitation mesh
@@ -464,7 +464,7 @@ Extract mode shapes using Sdof approximation
 
 [3] P. Verboven. "Frequency-domain system identification for modal analysis". PhD thesis, Katholieke Universiteit Leuven, 2002.
 """
-function modeshape_extraction(residues, poles::Vector{T}, alg::MdofModalExtraction; dpi = [1, 1], modetype = :emac) where {T <: Complex}
+function modeshape_extraction(residues, poles::Vector{T}, alg::MdofEMA; dpi = [1, 1], modetype = :emac) where {T <: Complex}
 
     # Data preparation
     np, nm, ne = size(residues)

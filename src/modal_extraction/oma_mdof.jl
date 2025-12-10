@@ -6,7 +6,7 @@ Extract poles using Stochastic System Identification methods.
 **Inputs**
 - `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
 - `order::Int`: Order of the system to identify
-- `method::OMAModalExtraction`: OMA method to use for pole extraction
+- `method::MdofOMA`: OMA method to use for pole extraction
     - `CovSSI`: Covariance-based SSI (default)
     - `DataSSI`: Data-based SSI
 - `stabdiag::Bool`: Whether to compute stabilization diagram (default: false)
@@ -21,7 +21,7 @@ Extract poles using Stochastic System Identification methods.
 
 [3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
 """
-function poles_extraction(prob::OMAProblem, order::Int, method::OMAModalExtraction = CovSSI(); stabdiag = false)
+function poles_extraction(prob::OMAProblem, order::Int, method::MdofOMA = CovSSI(); stabdiag = false)
 
     return modes_extraction(prob, order, method, stabdiag = stabdiag)[1]
 end
@@ -34,7 +34,7 @@ Extract modes using Stochastic System Identification methods.
 **Inputs**
 - `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
 - `order::Int`: Order of the system to identify
-- `method::OMAModalExtraction`: OMA method to use for pole extraction
+- `method::MdofOMA`: OMA method to use for pole extraction
     - `CovSSI`: Covariance-based SSI (default)
     - `DataSSI`: Data-based SSI
 - `stabdiag::Bool`: Whether to compute stabilization diagram (default: false)

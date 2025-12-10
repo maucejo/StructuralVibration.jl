@@ -309,7 +309,7 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 ---
 ```{julia}
 #| echo: false
-@doc poles_extraction(::OMAProblem, order::Int, method::StructuralVibration.OMAModalExtraction)
+@doc poles_extraction(::OMAProblem, order::Int, method::StructuralVibration.MdofOMA)
 ```
 :::
 

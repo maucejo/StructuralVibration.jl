@@ -273,7 +273,9 @@ function block_hankel(y::Matrix{Float64}, yref::Matrix{Float64}, nbr::Int)
     no, nt = size(y)
     nref, ntref = size(yref)
 
-    nt ≠ ntref && throw(ArgumentError("Input signals must have the same number of samples."))
+    if nt ≠ ntref
+        throw(ArgumentError("Input signals must have the same number of samples"))
+    end
 
     nc = nt - 2nbr + 1 # Number of columns of Hankel matrices
 

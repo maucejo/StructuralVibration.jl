@@ -184,7 +184,7 @@ The least squares fit method is based on the idea of fitting the frequency respo
 
 When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency $\omega$ close to the natural frequency $f_i$:
 $$
-H_{pq}(f) \approx \frac{_{i}A_{pq}}{f_i^2 - f^2 + 2j\xi_i f_i f}.
+H_{pq}(f) \approx \frac{{}_i A_{pq}}{f_i^2 - f^2 + 2j\xi_i f_i f}.
 $$
 
 The least squares fit method consists of the following steps:
@@ -193,7 +193,7 @@ The least squares fit method consists of the following steps:
 
     To construct the system matrices, we start by rewriting the previous equation as:
     $$
-    H_{pq}(f) \left(f_i^2 - f^2 + 2j\xi_i f_i f\right) - _{i}A_{pq} = 0.
+    H_{pq}(f) \left(f_i^2 - f^2 + 2j\xi_i f_i f\right) - {}_i A_{pq} = 0.
     $$
 
     This equation can be rewritten as:
