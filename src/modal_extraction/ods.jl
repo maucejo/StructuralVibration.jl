@@ -124,27 +124,35 @@ end
 
 function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where {T <: Complex}
 
-    ods_mode_ref, freq_pks = ods(Gyy, freq, pks_indices)
-    ny = size(ods_mode_ref, 1)
     no, ni, nf = size(Gyy)
-
     if ni > no
         Gyy = permutedims(Gyy, (2, 1, 3))
     end
+    ny = size(Gyy, 1)
 
     if pks_indices isa Int
         pks_indices = [pks_indices]
     end
 
-    ods_ref = similar(ods_mode_ref, ny)
-    ods_avg = similar(ods_mode_ref)
+    ods_ref = similar(Gyy, ny)
+    ods_avg = similar(ods_ref, ny, length(pks_indices))
     candidate = similar(ods_ref)
     ods_cand = zeros(eltype(ods_ref), ny)
     for (p, idx_peak) in enumerate(pks_indices)
-        ods_ref .= ods_mode_ref[:, p]
+        # Compute reference ODS
+        F = svd(Gyy[:, :, idx_peak])
+        ods_ref .= F.U[:, 1]
+        ods_cand .+= ods_ref
+
+        navg = 0.
+        if avg_alg == :sv
+            ods_cand .*= F.S[1]
+            navg += F.S[1]
+        else
+            navg += 1.
+        end
 
         # Search for all the candidates in a frequency band defined by MAC values
-        navg = avg_alg == :sv ? 0. : 1.
         lp = idx_peak - 1
         mac_val = 1.
         while lp ≥ 1 && mac_val ≥ min_mac
@@ -162,7 +170,7 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where 
                 ods_cand .+= candidate .* F.S[1]
                 navg += F.S[1]
             else
-                ods_cand .+ candidate
+                ods_cand .+= candidate
                 navg += 1.
             end
             lp -= 1
@@ -185,7 +193,7 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where 
                 ods_cand .+= candidate .* F.S[1]
                 navg += F.S[1]
             else
-                ods_cand .+ candidate
+                ods_cand .+= candidate
                 navg += 1.
             end
             rp += 1
@@ -197,5 +205,5 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where 
         fill!(ods_cand, eltype(ods_ref)(0.))
     end
 
-    return ods_avg, freq_pks
+    return ods_avg, freq[pks_indices]
 end

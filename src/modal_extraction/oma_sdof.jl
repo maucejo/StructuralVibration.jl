@@ -31,6 +31,9 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
 
         # Compute enhanced CSD
         eGyy = compute_ecsd(Gyy, ms[:, p], id_bell)
+
+        # Compute Least-squares matrices
+        
     end
 end
 

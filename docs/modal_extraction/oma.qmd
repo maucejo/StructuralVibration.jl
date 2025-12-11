@@ -21,13 +21,19 @@ Operational Modal Analysis (OMA) is a technique used to extract modal parameters
 
 From an algorithmic perspective, OMA can be performed using various methods, including EMA-based algorithms or specific OMA techniques such as Stochastic Subspace Identification techniques. In `StructuralVibration.jl`, the following methods are implemented for OMA:
 
-- Mdof EMA-based methods ;
+- Sdof method - Frequency-spatial domain decomposition (FSDD)
 
-- Stochastic Subspace Identification methods.
+- Mdof methods:
+  - EMA-based methods
+  - Stochastic Subspace Identification methods
 
-## EMA-based methods for OMA
+## Sdof method
 
-### General principle
+## Mdof methods
+
+### EMA-based methods for OMA
+
+#### General principle
 
 The EMA-based methods for OMA in `StructuralVibration.jl` leverage the existing Mdof EMA algorithms to extract modal parameters from response-only data. For applying these methods, one has to replace the Frequency Response Function by the so-called positive half-spectrum of the response signals.
 
@@ -81,7 +87,7 @@ In `StructuralVibration.jl`, the half-spectrum can be computed using the `half_c
 If the length of the time signals are longer than the block size used for the FFT computation, the half-spectrum is computed for each block and then averaged over all blocks.
 :::
 
-### Modal parameters extraction
+#### Modal parameters extraction
 
 Once the half-spectrum is computed, the existing Mdof EMA methods in `StructuralVibration.jl` can be directly applied to extract the poles from the half-spectrum data. More details on the usage of these methods can be found in the [Mdof EMA documentation](index.qmd). Regarding the extraction of mode shapes in OMA using EMA-based methods, a procedure similar to the one used in EMA can't be followed since the input forces are unknown. In this case, it is generally assumed that the rank of the residues is equal to 1, allowing to extract the mode shapes from the residues using a Singular Value Decomposition (SVD). Specifically, for a given mode $i$, the residue matrix ${}_i\mathbf{R}$ can be decomposed as:
 $$
@@ -103,7 +109,7 @@ where $\mathbf{U}_{i,1}$ is the first column of $\mathbf{U}_i$. However, this as
 
 4. For subsequent modes, select the singular vector $\mathbf{U}_{i,j}$ that minimizes the Modal Assurance Criterion (MAC) with respect to the previously extracted mode shapes, ensuring orthogonality and consistency among the extracted modes.
 
-### Half-spectrum reconstruction
+#### Half-spectrum reconstruction
 
 From the identified modal parameters (poles and residues), it is possible to reconstruct the half_spectrum of the system under study using the `half_csd_reconstruction` function. This function implements the following relation for a number $M$ of identified modes:
 
@@ -125,7 +131,7 @@ $$
 $$
 :::
 
-## Stochastic Subspace Identification methods
+### Stochastic Subspace Identification methods
 
 Stochastic Subspace Identification (SSI) methods are a class of techniques used in Operational Modal Analysis (OMA) to extract modal parameters from output-only data. These methods are based on the concept of subspace identification, which involves constructing a state-space model of the system from the measured response data. From a mathematical standpoint, the goal is to identify the system matrices $(\mathbf{A}, \mathbf{C})$ of the state-space representation:
 $$
@@ -150,7 +156,7 @@ $$
 $$
 where $\boldsymbol{\psi}_i$ are the eigenvectors of $\mathbf{A}$.
 
-### Covariance-driven Stochastic Subspace Identification
+#### Covariance-driven Stochastic Subspace Identification
 
 Covariance-driven Stochastic Subspace Identification (Cov-SSI) is a method that utilizes the covariance of the output data to identify the system matrices. The key steps involved in Cov-SSI are as follows:
 
@@ -198,7 +204,7 @@ $$
   $$
   where $\mathbf{O}_\text{up}$ and $\mathbf{O}_\text{down}$ are derived from the observability matrix removing the last and first block rows, respectively.
 
-### Data-driven Stochastic Subspace Identification
+#### Data-driven Stochastic Subspace Identification
 
 Data-driven Stochastic Subspace Identification (Data-SSI) is a method that directly utilizes the output data to identify the system matrices without explicitly computing the covariance matrices. The key steps involved in Data-SSI are as follows:
 

@@ -70,7 +70,7 @@ freq = freq[freq_idx]
 Gyy = Gyy[:, :, freq_idx]
 
 pks_indices = [23, 94, 211, 375]
-ods_complex, freq_peaks = ods(Gyy, freq, pks_indices)
+ods_complex, freq_peaks = ods(Gyy, freq, pks_indices, 0.9)
 ods_real = real_normalization(ods_complex)
 
 scaling = msf(ods_real, ms_m[:, 1:size(ods_real, 2)])
