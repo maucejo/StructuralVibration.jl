@@ -124,7 +124,6 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks
     ξn = similar(ftemp)
 
     # Damping ratios estimation from the half-bandwidth method
-    next = 5
     nfreq_itp = 250
     freq_left = similar(fn, nfreq_itp)
     freq_right = similar(freq_left)
@@ -133,8 +132,6 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks
     for (n, (f, idmax, Hmax, edg)) in enumerate(zip(ftemp, pks.indices, pks.heights, pks.edges))
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
-        edge1 = edge1 - next >= 1 ? edge1 - next : 1
-        edge2 = edge2 + next <= length(freq) ? edge2 + next : length(freq)
 
         # Left side of the peak
         itp_left = linear_interpolation(freq[edge1:idmax], Habs[edge1:idmax])
@@ -205,7 +202,6 @@ function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_i
     fn = similar(freq[pks.indices])
     ξn = similar(fn)
 
-    next = 5
     nfreq_itp = 500
     ReH_itp = similar(fn, nfreq_itp)
     ImH_itp = similar(ReH_itp)
@@ -216,8 +212,6 @@ function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_i
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
-        edge1 = edge1 - next >= 1 ? edge1 - next : 1
-        edge2 = edge2 + next <= length(freq) ? edge2 + next : length(freq)
 
         freqs = freq[edge1:edge2]
 
@@ -306,7 +300,6 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
     fn = freq[pks.indices]
     ξn = similar(fn)
 
-    next = 5
     nfreq_itp = 500
     freq_itp = similar(fn, nfreq_itp)
     ReH_itp = similar(freq_itp)
@@ -322,8 +315,6 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
-        edge1 = edge1 - next >= 1 ? edge1 - next : 1
-        edge2 = edge2 + next <= length(freq) ? edge2 + next : length(freq)
 
         freqs = freq[edge1:edge2]
 

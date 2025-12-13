@@ -161,8 +161,8 @@ function peak_proms!(pks; min = 0., max = Inf)
     data = pks.data
 
     n = length(data)
-    npreaks = length(pks.indices)
-    prominences = similar(data, npreaks)
+    npeaks = length(pks.indices)
+    prominences = similar(data, npeaks)
 
     for (i, (idx, peak_height)) in enumerate(zip(pks.indices, pks.heights))
         # Find left base
@@ -202,7 +202,7 @@ function peak_proms!(pks; min = 0., max = Inf)
 end
 
 """
-    peak_widths(pks; relheight = 0.5, min = 0., max = Inf)
+    peak_widths!(pks; relheight = 0.5, min = 0., max = Inf)
 
 Compute the widths of peaks at a specified relative height and filter them based on minimum and maximum width.
 

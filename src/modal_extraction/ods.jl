@@ -30,7 +30,7 @@ function ods(y::Matrix{T}, freq, pks_indices) where {T <: Complex}
     # For lightly damped structures, the response at resonance is approximately 90° out of phase (in quadrature) with the excitation. Taking the imaginary part (or equivalently rotating the complex vector by ±90° and taking the real part) removes the arbitrary global phase (up to a sign) if the response is mostly quadrature.
 
     ods_mode = y[:, pks_indices]
-    ods_mode ./= maximum(abs.(ods_mode); dims = 1)
+    ods_mode ./= maximum(abs, ods_mode; dims = 1)
 
     # ods_amplitude = abs.(y[:, pks_indices])
     # ods_phase = angle.(y[:, pks_indices]) .+ π/2
@@ -95,7 +95,7 @@ function ods(y::Matrix{T}, freq, pks_indices, min_mac) where {T <: Complex}
 
         # Average all the candidates
         ods_avg[:, p] .= ods_cand/navg
-        ods_avg[:, p] ./= maximum(abs.(ods_avg[:, p]))
+        ods_avg[:, p] ./= maximum(abs, ods_avg[:, p])
         fill!(ods_cand, eltype(ods_ref)(0.))
     end
 
@@ -201,7 +201,7 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where 
 
         # Average all the candidates
         ods_avg[:, p] .= ods_cand / navg
-        ods_avg[:, p] ./= maximum(abs.(ods_avg[:, p]))
+        ods_avg[:, p] ./= maximum(abs, ods_avg[:, p])
         fill!(ods_cand, eltype(ods_ref)(0.))
     end
 

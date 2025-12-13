@@ -17,7 +17,7 @@ using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
-The modal approach enables the dynamic behavior of a structure to be predicted based on knowledge of its natural modes of vibration, which are intrinsic to the system. From a practical point of view, this information can be used to determine the frequencies at which the structure is most likely to vibrate. For industry, this information is invaluable, as vibrations can cause discomfort, noise, premature wear and tear, or even damage to a system. This is where **Experimental Modal Analysis** (EMA) comes in. Experimental identification of vibration modes can also be used to calibrate a finite element model or certify a product (e.g. ground vibration testing or regulations related to the modal behavior of the structure).
+The modal approach enables the dynamic behavior of a structure to be predicted based on knowledge of its natural modes of vibration, which are intrinsic to the system. From a practical point of view, this information can be used to determine the frequencies at which the structure is most likely to vibrate. For industry, this information is invaluable, as vibrations can cause discomfort, noise, premature wear and tear, or even damage to a system. This is where **Experimental Modal Analysis** (EMA) comes in Experimental identification of vibration modes can also be used to calibrate a finite element model or certify a product (e.g. ground vibration testing or regulations related to the modal behavior of the structure).
 
 EMA aims to estimate the natural frequencies of the system and other characteristic parameters (e.g. damping ratios and mode shapes) from the vibration measurements in order to obtain a modal model of the system under consideration. This model can then be used to determine the structure's dynamic behaviour for a given excitation.
 
@@ -37,8 +37,9 @@ H_{pq}(\omega) = \sum_{i = 1}^{+\infty} \frac{\phi_i(x_p)\, \phi_i(x_q)}{M_i(\om
 $$
 where:
 
-* $\lambda_i = -\xi_i + j\,\Omega_i$ is the pole related to the mode $i$, with:
-    * $\Omega_i = \omega_i\sqrt{1 - \xi_i^2}$ is the damped natural frequency of the mode $i$, with $\omega_i = \vert \lambda_i\vert$.
+* $\lambda_i = -\xi_i\omega_i + j\,\Omega_i$ is the pole related to the mode $i$, with:
+    * $\omega_i = \vert \lambda_i\vert$ is the natural angular frequency of the system
+    * $\Omega_i = \omega_i\sqrt{1 - \xi_i^2}$ is the damped natural frequency of the mode $i$
     * $\xi_i = -\frac{\text{Re}(\lambda_i)}{\omega_i}$ the modal damping factor of the mode $i$ <br></br>
 
 * ${}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q)$ is the residue of the mode $i$, with:

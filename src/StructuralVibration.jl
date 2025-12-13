@@ -36,7 +36,7 @@ module StructuralVibration
        export AutoEMAMdofProblem, AutoEMASdofProblem, EMAProblem,
               EMASolution, OMAProblem, StabilizationAnalysis
 
-       export CircleFit, CovSSI, DataSSI, LSCE, LSCF, LSFit, PeakPicking, pLSCF
+       export CircleFit, CovSSI, DataSSI, FSDD, LSCE, LSCF, LSFit, PeakPicking, pLSCF
 
        # Structs - Signal processing
        export FFTParameters
