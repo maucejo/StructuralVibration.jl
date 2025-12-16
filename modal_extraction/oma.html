@@ -254,16 +254,11 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#ema-based-methods-for-oma" id="toc-ema-based-methods-for-oma" class="nav-link active" data-scroll-target="#ema-based-methods-for-oma"><span class="header-section-number">1</span> EMA-based methods for OMA</a>
+  <li><a href="#sdof-method" id="toc-sdof-method" class="nav-link active" data-scroll-target="#sdof-method"><span class="header-section-number">1</span> Sdof method</a></li>
+  <li><a href="#mdof-methods" id="toc-mdof-methods" class="nav-link" data-scroll-target="#mdof-methods"><span class="header-section-number">2</span> Mdof methods</a>
   <ul class="collapse">
-  <li><a href="#general-principle" id="toc-general-principle" class="nav-link" data-scroll-target="#general-principle"><span class="header-section-number">1.1</span> General principle</a></li>
-  <li><a href="#modal-parameters-extraction" id="toc-modal-parameters-extraction" class="nav-link" data-scroll-target="#modal-parameters-extraction"><span class="header-section-number">1.2</span> Modal parameters extraction</a></li>
-  <li><a href="#half-spectrum-reconstruction" id="toc-half-spectrum-reconstruction" class="nav-link" data-scroll-target="#half-spectrum-reconstruction"><span class="header-section-number">1.3</span> Half-spectrum reconstruction</a></li>
-  </ul></li>
-  <li><a href="#stochastic-subspace-identification-methods" id="toc-stochastic-subspace-identification-methods" class="nav-link" data-scroll-target="#stochastic-subspace-identification-methods"><span class="header-section-number">2</span> Stochastic Subspace Identification methods</a>
-  <ul class="collapse">
-  <li><a href="#covariance-driven-stochastic-subspace-identification" id="toc-covariance-driven-stochastic-subspace-identification" class="nav-link" data-scroll-target="#covariance-driven-stochastic-subspace-identification"><span class="header-section-number">2.1</span> Covariance-driven Stochastic Subspace Identification</a></li>
-  <li><a href="#data-driven-stochastic-subspace-identification" id="toc-data-driven-stochastic-subspace-identification" class="nav-link" data-scroll-target="#data-driven-stochastic-subspace-identification"><span class="header-section-number">2.2</span> Data-driven Stochastic Subspace Identification</a></li>
+  <li><a href="#ema-based-methods-for-oma" id="toc-ema-based-methods-for-oma" class="nav-link" data-scroll-target="#ema-based-methods-for-oma"><span class="header-section-number">2.1</span> EMA-based methods for OMA</a></li>
+  <li><a href="#stochastic-subspace-identification-methods" id="toc-stochastic-subspace-identification-methods" class="nav-link" data-scroll-target="#stochastic-subspace-identification-methods"><span class="header-section-number">2.2</span> Stochastic Subspace Identification methods</a></li>
   </ul></li>
   <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api"><span class="header-section-number">3</span> API</a></li>
   <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">4</span> Example</a>
@@ -301,13 +296,22 @@ window.Quarto = {
 <p>Operational Modal Analysis (OMA) is a technique used to extract modal parameters of a structure based solely on its response measurements, without requiring knowledge of the input excitation forces. This is particularly useful in scenarios where it is difficult or impossible to measure the input forces, such as in ambient vibration testing of large structures.</p>
 <p>From an algorithmic perspective, OMA can be performed using various methods, including EMA-based algorithms or specific OMA techniques such as Stochastic Subspace Identification techniques. In <code>StructuralVibration.jl</code>, the following methods are implemented for OMA:</p>
 <ul>
-<li><p>Mdof EMA-based methods ;</p></li>
-<li><p>Stochastic Subspace Identification methods.</p></li>
+<li><p>Sdof method - Frequency-spatial domain decomposition (FSDD)</p></li>
+<li><p>Mdof methods:</p>
+<ul>
+<li>EMA-based methods</li>
+<li>Stochastic Subspace Identification methods</li>
+</ul></li>
 </ul>
-<section id="ema-based-methods-for-oma" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="ema-based-methods-for-oma"><span class="header-section-number">1</span> EMA-based methods for OMA</h2>
-<section id="general-principle" class="level3" data-number="1.1">
-<h3 data-number="1.1" class="anchored" data-anchor-id="general-principle"><span class="header-section-number">1.1</span> General principle</h3>
+<section id="sdof-method" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="sdof-method"><span class="header-section-number">1</span> Sdof method</h2>
+</section>
+<section id="mdof-methods" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="mdof-methods"><span class="header-section-number">2</span> Mdof methods</h2>
+<section id="ema-based-methods-for-oma" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="ema-based-methods-for-oma"><span class="header-section-number">2.1</span> EMA-based methods for OMA</h3>
+<section id="general-principle" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="general-principle"><span class="header-section-number">2.1.1</span> General principle</h4>
 <p>The EMA-based methods for OMA in <code>StructuralVibration.jl</code> leverage the existing Mdof EMA algorithms to extract modal parameters from response-only data. For applying these methods, one has to replace the Frequency Response Function by the so-called positive half-spectrum of the response signals.</p>
 <p>To obtain the half-spectrum, we start from the full cross-spectral density (CSD) matrix between the output responses <span class="math inline">\(\mathbf{y}\)</span>, which is given by: <span class="math display">\[
 \mathbf{G}_{yy}(\omega) = \mathbf{H}(\omega) \mathbf{G}_{ff}(\omega) \mathbf{H}^H(\omega),
@@ -350,8 +354,8 @@ Note
 </div>
 </div>
 </section>
-<section id="modal-parameters-extraction" class="level3" data-number="1.2">
-<h3 data-number="1.2" class="anchored" data-anchor-id="modal-parameters-extraction"><span class="header-section-number">1.2</span> Modal parameters extraction</h3>
+<section id="modal-parameters-extraction" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="modal-parameters-extraction"><span class="header-section-number">2.1.2</span> Modal parameters extraction</h4>
 <p>Once the half-spectrum is computed, the existing Mdof EMA methods in <code>StructuralVibration.jl</code> can be directly applied to extract the poles from the half-spectrum data. More details on the usage of these methods can be found in the <a href="../modal_extraction/index.html">Mdof EMA documentation</a>. Regarding the extraction of mode shapes in OMA using EMA-based methods, a procedure similar to the one used in EMA can’t be followed since the input forces are unknown. In this case, it is generally assumed that the rank of the residues is equal to 1, allowing to extract the mode shapes from the residues using a Singular Value Decomposition (SVD). Specifically, for a given mode <span class="math inline">\(i\)</span>, the residue matrix <span class="math inline">\({}_i\mathbf{R}\)</span> can be decomposed as: <span class="math display">\[
 {}_i\mathbf{R} = \mathbf{U}_i\, \mathbf{S}_i\, \mathbf{V}_i^H,
 \]</span></p>
@@ -366,8 +370,8 @@ Note
 <li><p>For subsequent modes, select the singular vector <span class="math inline">\(\mathbf{U}_{i,j}\)</span> that minimizes the Modal Assurance Criterion (MAC) with respect to the previously extracted mode shapes, ensuring orthogonality and consistency among the extracted modes.</p></li>
 </ol>
 </section>
-<section id="half-spectrum-reconstruction" class="level3" data-number="1.3">
-<h3 data-number="1.3" class="anchored" data-anchor-id="half-spectrum-reconstruction"><span class="header-section-number">1.3</span> Half-spectrum reconstruction</h3>
+<section id="half-spectrum-reconstruction" class="level4" data-number="2.1.3">
+<h4 data-number="2.1.3" class="anchored" data-anchor-id="half-spectrum-reconstruction"><span class="header-section-number">2.1.3</span> Half-spectrum reconstruction</h4>
 <p>From the identified modal parameters (poles and residues), it is possible to reconstruct the half_spectrum of the system under study using the <code>half_csd_reconstruction</code> function. This function implements the following relation for a number <span class="math inline">\(M\)</span> of identified modes:</p>
 <p><span class="math display">\[
 G_{pq}^+(\omega) = \sum_{i = 1}^{M} \left[\frac{{}_i R_{pq}}{(j\omega - \lambda_i)} + \frac{{}_i R_{pq}^\ast}{(j\omega - \lambda_i^\ast)}\right],
@@ -393,8 +397,8 @@ Note
 </div>
 </section>
 </section>
-<section id="stochastic-subspace-identification-methods" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="stochastic-subspace-identification-methods"><span class="header-section-number">2</span> Stochastic Subspace Identification methods</h2>
+<section id="stochastic-subspace-identification-methods" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="stochastic-subspace-identification-methods"><span class="header-section-number">2.2</span> Stochastic Subspace Identification methods</h3>
 <p>Stochastic Subspace Identification (SSI) methods are a class of techniques used in Operational Modal Analysis (OMA) to extract modal parameters from output-only data. These methods are based on the concept of subspace identification, which involves constructing a state-space model of the system from the measured response data. From a mathematical standpoint, the goal is to identify the system matrices <span class="math inline">\((\mathbf{A}, \mathbf{C})\)</span> of the state-space representation: <span class="math display">\[
 \begin{aligned}
 \dot{\mathbf{x}}_{k+1} &amp;= \mathbf{A}\, \mathbf{x}_k + \mathbf{w}_k \\
@@ -408,8 +412,8 @@ Note
 <p>The mode shapes <span class="math inline">\(\boldsymbol{\phi}_i\)</span> can be obtained from the output matrix <span class="math inline">\(\mathbf{C}\)</span> and the eigenvectors of <span class="math inline">\(\mathbf{A}\)</span> using the following relation: <span class="math display">\[
 \boldsymbol{\phi}_i = \mathbf{C}\, \boldsymbol{\psi}_i
 \]</span> where <span class="math inline">\(\boldsymbol{\psi}_i\)</span> are the eigenvectors of <span class="math inline">\(\mathbf{A}\)</span>.</p>
-<section id="covariance-driven-stochastic-subspace-identification" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="covariance-driven-stochastic-subspace-identification"><span class="header-section-number">2.1</span> Covariance-driven Stochastic Subspace Identification</h3>
+<section id="covariance-driven-stochastic-subspace-identification" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="covariance-driven-stochastic-subspace-identification"><span class="header-section-number">2.2.1</span> Covariance-driven Stochastic Subspace Identification</h4>
 <p>Covariance-driven Stochastic Subspace Identification (Cov-SSI) is a method that utilizes the covariance of the output data to identify the system matrices. The key steps involved in Cov-SSI are as follows:</p>
 <ol type="1">
 <li>Compute the covariance matrices <span class="math inline">\(\mathbf{R}_i\)</span> of the output data at different time lags <span class="math inline">\(i\)</span>: <span class="math display">\[
@@ -462,8 +466,8 @@ Note
 </ul></li>
 </ol>
 </section>
-<section id="data-driven-stochastic-subspace-identification" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="data-driven-stochastic-subspace-identification"><span class="header-section-number">2.2</span> Data-driven Stochastic Subspace Identification</h3>
+<section id="data-driven-stochastic-subspace-identification" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="data-driven-stochastic-subspace-identification"><span class="header-section-number">2.2.2</span> Data-driven Stochastic Subspace Identification</h4>
 <p>Data-driven Stochastic Subspace Identification (Data-SSI) is a method that directly utilizes the output data to identify the system matrices without explicitly computing the covariance matrices. The key steps involved in Data-SSI are as follows:</p>
 <ol type="1">
 <li><p>Construct a block Hankel matrix from the output data: <span class="math display">\[
@@ -505,6 +509,7 @@ Note
 <li><p>Compute the observability matrix <span class="math inline">\(\mathbf{O}\)</span> from the SVD of <span class="math inline">\(\mathbf{P}\)</span>.</p></li>
 <li><p>Extract the system matrices <span class="math inline">\(\mathbf{A}\)</span> and <span class="math inline">\(\mathbf{C}\)</span> from the observability matrix as described in the Cov-SSI method.</p></li>
 </ol>
+</section>
 </section>
 </section>
 <section id="api" class="level2" data-number="3">
@@ -770,7 +775,7 @@ spectral density matrix Gyy.</code></pre>
 </li>
 <li><p><code>order::Int</code>: Order of the system to identify</p>
 </li>
-<li><p><code>method::OMAModalExtraction</code>: OMA method to use for pole extraction</p>
+<li><p><code>method::MdofOMA</code>: OMA method to use for pole extraction</p>
 <ul>
 <li><p><code>CovSSI</code>: Covariance-based SSI (default)</p>
 </li>
@@ -808,7 +813,7 @@ spectral density matrix Gyy.</code></pre>
 </li>
 <li><p><code>order::Int</code>: Order of the system to identify</p>
 </li>
-<li><p><code>method::OMAModalExtraction</code>: OMA method to use for pole extraction</p>
+<li><p><code>method::MdofOMA</code>: OMA method to use for pole extraction</p>
 <ul>
 <li><p><code>CovSSI</code>: Covariance-based SSI (default)</p>
 </li>

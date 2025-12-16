@@ -1267,7 +1267,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="42" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">assembly(model::OneDstructure, mesh::OneDMesh)</code></pre>
+<div class="markdown"><pre><code class="language-julia">assembly(model::OneDStructure, mesh::OneDMesh)</code></pre>
 <p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -1300,14 +1300,14 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <hr>
 <div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">rayleigh_damping_matrix(K, M, α, β)
-rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
+<div class="markdown"><pre><code class="language-julia">rayleigh_damping_matrix(M, K, α, β)
+rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>
 <p><strong>Inputs</strong></p>
 <ul>
-<li><p><code>K</code>: Stiffness matrix</p>
-</li>
 <li><p><code>M</code>: Mass matrix</p>
+</li>
+<li><p><code>K</code>: Stiffness matrix</p>
 </li>
 <li><p>Construction parameters</p>
 <ul>
@@ -1446,7 +1446,7 @@ rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)</code></pre>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>ωfe, Φfe <span class="op">=</span> <span class="fu">eigenmode</span>(Kbc, Mbc)</span>
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculation of the damping matrix</span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>Cray <span class="op">=</span> <span class="fu">rayleigh_damping_matrix</span>(Kbc, Mbc, <span class="fl">1</span>., <span class="fl">1</span>.)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>Cray <span class="op">=</span> <span class="fu">rayleigh_damping_matrix</span>(Mbc, Kbc, <span class="fl">1</span>., <span class="fl">1</span>.)</span>
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>Cmodal <span class="op">=</span> <span class="fu">modal_damping_matrix</span>(Mbc, ωfe, <span class="fl">0.01</span>, Φfe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>

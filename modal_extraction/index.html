@@ -297,7 +297,7 @@ window.Quarto = {
 </header>
 
 
-<p>The modal approach enables the dynamic behavior of a structure to be predicted based on knowledge of its natural modes of vibration, which are intrinsic to the system. From a practical point of view, this information can be used to determine the frequencies at which the structure is most likely to vibrate. For industry, this information is invaluable, as vibrations can cause discomfort, noise, premature wear and tear, or even damage to a system. This is where <strong>Experimental Modal Analysis</strong> (EMA) comes in. Experimental identification of vibration modes can also be used to calibrate a finite element model or certify a product (e.g.&nbsp;ground vibration testing or regulations related to the modal behavior of the structure).</p>
+<p>The modal approach enables the dynamic behavior of a structure to be predicted based on knowledge of its natural modes of vibration, which are intrinsic to the system. From a practical point of view, this information can be used to determine the frequencies at which the structure is most likely to vibrate. For industry, this information is invaluable, as vibrations can cause discomfort, noise, premature wear and tear, or even damage to a system. This is where <strong>Experimental Modal Analysis</strong> (EMA) comes in Experimental identification of vibration modes can also be used to calibrate a finite element model or certify a product (e.g.&nbsp;ground vibration testing or regulations related to the modal behavior of the structure).</p>
 <p>EMA aims to estimate the natural frequencies of the system and other characteristic parameters (e.g.&nbsp;damping ratios and mode shapes) from the vibration measurements in order to obtain a modal model of the system under consideration. This model can then be used to determine the structure’s dynamic behaviour for a given excitation.</p>
 <p>To reach these goals, it is supposed that:</p>
 <ul>
@@ -312,9 +312,10 @@ window.Quarto = {
 H_{pq}(\omega) = \sum_{i = 1}^{+\infty} \frac{\phi_i(x_p)\, \phi_i(x_q)}{M_i(\omega_i^2 - \omega^2 + 2j\xi_i\omega_i\omega)} = \sum_{i = 1}^{+\infty} \left[\frac{{}_i R_{pq}}{j\omega - \lambda_i} + \frac{{}_i R_{pq}^\ast}{j\omega - \lambda_i^\ast}\right],
 \]</span> where:</p>
 <ul>
-<li><span class="math inline">\(\lambda_i = -\xi_i + j\,\Omega_i\)</span> is the pole related to the mode <span class="math inline">\(i\)</span>, with:
+<li><span class="math inline">\(\lambda_i = -\xi_i\omega_i + j\,\Omega_i\)</span> is the pole related to the mode <span class="math inline">\(i\)</span>, with:
 <ul>
-<li><span class="math inline">\(\Omega_i = \omega_i\sqrt{1 - \xi_i^2}\)</span> is the damped natural frequency of the mode <span class="math inline">\(i\)</span>, with <span class="math inline">\(\omega_i = \vert \lambda_i\vert\)</span>.</li>
+<li><span class="math inline">\(\omega_i = \vert \lambda_i\vert\)</span> is the natural angular frequency of the system</li>
+<li><span class="math inline">\(\Omega_i = \omega_i\sqrt{1 - \xi_i^2}\)</span> is the damped natural frequency of the mode <span class="math inline">\(i\)</span></li>
 <li><span class="math inline">\(\xi_i = -\frac{\text{Re}(\lambda_i)}{\omega_i}\)</span> the modal damping factor of the mode <span class="math inline">\(i\)</span> <br><br></li>
 </ul></li>
 <li><span class="math inline">\({}_i R_{pq} = c_i\, \phi_i(x_p)\, \phi_i(x_q)\)</span> is the residue of the mode <span class="math inline">\(i\)</span>, with:
@@ -463,13 +464,13 @@ Note
 <h4 data-number="2.1.3" class="anchored" data-anchor-id="least-squares-fit-method"><span class="header-section-number">2.1.3</span> Least squares fit method</h4>
 <p>The least squares fit method is based on the idea of fitting the frequency response function (FRF) around the resonance peaks using a least squares approach<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <p>When the natural frequencies of the modes are sufficiently spaced and the damping is low, one can write at a frequency <span class="math inline">\(\omega\)</span> close to the natural frequency <span class="math inline">\(f_i\)</span>: <span class="math display">\[
-H_{pq}(f) \approx \frac{_{i}A_{pq}}{f_i^2 - f^2 + 2j\xi_i f_i f}.
+H_{pq}(f) \approx \frac{{}_i A_{pq}}{f_i^2 - f^2 + 2j\xi_i f_i f}.
 \]</span></p>
 <p>The least squares fit method consists of the following steps:</p>
 <ol type="1">
 <li><p><strong>Definition of the system matrices</strong></p>
 <p>To construct the system matrices, we start by rewriting the previous equation as: <span class="math display">\[
-H_{pq}(f) \left(f_i^2 - f^2 + 2j\xi_i f_i f\right) - _{i}A_{pq} = 0.
+H_{pq}(f) \left(f_i^2 - f^2 + 2j\xi_i f_i f\right) - {}_i A_{pq} = 0.
 \]</span></p>
 <p>This equation can be rewritten as: <span class="math display">\[
 \begin{bmatrix}
@@ -865,7 +866,7 @@ Note
 </li>
 </ul>
 </li>
-<li><p><code>alg::MdofModalExtraction</code>: Method to extract the poles</p>
+<li><p><code>alg::MdofEMA</code>: Method to extract the poles</p>
 <ul>
 <li><p><code>LSCE</code>: Least Squares Complex Exponential method</p>
 </li>
@@ -1149,7 +1150,7 @@ modeshape_extraction(residues, poles, alg; dpi, modetype)</code></pre>
 </li>
 <li><p><code>poles</code>: Vector of complex poles</p>
 </li>
-<li><p><code>alg::SdofModalExtraction</code> or <code>alg::MdofModalExtraction</code>: Modal extraction algorithm</p>
+<li><p><code>alg::SdofModalExtraction</code> or <code>alg::MdofEMA</code>: Modal extraction algorithm</p>
 </li>
 <li><p><code>dpi</code>: Driving point indices - default = [1, 1]</p>
 <ul>
