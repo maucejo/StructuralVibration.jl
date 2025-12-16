@@ -1,5 +1,6 @@
 """
     DirectTimeProblem(K, M, C, F, u0, t)
+    DirectTimeProblem(K, M, C, u0, t)
 
 Structure containing data for the time solver
 
@@ -22,6 +23,9 @@ Structure containing data for the time solver
     * `u0[1]`: Initial displacement
     * `u0[2]`: Initial velocity
 * `h::Real`: Time step
+
+**Note**
+- If `F` is not provided, it is assumed to be a zero matrix
 """
 @show_data struct DirectTimeProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractMatrix, Tu <: AbstractVector, Th <: Real}
     K::Tk
@@ -34,6 +38,11 @@ Structure containing data for the time solver
     function DirectTimeProblem(K::Tk, M::Tm, C::Tc, F::Tf, u0::Tuple{Tu, Tu}, t::AbstractRange) where {Tk, Tm, Tc, Tf, Tu}
         h = t[2] - t[1]
         return new{Tk, Tm, Tc, Tf, Tu, typeof(h)}(K, M, C, F, u0, h)
+    end
+
+    function DirectTimeProblem(K::Tk, M::Tm, C::Tc, u0::Tuple{Tu, Tu}, t::AbstractRange) where {Tk, Tm, Tc, Tu}
+        h = t[2] - t[1]
+        return new{Tk, Tm, Tc, typeof(K), Tu, typeof(h)}(K, M, C, zeros(eltype(K), size(K, 1), length(t)), u0, h)
     end
 end
 

@@ -369,7 +369,7 @@
                 "J = IG\n",
                 "\n",
                 "# Tension for string\n",
-                "T = 100.\n",
+                "T = 5000.\n",
                 "\n",
                 "# Material\n",
                 "E = 2.1e11\n",
@@ -378,7 +378,6 @@
                 "ρ = 7800.\n",
                 "\n",
                 "# Computation parameters\n",
-                "fmax = 2000.\n",
                 "x = [0.1, 0.9]\n",
                 "\n",
                 "# Initialization of the data types\n",
@@ -388,10 +387,16 @@
                 "beam = Beam(L, S, Iz, E, ρ)\n",
                 "\n",
                 "# Computation of the natural frequencies\n",
-                "ωn, kn = modefreq(bar, fmax)\n",
+                "ω_bar, k_bar = modefreq(bar, 10_000.)\n",
+                "ω_rod, k_rod = modefreq(rod, 10_000.)\n",
+                "ω_strings, k_strings = modefreq(strings, 100.)\n",
+                "ω_beam, k_beam = modefreq(beam, 2000.)\n",
                 "\n",
                 "# Computation of the corresponding mode shapes\n",
-                "ϕn = modeshape(bar, kn, x, :CC)\n",
+                "ϕ_bar = modeshape(bar, k_bar, x, :CC)\n",
+                "ϕ_rod = modeshape(rod, k_rod, x, :FF)\n",
+                "ϕ_strings = modeshape(strings, k_strings, x, :CC)\n",
+                "ϕ_beam = modeshape(beam, k_beam, x, :SS)\n",
                 "```\n",
                 "\n",
                 "### 2D models\n",
@@ -536,10 +541,10 @@
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mmodefreq(model::Plate, fmax)\u001b[39m\n  \u001b[36mmodefreq(model::Membrane, fmax)\u001b[39m\n\n  Computes the natural frequencies of a simply supported rectangular plate or\n  a clamped rectangular membrane up to fmax\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the plate\n    \u001b[34m• \u001b[39m \u001b[36mfmax\u001b[39m: Maximum frequency for calculating the modal shapes [Hz]\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωmn\u001b[39m: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n    \u001b[34m• \u001b[39m \u001b[36mkmn\u001b[39m: Matrix of modal wave numbers",
-                        "text/markdown": "```julia\nmodefreq(model::Plate, fmax)\nmodefreq(model::Membrane, fmax)\n```\n\nComputes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax\n\n**Inputs**\n\n  * `model`: Structure containing the data related to the plate\n  * `fmax`: Maximum frequency for calculating the modal shapes [Hz]\n\n**Outputs**\n\n  * `ωmn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n  * `kmn`: Matrix of modal wave numbers\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modefreq&#40;model::Plate, fmax&#41;\nmodefreq&#40;model::Membrane, fmax&#41;</code></pre>\n<p>Computes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the plate</p>\n</li>\n<li><p><code>fmax</code>: Maximum frequency for calculating the modal shapes &#91;Hz&#93;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ωmn</code>: Natural frequencies calculated up to ωmax &#61; 2π*fmax &#91;Hz&#93;</p>\n</li>\n<li><p><code>kmn</code>: Matrix of modal wave numbers</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nmodefreq(model::Plate, fmax)\nmodefreq(model::Membrane, fmax)\n\\end{verbatim}\nComputes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the plate\n\n\n\\item \\texttt{fmax}: Maximum frequency for calculating the modal shapes [Hz]\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ωmn}: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n\n\n\\item \\texttt{kmn}: Matrix of modal wave numbers\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mmodefreq(model::Plate, fmax)\u001b[39m\n  \u001b[36mmodefreq(model::Membrane, fmax)\u001b[39m\n\n  Computes the natural frequencies of a simply supported rectangular plate or\n  a clamped rectangular membrane up to fmax\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the plate\n    \u001b[34m• \u001b[39m \u001b[36mfmax\u001b[39m: Maximum frequency for calculating the modal shapes [Hz]\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mωmn\u001b[39m: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n    \u001b[34m• \u001b[39m \u001b[36mkmn\u001b[39m: Matrix of modal wave numbers\n    \u001b[34m• \u001b[39m \u001b[36mind\u001b[39m: Matrix of modal indices (m, n)",
+                        "text/markdown": "```julia\nmodefreq(model::Plate, fmax)\nmodefreq(model::Membrane, fmax)\n```\n\nComputes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax\n\n**Inputs**\n\n  * `model`: Structure containing the data related to the plate\n  * `fmax`: Maximum frequency for calculating the modal shapes [Hz]\n\n**Outputs**\n\n  * `ωmn`: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n  * `kmn`: Matrix of modal wave numbers\n  * `ind`: Matrix of modal indices (m, n)\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modefreq&#40;model::Plate, fmax&#41;\nmodefreq&#40;model::Membrane, fmax&#41;</code></pre>\n<p>Computes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the plate</p>\n</li>\n<li><p><code>fmax</code>: Maximum frequency for calculating the modal shapes &#91;Hz&#93;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ωmn</code>: Natural frequencies calculated up to ωmax &#61; 2π*fmax &#91;Hz&#93;</p>\n</li>\n<li><p><code>kmn</code>: Matrix of modal wave numbers</p>\n</li>\n<li><p><code>ind</code>: Matrix of modal indices &#40;m, n&#41;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodefreq(model::Plate, fmax)\nmodefreq(model::Membrane, fmax)\n\\end{verbatim}\nComputes the natural frequencies of a simply supported rectangular plate or a clamped rectangular membrane up to fmax\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the plate\n\n\n\\item \\texttt{fmax}: Maximum frequency for calculating the modal shapes [Hz]\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ωmn}: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]\n\n\n\\item \\texttt{kmn}: Matrix of modal wave numbers\n\n\n\\item \\texttt{ind}: Matrix of modal indices (m, n)\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -608,18 +613,21 @@
                 "ν = 0.33\n",
                 "\n",
                 "# Computation parameters\n",
-                "fmax = 1000.\n",
+                "fmax = 500.\n",
                 "xp = [0.1, 0.5]\n",
                 "yp = [0.1, 0.3]\n",
                 "\n",
                 "# Initialization of the data types\n",
                 "plate = Plate(Lp, bp, hp, E, ρ, ν)\n",
+                "membrane = Membrane(Lp, bp, ρ*hp, 100.)\n",
                 "\n",
                 "# Computation of the natural frequencies\n",
-                "ωn, kn = modefreq(plate, fmax)\n",
+                "ω_plate, k_plate = modefreq(plate, fmax)[1:2]\n",
+                "ω_membrane, k_membrane = modefreq(membrane, fmax)[1:2]\n",
                 "\n",
                 "# Computation of the corresponding mode shapes\n",
-                "ϕn = modeshape(plate, kn, xp, yp)\n",
+                "ϕ_plate = modeshape(plate, k_plate, xp, yp)\n",
+                "ϕ_membrane = modeshape(membrane, k_membrane, xp, yp)\n",
                 "```\n",
                 "\n",
                 "## Discrete models\n",
@@ -1041,7 +1049,7 @@
                 "mdof = Mdof(k_mdof, m_mdof, c_mdof)\n",
                 "\n",
                 "# Definition of a MdofMesh\n",
-                "mdof_mesh = MdofMesh(mdof, bc = :CF)\n",
+                "mdof_mesh = MdofMesh(mdof, :CF)\n",
                 "\n",
                 "# System assembly\n",
                 "K_mdof, M_mdof, C_mdof = assembly(mdof)\n",
@@ -1089,10 +1097,10 @@
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mOneDMesh(model, xmin, Nelt, bc)\u001b[39m\n\n  Construct a mesh for a beam with Nelt elements, length L and starting at\n  xmin.\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the 1D system\n    \u001b[34m• \u001b[39m \u001b[36mxmin\u001b[39m: starting position of the beam\n    \u001b[34m• \u001b[39m \u001b[36mNelt\u001b[39m: number of elements\n    \u001b[34m• \u001b[39m \u001b[36mbc\u001b[39m: Boundary conditions type\n       \n       \u001b[34m• \u001b[39m \u001b[36m:CC\u001b[39m: Clamped - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:FF\u001b[39m: Free - Free\n       \u001b[34m• \u001b[39m \u001b[36m:CF\u001b[39m: Clamped - Free\n       \u001b[34m• \u001b[39m \u001b[36m:SS\u001b[39m: Simply Supported - Simply Supported (specific to\n       beam)\n       \u001b[34m• \u001b[39m \u001b[36m:CS\u001b[39m: Clamped - Simply Supported (specific to beam)\n       \u001b[34m• \u001b[39m \u001b[36m:SF\u001b[39m: Simply Supported - Free (specific to beam)\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mxmin\u001b[39m: Starting position of the beam\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length of the beam\n    \u001b[34m• \u001b[39m \u001b[36mNodes\u001b[39m: Nodes of the mesh\n    \u001b[34m• \u001b[39m \u001b[36mElt\u001b[39m: Elements of the mesh\n    \u001b[34m• \u001b[39m \u001b[36mNdof_per_node\u001b[39m`: Number of degrees of freedom per node\n    \u001b[34m• \u001b[39m \u001b[36melem_size\u001b[39m: Size of the elements\n    \u001b[34m• \u001b[39m \u001b[36mconstrained_dofs\u001b[39m: Constrained degrees of freedom\n    \u001b[34m• \u001b[39m \u001b[36mfree_dofs\u001b[39m: Free degrees of freedom",
-                        "text/markdown": "```julia\nOneDMesh(model, xmin, Nelt, bc)\n```\n\nConstruct a mesh for a beam with Nelt elements, length L and starting at xmin.\n\n**Constructor parameters**\n\n  * `model`: Structure containing the data related to the 1D system\n  * `xmin`: starting position of the beam\n  * `Nelt`: number of elements\n  * `bc`: Boundary conditions type\n\n      * `:CC`: Clamped - Clamped\n      * `:FF`: Free - Free\n      * `:CF`: Clamped - Free\n      * `:SS`: Simply Supported - Simply Supported (specific to beam)\n      * `:CS`: Clamped - Simply Supported (specific to beam)\n      * `:SF`: Simply Supported - Free (specific to beam)\n\n**Fields**\n\n  * `xmin`: Starting position of the beam\n  * `L`: Length of the beam\n  * `Nodes`: Nodes of the mesh\n  * `Elt`: Elements of the mesh\n  * `Ndof_per_node``: Number of degrees of freedom per node\n  * `elem_size`: Size of the elements\n  * `constrained_dofs`: Constrained degrees of freedom\n  * `free_dofs`: Free degrees of freedom\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">OneDMesh&#40;model, xmin, Nelt, bc&#41;</code></pre>\n<p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the 1D system</p>\n</li>\n<li><p><code>xmin</code>: starting position of the beam</p>\n</li>\n<li><p><code>Nelt</code>: number of elements</p>\n</li>\n<li><p><code>bc</code>: Boundary conditions type</p>\n<ul>\n<li><p><code>:CC</code>: Clamped - Clamped</p>\n</li>\n<li><p><code>:FF</code>: Free - Free</p>\n</li>\n<li><p><code>:CF</code>: Clamped - Free</p>\n</li>\n<li><p><code>:SS</code>: Simply Supported - Simply Supported &#40;specific to beam&#41;</p>\n</li>\n<li><p><code>:CS</code>: Clamped - Simply Supported &#40;specific to beam&#41;</p>\n</li>\n<li><p><code>:SF</code>: Simply Supported - Free &#40;specific to beam&#41;</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>xmin</code>: Starting position of the beam</p>\n</li>\n<li><p><code>L</code>: Length of the beam</p>\n</li>\n<li><p><code>Nodes</code>: Nodes of the mesh</p>\n</li>\n<li><p><code>Elt</code>: Elements of the mesh</p>\n</li>\n<li><p><code>Ndof_per_node</code>&#96;: Number of degrees of freedom per node</p>\n</li>\n<li><p><code>elem_size</code>: Size of the elements</p>\n</li>\n<li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>\n</li>\n<li><p><code>free_dofs</code>: Free degrees of freedom</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nOneDMesh(model, xmin, Nelt, bc)\n\\end{verbatim}\nConstruct a mesh for a beam with Nelt elements, length L and starting at xmin.\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the 1D system\n\n\n\\item \\texttt{xmin}: starting position of the beam\n\n\n\\item \\texttt{Nelt}: number of elements\n\n\n\\item \\texttt{bc}: Boundary conditions type\n\n\\begin{itemize}\n\\item \\texttt{:CC}: Clamped - Clamped\n\n\n\\item \\texttt{:FF}: Free - Free\n\n\n\\item \\texttt{:CF}: Clamped - Free\n\n\n\\item \\texttt{:SS}: Simply Supported - Simply Supported (specific to beam)\n\n\n\\item \\texttt{:CS}: Clamped - Simply Supported (specific to beam)\n\n\n\\item \\texttt{:SF}: Simply Supported - Free (specific to beam)\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{xmin}: Starting position of the beam\n\n\n\\item \\texttt{L}: Length of the beam\n\n\n\\item \\texttt{Nodes}: Nodes of the mesh\n\n\n\\item \\texttt{Elt}: Elements of the mesh\n\n\n\\item \\texttt{Ndof\\_per\\_node}`: Number of degrees of freedom per node\n\n\n\\item \\texttt{elem\\_size}: Size of the elements\n\n\n\\item \\texttt{constrained\\_dofs}: Constrained degrees of freedom\n\n\n\\item \\texttt{free\\_dofs}: Free degrees of freedom\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mOneDMesh(model, xmin, Nelt, bc)\u001b[39m\n\n  Construct a mesh for a beam with Nelt elements, length L and starting at\n  xmin.\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the 1D system\n    \u001b[34m• \u001b[39m \u001b[36mxmin\u001b[39m: starting position of the beam\n    \u001b[34m• \u001b[39m \u001b[36mNelt\u001b[39m: number of elements\n    \u001b[34m• \u001b[39m \u001b[36mbc\u001b[39m: Boundary conditions type\n       \n       \u001b[34m• \u001b[39m \u001b[36m:CC\u001b[39m: Clamped - Clamped\n       \u001b[34m• \u001b[39m \u001b[36m:FF\u001b[39m: Free - Free\n       \u001b[34m• \u001b[39m \u001b[36m:CF\u001b[39m: Clamped - Free\n       \u001b[34m• \u001b[39m \u001b[36m:SS\u001b[39m: Simply Supported - Simply Supported (specific to\n       beam)\n       \u001b[34m• \u001b[39m \u001b[36m:CS\u001b[39m: Clamped - Simply Supported (specific to beam)\n       \u001b[34m• \u001b[39m \u001b[36m:SF\u001b[39m: Simply Supported - Free (specific to beam)\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mxmin\u001b[39m: Starting position of the beam\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length of the beam\n    \u001b[34m• \u001b[39m \u001b[36mNodes\u001b[39m: Node coordinates\n    \u001b[34m• \u001b[39m \u001b[36mElt\u001b[39m: Elements of the mesh\n    \u001b[34m• \u001b[39m \u001b[36mNdof_per_node\u001b[39m`: Number of degrees of freedom per node\n    \u001b[34m• \u001b[39m \u001b[36melem_size\u001b[39m: Size of the elements\n    \u001b[34m• \u001b[39m \u001b[36mconstrained_dofs\u001b[39m: Constrained degrees of freedom\n    \u001b[34m• \u001b[39m \u001b[36mfree_dofs\u001b[39m: Free degrees of freedom",
+                        "text/markdown": "```julia\nOneDMesh(model, xmin, Nelt, bc)\n```\n\nConstruct a mesh for a beam with Nelt elements, length L and starting at xmin.\n\n**Constructor parameters**\n\n  * `model`: Structure containing the data related to the 1D system\n  * `xmin`: starting position of the beam\n  * `Nelt`: number of elements\n  * `bc`: Boundary conditions type\n\n      * `:CC`: Clamped - Clamped\n      * `:FF`: Free - Free\n      * `:CF`: Clamped - Free\n      * `:SS`: Simply Supported - Simply Supported (specific to beam)\n      * `:CS`: Clamped - Simply Supported (specific to beam)\n      * `:SF`: Simply Supported - Free (specific to beam)\n\n**Fields**\n\n  * `xmin`: Starting position of the beam\n  * `L`: Length of the beam\n  * `Nodes`: Node coordinates\n  * `Elt`: Elements of the mesh\n  * `Ndof_per_node``: Number of degrees of freedom per node\n  * `elem_size`: Size of the elements\n  * `constrained_dofs`: Constrained degrees of freedom\n  * `free_dofs`: Free degrees of freedom\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">OneDMesh&#40;model, xmin, Nelt, bc&#41;</code></pre>\n<p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the 1D system</p>\n</li>\n<li><p><code>xmin</code>: starting position of the beam</p>\n</li>\n<li><p><code>Nelt</code>: number of elements</p>\n</li>\n<li><p><code>bc</code>: Boundary conditions type</p>\n<ul>\n<li><p><code>:CC</code>: Clamped - Clamped</p>\n</li>\n<li><p><code>:FF</code>: Free - Free</p>\n</li>\n<li><p><code>:CF</code>: Clamped - Free</p>\n</li>\n<li><p><code>:SS</code>: Simply Supported - Simply Supported &#40;specific to beam&#41;</p>\n</li>\n<li><p><code>:CS</code>: Clamped - Simply Supported &#40;specific to beam&#41;</p>\n</li>\n<li><p><code>:SF</code>: Simply Supported - Free &#40;specific to beam&#41;</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>xmin</code>: Starting position of the beam</p>\n</li>\n<li><p><code>L</code>: Length of the beam</p>\n</li>\n<li><p><code>Nodes</code>: Node coordinates</p>\n</li>\n<li><p><code>Elt</code>: Elements of the mesh</p>\n</li>\n<li><p><code>Ndof_per_node</code>&#96;: Number of degrees of freedom per node</p>\n</li>\n<li><p><code>elem_size</code>: Size of the elements</p>\n</li>\n<li><p><code>constrained_dofs</code>: Constrained degrees of freedom</p>\n</li>\n<li><p><code>free_dofs</code>: Free degrees of freedom</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nOneDMesh(model, xmin, Nelt, bc)\n\\end{verbatim}\nConstruct a mesh for a beam with Nelt elements, length L and starting at xmin.\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the 1D system\n\n\n\\item \\texttt{xmin}: starting position of the beam\n\n\n\\item \\texttt{Nelt}: number of elements\n\n\n\\item \\texttt{bc}: Boundary conditions type\n\n\\begin{itemize}\n\\item \\texttt{:CC}: Clamped - Clamped\n\n\n\\item \\texttt{:FF}: Free - Free\n\n\n\\item \\texttt{:CF}: Clamped - Free\n\n\n\\item \\texttt{:SS}: Simply Supported - Simply Supported (specific to beam)\n\n\n\\item \\texttt{:CS}: Clamped - Simply Supported (specific to beam)\n\n\n\\item \\texttt{:SF}: Simply Supported - Free (specific to beam)\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{xmin}: Starting position of the beam\n\n\n\\item \\texttt{L}: Length of the beam\n\n\n\\item \\texttt{Nodes}: Node coordinates\n\n\n\\item \\texttt{Elt}: Elements of the mesh\n\n\n\\item \\texttt{Ndof\\_per\\_node}`: Number of degrees of freedom per node\n\n\n\\item \\texttt{elem\\_size}: Size of the elements\n\n\n\\item \\texttt{constrained\\_dofs}: Constrained degrees of freedom\n\n\n\\item \\texttt{free\\_dofs}: Free degrees of freedom\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1131,10 +1139,10 @@
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36massembly(model::OneDstructure, mesh::OneDMesh)\u001b[39m\n\n  Compute the global stiffness and mass matrices for a 1D structure with a\n  given mesh.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36mBeam\u001b[39m: Beam model\n       \u001b[34m• \u001b[39m \u001b[36mWaveEquation\u001b[39m: Bar, Rod or String model\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: OneDMesh\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: global stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: global mass matrix",
-                        "text/markdown": "```julia\nassembly(model::OneDstructure, mesh::OneDMesh)\n```\n\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n**Inputs**\n\n  * `model`: OneDStructure\n\n      * `Beam`: Beam model\n      * `WaveEquation`: Bar, Rod or String model\n  * `mesh`: OneDMesh\n\n**Outputs**\n\n  * `K`: global stiffness matrix\n  * `M`: global mass matrix\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">assembly&#40;model::OneDstructure, mesh::OneDMesh&#41;</code></pre>\n<p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: OneDStructure</p>\n<ul>\n<li><p><code>Beam</code>: Beam model</p>\n</li>\n<li><p><code>WaveEquation</code>: Bar, Rod or String model</p>\n</li>\n</ul>\n</li>\n<li><p><code>mesh</code>: OneDMesh</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>K</code>: global stiffness matrix</p>\n</li>\n<li><p><code>M</code>: global mass matrix</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nassembly(model::OneDstructure, mesh::OneDMesh)\n\\end{verbatim}\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{Beam}: Beam model\n\n\n\\item \\texttt{WaveEquation}: Bar, Rod or String model\n\n\\end{itemize}\n\n\\item \\texttt{mesh}: OneDMesh\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: global stiffness matrix\n\n\n\\item \\texttt{M}: global mass matrix\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36massembly(model::OneDStructure, mesh::OneDMesh)\u001b[39m\n\n  Compute the global stiffness and mass matrices for a 1D structure with a\n  given mesh.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36mBeam\u001b[39m: Beam model\n       \u001b[34m• \u001b[39m \u001b[36mWaveEquation\u001b[39m: Bar, Rod or String model\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: OneDMesh\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: global stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: global mass matrix",
+                        "text/markdown": "```julia\nassembly(model::OneDStructure, mesh::OneDMesh)\n```\n\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n**Inputs**\n\n  * `model`: OneDStructure\n\n      * `Beam`: Beam model\n      * `WaveEquation`: Bar, Rod or String model\n  * `mesh`: OneDMesh\n\n**Outputs**\n\n  * `K`: global stiffness matrix\n  * `M`: global mass matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">assembly&#40;model::OneDStructure, mesh::OneDMesh&#41;</code></pre>\n<p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: OneDStructure</p>\n<ul>\n<li><p><code>Beam</code>: Beam model</p>\n</li>\n<li><p><code>WaveEquation</code>: Bar, Rod or String model</p>\n</li>\n</ul>\n</li>\n<li><p><code>mesh</code>: OneDMesh</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>K</code>: global stiffness matrix</p>\n</li>\n<li><p><code>M</code>: global mass matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nassembly(model::OneDStructure, mesh::OneDMesh)\n\\end{verbatim}\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{Beam}: Beam model\n\n\n\\item \\texttt{WaveEquation}: Bar, Rod or String model\n\n\\end{itemize}\n\n\\item \\texttt{mesh}: OneDMesh\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: global stiffness matrix\n\n\n\\item \\texttt{M}: global mass matrix\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1164,17 +1172,17 @@
             "source": [
                 "#| echo: false\n",
                 "\n",
-                "@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)"
+                "@doc rayleigh_damping_matrix(M, K, α::Float64, β::Float64)"
             ],
             "outputs": [
                 {
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mrayleigh_damping_matrix(K, M, α, β)\u001b[39m\n  \u001b[36mrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\u001b[39m\n\n  Compute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m Construction parameters\n       \n       \u001b[34m• \u001b[39m Method 1\n       \n       \u001b[34m• \u001b[39m \u001b[36mα\u001b[39m: Mass proportional damping coefficient\n       \u001b[34m• \u001b[39m \u001b[36mβ\u001b[39m: Stiffness proportional damping coefficient\n       \u001b[34m• \u001b[39m Method 2\n       \n       \u001b[34m• \u001b[39m \u001b[36mω1\u001b[39m: First natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mω2\u001b[39m: Second natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ1\u001b[39m: Damping ratio for the first natural\n       frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ2\u001b[39m: Damping ratio for the second natural\n       frequency\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Rayleigh damping matrix",
-                        "text/markdown": "```julia\nrayleigh_damping_matrix(K, M, α, β)\nrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\n```\n\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n**Inputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * Construction parameters\n\n      * Method 1\n\n          * `α`: Mass proportional damping coefficient\n          * `β`: Stiffness proportional damping coefficient\n      * Method 2\n\n          * `ω1`: First natural frequency\n          * `ω2`: Second natural frequency\n          * `ξ1`: Damping ratio for the first natural frequency\n          * `ξ2`: Damping ratio for the second natural frequency\n\n**Output**\n\n  * `C`: Rayleigh damping matrix\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">rayleigh_damping_matrix&#40;K, M, α, β&#41;\nrayleigh_damping_matrix&#40;K, M, ω1, ω2, ξ1, ξ2&#41;</code></pre>\n<p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p>Construction parameters</p>\n<ul>\n<li><p>Method 1</p>\n<ul>\n<li><p><code>α</code>: Mass proportional damping coefficient</p>\n</li>\n<li><p><code>β</code>: Stiffness proportional damping coefficient</p>\n</li>\n</ul>\n</li>\n<li><p>Method 2</p>\n<ul>\n<li><p><code>ω1</code>: First natural frequency</p>\n</li>\n<li><p><code>ω2</code>: Second natural frequency</p>\n</li>\n<li><p><code>ξ1</code>: Damping ratio for the first natural frequency</p>\n</li>\n<li><p><code>ξ2</code>: Damping ratio for the second natural frequency</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>C</code>: Rayleigh damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nrayleigh_damping_matrix(K, M, α, β)\nrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\n\\end{verbatim}\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item Construction parameters\n\n\\begin{itemize}\n\\item Method 1\n\n\\begin{itemize}\n\\item \\texttt{α}: Mass proportional damping coefficient\n\n\n\\item \\texttt{β}: Stiffness proportional damping coefficient\n\n\\end{itemize}\n\n\\item Method 2\n\n\\begin{itemize}\n\\item \\texttt{ω1}: First natural frequency\n\n\n\\item \\texttt{ω2}: Second natural frequency\n\n\n\\item \\texttt{ξ1}: Damping ratio for the first natural frequency\n\n\n\\item \\texttt{ξ2}: Damping ratio for the second natural frequency\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{C}: Rayleigh damping matrix\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mrayleigh_damping_matrix(M, K, α, β)\u001b[39m\n  \u001b[36mrayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)\u001b[39m\n\n  Compute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m Construction parameters\n       \n       \u001b[34m• \u001b[39m Method 1\n       \n       \u001b[34m• \u001b[39m \u001b[36mα\u001b[39m: Mass proportional damping coefficient\n       \u001b[34m• \u001b[39m \u001b[36mβ\u001b[39m: Stiffness proportional damping coefficient\n       \u001b[34m• \u001b[39m Method 2\n       \n       \u001b[34m• \u001b[39m \u001b[36mω1\u001b[39m: First natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mω2\u001b[39m: Second natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ1\u001b[39m: Damping ratio for the first natural\n       frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ2\u001b[39m: Damping ratio for the second natural\n       frequency\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Rayleigh damping matrix",
+                        "text/markdown": "```julia\nrayleigh_damping_matrix(M, K, α, β)\nrayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)\n```\n\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n**Inputs**\n\n  * `M`: Mass matrix\n  * `K`: Stiffness matrix\n  * Construction parameters\n\n      * Method 1\n\n          * `α`: Mass proportional damping coefficient\n          * `β`: Stiffness proportional damping coefficient\n      * Method 2\n\n          * `ω1`: First natural frequency\n          * `ω2`: Second natural frequency\n          * `ξ1`: Damping ratio for the first natural frequency\n          * `ξ2`: Damping ratio for the second natural frequency\n\n**Output**\n\n  * `C`: Rayleigh damping matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">rayleigh_damping_matrix&#40;M, K, α, β&#41;\nrayleigh_damping_matrix&#40;M, K, ω1, ω2, ξ1, ξ2&#41;</code></pre>\n<p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p>Construction parameters</p>\n<ul>\n<li><p>Method 1</p>\n<ul>\n<li><p><code>α</code>: Mass proportional damping coefficient</p>\n</li>\n<li><p><code>β</code>: Stiffness proportional damping coefficient</p>\n</li>\n</ul>\n</li>\n<li><p>Method 2</p>\n<ul>\n<li><p><code>ω1</code>: First natural frequency</p>\n</li>\n<li><p><code>ω2</code>: Second natural frequency</p>\n</li>\n<li><p><code>ξ1</code>: Damping ratio for the first natural frequency</p>\n</li>\n<li><p><code>ξ2</code>: Damping ratio for the second natural frequency</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>C</code>: Rayleigh damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nrayleigh_damping_matrix(M, K, α, β)\nrayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)\n\\end{verbatim}\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item Construction parameters\n\n\\begin{itemize}\n\\item Method 1\n\n\\begin{itemize}\n\\item \\texttt{α}: Mass proportional damping coefficient\n\n\n\\item \\texttt{β}: Stiffness proportional damping coefficient\n\n\\end{itemize}\n\n\\item Method 2\n\n\\begin{itemize}\n\\item \\texttt{ω1}: First natural frequency\n\n\n\\item \\texttt{ω2}: Second natural frequency\n\n\n\\item \\texttt{ξ1}: Damping ratio for the first natural frequency\n\n\n\\item \\texttt{ξ2}: Damping ratio for the second natural frequency\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{C}: Rayleigh damping matrix\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1321,7 +1329,7 @@
                 "ωfe, Φfe = eigenmode(Kbc, Mbc)\n",
                 "\n",
                 "# Calculation of the damping matrix\n",
-                "Cray = rayleigh_damping_matrix(Kbc, Mbc, 1., 1.)\n",
+                "Cray = rayleigh_damping_matrix(Mbc, Kbc, 1., 1.)\n",
                 "Cmodal = modal_damping_matrix(Mbc, ωfe, 0.01, Φfe)\n",
                 "```\n",
                 "\n",
@@ -1587,45 +1595,6 @@
             "source": [
                 ":::\n",
                 "\n",
-                "::: {.api}\n",
-                "**real_normalization**\n",
-                "\n",
-                "---"
-            ]
-        },
-        {
-            "id": "60",
-            "cell_type": "code",
-            "metadata": {
-            },
-            "source": [
-                "#| echo: false\n",
-                "@doc real_normalization"
-            ],
-            "outputs": [
-                {
-                    "output_type": "execute_result",
-                    "execution_count": 1,
-                    "data": {
-                        "text/plain": "  \u001b[36mreal_normalization(Ψ)\u001b[39m\n\n  Converts the complex modes to real modes\n\n  \u001b[1mInput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mΨ\u001b[39m: Complex modes\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mϕn\u001b[39m: Real modes",
-                        "text/markdown": "```julia\nreal_normalization(Ψ)\n```\n\nConverts the complex modes to real modes\n\n**Input**\n\n  * `Ψ`: Complex modes\n\n**Output**\n\n  * `ϕn`: Real modes\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">real_normalization&#40;Ψ&#41;</code></pre>\n<p>Converts the complex modes to real modes</p>\n<p><strong>Input</strong></p>\n<ul>\n<li><p><code>Ψ</code>: Complex modes</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>ϕn</code>: Real modes</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nreal_normalization(Ψ)\n\\end{verbatim}\nConverts the complex modes to real modes\n\n\\textbf{Input}\n\n\\begin{itemize}\n\\item \\texttt{Ψ}: Complex modes\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{ϕn}: Real modes\n\n\\end{itemize}\n"
-                    },
-                    "metadata": {
-                    }
-                }
-            ],
-            "execution_count": 1
-        },
-        {
-            "id": "61",
-            "cell_type": "markdown",
-            "metadata": {
-            },
-            "source": [
-                ":::\n",
-                "\n",
                 "#### Example\n",
                 "\n",
                 "```julia\n",
@@ -1637,8 +1606,7 @@
                 "# Continuous-time state space from system matrices\n",
                 "css = ss_model(k_ss, m_ss, c_ss)\n",
                 "λ, Ψ = eigenmode(css.Ac)\n",
-                "ω, ξ = modal_parameters(λss)\n",
-                "Ψr = real_normalization(Ψ)\n",
+                "ω, ξ = modal_parameters(λ)\n",
                 "\n",
                 "# Continuous-time state space from modal information\n",
                 "ωn, ϕn = eigenmode(k_ss, m_ss)\n",
@@ -1732,7 +1700,7 @@
             ]
         },
         {
-            "id": "62",
+            "id": "60",
             "cell_type": "code",
             "metadata": {
             },
@@ -1758,7 +1726,7 @@
             "execution_count": 1
         },
         {
-            "id": "63",
+            "id": "61",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1774,7 +1742,7 @@
             ]
         },
         {
-            "id": "64",
+            "id": "62",
             "cell_type": "code",
             "metadata": {
             },
@@ -1800,7 +1768,7 @@
             "execution_count": 1
         },
         {
-            "id": "65",
+            "id": "63",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1815,7 +1783,7 @@
             ]
         }
     ],
-    "timestamp": "2025-10-21T16:34:39.822",
+    "timestamp": "2025-12-16T15:52:03.792",
     "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/models/index.qmd",
     "qnr_schema_version": "1.0.0"
 }

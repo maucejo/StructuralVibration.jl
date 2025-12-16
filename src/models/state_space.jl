@@ -90,7 +90,7 @@ Generates a continuous-time state-space model from the mass, damping, and stiffn
 function ss_model(K, M, C)
 
     n = size(K, 1)
-    lu!(M)
+    M_fact = lu(M)
     Ac = [zeros(n, n) I; -M\K -M\C]
     Bc = [zeros(n, n); M\I]
 

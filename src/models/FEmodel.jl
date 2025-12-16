@@ -253,14 +253,14 @@ function eigenmode(K, M, n::Int = size(K, 1))
 end
 
 """
-    rayleigh_damping_matrix(K, M, α, β)
-    rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)
+    rayleigh_damping_matrix(M, K, α, β)
+    rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)
 
 Compute the Rayleigh damping matrix for a given stiffness and mass matrices
 
 **Inputs**
-* `K`: Stiffness matrix
 * `M`: Mass matrix
+* `K`: Stiffness matrix
 * Construction parameters
     * Method 1
         * `α`: Mass proportional damping coefficient
@@ -274,11 +274,11 @@ Compute the Rayleigh damping matrix for a given stiffness and mass matrices
 **Output**
 * `C`: Rayleigh damping matrix
 """
-function rayleigh_damping_matrix(K, M, α, β)
+function rayleigh_damping_matrix(M, K, α, β)
     return α*M + β*K
 end
 
-function rayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)
+function rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)
     β = 2(ξ2*ω2 - ξ1*ω1)/(ω2^2 - ω1^2)
     α = 2ξ1*ω1 - ω1^2*β
     return α*M + β*K

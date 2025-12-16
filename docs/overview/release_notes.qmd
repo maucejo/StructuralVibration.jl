@@ -8,6 +8,10 @@ format:
 
 ## v1.4.0
 
+**Documentation**
+
+- Add examples of time solvers with `DifferentialEquations.jl` integration.w
+
 **New features**
 
 - Add `FSDD` method to `mode_extraction` function for modal parameter extraction using the Frequency-spatial Domain Decomposition (FSDD) method.
@@ -15,6 +19,11 @@ format:
 **Breaking changes**
 
 - Refactor `FreeModalTimeProblem`, `HarmonicModalTimeProblem` and `ForcedModalTimeProblem` constructors to simplify handling of modal data.
+
+**Bug fixes**
+
+- Fix bugs in `eigenmode` function.
+- Fix bugs in `solve` function for `DirectTimeProblem`.
 
 ## v1.3.0
 

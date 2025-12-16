@@ -561,7 +561,7 @@ Finite element models are available for the 1D continuous systems defined in @se
 ```{julia}
 #| echo: false
 
-@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)
+@doc rayleigh_damping_matrix(M, K, α::Float64, β::Float64)
 ```
 :::
 
@@ -638,7 +638,7 @@ Mbc = apply_bc(Mfe, oned_mesh)
 ωfe, Φfe = eigenmode(Kbc, Mbc)
 
 # Calculation of the damping matrix
-Cray = rayleigh_damping_matrix(Kbc, Mbc, 1., 1.)
+Cray = rayleigh_damping_matrix(Mbc, Kbc, 1., 1.)
 Cmodal = modal_damping_matrix(Mbc, ωfe, 0.01, Φfe)
 ```
 

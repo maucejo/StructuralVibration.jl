@@ -31,7 +31,7 @@ om_fe, ms_fe = eigenmode(Kbc, Mbc)
 Cbc = rayleigh_damping_matrix(Kbc, Mbc, 1e-4, 5e-4)
 # Cmodal = modal_damping_matrix(Mbc, om_fe, 0.01, ms_fe)
 
-t = 0.:1e-6:0.01
+t = 0.:1e-5:1.
 nt = length(t)
 
 # pull middle node
@@ -50,10 +50,30 @@ prob = DirectTimeProblem(Kbc, Mbc, Cbc, Fbc, u0, t)
 
 res = solve(prob)
 res_cd = solve(prob, CentralDiff())
-res_rk4 = solve(prob, RK4())
 
-# State-space model
-css = ss_model(Kbc, Mbc, Cbc)
+# DifferentialEquations.jl
+@usingany OrdinaryDiffEqTsit5, OrdinaryDiffEqRosenbrock
+import OrdinaryDiffEqTsit5 as ODET
+import OrdinaryDiffEqRosenbrock as ODER
+function ode_solve!(du, u, p, t)
+    A = p[1].Ac
+
+    du .= A*u
+end
+
 u0 = [x0; v0]
-prob_ss = StateSpaceTimeProblem(css, Fbc, u0, t)
-res_ss = solve(prob_ss, :zoh)
+css = ss_model(Kbc, Mbc, Cbc)
+prob_ode = ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
+sol_ode = ODET.solve(prob_ode, ODET.AutoTsit5(ODER.Rosenbrock23()))
+u_ode = sol_ode(t)[1:nddl, :]
+
+function sde_solve!(ddu, du, u, p, t)
+    M = p[1]
+    K = p[2]
+    C = p[3]
+
+    ddu .= M\(-C*du .- K*u)
+end
+prob_sde = SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
+sol_sde = ODET.solve(prob_sde, ODET.AutoTsit5(ODER.Rosenbrock23()))
+u_sde = sol_sde(t)[nddl+1:2*nddl, :]
