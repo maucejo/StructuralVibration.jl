@@ -338,7 +338,7 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
         # so we separate the real and imaginary parts to solve a real system of double size using
         Sa .= [real(A); imag(A)]
         Sb .= [real(b); imag(b)]
-        res .= (Sa'Sa)\(Sa'Sb)
+        res .= qr(Sa)\Sb
         # Actually, only one of the two parts can be used to solve the system
         # res .= real(A)\real(b)
 

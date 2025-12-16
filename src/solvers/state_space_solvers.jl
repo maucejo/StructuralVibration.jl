@@ -247,10 +247,10 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
     A = similar(F, m, nt)
 
     # Intermediate vectors
-    k₁ = similar(F, nx)
-    k₂ = similar(k₁)
-    k₃ = similar(k₁)
-    k₄ = similar(k₁)
+    k1 = similar(F, nx)
+    k2 = similar(k1)
+    k3 = similar(k1)
+    k4 = similar(k1)
     Fn_2 = similar(F, m)
 
     x[:, 1] .= u0[:]
@@ -261,12 +261,12 @@ function solve(prob::StateSpaceTimeProblem, alg::RK4; progress = true)
 
         Fn_2 .= (F[:, k] .+ F[:, k+1])/2
 
-        k₁ .= Ac*x[:, k] .+ Bc*F[:, k]
-        k₂ .= Ac*(x[:, k] .+ h*k₁/2) .+ Bc*Fn_2
-        k₃ .= Ac*(x[:, k] .+ h*k₂/2) .+ Bc*Fn_2
-        k₄ .= Ac*(x[:, k] .+ h*k₃) .+ Bc*F[:, k+1]
+        k1 .= Ac*x[:, k] .+ Bc*F[:, k]
+        k2 .= Ac*(x[:, k] .+ h*k1/2) .+ Bc*Fn_2
+        k3 .= Ac*(x[:, k] .+ h*k2/2) .+ Bc*Fn_2
+        k4 .= Ac*(x[:, k] .+ h*k3) .+ Bc*F[:, k+1]
 
-        @. x[:, k+1] = x[:, k] + h*(k₁ + 2k₂ + 2k₃ + k₄)/6
+        @. x[:, k+1] = x[:, k] + h*(k1 + 2k2 + 2k3 + k4)/6
         A[:, k+1] .= css.Bc[m+1:end, :]*F[:, k+1] .+ css.Ac[m+1:end, :]*x[:, k+1]
     end
 

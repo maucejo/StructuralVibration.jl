@@ -89,7 +89,7 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
 end
 
 """
-    assembly(model::OneDstructure, mesh::OneDMesh)
+    assembly(model::OneDStructure, mesh::OneDMesh)
 
 Compute the global stiffness and mass matrices for a 1D structure with a given mesh.
 
@@ -141,37 +141,38 @@ Compute the elemental stiffness and mass matrices for a beam with a element size
 * `me`: elemental mass matrix
 """
 function element_matrix(beam::Beam, h)
-    # Constants
-    kc = beam.D/h^3
-    mc = beam.m*h/420.
-
     # Elemental stiffness matrix
+    kc = beam.D/h^3
     ke = kc.*[12. 6h -12. 6h;
               6h 4h^2 -6h 2h^2;
               -12. -6h 12. -6h;
               6h 2h^2 -6h 4h^2]
 
     # Elemental mass matrix
+    mc = beam.m*h/420.
     me = mc.*[156. 22h 54. -13h;
               22h 4h^2 13h -3h^2;
               54. 13h 156. -22h;
               -13h -3h^2 -22h 4h^2]
 
+    # mc = beam.m*h/78.
+    # me = mc.*Diagonal([1., 0., 1., 0.])
+
     return ke, me
 end
 
 function element_matrix(we::WaveEquation, h)
-    # Constants
-    kc = we.D/h
-    mc = we.m*h/6.
-
     # Elemental stiffness matrix
+    kc = we.D/h
     ke = kc.*[1. -1.;
               -1. 1.]
 
     # Elemental mass matrix
+    mc = we.m*h/6.
     me = mc.*[2. 1.;
               1. 2.]
+    # mc = we.m*h/2.
+    # me = mc.*Diagonal(ones(2))
 
     return ke, me
 end
@@ -243,8 +244,10 @@ function eigenmode(K, M, n::Int = size(K, 1))
     ωn = similar(K, n)
     Φn = similar(K, size(Φ, 1)::Int, n)
 
-    @. ωn = √abs(λ[1:n])
-    @. Φn = Φ[:, 1:n]
+    sort_idx = sortperm(abs.(λ))
+
+    @. ωn = √abs(λ[sort_idx][1:n])
+    @. Φn = Φ[:, sort_idx][:, 1:n]
 
     return ωn, Φn
 end

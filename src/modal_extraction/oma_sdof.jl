@@ -35,16 +35,22 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
         ωb = 2π * freq[id_bell]
 
         # Compute Least-squares matrices
+
         A = [eGyy -(2ωb.*eGyy) -one.(eGyy)]
         b = -ωb.^2 .* eGyy
 
-        coeff = A\b
+        # Solve the system
+        # Tips: Solving the complex system directly can lead to numerical issues
+        # so we separate the real and imaginary parts to solve a real system of double size using
+        Sa = [real(A); imag(A)]
+        Sb = [real(b); imag(b)]
+        res = qr(Sa)\Sb
 
-        ωn = sqrt(coeff[1])
-        Ωn = coeff[2]
-        # ξn = sqrt(1. - (Ωn/ωn)^2)
+        ωn = √res[1]
+        Ωn = res[2]
+        # ξn = √(1. - (Ωn/ωn)^2)
 
-        poles[p] = -sqrt(ωn^2 - Ωn^2) + 1im*Ωn
+        poles[p] = -√(ωn^2 - Ωn^2) + 1im*Ωn
     end
 
     return poles, ms ./ maximum(abs, ms; dims = 1)

@@ -181,7 +181,7 @@ Generalized-α time solver
             (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
 
             αf = ρ/(ρ + 1.)
-            αm = 3αf - 1.
+            αm = (2ρ - 1.)/(ρ + 1.)
         end
 
         return new{T}(αf, αm, γ0, β0, "Direct Time Problem - Generalized-α...")
@@ -238,85 +238,166 @@ function solve(prob::DirectTimeProblem, alg::CentralDiff; progress = true)
 
     # Intermediate vectors
     rhs = similar(F, Nddl)
+    D_1 = similar(F, Nddl)
 
-    # Computation of the initial acceleration
+    # Initial conditions
     D[:, 1] .= u0[1]
     V[:, 1] .= u0[2]
 
+    # Computation of the initial acceleration
     rhs .= F[:, 1] - C*V[:, 1] - K*D[:, 1]
-    lu!(M)
-    A[:, 1] = M\rhs
+    M_fact = lu(M)
+    A[:, 1] = M_fact\rhs
 
-    D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
+    # Compute fictitious displacement at step -1 using Taylor expansion
+    @. D_1 = D[:, 1] - h*V[:, 1] + (h^2*A[:, 1]/2)
+
+    # Effective mass matrix for central difference
+    M_eff = M + (h/2)*C
+    M_eff_fact = lu(M_eff)
 
     p = Progress(nt - 1, desc = "Direct Time Problem - Central difference...", showspeed = true)
     @views @inbounds for n in 1:nt-1
         progress ? next!(p) : nothing
 
+        # Update displacement using central difference formula
         if n == 1
-            D[:, n+1] = 2D[:, n] - D_1 + (h^2*A[:, n])
+            @. D[:, n+1] = 2D[:, n] - D_1 + h^2*A[:, n]
         else
-            D[:, n+1] = 2D[:, n] - D[:, n-1] + (h^2*A[:, n])
+            @. D[:, n+1] = 2D[:, n] - D[:, n-1] + h^2*A[:, n]
         end
 
-        V[:, n+1] = (D[:, n+1] - D[:, n])/h
+        # Update velocity (central difference)
+        if n == 1
+            @. V[:, n+1] = (D[:, n+1] - D_1)/(2h)
+        else
+            @. V[:, n+1] = (D[:, n+1] - D[:, n-1])/(2h)
+        end
 
-        rhs .= F[:, n+1] - C*V[:, n+1] - K*D[:, n+1]
-        A[:, n+1] = M\rhs
+        # Compute acceleration at n+1
+        if n < nt - 1
+            rhs .= F[:, n+1] - K*D[:, n+1] - (C/h)*(D[:, n+1] - D[:, n])
+            A[:, n+1] = M_eff_fact\rhs
+        end
     end
+
+    # Final acceleration at last time step
+    rhs .= F[:, nt] - C*V[:, nt] - K*D[:, nt]
+    A[:, nt] = M_fact\rhs
 
     return DirectTimeSolution(D, V, A)
 end
 
 # Fourth-order Runge-Kutta
+# function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
+#     (; K, M, C, F, u0, h) = prob
+
+#     Nddl, nt = size(F)
+#     # Initialization of the result matrices
+#     D = similar(K, Nddl, nt)
+#     V = similar(D)
+#     A = similar(D)
+
+#     # Initialization of the intermediate vectors
+#     k₁ = similar(F, Nddl)
+#     k₂ = similar(k₁)
+#     k₃ = similar(k₁)
+#     k₄ = similar(k₁)
+#     KD = similar(k₁)
+#     CK = similar(k₁)
+#     Fn_2 = similar(k₁)
+
+#     # Computation of the initial acceleration
+#     D[:, 1] .= u0[1]
+#     V[:, 1] .= u0[2]
+
+#     rhs0 = F[:, 1] - C*V[:, 1] - K*D[:, 1]
+#     M_fact = lu(M)
+#     A[:, 1] = M_fact\rhs0
+
+#     p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", showspeed = true)
+#     @views @inbounds for n = 1:nt-1
+#         progress ? next!(p) : nothing
+
+#         Fn_2 .= (F[:, n+1] + F[:, n])/2
+#         CK .= (C + h.*K./2)*V[:, n]
+#         KD .= K*D[:, n]
+
+#         k₁ .= A[:, n]
+#         k₂ .= Fn_2 - CK - h*(C*k₁)./2 - KD
+#         k₃ .= Fn_2 - CK - h*(C*k₂)./2 - (h^2*(K*k₁)/4) - KD
+#         k₄ .= F[:, n+1] - (C + h*K)*V[:, n] - h*(C*k₃) - (h^2*(K*k₂)/2) - KD
+
+#         D[:, n+1] .= D[:, n] + h*V[:, n] + (h^2*(k₁ + ( M_fact\(k₂ + k₃)))/6)
+#         V[:, n+1] .= V[:, n] + h*(k₁ + (M_fact\(2k₂ + 2k₃ + k₄)))/6
+#         A[:, n+1] .= M_fact\(F[:, n+1] - C*V[:, n+1] - K*D[:, n+1])
+#     end
+
+#     return DirectTimeSolution(D, V, A)
+# end
+
 function solve(prob::DirectTimeProblem, alg::RK4; progress = true)
     (; K, M, C, F, u0, h) = prob
 
     Nddl, nt = size(F)
+
     # Initialization of the result matrices
     D = similar(K, Nddl, nt)
     V = similar(D)
     A = similar(D)
 
     # Initialization of the intermediate vectors
-    k₁ = similar(F, Nddl)
-    k₂ = similar(k₁)
-    k₃ = similar(k₁)
-    k₄ = similar(k₁)
-    KD = similar(k₁)
-    CK = similar(k₁)
-    Fn_2 = similar(k₁)
+    k1_d = similar(F, Nddl)  # k for displacement
+    k2_d = similar(k1_d)
+    k3_d = similar(k1_d)
+    k4_d = similar(k1_d)
 
-    # Computation of the initial acceleration
+    k1_v = similar(F, Nddl)  # k for velocity
+    k2_v = similar(k1_v)
+    k3_v = similar(k1_v)
+    k4_v = similar(k1_v)
+
+    Fn_2 = similar(F, Nddl)
+
+    # Initial conditions
     D[:, 1] .= u0[1]
     V[:, 1] .= u0[2]
 
-    rhs0 = F[:, 1] - C*V[:, 1] - K*D[:, 1]
-    lu!(M)
-    A[:, 1] = M\rhs0
+    # Computation of the initial acceleration
+    M_fact = lu(M)
+    A[:, 1] .= M_fact\(F[:, 1] - C*V[:, 1] - K*D[:, 1])
 
     p = Progress(nt - 1, desc = "Direct Time Problem - RK4...", showspeed = true)
     @views @inbounds for n = 1:nt-1
         progress ? next!(p) : nothing
 
-        Fn_2 .= (F[:, n+1] + F[:, n])/2
-        CK .= (C + h.*K./2)*V[:, n]
-        KD .= K*D[:, n]
+        Fn_2 .= (F[:, n] .+ F[:, n+1])/2
 
-        k₁ .= A[:, n]
-        k₂ .= Fn_2 - CK - h*(C*k₁)./2 - KD
-        k₃ .= Fn_2 - CK - h*(C*k₂)./2 - (h^2*(K*k₁)/4) - KD
-        k₄ .= F[:, n+1] - (C + h*K)*V[:, n] - h*(C*k₃) - (h^2*(K*k₂)/2) - KD
+        # k₁
+        k1_d .= V[:, n]
+        k1_v .= M_fact\(F[:, n] - C*V[:, n] - K*D[:, n])
 
-        D[:, n+1] .= D[:, n] + h*V[:, n] + (h^2*(k₁ + (M\(k₂ + k₃)))/6)
-        V[:, n+1] .= V[:, n] + h*(k₁ + (M\(2k₂ + 2k₃ + k₄)))/6
-        A[:, n+1] .= M\(F[:, n+1] - C*V[:, n+1] - K*D[:, n+1])
+        # k₂
+        k2_d .= V[:, n] .+ h*k1_v/2
+        k2_v .= M_fact\(Fn_2 - C*(V[:, n] .+ h*k1_v/2) - K*(D[:, n] .+ h*k1_d/2))
+
+        # k₃
+        k3_d .= V[:, n] .+ h*k2_v/2
+        k3_v .= M_fact\(Fn_2 - C*(V[:, n] .+ h*k2_v/2) - K*(D[:, n] .+ h*k2_d/2))
+        # k₄
+        k4_d .= V[:, n] .+ h*k3_v
+        k4_v .= M_fact\(F[:, n+1] - C*(V[:, n] .+ h*k3_v) - K*(D[:, n] .+ h*k3_d))
+
+        # Update
+        D[:, n+1] .= D[:, n] .+ h*(k1_d .+ 2k2_d .+ 2k3_d .+ k4_d)/6
+        V[:, n+1] .= V[:, n] .+ h*(k1_v .+ 2k2_v .+ 2k3_v .+ k4_v)/6
+        A[:, n+1] .= M_fact\(F[:, n+1] - C*V[:, n+1] - K*D[:, n+1])
     end
 
     return DirectTimeSolution(D, V, A)
 end
 
-#Newmark family
+# Newmark family
 function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     (; K, M, C, F, u0, h) = prob
     (; αf, αm, γ0, β0, name) = alg
@@ -327,48 +408,41 @@ function solve(prob::DirectTimeProblem, alg::NewmarkFamily; progress = true)
     V = similar(D)
     A = similar(D)
 
-    # Intermediate vectors
-    rhs = similar(F, Nddl)
 
     # Computation of the initial acceleration
     D[:, 1] .= u0[1]
     V[:, 1] .= u0[2]
 
-    rhs .= F[:, 1] - C*V[:, 1] - K*D[:, 1]
+    rhs = F[:, 1] - C*V[:, 1] - K*D[:, 1]
     A[:, 1] = M\rhs
 
     # Newmark scheme parameters
-    γ = γ0*(1. + 2αf - 2αm)
+    γ = γ0 + αf - αm
     β = β0*(1. + αf - αm)^2
 
-    a₁ = (1. - γ)*h
-    a₂ = (0.5 - β)*h^2
-    a₃ = γ*h
-    a₄ = β*h^2
+    a1 = (1. - γ)*h
+    a2 = (0.5 - β)*h^2
+    a3 = γ*h
+    a4 = β*h^2
 
-    b₈ = 1. - αf
-    b₁ = b₈*a₁
-    b₂ = b₈*a₂
-    b₃ = b₈*a₃
-    b₄ = b₈*a₄
-    b₅ = b₈*h
-    b₆ = 1. - αm
-    b₇ = αm
-    b₉ = αf
+    b1 = (1. - αm)
+    b2 = αm
+    b3 = (1. - αf)
+    b4 = αf
 
     # Computation of the effective stiffness matrix
-    S = @. b₆*M + b₃*C + b₄*K
-    lu!(S)
+    S = @. b1*M + b3*a3*C + b3*a4*K
+    S_fact = lu(S)
 
     p = Progress(nt - 1, desc = name, showspeed = true)
     @views @inbounds for n = 1:nt-1
         progress ? next!(p) : nothing
 
-        rhs .= b₈*F[:, n+1] + b₉*F[:, n] - C*(b₁*A[:, n] + V[:, n]) - K*(b₂*A[:, n] + b₅*V[:, n] + D[:, n]) - b₇*M*A[:, n]
+        rhs .= b3*F[:, n+1] + b4*F[:, n] - (b2*M + b3*a1*C + b3*a2*K)*A[:, n] - (C + a1*K)*V[:, n] - K*D[:, n]
 
-        A[:, n+1] = S\rhs
-        V[:, n+1] = @. V[:, n] + a₁*A[:, n] + a₃*A[:, n+1]
-        D[:, n+1] = @. D[:, n] + h*V[:, n] + a₂*A[:, n] + a₄*A[:, n+1]
+        A[:, n+1] .= S_fact\rhs
+        @. V[:, n+1] = V[:, n] + a1*A[:, n] + a3*A[:, n+1]
+        @. D[:, n+1] = D[:, n] + h*V[:, n] + a2*A[:, n] + a4*A[:, n+1]
     end
 
     return DirectTimeSolution(D, V, A)

@@ -1,7 +1,30 @@
 """
-    FreeModalTimeProblem(K, M, ξn, n = size(K, 1); ismodal = false)
+    FreeModalTimeProblem(K, M, ξn, n)
+    FreeModalTimeProblem(ωn, ϕn, ξn, n)
 
 Structure containing data for the modal time solver
+
+**Constructor**
+* `K::Matrix{Real}`: Stiffness matrix
+* `M::AbstractMatrix`: Mass matrix
+* `ξn`: Damping ratios
+* `u0::Tuple`: Initial conditions
+    * `u0[1]`: Initial displacement
+    * `u0[2]`: Initial velocity
+* `t::AbstractRange`: Time points at which to evaluate the response
+* `freq::Real`: Excitation frequency
+* `n::Int`: Number of modes to retain in the modal basis (default: size(K, 1))
+
+**Alternative constructor**
+* `ωn::Vector{Real}`: Natural angular frequencies
+* `ϕn::AbstractMatrix`: Mass-normalized mode shapes
+* `ξn`: Damping ratios
+* `u0::Tuple`: Modal initial conditions
+    * `u0[1]`: Modal initial displacement
+    * `u0[2]`: Modal initial velocity
+* `t::AbstractRange`: Time points at which to evaluate the response
+* `freq::Real`: Excitation frequency
+* `n::Int`: Number of modes to retain in the modal basis (default: length(ωn))
 
 **Fields**
 * `K::VecOrMat{Real}`:
@@ -15,7 +38,6 @@ Structure containing data for the modal time solver
     * `u0[1]`: Initial displacement (or modal displacement)
     * `u0[2]`: Initial velocity (or modal velocity)
 * `t::AbstractRange`: Time points at which to evaluate the response
-* `F::Matrix{Real}`: External force matrix (or modal force matrix)
 * `n::Int`: Number of modes to retain in the modal basis
 * `ismodal::Bool`: Flag to indicate if the problem contains modal data
 """
@@ -28,7 +50,7 @@ Structure containing data for the modal time solver
     n::Int
     ismodal::Bool
 
-    function FreeModalTimeProblem(K::VecOrMat{Tk}, M::Tm, ξn::Union{Tx, Vector{Tx}}, u0::Tuple{Tu, Tu}, t::Tt, n = size(K, 1); ismodal = false) where {Tk, Tm, Tx, Tu, Tt}
+    function FreeModalTimeProblem(K::Matrix{Tk}, M::Tm, ξn::Union{Tx, Vector{Tx}}, u0::Tuple{Tu, Tu}, t::Tt, n = size(K, 1)) where {Tk, Tm, Tx, Tu, Tt}
         if !isa(ξn, Array)
             ξn = fill(ξn, n)
         elseif length(ξn) != n
@@ -37,34 +59,54 @@ Structure containing data for the modal time solver
 
         n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
 
-        new{Tk, Tm, Tx, Tu, Tt}(K, M, ξn, u0, t, n, ismodal)
+        new{Tk, Tm, Tx, Tu, Tt}(K, M, ξn, u0, t, n, false)
+    end
+
+    function FreeModalTimeProblem(ωn::Vector{Tk}, ϕn::Tm, ξn::Union{Tx, Vector{Tx}}, u0::Tuple{Tu, Tu}, t::Tt, n = length(ωn)) where {Tk, Tm, Tx, Tu, Tt}
+        if !isa(ξn, Array)
+            ξn = fill(ξn, n)
+        elseif length(ξn) != n
+            error("The number of damping ratios must be equal to n")
+        end
+
+        n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
+
+        new{Tk, Tm, Tx, Tu, Tt}(ωn, ϕn, ξn, u0, t, n, true)
     end
 end
 
 """
-    HarmonicModalTimeProblem(K, M, ξn, u0, t, F, ω = 0., n = size(K, 1); ismodal = false)
+    HarmonicModalTimeProblem(K, M, ξn, u0, t, F, freq, n)
+    HarmonicModalTimeProblem(ωn, ϕn, ξn, u0, t, Fn, freq, n)
 
 Structure containing data for the modal time solver for computing the forced response due to an harmonic excitation
 
 **Constructor**
-* `K::VecOrMat{Real}`:
-    * If `ismodal = false` then `Matrix{Real}`: Stiffness matrix
-    * If `ismodal = true` then `Vector{Real}`: Natural angular frequencies
-* `M::AbtractMatrix`:
-    * If `ismodal = false`: Mass matrix
-    * If `ismodal = true`: Mass-normalized mode shapes
+* `K::Matrix{Real}`: Stiffness matrix
+* `M::AbstractMatrix`: Mass matrix
 * `ξn`: Damping ratios
 * `u0::Tuple`: Initial conditions
-    * `u0[1]`: Initial displacement (or modal displacement)
-    * `u0[2]`: Initial velocity (or modal velocity)
+    * `u0[1]`: Initial displacement
+    * `u0[2]`: Initial velocity
 * `t::AbstractRange`: Time points at which to evaluate the response
-* `F::Real`: External force matrix (or modal participation factors)
+* `F::Real`: External force matrix
 * `freq::Real`: Excitation frequency
-* `n::Int`: Number of modes to retain in the modal basis
-* `ismodal::Bool`: Flag to indicate if the problem contains modal data
+* `n::Int`: Number of modes to retain in the modal basis (default: size(K, 1))
+
+**Alternative constructor**
+* `ωn::Vector{Real}`: Natural angular frequencies
+* `ϕn::AbstractMatrix`: Mass-normalized mode shapes
+* `ξn`: Damping ratios
+* `u0::Tuple`: Modal initial conditions
+    * `u0[1]`: Modal initial displacement
+    * `u0[2]`: Modal initial velocity
+* `t::AbstractRange`: Time points at which to evaluate the response
+* `F::Real`: Modal participation factors
+* `freq::Real`: Excitation frequency
+* `n::Int`: Number of modes to retain in the modal basis (default: length(ωn))
 
 **Fields**
-* `K`: Stiffness matrix (or modal stiffness matrix)
+* `K`: Stiffness matrix (or natural angular frequencies)
 * `M`: Mass matrix (or mass-normalized mode shapes)
 * `ξn`: Damping ratios
 * `u0`: Initial conditions
@@ -87,7 +129,7 @@ Structure containing data for the modal time solver for computing the forced res
     n::Int
     ismodal::Bool
 
-    function HarmonicModalTimeProblem(K::VecOrMat{Tk}, M::Tm, ξn::Union{Tx, Vector{Tx}}, F::TF, freq::Tf, u0::Tuple{Tu, Tu}, t::Tt, n = size(K, 1); ismodal = false) where {Tk, Tm, Tx, TF, Tf, Tu, Tt}
+    function HarmonicModalTimeProblem(K::Matrix{Tk}, M::Tm, ξn::Union{Tx, Vector{Tx}}, F::TF, freq::Tf, u0::Tuple{Tu, Tu}, t::Tt, n = size(K, 1)) where {Tk, Tm, Tx, TF, Tf, Tu, Tt}
         if !isa(ξn, Array)
             ξn = fill(ξn, n)
         elseif length(ξn) != n
@@ -96,7 +138,19 @@ Structure containing data for the modal time solver for computing the forced res
 
         n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
 
-        new{Tk, Tm, Tx, TF, Tf, Tu, Tt}(K, M, ξn, F, 2π*freq, u0, t, n, ismodal)
+        new{Tk, Tm, Tx, TF, Tf, Tu, Tt}(K, M, ξn, F, 2π*freq, u0, t, n, false)
+    end
+
+    function HarmonicModalTimeProblem(ωn::Vector{Tk}, ϕn::Tm, ξn::Union{Tx, Vector{Tx}}, F::TF, freq::Tf, u0::Tuple{Tu, Tu}, t::Tt, n = length(ωn)) where {Tk, Tm, Tx, TF, Tf, Tu, Tt}
+        if !isa(ξn, Array)
+            ξn = fill(ξn, n)
+        elseif length(ξn) != n
+            error("The number of damping ratios must be equal to n")
+        end
+
+        n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
+
+        new{Tk, Tm, Tx, TF, Tf, Tu, Tt}(ωn, ϕn, ξn, F, 2π*freq, u0, t, n, true)
     end
 end
 
@@ -105,13 +159,31 @@ end
 
 Structure containing data for modal time solver for computing the forced response due to an arbitrary excitation
 
+**Constructor**
+* `K::Matrix{Real}`: Stiffness matrix
+* `M::AbstractMatrix`: Mass matrix
+* `ξn`: Damping ratios
+* `F::Matrix{Real}`: Modal participation factors
+* `u0::Tuple`: Initial conditions
+    * `u0[1]`: Initial displacement
+    * `u0[2]`: Initial velocity
+* `t::AbstractRange`: Time points at which to evaluate the response
+* `n::Int`: Number of modes to retain in the modal basis (default: size(K, 1))
+
+**Alternative constructor**
+* `ωn::Vector{Real}`: Natural angular frequencies
+* `ϕn::AbstractMatrix`: Mass-normalized mode shapes
+* `ξn`: Damping ratios
+* `F::Matrix{Real}`: Modal participation factors
+* `u0::Tuple`: Modal initial conditions
+    * `u0[1]`: Modal initial displacement
+    * `u0[2]`: Modal initial velocity
+* `t::AbstractRange`: Time points at which to evaluate the response
+* `n::Int`: Number of modes to retain in the modal basis (default: length(ωn))
+
 **Fields**
-* `K::VecOrMat{Real}`:
-    * If `ismodal = false` then `Matrix{Real}`: Stiffness matrix
-    * If `ismodal = true` then `Vector{Real}`: Natural angular frequencies
-* `M::AbtractMatrix`:
-    * If `ismodal = false`: Mass matrix
-    * If `ismodal = true`: Mass-normalized mode shapes
+    * `K::VecOrMat{Real}`: Stiffness matrix (or natural angular frequencies)
+* `M::AbtractMatrix`: Mass matrix (or mass-normalized mode shapes)
 * `ξn`: Damping ratios
 * `F::Matrix{Real}`: External force matrix (or modal participation factors)
 * `u0::Tuple`: Initial conditions
@@ -131,7 +203,7 @@ Structure containing data for modal time solver for computing the forced respons
     n::Int
     ismodal::Bool
 
-    function ForcedModalTimeProblem(K::VecOrMat{Tk}, M::Tm, ξn::Union{Tx, Vector{Tx}}, F::Matrix{Tk}, u0::Tuple{Tu, Tu}, t::Tt, n = size(K, 1); ismodal = false) where {Tk, Tm, Tx, Tu, Tt}
+    function ForcedModalTimeProblem(K::Matrix{Tk}, M::Tm, ξn::Union{Tx, Vector{Tx}}, F::Matrix{Tk}, u0::Tuple{Tu, Tu}, t::Tt, n = size(K, 1)) where {Tk, Tm, Tx, Tu, Tt}
         if !isa(ξn, Array)
             ξn = fill(ξn, n)
         elseif length(ξn) != n
@@ -140,7 +212,19 @@ Structure containing data for modal time solver for computing the forced respons
 
         n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
 
-        new{Tk, Tm, Tx, Tu, Tt}(K, M, ξn, F, u0, t, n, ismodal)
+        new{Tk, Tm, Tx, Tu, Tt}(K, M, ξn, F, u0, t, n, false)
+    end
+
+    function ForcedModalTimeProblem(ωn::Vector{Tk}, ϕn::Tm, ξn::Union{Tx, Vector{Tx}}, F::Matrix{Tk}, u0::Tuple{Tu, Tu}, t::Tt, n = length(ωn)) where {Tk, Tm, Tx, Tu, Tt}
+        if !isa(ξn, Array)
+            ξn = fill(ξn, n)
+        elseif length(ξn) != n
+            error("The number of damping ratios must be equal to n")
+        end
+
+        n == 0 ? throw(ArgumentError("The number of modes must be greater than 0")) : nothing
+
+        new{Tk, Tm, Tx, Tu, Tt}(ωn, ϕn, ξn, F, u0, t, n, true)
     end
 end
 
@@ -198,11 +282,8 @@ function solve(prob::FreeModalTimeProblem)
         qv = Φn'*M*v0
     else
         Φn = M[:, 1:n]
-        if K isa Vector
-            ωn = K[1:n]
-        else
-            ωn = diag(K)[1:n]
-        end
+        ωn = K[1:n]
+
         qx = x0[1:n]
         qv = v0[1:n]
     end
@@ -268,11 +349,8 @@ function solve(prob::HarmonicModalTimeProblem)
         Ln = Φn'*F
     else
         Φn = M[:, 1:n]
-        if K isa Vector
-            ωn = K[1:n]
-        else
-            ωn = diag(K)[1:n]
-        end
+        ωn = K[1:n]
+
         qx = x0[1:n]
         qv = v0[1:n]
 
@@ -343,11 +421,7 @@ function solve(prob::ForcedModalTimeProblem; method = :filt)
     else
         # Mode shapes and natural frequencies are already provided
         Φn = M[:, 1:n]
-        if K isa Vector
-            ωn = K[1:n]
-        else
-            ωn = diag(K)[1:n]
-        end
+        ωn = K[1:n]
 
         # Modal initial condition
         qx = x0[1:n]
@@ -423,11 +497,7 @@ function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false)
         fn = ωn/2π
         ndofs = size(K, 1)
     else
-        if K isa Vector
-            fn = K[1:n]/2π
-        else
-            fn = diag(K)[1:n]/2π
-        end
+        fn = K[1:n]/2π
         Φn = M[:, 1:n]
         ndofs = size(Φn, 1)
     end

@@ -37,7 +37,7 @@ force = zeros(length(x), length(t))
 force[2, :] .= excitation(chirp, t)
 
 # Response calculation
-prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t, ismodal = true)
+prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t)
 y = solve(prob).u
 
 
@@ -106,3 +106,8 @@ ms_dssi_real = real_normalization(ms_dssi)
 # Mode shape scaling for comparison using the modal scale factor
 scaling = msf(ms_dssi_real, ms_ref[:, 1:size(ms_dssi_real, 2)])
 ms_dssi_scaled = ms_dssi_real .* scaling'
+
+
+## FSDD
+pks_indices = [23, 94, 211, 375, 586, 845]
+p_fsdd, ms_fsdd = modes_extraction(prob_oma, FSDD(), pks_indices = pks_indices)

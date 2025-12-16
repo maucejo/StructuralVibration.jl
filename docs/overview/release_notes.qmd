@@ -10,7 +10,11 @@ format:
 
 **New features**
 
-- Add `EFDD` method to `mode_extraction` function for modal parameter extraction using the Enhanced Frequency Domain Decomposition (EFDD) method.
+- Add `FSDD` method to `mode_extraction` function for modal parameter extraction using the Frequency-spatial Domain Decomposition (FSDD) method.
+
+**Breaking changes**
+
+- Refactor `FreeModalTimeProblem`, `HarmonicModalTimeProblem` and `ForcedModalTimeProblem` constructors to simplify handling of modal data.
 
 ## v1.3.0
 
