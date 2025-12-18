@@ -1,6 +1,6 @@
 name = "StructuralVibration"
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "1.4.0"
+version = "1.4.1"
 authors = ["Mathieu Aucejo <79322171+maucejo@users.noreply.github.com> and contributors"]
 
 [deps]
