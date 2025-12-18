@@ -377,7 +377,7 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
     function OMAProblem(y::Matrix{R}, yref::Matrix{R}, t::AbstractArray{R}, fs, bs; frange = [0., fs/2.56], win = hanning, overlap = 0.5) where {R <: Real}
 
         # Compute half power spectral density matrix
-        Gyy, freq = csd(y, yref, bs, win, fs = fs, overlap = overlap)
+        Gyy, freq = csd(yref, y, bs, win, fs = fs, overlap = overlap)
 
         # Correct frange to avoid division by zero
         frange[1] == 0. ? frange[1] = 1. : nothing

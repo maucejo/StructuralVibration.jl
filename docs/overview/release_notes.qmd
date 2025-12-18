@@ -6,6 +6,13 @@ format:
     number-sections: false
 ---
 
+## v1.4.1
+
+**Documentation**
+
+- Update documentation for FSDD method in OMA modal extraction.
+- Update FSDD method to take into account the fact that the number of outputs is different from the number of references.
+
 ## v1.4.0
 
 **Documentation**
