@@ -17,15 +17,15 @@ using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
-An Operational Deflection Shape (ODS) represents the deformation pattern of a structure at a specific frequency when it is subjected to operational forces. Unlike traditional mode shapes, which are derived from theoretical models or controlled experiments, ODSs are obtained from measurements taken while the structure is in operation. This makes them particularly useful for understanding how a structure behaves under real-world conditions. If the structure under consideration is lightly damped, ODSs can approximate mode shapes, providing insights into the dynamic characteristics of the structure.
+An Operational Deflection Shape (ODS) represents the deformation pattern of a structure at a specific frequency when it is subjected to operational forces. Unlike traditional mode shapes, which are derived from theoretical models or controlled experiments, ODS are obtained from measurements taken while the structure is in operation. This makes them particularly useful for understanding how a structure behaves under real-world conditions. If the structure under consideration is lightly damped, ODS can approximate mode shapes, providing insights into the dynamic characteristics of the structure.
 
 ## Extracting ODS from measured data
 
-The extraction of ODSs from the measured data typically depends on the measured quantities. In `StructuralVibration.jl`, we provide methods to extract ODSs from response spectra and cross-spectral density matrices.
+The extraction of ODS from the measured data typically depends on the measured quantities. In `StructuralVibration.jl`, we provide methods to extract ODS from response spectra and cross-spectral density matrices.
 
 ### Extraction from response spectra
 
-When response spectra are available, ODSs can be extracted by identifying the peaks in the spectra corresponding to the frequencies of interest. The ODS $\boldsymbol{\Psi}_k$ at a specific frequency peak $f_k$ is simply given by:
+When response spectra are available, ODS can be extracted by identifying the peaks in the spectra corresponding to the frequencies of interest. The ODS $\boldsymbol{\Psi}_k$ at a specific frequency peak $f_k$ is simply given by:
 
 $$
 \boldsymbol{\Psi}_k = \mathbf{y}(f_k),
@@ -34,14 +34,14 @@ where $\mathbf{y}(f_k)$ is the response spectrum vector at frequency $f_k$.
 
 ### Extraction from CSD matrices
 
-When cross-spectral density (CSD) matrices are available, ODSs can be extracted using singular value decomposition (SVD). The CSD matrix $\mathbf{G}(f)$ at some frequency $f$ can be decomposed as[^1]:
+When cross-spectral density (CSD) matrices are available, ODSs can be extracted using singular value decomposition (SVD). The CSD matrix $\mathbf{G}_{yy}(f)$ at some frequency $f$ can be decomposed as [^1]:
 $$
-\mathbf{G}(f) = \boldsymbol{\Phi}\boldsymbol{G}_{qq}(f) \boldsymbol{\Phi}^H,
+\mathbf{G}_{yy}(f) = \boldsymbol{\Phi}\boldsymbol{G}_{qq}(f) \boldsymbol{\Phi}^H,
 $$
 where $\boldsymbol{\Phi}$ is the mode shapes matrix, and $\boldsymbol{G}_{qq}(f)$ is the power spectral density matrix of the modal coordinates. On the other hand, performing SVD on the CSD matrix yields:
 
 $$
-\mathbf{G}(f) = \mathbf{U}(f) \boldsymbol{\Sigma}(f) \mathbf{U}(f)^H,
+\mathbf{G}_{yy}(f) = \mathbf{U}(f) \boldsymbol{\Sigma}(f) \mathbf{U}(f)^H,
 $$
 where $\mathbf{U}$ consists of the left singular vectors, and $\boldsymbol{\Sigma}$ is a diagonal matrix containing the singular values. This comparison reveals a connection between the singular vectors and the mode shapes. In fact, near a resonance frequency $f_k$, the largest singular value is associated with the dominant mode at that frequency.
 
@@ -54,11 +54,19 @@ $$
 
 ### Real-normalization of ODS
 
-In practice, ODSs are often real-normalized for better interpretability. It consists in converting the complex-valued ODS $\boldsymbol{\Psi}_k$ into a real-valued vector $\bar{\boldsymbol{\Psi}}_k$. This can be achieved using the `real_normalization` function (see [Mode shapes real-normalization](index.qmd#mode-shape-extraction-1)).
+In practice, ODS are often real-normalized for better interpretability. It consists in converting the complex-valued ODS $\boldsymbol{\Psi}_k$ into a real-valued vector $\bar{\boldsymbol{\Psi}}_k$. This can be achieved using the `real_normalization` function (see [Mode shapes real-normalization](index.qmd#mode-shape-extraction-1)).
 
 ### Improve ODS extraction robustness
 
-In an attempt to improve the robustness of the ODS extraction, especially in the presence of noise, an averaging technique can be employed. This involves averaging multiple ODS candidates within a frequency band around each identified peak frequency. The candidates are selected based on a Modal Assurance Criterion (MAC) threshold to ensure they are sufficiently similar to the reference ODS at the peak frequency.
+In an attempt to improve the robustness of the ODS extraction, especially in the presence of noise, an averaging technique can be employed. This involves averaging multiple ODS candidates within a frequency band around each identified peak frequency. The candidates are selected based on a Modal Assurance Criterion (MAC) threshold to ensure they are sufficiently similar to the reference ODS at the peak frequency. This approach allows defining what is called the Sdof-bell corresponding to the frequencies around each peak where the ODS candidates are considered for averaging.
+
+To estimate the ODS from the average of all selected candidates, a weighted averaging process is implemented using the following formula:
+$$
+\boldsymbol{\Psi}_k = \frac{\sum_{i=1}^{N_k} w_i\, \mathbf{u}_1(\omega_i)}{\sum_{i=1}^{N_k} w_i},
+$$
+where $N_k$ is the number of selected candidates within the bell and $w_i$ are the weights assigned to each candidate.
+
+In `StructuralVibration.jl`, the weights are either uniform (i.e. $w_i = 1$) or based on the value of the largest singular value of the CSD matrix at the peak frequency (i.e. $w_i = s_1(\omega_i)$). From a theoretical standpoint, using the singular value as a weight give more importance to candidates that are more likely to represent the true mode shape and less importance to those that may be influenced by noise or other factors.
 
 ## API
 
@@ -171,7 +179,7 @@ force = zeros(length(x), length(t))
 force[2, :] .= excitation(chirp, t)
 
 # Response calculation
-prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t, ismodal = true)
+prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t)
 y = solve(prob).u
 
 tukeywin(x) = tukey(x, 0.5)

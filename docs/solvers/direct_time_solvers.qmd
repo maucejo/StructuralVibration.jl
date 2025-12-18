@@ -300,12 +300,8 @@ I = b*h^3/12
 E = 2.1e11
 ρ = 7850.
 
-# Computation parameters
-fmax = 5000.
-
 # Initialization of the data types
 beam = Beam(L, S, I, E, ρ)
-om_th, k_th = modefreq(beam, fmax)
 
 # Mesh definition
 oned_mesh = OneDMesh(beam, 0., 20, :SS)
@@ -336,14 +332,14 @@ v0 = zeros(nddl)
 u0 = (x0, v0)
 
 # Direct time problem - Generalized-alpha method
-prob = DirectTimeProblem(Mbc, Kbc, Cbc, u0, t)
-u = solve(prob).u
+prob = DirectTimeProblem(Kbc, Mbc, Cbc, u0, t)
+u_gα = solve(prob).u
 ```
 
 ```{julia}
 #| output: false
 #| echo: false
-@usingany OrdinaryDiffEqTsit5, OrdinaryDiffEqRosenbrock
+ShareAdd.make_importable("OrdinaryDiffEqTsit5", "OrdinaryDiffEqRosenbrock")
 ```
 
 ```{julia}
@@ -361,7 +357,7 @@ end
 
 u0 = [x0; v0]
 css = ss_model(Kbc, Mbc, Cbc)
-prob_ode = ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
+prob_ode = Odet.ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
 sol_ode = Odet.solve(prob_ode, Odet.AutoTsit5(Oder.Rosenbrock23()))
 u_ode = sol_ode(t)[1:nddl, :]
 
@@ -374,7 +370,7 @@ function sde_solve!(ddu, du, u, p, t)
     ddu .= M\(-C*du .- K*u)
 end
 
-prob_sde = SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
+prob_sde = Odet.SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
 sol_sde = Odet.solve(prob_sde, Odet.AutoTsit5(Oder.Rosenbrock23()))
 u_sde = sol_sde(t)[nddl+1:2*nddl, :]
 ```
@@ -384,7 +380,7 @@ u_sde = sol_sde(t)[nddl+1:2*nddl, :]
 
 fig_fe = Figure()
 ax = Axis(fig_fe[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "FE model response comparison at mid-span")
-lines!(ax, t, u[20, :], label = "Generalized-α")
+lines!(ax, t, u_gα[20, :], label = "Generalized-α")
 lines!(ax, t, u_ode[20, :], linestyle = :dash, label = "DiffEq - First order ODE")
 lines!(ax, t, u_sde[20, :], linestyle = :dashdot, label = "DiffEq - Second order ODE")
 xlims!(ax, minimum(t), maximum(t))

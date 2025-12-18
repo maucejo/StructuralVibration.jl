@@ -557,7 +557,7 @@ version = "0.5.3"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.12.0"
+version = "1.12.1"
 weakdeps = ["REPL"]
 
     [deps.Pkg.extensions]
@@ -755,15 +755,15 @@ version = "1.8.0"
 
 [[deps.StatsBase]]
 deps = ["AliasTables", "DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "064b532283c97daae49e544bb9cb413c26511f8c"
+git-tree-sha1 = "be5733d4a2b03341bdcab91cea6caa7e31ced14b"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.34.8"
+version = "0.34.9"
 
 [[deps.StructuralVibration]]
 deps = ["DSP", "DispatchDoctor", "FFTW", "FastGaussQuadrature", "Interpolations", "LinearAlgebra", "Optim", "Peaks", "Polynomials", "ProgressMeter", "Random", "SkipNan", "SpecialFunctions", "Statistics", "ToeplitzMatrices"]
 path = ".."
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "1.1.4"
+version = "1.4.0"
 
     [deps.StructuralVibration.extensions]
     SVMakieExt = "Makie"

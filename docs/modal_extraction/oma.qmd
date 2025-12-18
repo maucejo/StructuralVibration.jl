@@ -29,6 +29,90 @@ From an algorithmic perspective, OMA can be performed using various methods, inc
 
 ## Sdof method
 
+The Frequency-Spatial Domain Decomposition (FSDD) method is a single-degree-of-freedom (Sdof) technique used in Operational Modal Analysis (OMA) to extract modal parameters from output-only data[^1]. The FSDD method relies on the fact that in the vicinity of a resonance frequency $\omega_k$, the cross-spectral density (CSD) matrix of the output responses can be approximated by a rank-1 matrix, which corresponds to the dominant mode shape of the structure at that frequency. In particular, this means that the CSD matrix $\mathbf{G}_{yy}(\omega_k)$ can be expressed as:
+$$
+\mathbf{G}_{yy}(\omega_k) \approx \mathbf{u}_1(\omega_k)\, s_1(\omega_k) \mathbf{u}_1(\omega_k)^H,
+$$
+where $\mathbf{u}_1(\omega_k)$ is the first singular vector of the CSD matrix, and $s_1(\omega_k)$ is the corresponding singular value.
+
+By noting that the CSD matrix near the resonance frequency can also be expressed in terms of the mode shape $\boldsymbol{\Phi}$ and the power spectral density of the modal coordinate ${G}_{qq}(\omega)$ as:
+$$
+\mathbf{G}_{yy}(\omega_k) \approx \boldsymbol{\Phi}\boldsymbol{G}_{qq}(\omega_k) \boldsymbol{\Phi}^H,
+$$
+where $\boldsymbol{G}_{qq}(\omega)$ is dominated by the contribution of the $k$-th mode, we can establish a relationship between the singular vectors and the mode shapes. More specifically, the mode shape $\boldsymbol{\Phi}_k$ at frequency $\omega_k$ is given by the first singular vector:
+$$
+\boldsymbol{\Phi}_k \approx \mathbf{u}_1(\omega_k).
+$$
+
+Once the mode shapes are extracted, the FSDD utilizes the unitary property of the singular vectors to derive an enhanced output PSD $\hat{G}_{yy}(\omega)$ in the vicinity of the resonance frequency, such that:
+$$
+\hat{G}_{yy}(\omega) = \mathbf{u}_1(\omega_k)^H\, \mathbf{G}_{yy}(\omega)\, \mathbf{u}_1(\omega_k) \approx \frac{d_k}{\sigma_k^2 + (\omega - \Omega_k)^2},
+$$
+where $d_k$ is a constant related to the mode shape normalization, $\sigma_k = -\xi_k\omega_k$ , and $\Omega_k$ is the damped natural angular frequency of the $k$-th mode. By fitting a Sdof model to the enhanced PSD $\hat{G}_{yy}(\omega)$ around the resonance frequency $\omega_k$ using a least-squares approach, the modal parameters (natural frequency and damping ratio) can be estimated.
+
+::: {.callout-note}
+The FSDD method is particularly effective for structures with well-separated modes and low damping, as it relies on the dominance of a single mode in the CSD matrix near resonance frequencies. However, it may face challenges when dealing with closely spaced modes or high damping scenarios, where the rank-1 approximation may not hold true.
+:::
+
+To perform a robust FSDD, `StructuralVibration.jl` implements two additional steps during the estimation process:
+
+1. Because the signals are often contaminated with noise, the singular vector $\mathbf{u}_1(\omega_k)$ is estimated by averaging the first left-singlular vectors within a frequency band around each resonance frequency. This aims to reduce the effects of noise on the mode shape estimates. During this process, a MAC threshold is used to select only the singular vectors that are sufficiently similar to the reference singular vector at the peak frequency. Said differently, only the singular vectors, for which the first singular value is approximately constant within the frequency band, are considered for the averaging.
+
+    In doing so, we define the so-called Sdof-bell corresponding to the frequencies around each peak where the singular vectors are considered for averaging. It results that the left-singular vector $\mathbf{u}_1(\omega_k)$ is estimated as:
+    $$
+    \hat{\mathbf{u}}_1(\omega_k) = \frac{\sum_{i=1}^{N_k} w_i\, \mathbf{u}_1(\omega_i)}{\sum_{i=1}^{N_k} w_i},
+    $$
+
+    where $N_k$ is the number of selected candidates within the bell and $w_i$ are the weights assigned to each candidate. `StructuralVibration.jl` proposes two types of weights:
+
+    * Uniform weights: $w_i = 1$ corresponding to a linear average of the selected candidates.
+
+    * Singular value-based weights: $w_i = s_1(\omega_i)$. This weighting scheme gives more importance to candidates that are more likely to represent the true mode shape and less importance to those that may be influenced by noise or other factors.
+
+    Knowing the Sdof-bell also allows to define the frequency range around each resonance frequency where the Sdof model is fitted to the enhanced PSD. To do so, the fitting equation is expressed as:
+    $$
+    \begin{bmatrix}
+    \hat{G}_{yy}(\omega) & -2\omega \hat{G}_{yy}(\omega) & -1 \\
+    \end{bmatrix} \begin{bmatrix}
+    \omega_k^2 \\
+    \Omega_k \\
+    d_k
+    \end{bmatrix} = -\omega^2 \hat{G}_{yy}(\omega)
+    $$
+
+    By applying this equation over all frequencies $\omega$ within the Sdof-bell, a least-squares solution can be obtained for the unknowns $\omega_k$, $\Omega_k$, and $d_k$. From these estimates, the poles $p_k$ can be computed as:
+    $$
+    p_k = -\sqrt{\omega_k^2 - \Omega_k^2} + j \Omega_k,
+    $$
+
+::: {.callout-note}
+
+In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the real and imaginary parts are separated to solve a real system of double size.
+
+:::
+
+2. For lightly damped structures, the least-squares fitting may failed to provide a physical solution due to numerical inaccuracies. In this case, one typically observes that $\Omega_k > \omega_k$, leading to imaginary values for the damping ratio. To overcome this issue, `StructuralVibration.jl` uses the estimation inspired by the Enhanced Frequency Domain Decomposition (EFDD) method[^2].
+
+    The estimation consists in taking the inverse Fourier transform of the enhanced PSD $\hat{G}_{yy}(\omega)$ to obtain the corresponding Autocorrelation function $R(\tau)$ of the Sdof system:
+    $$
+    R(\tau) \approx C\, e^{-\sigma_k \tau} \cos(\Omega_k \tau).
+    $$
+
+    Then, we compute the envelope $E(\tau)$ of the signal using the Hilbert transform, which gives:
+    $$
+    E(\tau) = C\, e^{-\sigma_k \tau}.
+    $$
+    By fitting a linear model to the logarithm of the envelope, we can estimate $\sigma_k$ from a least-squares regression.
+
+    Assuming that the damped natural frequency $\Omega_k$ was properly estimated in the initial estimation, the pole $p_k$ can then be estimated as:
+    $$
+    p_k = -\sigma_k + j \Omega_k.
+    $$
+
+[^1]: W. Tong, Z. Lingmi and T. Yukio. "An operational modal analysis method in frequency and spatial domain". Earthquake engineering and engineering vibration, 4(2): 295-300, 2005.
+
+[^2]: R. Brincker, C. E. Ventura and P. Andersen. "Damping estimation by Frequency Domain Decomposition". In Proceedings of IMAC XIX, Orlando, Florida, USA. 2001.
+
 ## Mdof methods
 
 ### EMA-based methods for OMA
@@ -43,22 +127,22 @@ $$
 $$
 where $\mathbf{H}(\omega)$ is the Frequency Response Function matrix of the system, $\mathbf{G}_{ff}(\omega)$ is the cross-spectral density matrix of the input forces, and $^H$ denotes the Hermitian transpose.
 
-Generally, OMA relies on the assumption that the input excitation are random white noise processes, implying that $\mathbf{G}_{ff}(\omega) = \mathbf{I}$. Under this assumption, a component of the cross-spectral density matrix $G_{pq}(\omega)$ can be expressed under the poles-residues form as[^1][^2]:
+Generally, OMA relies on the assumption that the input excitation are random white noise processes, implying that $\mathbf{G}_{ff}(\omega) = \mathbf{I}$. Under this assumption, a component of the cross-spectral density matrix $G_{pq}(\omega)$ can be expressed under the poles-residues form as[^3][^4]:
 $$
 G_{pq}(\omega) = \sum_{i=1}^{n} \left( \frac{{}_iR_{pq}}{j\omega - \lambda_i} + \frac{{}_iR_{pq}^\ast}{j\omega - \lambda_i^\ast} + \frac{{}_iS_{pq}}{-j\omega - \lambda_i} + \frac{{}_iS_{pq}^\ast}{-j\omega - \lambda_i^\ast} \right),
 $$
 where $\lambda_i$ and (${}_iR_{pq}$, ${}_iS_{pq}$) are the system poles and residues, respectively.
 
-[^1]: R. Brincker and L. Zhang. "Frequency domain decomposition revisited". In PProceedings of the 3rd International Operational Modal Analysis conference (IOMAC), Portonovo, Italy, 2009.
+[^3]: R. Brincker and L. Zhang. "Frequency domain decomposition revisited". In PProceedings of the 3rd International Operational Modal Analysis conference (IOMAC), Portonovo, Italy, 2009.
 
-[^2]: B. Peeters and H. Van der Auweraer. "Polymax: A revolution in operational modal analysis". In Proceedings of the 1st International Operational Modal Analysis conference (IOMAC), Copenhagen, Denmark, 2005.
+[^4]: B. Peeters and H. Van der Auweraer. "Polymax: A revolution in operational modal analysis". In Proceedings of the 1st International Operational Modal Analysis conference (IOMAC), Copenhagen, Denmark, 2005.
 
-From this definition, the half-spectrum $G_{pq}^+(\omega)$ is defined as the sum of the first two terms in the above expression[^3]:
+From this definition, the half-spectrum $G_{pq}^+(\omega)$ is defined as the sum of the first two terms in the above expression[^5]:
 $$
 G_{pq}^+(\omega) = \sum_{i=1}^{n} \left( \frac{{}_iR_{pq}}{j\omega - \lambda_i} + \frac{{}_iR_{pq}^\ast}{j\omega - \lambda_i^\ast} \right).
 $$
 
-[^3]: R. Brincker and C. Ventura. "Introduction to Operational Modal Analysis". Wiley, 2015.
+[^5]: R. Brincker and C. Ventura. "Introduction to Operational Modal Analysis". Wiley, 2015.
 
 In `StructuralVibration.jl`, the half-spectrum can be computed using the `half_csd` function, which can proceed in two different ways. These approaches can be summarized as follows:
 
@@ -127,7 +211,7 @@ where $L_{pq}$ and $U_{pq}$ are the lower and upper residuals, respectively. The
 ::: {.callout-note}
 As indicated by Peeters and Van der Auweraer in Ref. [2], the lower and upper residuals are independent of the output quantity. More precisely, this means that the residuals terms are always of the form:
 $$
-\text{res}_{pq} = \frac{L_{pq}}{j\omega} + j\omega\, U_{pq}.
+\text{Res}_{pq} = \frac{L_{pq}}{j\omega} + j\omega\, U_{pq}.
 $$
 :::
 
@@ -250,6 +334,13 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 ```{julia}
 #| echo: false
 @doc OMAProblem
+```
+:::
+
+::: {.api}
+```{julia}
+#| echo: false
+@doc FSDD
 ```
 :::
 
@@ -391,17 +482,83 @@ force = zeros(length(x), length(t))
 force[2, :] .= excitation(chirp, t)
 
 # Response calculation
-prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t, ismodal = true)
+prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t)
 y = solve(prob).u
+
+# OMA problem definition
+tukeywin(x) = tukey(x, 0.5)
+prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin, frange = [1., 1000.])
+```
+
+### Frequency-spatial Domain Decomposition
+
+```{julia}
+#| output: false
+
+pks_indices = [23, 94, 211, 375, 586, 845]
+p_fsdd, ms_fsdd = modes_extraction(prob_oma, FSDD(), pks_indices = pks_indices)
+ms_fsdd_real = real_normalization(ms_fsdd)
+
+# Mode shape scaling for comparison using the modal scale factor
+scaling = msf(ms_fsdd_real, ms_ref[:, 1:size(ms_fsdd_real, 2)])
+ms_fsdd_scaled = ms_fsdd_real .* scaling'
+```
+
+```{julia}
+#| echo: false
+
+# Natural frequencies and damping ratios
+fn_fsdd, dr_fsdd = poles2modal(p_fsdd)
+
+fig_f = Figure()
+ax_f1 = Axis(fig_f[1, 1], title = "Natural frequencies", xlabel = "Mode ID", ylabel = "Natural frequency (Hz)")
+ax_f2 = Axis(fig_f[1, 2], title = "Damping ratios", xlabel = "Mode ID", ylabel = "Damping ratio  (%)")
+
+scatter!(ax_f1, 1:6, ωn[1:6]/2π, marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f1, 1:6, fn_fsdd, markersize = 20, label = "FSDD")
+axislegend(ax_f1, position = :lt)
+
+scatter!(ax_f2, 1:6, 100ξ*ones(6), marker = :rect, markersize = 25, label = "Reference")
+scatter!(ax_f2, 1:6, 100dr_fsdd, markersize = 20, label = "FSDD")
+
+display(fig_f);
+```
+
+```{julia}
+#| echo: false
+
+# Mode shapes
+fig_mode = Figure()
+ax_mode1 = Axis(fig_mode[1, 1], title = "Mode shape 1", ylabel = "Value")
+ax_mode2 = Axis(fig_mode[1, 2], title = "Mode shape 2")
+ax_mode3 = Axis(fig_mode[2, 1], title = "Mode shape 3", xlabel = "Position (m)", ylabel = "Value")
+ax_mode4 = Axis(fig_mode[2, 2], title = "Mode shape 4", xlabel = "Position (m)")
+
+lines!(ax_mode1, x, ms_ref[:, 1], label = "Reference")
+lines!(ax_mode1, x, ms_fsdd_scaled[:, 1], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode1, 0, L)
+axislegend(ax_mode1, position = :cb)
+
+lines!(ax_mode2, x, ms_ref[:, 2], label = "Reference")
+lines!(ax_mode2, x, ms_fsdd_scaled[:, 2], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode2, 0, L)
+
+lines!(ax_mode3, x, ms_ref[:, 3], label = "Reference")
+lines!(ax_mode3, x, ms_fsdd_scaled[:, 3], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode3, 0, L)
+
+lines!(ax_mode4, x, ms_ref[:, 4], label = "Reference")
+lines!(ax_mode4, x, ms_fsdd_scaled[:, 4], linestyle = :dash, label = "Estimated")
+xlims!(ax_mode4, 0, L)
+
+display(fig_mode);
 ```
 
 ### EMA-based OMA
 
 #### Poles extraction using LSCF
 ```{julia}
-# OMA problem definition
-tukeywin(x) = tukey(x, 0.5)
-prob_oma = OMAProblem(y, t, sample_rate, block_size, win = tukeywin, frange = [1., 1000.])
+#| output: false
 
 # EMA-MDOF pole stability analysis
 sol_stab = stabilization(prob_oma, 30, LSCF())

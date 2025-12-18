@@ -39,22 +39,18 @@ x0 = 1e-3ones(nddl)
 v0 = zeros(nddl)
 u0 = (x0, v0)
 
-# No force
-Fbc = zeros(nddl, nt)
 # Direct time problem
-prob = DirectTimeProblem(Kbc, Mbc, Cbc, Fbc, u0, t)
-# prob = FreeModalTimeProblem(Kbc, Mbc, .01, u0, t)
+prob = DirectTimeProblem(Kbc, Mbc, Cbc, u0, t)
 
-# u0m = (ms_fe'u0[1], ms_fe'u0[2])
-# prob = DirectTimeProblem(ms_fe'Kbc*ms_fe, ms_fe'Mbc*ms_fe, ms_fe'Cmodal*ms_fe, ms_fe'F_free, u0m, t)
 
-res = solve(prob)
-res_cd = solve(prob, CentralDiff())
+u_gα = solve(prob).u
+u_cd = solve(prob, CentralDiff()).u
 
 # DifferentialEquations.jl
-@usingany OrdinaryDiffEqTsit5, OrdinaryDiffEqRosenbrock
-import OrdinaryDiffEqTsit5 as ODET
-import OrdinaryDiffEqRosenbrock as ODER
+import ShareAdd as SA
+SA.make_importable("OrdinaryDiffEqTsit5", "OrdinaryDiffEqRosenbrock")
+import OrdinaryDiffEqTsit5 as Odet
+import OrdinaryDiffEqRosenbrock as Oder
 function ode_solve!(du, u, p, t)
     A = p[1].Ac
 
@@ -63,8 +59,8 @@ end
 
 u0 = [x0; v0]
 css = ss_model(Kbc, Mbc, Cbc)
-prob_ode = ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
-sol_ode = ODET.solve(prob_ode, ODET.AutoTsit5(ODER.Rosenbrock23()))
+prob_ode = Odet.ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
+sol_ode = Odet.solve(prob_ode, Odet.AutoTsit5(Oder.Rosenbrock23()))
 u_ode = sol_ode(t)[1:nddl, :]
 
 function sde_solve!(ddu, du, u, p, t)
@@ -74,6 +70,6 @@ function sde_solve!(ddu, du, u, p, t)
 
     ddu .= M\(-C*du .- K*u)
 end
-prob_sde = SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
-sol_sde = ODET.solve(prob_sde, ODET.AutoTsit5(ODER.Rosenbrock23()))
+prob_sde = Odet.SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
+sol_sde = Odet.solve(prob_sde, Odet.AutoTsit5(Oder.Rosenbrock23()))
 u_sde = sol_sde(t)[nddl+1:2*nddl, :]

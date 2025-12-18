@@ -139,10 +139,10 @@ Hilber-Hughes-Taylor time solver
 
     function HHT(; γ0::T = 0.5, β0::T = 0.25, ρ::T = 1., αf::T = Inf) where T
         if αf ≠ Inf
-            (0. < αf < 1/3) ? error("αf must be in [0, 1/3[") : nothing
+            (0. < αf < 1/3) ? throw(ArgumentError("αf must be in [0, 1/3[")) : nothing
             return new{T}(αf, 0., γ0, β0, "Direct Time Problem - HHT...")
         else
-            ρ < 0.5 ? error("ρ must be in [0.5, 1]") : nothing
+            ρ < 0.5 ? throw(ArgumentError("ρ must be in [0.5, 1]")) : nothing
             return new{T}((1. - ρ)/(1. + ρ), 0., γ0, β0, "Direct Time Problem - HHT...")
         end
     end
@@ -162,10 +162,10 @@ Wood-Bossak-Zienkiewicz time solver
 
     function WBZ(; γ0::T = 0.5, β0::T = 0.25, ρ::T = 1., αm::T = Inf) where T
         if αm ≠ Inf
-            (αm ≤ 0.5) ? error("αm must be ≤ 0.5") : nothing
+            (αm ≤ 0.5) ? throw(ArgumentError("αm must be ≤ 0.5")) : nothing
             return new{T}(0., αm, γ0, β0, "Direct Time Problem - WBZ...")
         else
-            (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
+            (ρ > 1.) ? throw(ArgumentError("ρ must be in [0, 1]")) : nothing
             return new{T}(0., (ρ - 1.)/(ρ + 1.), γ0, β0, "Direct Time Problem - WBZ...")
         end
     end
@@ -185,9 +185,9 @@ Generalized-α time solver
 
     function GeneralizedAlpha(; γ0::T = 0.5, β0::T = 0.25, ρ::T = 1., αf::T = Inf, αm = Inf) where T
         if αf ≠ Inf && αm ≠ Inf
-            (αm ≤ αf ≤ 0.5) ? error("αm ≤ αf ≤ 0.5") : nothing
+            (αm ≤ αf ≤ 0.5) ? throw(ArgumentError("αm ≤ αf ≤ 0.5")) : nothing
         else
-            (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
+            (ρ > 1.) ? throw(ArgumentError("ρ must be in [0, 1]")) : nothing
 
             αf = ρ/(ρ + 1.)
             αm = (2ρ - 1.)/(ρ + 1.)

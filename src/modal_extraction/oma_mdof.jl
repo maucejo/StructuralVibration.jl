@@ -34,7 +34,7 @@ Extract modes using Stochastic System Identification methods.
 **Inputs**
 - `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
 - `order::Int`: Order of the system to identify
-- `method::MdofOMA`: OMA method to use for pole extraction
+- `method`: OMA method to use for pole extraction
     - `CovSSI`: Covariance-based SSI (default)
     - `DataSSI`: Data-based SSI
 - `stabdiag::Bool`: Whether to compute stabilization diagram (default: false)
