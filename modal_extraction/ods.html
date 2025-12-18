@@ -292,24 +292,24 @@ window.Quarto = {
 </header>
 
 
-<p>An Operational Deflection Shape (ODS) represents the deformation pattern of a structure at a specific frequency when it is subjected to operational forces. Unlike traditional mode shapes, which are derived from theoretical models or controlled experiments, ODSs are obtained from measurements taken while the structure is in operation. This makes them particularly useful for understanding how a structure behaves under real-world conditions. If the structure under consideration is lightly damped, ODSs can approximate mode shapes, providing insights into the dynamic characteristics of the structure.</p>
+<p>An Operational Deflection Shape (ODS) represents the deformation pattern of a structure at a specific frequency when it is subjected to operational forces. Unlike traditional mode shapes, which are derived from theoretical models or controlled experiments, ODS are obtained from measurements taken while the structure is in operation. This makes them particularly useful for understanding how a structure behaves under real-world conditions. If the structure under consideration is lightly damped, ODS can approximate mode shapes, providing insights into the dynamic characteristics of the structure.</p>
 <section id="extracting-ods-from-measured-data" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="extracting-ods-from-measured-data"><span class="header-section-number">1</span> Extracting ODS from measured data</h2>
-<p>The extraction of ODSs from the measured data typically depends on the measured quantities. In <code>StructuralVibration.jl</code>, we provide methods to extract ODSs from response spectra and cross-spectral density matrices.</p>
+<p>The extraction of ODS from the measured data typically depends on the measured quantities. In <code>StructuralVibration.jl</code>, we provide methods to extract ODS from response spectra and cross-spectral density matrices.</p>
 <section id="extraction-from-response-spectra" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="extraction-from-response-spectra"><span class="header-section-number">1.1</span> Extraction from response spectra</h3>
-<p>When response spectra are available, ODSs can be extracted by identifying the peaks in the spectra corresponding to the frequencies of interest. The ODS <span class="math inline">\(\boldsymbol{\Psi}_k\)</span> at a specific frequency peak <span class="math inline">\(f_k\)</span> is simply given by:</p>
+<p>When response spectra are available, ODS can be extracted by identifying the peaks in the spectra corresponding to the frequencies of interest. The ODS <span class="math inline">\(\boldsymbol{\Psi}_k\)</span> at a specific frequency peak <span class="math inline">\(f_k\)</span> is simply given by:</p>
 <p><span class="math display">\[
 \boldsymbol{\Psi}_k = \mathbf{y}(f_k),
 \]</span> where <span class="math inline">\(\mathbf{y}(f_k)\)</span> is the response spectrum vector at frequency <span class="math inline">\(f_k\)</span>.</p>
 </section>
 <section id="extraction-from-csd-matrices" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="extraction-from-csd-matrices"><span class="header-section-number">1.2</span> Extraction from CSD matrices</h3>
-<p>When cross-spectral density (CSD) matrices are available, ODSs can be extracted using singular value decomposition (SVD). The CSD matrix <span class="math inline">\(\mathbf{G}(f)\)</span> at some frequency <span class="math inline">\(f\)</span> can be decomposed as<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>: <span class="math display">\[
-\mathbf{G}(f) = \boldsymbol{\Phi}\boldsymbol{G}_{qq}(f) \boldsymbol{\Phi}^H,
+<p>When cross-spectral density (CSD) matrices are available, ODSs can be extracted using singular value decomposition (SVD). The CSD matrix <span class="math inline">\(\mathbf{G}_{yy}(f)\)</span> at some frequency <span class="math inline">\(f\)</span> can be decomposed as <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>: <span class="math display">\[
+\mathbf{G}_{yy}(f) = \boldsymbol{\Phi}\boldsymbol{G}_{qq}(f) \boldsymbol{\Phi}^H,
 \]</span> where <span class="math inline">\(\boldsymbol{\Phi}\)</span> is the mode shapes matrix, and <span class="math inline">\(\boldsymbol{G}_{qq}(f)\)</span> is the power spectral density matrix of the modal coordinates. On the other hand, performing SVD on the CSD matrix yields:</p>
 <p><span class="math display">\[
-\mathbf{G}(f) = \mathbf{U}(f) \boldsymbol{\Sigma}(f) \mathbf{U}(f)^H,
+\mathbf{G}_{yy}(f) = \mathbf{U}(f) \boldsymbol{\Sigma}(f) \mathbf{U}(f)^H,
 \]</span> where <span class="math inline">\(\mathbf{U}\)</span> consists of the left singular vectors, and <span class="math inline">\(\boldsymbol{\Sigma}\)</span> is a diagonal matrix containing the singular values. This comparison reveals a connection between the singular vectors and the mode shapes. In fact, near a resonance frequency <span class="math inline">\(f_k\)</span>, the largest singular value is associated with the dominant mode at that frequency.</p>
 <p>Consequently, the ODS <span class="math inline">\(\boldsymbol{\Psi}_k\)</span> at frequency <span class="math inline">\(f_k\)</span> is given by the first singular vector: <span class="math display">\[
 \boldsymbol{\Psi}_k = \mathbf{u}_1(f_k).
@@ -317,11 +317,15 @@ window.Quarto = {
 </section>
 <section id="real-normalization-of-ods" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="real-normalization-of-ods"><span class="header-section-number">1.3</span> Real-normalization of ODS</h3>
-<p>In practice, ODSs are often real-normalized for better interpretability. It consists in converting the complex-valued ODS <span class="math inline">\(\boldsymbol{\Psi}_k\)</span> into a real-valued vector <span class="math inline">\(\bar{\boldsymbol{\Psi}}_k\)</span>. This can be achieved using the <code>real_normalization</code> function (see <a href="../modal_extraction/index.html#mode-shape-extraction-1">Mode shapes real-normalization</a>).</p>
+<p>In practice, ODS are often real-normalized for better interpretability. It consists in converting the complex-valued ODS <span class="math inline">\(\boldsymbol{\Psi}_k\)</span> into a real-valued vector <span class="math inline">\(\bar{\boldsymbol{\Psi}}_k\)</span>. This can be achieved using the <code>real_normalization</code> function (see <a href="../modal_extraction/index.html#mode-shape-extraction-1">Mode shapes real-normalization</a>).</p>
 </section>
 <section id="improve-ods-extraction-robustness" class="level3" data-number="1.4">
 <h3 data-number="1.4" class="anchored" data-anchor-id="improve-ods-extraction-robustness"><span class="header-section-number">1.4</span> Improve ODS extraction robustness</h3>
-<p>In an attempt to improve the robustness of the ODS extraction, especially in the presence of noise, an averaging technique can be employed. This involves averaging multiple ODS candidates within a frequency band around each identified peak frequency. The candidates are selected based on a Modal Assurance Criterion (MAC) threshold to ensure they are sufficiently similar to the reference ODS at the peak frequency.</p>
+<p>In an attempt to improve the robustness of the ODS extraction, especially in the presence of noise, an averaging technique can be employed. This involves averaging multiple ODS candidates within a frequency band around each identified peak frequency. The candidates are selected based on a Modal Assurance Criterion (MAC) threshold to ensure they are sufficiently similar to the reference ODS at the peak frequency. This approach allows defining what is called the Sdof-bell corresponding to the frequencies around each peak where the ODS candidates are considered for averaging.</p>
+<p>To estimate the ODS from the average of all selected candidates, a weighted averaging process is implemented using the following formula: <span class="math display">\[
+\boldsymbol{\Psi}_k = \frac{\sum_{i=1}^{N_k} w_i\, \mathbf{u}_1(\omega_i)}{\sum_{i=1}^{N_k} w_i},
+\]</span> where <span class="math inline">\(N_k\)</span> is the number of selected candidates within the bell and <span class="math inline">\(w_i\)</span> are the weights assigned to each candidate.</p>
+<p>In <code>StructuralVibration.jl</code>, the weights are either uniform (i.e.&nbsp;<span class="math inline">\(w_i = 1\)</span>) or based on the value of the largest singular value of the CSD matrix at the peak frequency (i.e.&nbsp;<span class="math inline">\(w_i = s_1(\omega_i)\)</span>). From a theoretical standpoint, using the singular value as a weight give more importance to candidates that are more likely to represent the true mode shape and less importance to those that may be influenced by noise or other factors.</p>
 </section>
 </section>
 <section id="api" class="level2" data-number="2">
@@ -332,7 +336,9 @@ window.Quarto = {
 <div id="4" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">ods(y, freq, pks_indices)
-ods(Gyy, freq, pks_indices)</code></pre>
+ods(y, freq, pks_indices, min_mac)
+ods(Gyy, freq, pks_indices)
+ods(Gyy, freq, pks_indices, min_mac; avg_alg)</code></pre>
 <p>Compute the operational deflection shapes (ODS) from response spectrum.</p>
 <p><strong>Inputs</strong></p>
 <ul>
@@ -344,7 +350,15 @@ ods(Gyy, freq, pks_indices)</code></pre>
 </li>
 <li><p><code>pks_indices</code>: Indices of the peaks in the frequency vector</p>
 </li>
-<li><p><code>min_mac</code> (optional): Minimum MAC value to consider a candidate ODS for averaging</p>
+<li><p><code>min_mac</code>: Minimum MAC value to consider a candidate ODS for averaging</p>
+</li>
+<li><p><code>avg_alg</code>: Algorithm used for averaging</p>
+<ul>
+<li><p><code>:lin</code>: Linear averaging</p>
+</li>
+<li><p><code>:sv</code>: Weighted average using singular value (default)</p>
+</li>
+</ul>
 </li>
 </ul>
 <p><strong>Outputs</strong></p>
@@ -437,7 +451,7 @@ ods(Gyy, freq, pks_indices)</code></pre>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>force[<span class="fl">2</span>, <span class="op">:</span>] <span class="op">.=</span> <span class="fu">excitation</span>(chirp, t)</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Response calculation</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(ωn, ms_ref, <span class="fu">ξ*ones</span>(<span class="fu">length</span>(kn)), ms_ref<span class="op">'</span>force, (<span class="fu">zeros</span>(<span class="fu">length</span>(x)), <span class="fu">zeros</span>(<span class="fu">length</span>(x))), t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(ωn, ms_ref, <span class="fu">ξ*ones</span>(<span class="fu">length</span>(kn)), ms_ref<span class="op">'</span>force, (<span class="fu">zeros</span>(<span class="fu">length</span>(x)), <span class="fu">zeros</span>(<span class="fu">length</span>(x))), t)</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="fu">tukeywin</span>(x) <span class="op">=</span> <span class="fu">tukey</span>(x, <span class="fl">0.5</span>)</span>
