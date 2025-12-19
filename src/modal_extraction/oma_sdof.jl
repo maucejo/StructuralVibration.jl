@@ -49,7 +49,7 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
 
     # Initialization for EFDD if needed
     npoints = 2(nf - 1)
-    dt = 1/2freq[end]
+    dt = 1/2.56freq[end]
     t_sdof = 0:dt:(npoints÷2 - 1)*dt
     sdof_bell = zeros(eltype(fullspec), nf)
     corr_sdof = similar(freq, npoints÷2)
