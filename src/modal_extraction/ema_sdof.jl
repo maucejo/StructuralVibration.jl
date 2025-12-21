@@ -124,26 +124,24 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks
     ξn = similar(ftemp)
 
     # Damping ratios estimation from the half-bandwidth method
-    nfreq_itp = 250
-    freq_left = similar(fn, nfreq_itp)
-    freq_right = similar(freq_left)
-    Hleft = similar(freq_left)
-    Hright = similar(freq_left)
+    nfreq_itp = 50
     for (n, (f, idmax, Hmax, edg)) in enumerate(zip(ftemp, pks.indices, pks.heights, pks.edges))
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
 
         # Left side of the peak
+        nleft = max(nfreq_itp, length(freq[edge1:idmax]))
         itp_left = linear_interpolation(freq[edge1:idmax], Habs[edge1:idmax])
-        freq_left .= LinRange(freq[edge1], f, nfreq_itp)
-        @. Hleft = itp_left(freq_left)
+        freq_left = LinRange(freq[edge1], f, nleft)
+        Hleft = itp_left(freq_left)
         posleft = argmin(abs.(Hleft .- Hmax/√2))
         fmin = freq_left[posleft]
 
         # Right side of the peak
+        nright = max(nfreq_itp, length(freq[idmax:edge2]))
         itp_right = linear_interpolation(freq[idmax:edge2], Habs[idmax:edge2])
-        freq_right .= LinRange(f, freq[edge2], nfreq_itp)
-        @. Hright = itp_right(freq_right)
+        freq_right = LinRange(f, freq[edge2], nright)
+        Hright = itp_right(freq_right)
         posright = argmin(abs.(Hright .- Hmax/√2))
         fmax = freq_right[posright]
 
@@ -202,12 +200,7 @@ function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_i
     fn = similar(freq[pks.indices])
     ξn = similar(fn)
 
-    nfreq_itp = 500
-    ReH_itp = similar(fn, nfreq_itp)
-    ImH_itp = similar(ReH_itp)
-    freq_itp = similar(ReH_itp)
-    α = similar(ReH_itp)
-    θ = similar(ReH_itp)
+    nfreq_itp = 100
     for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
@@ -223,13 +216,14 @@ function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_i
         itp_real = linear_interpolation(freqs, ReH)
         itp_imag = linear_interpolation(freqs, ImH)
 
-        freq_itp .= LinRange(freqs[1], freqs[end], nfreq_itp)
-        ReH_itp .= itp_real(freq_itp)
-        ImH_itp .= itp_imag(freq_itp)
+        nfreq = max(nfreq_itp, length(freqs))
+        freq_itp = LinRange(freqs[1], freqs[end], nfreq)
+        ReH_itp = itp_real(freq_itp)
+        ImH_itp = itp_imag(freq_itp)
 
         # Angles
-        @. α = atan(ImH_itp, ReH_itp)
-        @. θ = π + 2α
+        α = atan.(ImH_itp, ReH_itp)
+        θ = π .+ 2α
 
         # Angular frequency such that θ₁ = π/2
         pos1 = argmin(@. abs(θ - π/2))
@@ -300,17 +294,7 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
     fn = freq[pks.indices]
     ξn = similar(fn)
 
-    nfreq_itp = 500
-    freq_itp = similar(fn, nfreq_itp)
-    ReH_itp = similar(freq_itp)
-    ImH_itp = similar(freq_itp)
-    Hitp = similar(H, nfreq_itp)
-
-    A = similar(Hitp, nfreq_itp, 3)
-    b = similar(Hitp, nfreq_itp)
-    Sa = similar(Hitp, 2nfreq_itp, 3)
-    Sb = similar(Hitp, 2nfreq_itp)
-    res = similar(b, 3)
+    nfreq_itp = 100
      for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
@@ -325,20 +309,21 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
         itp_real = linear_interpolation(freqs, ReH)
         itp_imag = linear_interpolation(freqs, ImH)
 
-        freq_itp .= LinRange(freqs[1], freqs[end], nfreq_itp)
-        ReH_itp .= itp_real(freq_itp)
-        ImH_itp .= itp_imag(freq_itp)
-        @. Hitp = ReH_itp + 1im*ImH_itp
+        nfreq = max(nfreq_itp, length(freqs))
+        freq_itp = LinRange(freqs[1], freqs[end], nfreq_itp)
+        ReH_itp = itp_real(freq_itp)
+        ImH_itp = itp_imag(freq_itp)
+        Hitp = ReH_itp .+ 1im*ImH_itp
 
         # Construction of Least Squares problem
-        A .= [Hitp 2im*freq_itp.*Hitp -one.(Hitp)]
-        @. b = freq_itp^2*Hitp
+        A = [Hitp 2im*freq_itp.*Hitp -one.(Hitp)]
+        b = @. freq_itp^2*Hitp
         # Solve the system
         # Tips: Solving the complex system directly can lead to numerical issues
         # so we separate the real and imaginary parts to solve a real system of double size using
-        Sa .= [real(A); imag(A)]
-        Sb .= [real(b); imag(b)]
-        res .= qr(Sa)\Sb
+        Sa = [real(A); imag(A)]
+        Sb = [real(b); imag(b)]
+        res = qr(Sa)\Sb
         # Actually, only one of the two parts can be used to solve the system
         # res .= real(A)\real(b)
 
@@ -409,7 +394,7 @@ function modeshape_extraction(prob::EMAProblem, poles::Vector{T}, alg::SdofEMA; 
     # Nodes other than driving point
     pos_ndi = findall(x -> x ∉ dpi[1], 1:nx)
 
-    for (n, (ω₀, ξ)) in enumerate(zip(ωn, ξn))
+    for (n, (ω0, ξ)) in enumerate(zip(ωn, ξn))
         # Trick for estimating the mode shape when ξ = 0
         η = 2ξ
         if η == 0.
@@ -420,11 +405,11 @@ function modeshape_extraction(prob::EMAProblem, poles::Vector{T}, alg::SdofEMA; 
 
         # Mode shape estimation at driving point
         Himag = -imag(H[:, pos_max])
-        ϕn[dpi[1], n] = √(η*ω₀^2*Himag[dpi[1]])
+        ϕn[dpi[1], n] = √(η*ω0^2*Himag[dpi[1]])
 
         # Mode shape estimation at other nodes
         for pos in pos_ndi
-            ϕn[pos, n] = η*ω₀^2*Himag[pos]/ϕn[dpi[1], n]
+            ϕn[pos, n] = η*ω0^2*Himag[pos]/ϕn[dpi[1], n]
         end
     end
 
