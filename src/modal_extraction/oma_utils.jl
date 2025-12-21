@@ -91,11 +91,11 @@ matrix Gxx.
 end
 
 """
-    half_psd(Gyy, freq)
-    half_psd(y, yref, freq, fs, bs)
-    half_psd(y, freq, fs, bs)
+    half_csd(Gyy, freq)
+    half_csd(y, yref, freq, fs, bs)
+    half_csd(y, freq, fs, bs)
 
-    Compute the half power spectral density matrix Gyy_half given the
+    Compute the half cross spectral density matrix Gyy_half given the
     spectral density matrix Gyy.
 
 **Inputs**
@@ -132,7 +132,6 @@ end
 
     df = freq[2] - freq[1]                # Frequency resolution
     fs = 2.56*(freq[end] - freq[1])       # Effective sampling frequency
-    # fs = 2.56*freq[end]
     freq_g = (0.:df:(fs - df)) .+ freq[1] # Frequency vector for Gyy_half
 
     Gyy_half = similar(Gyy, no, ni, length(freq_g))
