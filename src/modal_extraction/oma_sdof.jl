@@ -220,5 +220,5 @@ function compute_ecsd(Gyy, u, v, id_bell)
         eGyy[f] = u'Gyy[:, :, idb]*v
     end
 
-    return eGyy
+    return real(eGyy)
 end

@@ -44,7 +44,7 @@ $$
 \boldsymbol{\Phi}_k \approx \mathbf{u}_1(\omega_k).
 $$
 
-Once the mode shapes are extracted, the FSDD utilizes the unitary property of the singular vectors to derive an enhanced output PSD $\hat{G}_{yy}(\omega)$ in the vicinity of the resonance frequency, such that:
+Once the mode shapes are extracted, the FSDD utilizes the unitary property of the singular vectors to derive an enhanced output PSD $\hat{G}_{yy}(\omega)$, which is a real quantity, in the vicinity of the resonance frequency, such that:
 $$
 \hat{G}_{yy}(\omega) = \mathbf{u}_1(\omega_k)^H\, \mathbf{G}_{yy}(\omega)\, \mathbf{u}_1(\omega_k) \approx \frac{d_k}{\sigma_k^2 + (\omega - \Omega_k)^2},
 $$
@@ -84,12 +84,6 @@ To perform a robust FSDD, `StructuralVibration.jl` implements two additional ste
     $$
     p_k = -\sqrt{\omega_k^2 - \Omega_k^2} + j \Omega_k,
     $$
-
-::: {.callout-note}
-
-In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the real and imaginary parts are separated to solve a real system of double size.
-
-:::
 
 2. For lightly damped structures, the least-squares fitting may failed to provide a physical solution due to numerical inaccuracies. In this case, one typically observes that $\Omega_k > \omega_k$, leading to imaginary values for the damping ratio. To overcome this issue, `StructuralVibration.jl` uses the estimation inspired by the Enhanced Frequency Domain Decomposition (EFDD) method[^2].
 
