@@ -35,7 +35,7 @@ id_end = length(fft_params.freq) - 0
 freq = fft_params.freq
 freq_calc = freq[id_start:id_end]
 prob = ModalFRFProblem(ωn, ξ, freq_calc, ϕm, ϕexc)
-H = solve(prob; ismat = true).u
+H = solve(prob).u
 
 # Acquisition parameters
 nblocks = 5
@@ -51,7 +51,7 @@ x = repeat(excitation(chirp, tb), outer = nblocks)
 force = zeros(length(xexc), length(t))
 force[2, :] .= x
 
-prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t, ismodal = true)
+prob = ForcedModalTimeProblem(ωn, ϕexc, ξ*ones(length(kn)), ϕexc'force, (zeros(length(xexc)), zeros(length(xexc))), t)
 y = solve(prob).u
 
 # Chirp excitation - Excitation CSD matrix
