@@ -75,10 +75,8 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
 
         # Solve the system
         # Tips: Solving the complex system directly can lead to numerical issues
-        # so we separate the real and imaginary parts to solve a real system of double size using
-        Sa = [real(A); imag(A)]
-        Sb = [real(b); imag(b)]
-        res = (Sa'Sa)\(Sa'Sb)
+        # so we separate the real and imaginary parts to solve a real system of double size using least-squares
+        res = (A'A)\(A'b)
 
         ωn = √res[1]
         Ωn = res[2]
