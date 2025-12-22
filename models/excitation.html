@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,14 +70,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-400b18e4f718b57415d2ed5ec8a80165.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23977704ecf4f09799f5ead403e6f5db.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1a140738512e4c5ea5f4258c037310e7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e51b4e25238c3c2b9aea47dc2975d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -124,7 +125,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -150,7 +151,8 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">StructuralVibration.jl</span>
@@ -292,9 +294,9 @@ window.Quarto = {
 <p>To define an excitation, two steps must be followed:</p>
 <ol type="1">
 <li><p>Initialize an excitation type:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>exc_type <span class="op">=</span> <span class="fu">MyExcitation</span>(params<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>exc_type <span class="op">=</span> <span class="fu">MyExcitation</span>(params<span class="op">...</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
 <li><p>Compute the excitation signal corresponding to the given excitation type over a given duration <code>t</code> (See <a href="#sec-exc-api" class="quarto-xref">Section&nbsp;2</a> for details):</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(exc_type, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">excitation</span>(exc_type, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
 </ol>
 <section id="rectangular-signal" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="rectangular-signal"><span class="header-section-number">1.1</span> Rectangular signal</h3>
@@ -327,7 +329,7 @@ F_0 &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
 </div>
 </div>
 <div id="6" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -340,7 +342,7 @@ F_0 &amp; \text{if } t \in [t_\text{start}, t_\text{start} + T] \\
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>rect <span class="op">=</span> <span class="fu">Rectangle</span>(F0, tstart, duration)</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>F_rect <span class="op">=</span> <span class="fu">excitation</span>(rect, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>F_rect <span class="op">=</span> <span class="fu">excitation</span>(rect, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -380,7 +382,7 @@ F_0 - \frac{2F_0}{T}(t - t_m) &amp; \text{if } t \in [t_m, t_\text{start} + T] \
 </div>
 </div>
 <div id="12" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -393,7 +395,7 @@ F_0 - \frac{2F_0}{T}(t - t_m) &amp; \text{if } t \in [t_m, t_\text{start} + T] \
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>tri <span class="op">=</span> <span class="fu">Triangle</span>(F0, tstart, duration)</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>F_tri <span class="op">=</span> <span class="fu">excitation</span>(tri, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>F_tri <span class="op">=</span> <span class="fu">excitation</span>(tri, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="14" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -434,7 +436,7 @@ F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\ri
 </div>
 </div>
 <div id="18" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-5</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">0.05</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -448,7 +450,7 @@ F_0\left(\frac{t_h}{p\theta}\right)^p \text{exp}\left(-\frac{t_h}{\theta} + p\ri
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>hammer <span class="op">=</span> <span class="fu">Hammer</span>(F0, tstart, k, θ)</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>F_hammer <span class="op">=</span> <span class="fu">excitation</span>(hammer, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>F_hammer <span class="op">=</span> <span class="fu">excitation</span>(hammer, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -491,7 +493,7 @@ F_0 &amp; \text{if } t \in [t_\text{start} + t_\text{rise}, t_\text{start} + t_\
 </div>
 </div>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -505,7 +507,7 @@ F_0 &amp; \text{if } t \in [t_\text{start} + t_\text{rise}, t_\text{start} + t_\
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>srect <span class="op">=</span> <span class="fu">SmoothRect</span>(F0, tstart, duration, trise)</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>F_srect <span class="op">=</span> <span class="fu">excitation</span>(srect, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>F_srect <span class="op">=</span> <span class="fu">excitation</span>(srect, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -522,12 +524,12 @@ F_0 \sin\left(\omega (t - t_\text{start}) + \theta\right), &amp; \text{if } t \i
 \end{cases},
 \]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(\omega\)</span> is the angular frequency of the signal, and <span class="math inline">\(\theta\)</span> is the phase of the signal.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Zero-end signal">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Zero-end signal
+<span class="screen-reader-only">Note</span>Zero-end signal
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -582,7 +584,7 @@ T_\text{new} = \frac{2\pi n - \theta}{\omega}.
 </div>
 </div>
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -596,7 +598,7 @@ T_\text{new} = \frac{2\pi n - \theta}{\omega}.
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>sine <span class="op">=</span> <span class="fu">SineWave</span>(F0, tstart, duration, f, zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>F_sine <span class="op">=</span> <span class="fu">excitation</span>(sine, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>F_sine <span class="op">=</span> <span class="fu">excitation</span>(sine, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -635,7 +637,7 @@ F_0 \sin(\frac{\pi (t - t_\text{start}}{T}) &amp; \text{if } t \in [t_\text{star
 </div>
 </div>
 <div id="36" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -648,7 +650,7 @@ F_0 \sin(\frac{\pi (t - t_\text{start}}{T}) &amp; \text{if } t \in [t_\text{star
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>hsine <span class="op">=</span> <span class="fu">HalfSine</span>(F0, tstart, duration)</span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>F_hsine <span class="op">=</span> <span class="fu">excitation</span>(hsine, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>F_hsine <span class="op">=</span> <span class="fu">excitation</span>(hsine, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="38" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -687,7 +689,7 @@ F_0\left(1 - cos(\frac{2\pi t}{T}\right) &amp; \text{if } t \in [t_\text{start},
 </div>
 </div>
 <div id="42" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -700,7 +702,7 @@ F_0\left(1 - cos(\frac{2\pi t}{T}\right) &amp; \text{if } t \in [t_\text{start},
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>haversine <span class="op">=</span> <span class="fu">HaverSine</span>(F0, tstart, duration)</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>F_haversine <span class="op">=</span> <span class="fu">excitation</span>(haversine, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>F_haversine <span class="op">=</span> <span class="fu">excitation</span>(haversine, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -737,12 +739,12 @@ f(t) = f_\text{start}\beta^{t - t_\text{start}} \Rightarrow \theta(t) = \frac{2\
 \]</span> where <span class="math inline">\(\beta = \left(\frac{f_\text{end}}{f_\text{start}}\right)^{1/T}\)</span>.</p></li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled" title="Zero-end signal">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Zero-end signal
+<span class="screen-reader-only">Note</span>Zero-end signal
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -805,7 +807,7 @@ n = \frac{f_\text{end} - f_\text{start}}{\log(f_\text{end}/f_\text{start})}T \Ri
 </div>
 </div>
 <div id="48" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -821,7 +823,7 @@ n = \frac{f_\text{end} - f_\text{start}}{\log(f_\text{end}/f_\text{start})}T \Ri
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>chirp <span class="op">=</span> <span class="fu">SweptSine</span>(F0, tstart, duration, fstart, fend, type_swept, zero_end <span class="op">=</span> <span class="cn">true</span>)</span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>F_chirp <span class="op">=</span> <span class="fu">excitation</span>(chirp, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>F_chirp <span class="op">=</span> <span class="fu">excitation</span>(chirp, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="50" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -838,12 +840,12 @@ F_0 \exp\left(-\frac{t_p^2}{2\sigma^2}\right) \cos(2\pi f_c t_p), &amp; \text{if
 \end{cases},
 \]</span> where <span class="math inline">\(F_0\)</span> is the amplitude of the signal, <span class="math inline">\(t_\text{start}\)</span> is the start time of the signal, <span class="math inline">\(\sigma\)</span> is the standard deviation of the signal, and <span class="math inline">\(f_c\)</span> is the carrier frequency. Here <span class="math inline">\(t_p = t - t_\text{start} - T/2\)</span> so that the Gaussian pulse reaches its maximum value at <span class="math inline">\(t = t_\text{start} + T/2\)</span>.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Variance calibration">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Variance calibration
+<span class="screen-reader-only">Note</span>Variance calibration
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -884,7 +886,7 @@ n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
 </div>
 </div>
 <div id="54" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -898,7 +900,7 @@ n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>gpulse <span class="op">=</span> <span class="fu">GaussianPulse</span>(F0, tstart, duration, fc)</span>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the excitation</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>F_gpulse <span class="op">=</span> <span class="fu">excitation</span>(gpulse, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>F_gpulse <span class="op">=</span> <span class="fu">excitation</span>(gpulse, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="56" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -969,7 +971,7 @@ n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
 </div>
 </div>
 <div id="60" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-4</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fu">length</span>(t)</span>
@@ -994,7 +996,7 @@ n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
 <span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>S_pink <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_pink, t))</span>
 <span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>S_blue <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_blue, t))</span>
 <span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>S_brown <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_brown, t))</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>S_purple <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_purple, t))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>S_purple <span class="op">=</span> <span class="fu">rfft</span>(<span class="fu">excitation</span>(exc_purple, t))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1108,13 +1110,14 @@ n = 2\sqrt{2(p\log 10 + \log F_0)} \Rightarrow \sigma = \frac{T}{n}.
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

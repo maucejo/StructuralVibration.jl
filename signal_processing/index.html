@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,14 +69,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-400b18e4f718b57415d2ed5ec8a80165.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23977704ecf4f09799f5ead403e6f5db.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1a140738512e4c5ea5f4258c037310e7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e51b4e25238c3c2b9aea47dc2975d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -123,7 +124,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -149,7 +150,8 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">StructuralVibration.jl</span>
@@ -322,7 +324,7 @@ w[n] = 1,
 <section id="example" class="level5" data-number="1.1.1.2">
 <h5 data-number="1.1.1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.1.1.2</span> Example</h5>
 <div id="6" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>rectwin <span class="op">=</span> <span class="fu">rect</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>rectwin <span class="op">=</span> <span class="fu">rect</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -356,7 +358,7 @@ w[n] = \frac{1}{2} \left[1 - \cos\left(\frac{2\pi n}{N-1}\right)\right],
 <section id="example-1" class="level5" data-number="1.1.2.2">
 <h5 data-number="1.1.2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">1.1.2.2</span> Example</h5>
 <div id="12" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hannwin <span class="op">=</span> <span class="fu">hanning</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hannwin <span class="op">=</span> <span class="fu">hanning</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="14" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -390,7 +392,7 @@ w[n] = 0.54 - 0.46 \cos\left(\frac{2\pi n}{N-1}\right),
 <section id="example-2" class="level5" data-number="1.1.3.2">
 <h5 data-number="1.1.3.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">1.1.3.2</span> Example</h5>
 <div id="18" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hammwin <span class="op">=</span> <span class="fu">hamming</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hammwin <span class="op">=</span> <span class="fu">hamming</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -430,7 +432,7 @@ w[n] = 0.54 - 0.46 \cos\left(\frac{2\pi n}{N-1}\right),
 <section id="example-3" class="level5" data-number="1.1.4.2">
 <h5 data-number="1.1.4.2" class="anchored" data-anchor-id="example-3"><span class="header-section-number">1.1.4.2</span> Example</h5>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tukeywin <span class="op">=</span> <span class="fu">tukey</span>(<span class="fl">1024</span>, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tukeywin <span class="op">=</span> <span class="fu">tukey</span>(<span class="fl">1024</span>, <span class="fl">0.5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -464,7 +466,7 @@ w[n] = \cos\left(\frac{\pi n}{N-1} - \frac{\pi}{2}\right),
 <section id="example-4" class="level5" data-number="1.1.5.2">
 <h5 data-number="1.1.5.2" class="anchored" data-anchor-id="example-4"><span class="header-section-number">1.1.5.2</span> Example</h5>
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>coswin <span class="op">=</span> <span class="fu">cosine</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>coswin <span class="op">=</span> <span class="fu">cosine</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -498,7 +500,7 @@ w[n] = \text{sinc}\left(\frac{2n}{N-1} - 1\right),
 <section id="example-5" class="level5" data-number="1.1.6.2">
 <h5 data-number="1.1.6.2" class="anchored" data-anchor-id="example-5"><span class="header-section-number">1.1.6.2</span> Example</h5>
 <div id="36" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lanczoswin <span class="op">=</span> <span class="fu">lanczos</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lanczoswin <span class="op">=</span> <span class="fu">lanczos</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="38" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -529,7 +531,7 @@ w[n] = 1 - \frac{|2n - (N-1)|}{L},
 </div>
 </div>
 <div id="42" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>triangwin <span class="op">=</span> <span class="fu">triang</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>triangwin <span class="op">=</span> <span class="fu">triang</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -563,7 +565,7 @@ w[n] = \left(1 - \frac{|n - L|}{L}\right),
 <section id="example-6" class="level5" data-number="1.1.8.2">
 <h5 data-number="1.1.8.2" class="anchored" data-anchor-id="example-6"><span class="header-section-number">1.1.8.2</span> Example</h5>
 <div id="48" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bartlettwin <span class="op">=</span> <span class="fu">bartlett</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bartlettwin <span class="op">=</span> <span class="fu">bartlett</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="50" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -597,7 +599,7 @@ w[n] = 0.62 - 0.48 \left|\frac{n}{N-1} - 0.5\right| + 0.38 \cos\left(2\pi\left[\
 <section id="example-7" class="level5" data-number="1.1.9.2">
 <h5 data-number="1.1.9.2" class="anchored" data-anchor-id="example-7"><span class="header-section-number">1.1.9.2</span> Example</h5>
 <div id="54" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>barthannwin <span class="op">=</span> <span class="fu">bartlett_hann</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>barthannwin <span class="op">=</span> <span class="fu">bartlett_hann</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="56" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -631,7 +633,7 @@ w[n] = \text{exp}\left(-\frac{(n - \mu)^2}{2\sigma^2}\right),
 <section id="example-8" class="level5" data-number="1.1.10.2">
 <h5 data-number="1.1.10.2" class="anchored" data-anchor-id="example-8"><span class="header-section-number">1.1.10.2</span> Example</h5>
 <div id="60" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>gaussianwin <span class="op">=</span> <span class="fu">gaussian</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>gaussianwin <span class="op">=</span> <span class="fu">gaussian</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -665,7 +667,7 @@ w[n] = 0.42 - 0.5 \cos\left(\frac{2\pi n}{N-1}\right) + 0.08 \cos\left(\frac{4\p
 <section id="example-9" class="level5" data-number="1.1.11.2">
 <h5 data-number="1.1.11.2" class="anchored" data-anchor-id="example-9"><span class="header-section-number">1.1.11.2</span> Example</h5>
 <div id="66" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>blackmanwin <span class="op">=</span> <span class="fu">blackman</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>blackmanwin <span class="op">=</span> <span class="fu">blackman</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="68" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -699,7 +701,7 @@ w[n] = I_0\left(\pi\alpha \sqrt{1 - \left(\frac{2n}{N-1} - 1\right)^2}\right) / 
 <section id="example-10" class="level5" data-number="1.1.12.2">
 <h5 data-number="1.1.12.2" class="anchored" data-anchor-id="example-10"><span class="header-section-number">1.1.12.2</span> Example</h5>
 <div id="72" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kaiserwin <span class="op">=</span> <span class="fu">kaiser</span>(<span class="fl">1024</span>, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kaiserwin <span class="op">=</span> <span class="fu">kaiser</span>(<span class="fl">1024</span>, <span class="fl">0.5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="74" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -731,7 +733,7 @@ w[n] = I_0\left(\pi\alpha \sqrt{1 - \left(\frac{2n}{N-1} - 1\right)^2}\right) / 
 <section id="example-11" class="level5" data-number="1.1.13.2">
 <h5 data-number="1.1.13.2" class="anchored" data-anchor-id="example-11"><span class="header-section-number">1.1.13.2</span> Example</h5>
 <div id="78" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dpsswin <span class="op">=</span> <span class="fu">dpss</span>(<span class="fl">1024</span>, <span class="fl">4</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dpsswin <span class="op">=</span> <span class="fu">dpss</span>(<span class="fl">1024</span>, <span class="fl">4</span>, <span class="fl">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="80" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -779,7 +781,7 @@ w[n] = \text{exp}\left(-\frac{\tau n}{N-1}\right),
 <section id="example-12" class="level5" data-number="1.2.1.2">
 <h5 data-number="1.2.1.2" class="anchored" data-anchor-id="example-12"><span class="header-section-number">1.2.1.2</span> Example</h5>
 <div id="84" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>exponentialwin <span class="op">=</span> <span class="fu">exponential</span>(<span class="fl">1024</span>, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>exponentialwin <span class="op">=</span> <span class="fu">exponential</span>(<span class="fl">1024</span>, <span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="86" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -837,8 +839,8 @@ w[n] = w_1[n] \cdot w_2[n],
 <section id="example-13" class="level5" data-number="1.2.2.2">
 <h5 data-number="1.2.2.2" class="anchored" data-anchor-id="example-13"><span class="header-section-number">1.2.2.2</span> Example</h5>
 <div id="90" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>forcewin <span class="op">=</span> <span class="fu">force</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>, <span class="fl">1</span>.)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>force_expwin <span class="op">=</span> <span class="fu">force</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>, <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>forcewin <span class="op">=</span> <span class="fu">force</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>, <span class="fl">1</span>.)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>force_expwin <span class="op">=</span> <span class="fu">force</span>(<span class="fl">1024</span>, <span class="fl">0.2</span>, <span class="fl">0.01</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="92" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -881,7 +883,7 @@ w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}
 <section id="example-14" class="level5" data-number="1.2.3.2">
 <h5 data-number="1.2.3.2" class="anchored" data-anchor-id="example-14"><span class="header-section-number">1.2.3.2</span> Example</h5>
 <div id="96" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>flattopwin <span class="op">=</span> <span class="fu">flattop</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>flattopwin <span class="op">=</span> <span class="fu">flattop</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="98" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -924,7 +926,7 @@ w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}
 <section id="example-15" class="level5" data-number="1.2.4.2">
 <h5 data-number="1.2.4.2" class="anchored" data-anchor-id="example-15"><span class="header-section-number">1.2.4.2</span> Example</h5>
 <div id="102" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nuttallwin <span class="op">=</span> <span class="fu">nuttall</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nuttallwin <span class="op">=</span> <span class="fu">nuttall</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="104" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -967,7 +969,7 @@ w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}
 <section id="example-16" class="level5" data-number="1.2.5.2">
 <h5 data-number="1.2.5.2" class="anchored" data-anchor-id="example-16"><span class="header-section-number">1.2.5.2</span> Example</h5>
 <div id="108" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>blackman_nuttallwin <span class="op">=</span> <span class="fu">blackman_nuttall</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>blackman_nuttallwin <span class="op">=</span> <span class="fu">blackman_nuttall</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="110" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1010,7 +1012,7 @@ w[n] = a_0 - a_1\cos\left(\frac{2\pi n}{N-1}\right) + a_2\cos\left(\frac{4\pi n}
 <section id="example-17" class="level5" data-number="1.2.6.2">
 <h5 data-number="1.2.6.2" class="anchored" data-anchor-id="example-17"><span class="header-section-number">1.2.6.2</span> Example</h5>
 <div id="114" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>blackman_harriswin <span class="op">=</span> <span class="fu">blackman_harris</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>blackman_harriswin <span class="op">=</span> <span class="fu">blackman_harris</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="116" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1056,7 +1058,7 @@ w[n] = \begin{cases}
 <section id="example-18" class="level5" data-number="1.2.7.2">
 <h5 data-number="1.2.7.2" class="anchored" data-anchor-id="example-18"><span class="header-section-number">1.2.7.2</span> Example</h5>
 <div id="120" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>parzenwin <span class="op">=</span> <span class="fu">parzen</span>(<span class="fl">1024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>parzenwin <span class="op">=</span> <span class="fu">parzen</span>(<span class="fl">1024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="122" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1106,7 +1108,7 @@ w[N - n], &amp; 0 \leq n &lt; N/2 \\
 <section id="example-19" class="level5" data-number="1.2.8.2">
 <h5 data-number="1.2.8.2" class="anchored" data-anchor-id="example-19"><span class="header-section-number">1.2.8.2</span> Example</h5>
 <div id="126" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>planckwin <span class="op">=</span> <span class="fu">planck</span>(<span class="fl">1024</span>, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>planckwin <span class="op">=</span> <span class="fu">planck</span>(<span class="fl">1024</span>, <span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="128" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1154,7 +1156,7 @@ w[n] = \begin{cases}
 <section id="example-20" class="level5" data-number="1.2.9.2">
 <h5 data-number="1.2.9.2" class="anchored" data-anchor-id="example-20"><span class="header-section-number">1.2.9.2</span> Example</h5>
 <div id="132" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>flattriwin <span class="op">=</span> <span class="fu">flattri</span>(<span class="fl">1024</span>, <span class="fl">0.25</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>flattriwin <span class="op">=</span> <span class="fu">flattri</span>(<span class="fl">1024</span>, <span class="fl">0.25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="134" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1215,7 +1217,7 @@ w[n] = \begin{cases}
 <section id="example-21" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="example-21"><span class="header-section-number">2.2</span> Example</h3>
 <div id="138" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time parameters</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>Δt <span class="op">=</span> <span class="fl">1e-4</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span>Δt<span class="op">:</span><span class="fl">10</span>.</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>Δt</span>
@@ -1225,7 +1227,7 @@ w[n] = \begin{cases}
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">randn</span>(nt)</span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># filtered signal</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>yf <span class="op">=</span> <span class="fu">anti_alias</span>(y, <span class="fl">2500</span>., fs <span class="op">=</span> fs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>yf <span class="op">=</span> <span class="fu">anti_alias</span>(y, <span class="fl">2500</span>., fs <span class="op">=</span> fs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="140" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1346,7 +1348,7 @@ f_{max} = \frac{f_s}{2.56}.
 <section id="example-22" class="level4" data-number="3.2.2">
 <h4 data-number="3.2.2" class="anchored" data-anchor-id="example-22"><span class="header-section-number">3.2.2</span> Example</h4>
 <div id="146" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -1378,7 +1380,7 @@ f_{max} = \frac{f_s}{2.56}.
 <span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">solve</span>(prob_y).u</span>
 <span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectrum stimation</span></span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>uest <span class="op">=</span> <span class="fu">spectrum</span>(y, block_size, rect, fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>uest <span class="op">=</span> <span class="fu">spectrum</span>(y, block_size, rect, fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="148" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1536,7 +1538,7 @@ csd(x::AbstractVector, y::AbstractVector, bs, window_x = hanning, window_y = win
 <h4 data-number="3.3.2" class="anchored" data-anchor-id="example-23"><span class="header-section-number">3.3.2</span> Example</h4>
 <p>This example is based on the one provided in the <code>DSP.jl</code> documentation. It generates a signal composed of two sine waves at 100 Hz and 150 Hz with amplitudes equal to 1 and 2 respectively, and then estimates the power spectral density using the Welch method.</p>
 <div id="154" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="fl">1000</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="fl">100</span></span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -1555,7 +1557,7 @@ csd(x::AbstractVector, y::AbstractVector, bs, window_x = hanning, window_y = win
 <span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co"># PSD estimation from StructuralVibration.jl</span></span>
 <span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>pxx <span class="op">=</span> <span class="fu">welch</span>(x, bs, hamming, fs <span class="op">=</span> fs)[<span class="fl">1</span>]</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>pxx_csd <span class="op">=</span> <span class="fu">csd</span>(x, x, bs, hamming, fs <span class="op">=</span> fs)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>pxx_csd <span class="op">=</span> <span class="fu">csd</span>(x, x, bs, hamming, fs <span class="op">=</span> fs)[<span class="fl">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="156" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1669,7 +1671,7 @@ tfestimate(input_signal::AbstractVector, output_signal::AbstractVector, bs::Int,
 <section id="example-24" class="level4" data-number="3.4.2">
 <h4 data-number="3.4.2" class="anchored" data-anchor-id="example-24"><span class="header-section-number">3.4.2</span> Example</h4>
 <div id="160" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">25</span>.</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -1702,7 +1704,7 @@ tfestimate(input_signal::AbstractVector, output_signal::AbstractVector, bs::Int,
 <span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a><span class="co"># FRF estimation</span></span>
 <span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a><span class="fu">win</span>(x) <span class="op">=</span> <span class="fu">tukey</span>(x, <span class="fl">0.25</span>)</span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>H1 <span class="op">=</span> <span class="fu">tfestimate</span>(x, y, block_size, win, fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>H1 <span class="op">=</span> <span class="fu">tfestimate</span>(x, y, block_size, win, fs <span class="op">=</span> sample_rate)[<span class="fl">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="162" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1776,13 +1778,14 @@ tfestimate(input_signal::AbstractVector, output_signal::AbstractVector, bs::Int,
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

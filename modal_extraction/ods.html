@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,14 +70,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-400b18e4f718b57415d2ed5ec8a80165.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23977704ecf4f09799f5ead403e6f5db.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1a140738512e4c5ea5f4258c037310e7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e51b4e25238c3c2b9aea47dc2975d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -124,7 +125,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -150,7 +151,8 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">StructuralVibration.jl</span>
@@ -385,7 +387,7 @@ ods(Gyy, freq, pks_indices, min_mac; avg_alg)</code></pre>
 <section id="extracting-ods-from-response-spectra" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="extracting-ods-from-response-spectra"><span class="header-section-number">3.1</span> Extracting ODS from response spectra</h3>
 <div id="6" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structure parameters of the beam</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structure parameters of the beam</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.        <span class="co"># Length</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="fl">0.03</span>      <span class="co"># Width</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">0.01</span>      <span class="co"># Thickness</span></span>
@@ -420,7 +422,7 @@ ods(Gyy, freq, pks_indices, min_mac; avg_alg)</code></pre>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>ods_real <span class="op">=</span> <span class="fu">real_normalization</span>(ods_complex)</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ods_real, ms_m[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ods_real, <span class="fl">2</span>)])</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>ods_scaled <span class="op">=</span> ods_real <span class="op">.*</span> scaling<span class="op">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>ods_scaled <span class="op">=</span> ods_real <span class="op">.*</span> scaling<span class="op">'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -431,7 +433,7 @@ ods(Gyy, freq, pks_indices, min_mac; avg_alg)</code></pre>
 <section id="extracting-ods-from-csd-matrices" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="extracting-ods-from-csd-matrices"><span class="header-section-number">3.2</span> Extracting ODS from CSD matrices</h3>
 <div id="10" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Acquisition parameters</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sample_rate <span class="op">=</span> <span class="fl">4096</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="fl">4096</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>fft_params <span class="op">=</span> <span class="fu">FFTParameters</span>(sample_rate, block_size)</span>
@@ -467,7 +469,7 @@ ods(Gyy, freq, pks_indices, min_mac; avg_alg)</code></pre>
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>ods_real <span class="op">=</span> <span class="fu">real_normalization</span>(ods_complex)</span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>scaling <span class="op">=</span> <span class="fu">msf</span>(ods_real, ms_m[<span class="op">:</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">size</span>(ods_real, <span class="fl">2</span>)])</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>ods_scaled <span class="op">=</span> ods_real <span class="op">.*</span> scaling<span class="op">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>ods_scaled <span class="op">=</span> ods_real <span class="op">.*</span> scaling<span class="op">'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="12" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -537,13 +539,14 @@ ods(Gyy, freq, pks_indices, min_mac; avg_alg)</code></pre>
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,14 +69,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-400b18e4f718b57415d2ed5ec8a80165.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23977704ecf4f09799f5ead403e6f5db.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1a140738512e4c5ea5f4258c037310e7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e51b4e25238c3c2b9aea47dc2975d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -123,7 +124,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -149,7 +150,8 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">StructuralVibration.jl</span>
@@ -392,7 +394,7 @@ x(t) = x_0 + v_0 t.
 <section id="example" class="level4" data-number="1.1.2">
 <h4 data-number="1.1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.1.2</span> Example</h4>
 <div id="8" class="cell" data-ouput="false" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -420,7 +422,7 @@ x(t) = x_0 + v_0 t.
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Overdamped system</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>sdof_od <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, <span class="fl">1.2</span>)</span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>prob_od <span class="op">=</span> <span class="fu">SdofFreeTimeProblem</span>(sdof_od, u0, t)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>x_od <span class="op">=</span> <span class="fu">solve</span>(prob_od).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>x_od <span class="op">=</span> <span class="fu">solve</span>(prob_od).u;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="10" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -560,7 +562,7 @@ x(t) = x_h(t) + x_p(t),
 <section id="example-1" class="level5" data-number="1.2.1.2">
 <h5 data-number="1.2.1.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">1.2.1.2</span> Example</h5>
 <div id="16" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -578,7 +580,7 @@ x(t) = x_h(t) + x_p(t),
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofHarmonicTimeProblem</span>(sdof, u0, t, F0, f, <span class="op">:</span>force)</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the problem</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>x_harmo <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>x_harmo <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="18" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -679,7 +681,7 @@ x(t) = x_\text{free}(t) + \int_0^t rhs(t - τ)h(τ)dτ,
 <section id="example-2" class="level5" data-number="1.2.2.2">
 <h5 data-number="1.2.2.2" class="anchored" data-anchor-id="example-2"><span class="header-section-number">1.2.2.2</span> Example</h5>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -703,7 +705,7 @@ x(t) = x_\text{free}(t) + \int_0^t rhs(t - τ)h(τ)dτ,
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the problem</span></span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>x_arb_filt <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>filt).u</span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>x_arb_interp <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>interp).u</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>x_arb_conv <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>conv).u;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>x_arb_conv <span class="op">=</span> <span class="fu">solve</span>(prob, method <span class="op">=</span> <span class="op">:</span>conv).u;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -753,7 +755,7 @@ h(t) = 0 &amp; \text{at } t = 0 \\
 </div>
 </div>
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -763,7 +765,7 @@ h(t) = 0 &amp; \text{at } t = 0 \\
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiation of the Sdof object</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(m, f0, ξ)</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(sdof, t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fu">impulse_response</span>(sdof, t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -779,7 +781,7 @@ h(t) = 0 &amp; \text{at } t = 0 \\
 <p>To compute the SRS, the following steps are performed at a given frequency <span class="math inline">\(f\)</span>:</p>
 <ol type="1">
 <li><p>Instantiate a Sdof type</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(<span class="fl">1</span>., f, ξ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sdof <span class="op">=</span> <span class="fu">Sdof</span>(<span class="fl">1</span>., f, ξ)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
 <li><p>Compute the time response of the relative displacement <span class="math inline">\(z(t)\)</span> due to a base acceleration for <span class="math inline">\(z(0) = 0\)</span> and <span class="math inline">\(\dot z(0) = 0\)</span>.</p></li>
 <li><p>Compute the acceleration <span class="math inline">\(\ddot x(t)\)</span> of the system: <span class="math display">\[
 x(t) = -2\xi\omega_0\dot z(t) - \omega_0^2 z(t)
@@ -878,7 +880,7 @@ SRS(f) = \max\left(\max(-\ddot x(t), 0)\right)
 </div>
 </div>
 <div id="36" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the base acceleration</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definition of the base acceleration</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">1e-5</span><span class="op">:</span><span class="fl">0.5</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>base_acc <span class="op">=</span> <span class="fu">HalfSine</span>(<span class="fl">10</span>., <span class="fl">0</span>., <span class="fl">1e-3</span>)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -887,7 +889,7 @@ SRS(f) = \max\left(\max(-\ddot x(t), 0)\right)
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>srs_basic <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>srs_rec_int <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>RecursiveInt)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>srs_rec_filt <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>RecursiveFilt)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>srs_smallwood <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>Smallwood)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>srs_smallwood <span class="op">=</span> <span class="fu">srs</span>(base_acc, f, t, alg <span class="op">=</span> <span class="op">:</span>Smallwood)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="38" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -981,7 +983,7 @@ H(\omega) = \begin{cases}
 <section id="example-3" class="level4" data-number="2.1.2">
 <h4 data-number="2.1.2" class="anchored" data-anchor-id="example-3"><span class="header-section-number">2.1.2</span> Example</h4>
 <div id="44" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">10</span>.</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span></span>
@@ -996,7 +998,7 @@ H(\omega) = \begin{cases}
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofFRFProblem</span>(sdof, f)</span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the problem</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="46" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1088,7 +1090,7 @@ Y(\omega) = \begin{cases}
 <section id="example-4" class="level4" data-number="2.2.2">
 <h4 data-number="2.2.2" class="anchored" data-anchor-id="example-4"><span class="header-section-number">2.2.2</span> Example</h4>
 <div id="52" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> <span class="fl">10</span>.</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.01</span></span>
@@ -1104,7 +1106,7 @@ Y(\omega) = \begin{cases}
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">SdofFrequencyProblem</span>(sdof, f, F)</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Solve the problem</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="54" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -1169,13 +1171,14 @@ Y(\omega) = \begin{cases}
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

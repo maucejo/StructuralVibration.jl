@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,14 +70,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-400b18e4f718b57415d2ed5ec8a80165.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-23977704ecf4f09799f5ead403e6f5db.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1a140738512e4c5ea5f4258c037310e7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0e51b4e25238c3c2b9aea47dc2975d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -124,7 +125,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -150,7 +151,8 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/logo/doclogo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">StructuralVibration.jl</span>
@@ -537,7 +539,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <h2 data-number="2" class="anchored" data-anchor-id="free-response"><span class="header-section-number">2</span> Free response</h2>
 <p>The free response of a 2-dofs system is obtained by setting the external forces to zero. In this condition, the motion of the system is initiated by non-zero initial conditions. In the following example, the response provided by the direct time solvers is compared with the solution obtained by the modal solver described in <a href="https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html">Modal time solvers - Section 1</a> for the purpose of cross-validation.</p>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
@@ -564,7 +566,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Modal time problem</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>prob_free_modal <span class="op">=</span>  <span class="fu">FreeModalTimeProblem</span>(K, M, ξ, u0, t)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>x_free_modal <span class="op">=</span> <span class="fu">solve</span>(prob_free_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>x_free_modal <span class="op">=</span> <span class="fu">solve</span>(prob_free_modal).u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -576,7 +578,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <h2 data-number="3" class="anchored" data-anchor-id="forced-response"><span class="header-section-number">3</span> Forced response</h2>
 <p>The forced response of a 2-dofs system is obtained by applying a haversine excitation to the first dof of the system. As in the previous section, the response provided by the direct time solvers is compared with the solution obtained by the modal solver described in <a href="https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html">Modal time solvers - Section 2</a> for the purpose of cross-validation.</p>
 <div id="28" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> [<span class="fl">6</span>. <span class="op">-</span><span class="fl">2</span>.; <span class="op">-</span><span class="fl">2</span>. <span class="fl">4</span>.]</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ξ <span class="op">=</span> <span class="fl">0.05</span></span>
@@ -609,7 +611,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Modal time problem</span></span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(K, M, ξ, F, u0, t)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>x_forced_modal <span class="op">=</span> <span class="fu">solve</span>(prob_forced_modal).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>x_forced_modal <span class="op">=</span> <span class="fu">solve</span>(prob_forced_modal).u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="30" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -623,7 +625,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <section id="data-preparation" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">4.1</span> Data preparation</h3>
 <div id="32" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1</span>.</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="fl">0.03</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">0.01</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> b<span class="op">*</span>h</span>
@@ -646,13 +648,13 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>nddl <span class="op">=</span> <span class="fu">size</span>(Kbc, <span class="fl">1</span>)</span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculation of the damping matrix</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>Cbc <span class="op">=</span> <span class="fu">rayleigh_damping_matrix</span>(Kbc, Mbc, <span class="fl">1e-4</span>, <span class="fl">5e-4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>Cbc <span class="op">=</span> <span class="fu">rayleigh_damping_matrix</span>(Kbc, Mbc, <span class="fl">1e-4</span>, <span class="fl">5e-4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="problem-solution" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="problem-solution"><span class="header-section-number">4.2</span> Problem solution</h3>
 <div id="34" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time vector</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Time vector</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0</span>.<span class="op">:</span><span class="fl">1e-5</span><span class="op">:</span><span class="fl">1</span>.</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fu">length</span>(t)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -663,10 +665,10 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct time problem - Generalized-alpha method</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> <span class="fu">DirectTimeProblem</span>(Kbc, Mbc, Cbc, u0, t)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>u_gα <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>u_gα <span class="op">=</span> <span class="fu">solve</span>(prob).u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="38" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To avoid name conflicts</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To avoid name conflicts</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">OrdinaryDiffEqTsit5</span> as Odet</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">OrdinaryDiffEqRosenbrock</span> as Oder</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -694,7 +696,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>prob_sde <span class="op">=</span> Odet.<span class="fu">SecondOrderODEProblem</span>(sde_solve!, v0, x0, (t[<span class="fl">1</span>], t[<span class="kw">end</span>]), (Mbc, Kbc, Cbc))</span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>sol_sde <span class="op">=</span> Odet.<span class="fu">solve</span>(prob_sde, Odet.<span class="fu">AutoTsit5</span>(Oder.<span class="fu">Rosenbrock23</span>()))</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>u_sde <span class="op">=</span> <span class="fu">sol_sde</span>(t)[nddl<span class="op">+</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">*</span>nddl, <span class="op">:</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>u_sde <span class="op">=</span> <span class="fu">sol_sde</span>(t)[nddl<span class="op">+</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">*</span>nddl, <span class="op">:</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="40" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
@@ -769,13 +771,14 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
