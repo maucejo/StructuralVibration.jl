@@ -6,6 +6,12 @@ format:
     number-sections: false
 ---
 
+## 1.5.0
+
+**Breaking changes**
+
+- Refactor `poles_extraction` function to add `scaling::Function` argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection
+
 ## v1.4.1
 
 **Documentation**
