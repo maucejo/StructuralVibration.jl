@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -107,7 +107,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
@@ -669,8 +669,8 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 </div>
 <div id="38" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To avoid name conflicts</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">OrdinaryDiffEqTsit5</span> as Odet</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">OrdinaryDiffEqRosenbrock</span> as Oder</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">OrdinaryDiffEqTsit5</span> as DET</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">OrdinaryDiffEqRosenbrock</span> as DER</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># First-order ODE function</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">ode_solve!</span>(du, u, p, t)</span>
@@ -681,8 +681,8 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> [x0; v0]</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>css <span class="op">=</span> <span class="fu">ss_model</span>(Kbc, Mbc, Cbc)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>prob_ode <span class="op">=</span> Odet.<span class="fu">ODEProblem</span>(ode_solve!, u0, (t[<span class="fl">1</span>], t[<span class="kw">end</span>]), (css,))</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>sol_ode <span class="op">=</span> Odet.<span class="fu">solve</span>(prob_ode, Odet.<span class="fu">AutoTsit5</span>(Oder.<span class="fu">Rosenbrock23</span>()))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>prob_ode <span class="op">=</span> DET.<span class="fu">ODEProblem</span>(ode_solve!, u0, (t[<span class="fl">1</span>], t[<span class="kw">end</span>]), (css,))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>sol_ode <span class="op">=</span> DET.<span class="fu">solve</span>(prob_ode, DET.<span class="fu">AutoTsit5</span>(DER.<span class="fu">Rosenbrock23</span>()))</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>u_ode <span class="op">=</span> <span class="fu">sol_ode</span>(t)[<span class="fl">1</span><span class="op">:</span>nddl, <span class="op">:</span>]</span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Second-order ODE function</span></span>
@@ -694,8 +694,8 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    ddu <span class="op">.=</span> <span class="fu">M\</span>(<span class="op">-</span>C<span class="op">*</span>du <span class="op">.-</span> K<span class="op">*</span>u)</span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>prob_sde <span class="op">=</span> Odet.<span class="fu">SecondOrderODEProblem</span>(sde_solve!, v0, x0, (t[<span class="fl">1</span>], t[<span class="kw">end</span>]), (Mbc, Kbc, Cbc))</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>sol_sde <span class="op">=</span> Odet.<span class="fu">solve</span>(prob_sde, Odet.<span class="fu">AutoTsit5</span>(Oder.<span class="fu">Rosenbrock23</span>()))</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>prob_sde <span class="op">=</span> DET.<span class="fu">SecondOrderODEProblem</span>(sde_solve!, v0, x0, (t[<span class="fl">1</span>], t[<span class="kw">end</span>]), (Mbc, Kbc, Cbc))</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>sol_sde <span class="op">=</span> DET.<span class="fu">solve</span>(prob_sde, DET.<span class="fu">AutoTsit5</span>(DER.<span class="fu">Rosenbrock23</span>()))</span>
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>u_sde <span class="op">=</span> <span class="fu">sol_sde</span>(t)[nddl<span class="op">+</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">*</span>nddl, <span class="op">:</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="40" class="cell" data-execution_count="1">

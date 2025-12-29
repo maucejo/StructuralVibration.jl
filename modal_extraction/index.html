@@ -963,9 +963,8 @@ Note
 <li><p><code>nothing</code></p>
 </li>
 </ul>
-<p><strong>References</strong></p>
-<p>[1] D.J. Ewins, "Modal Testing: Theory, Practice and Application", 2nd Edition, Research Studies Press, 2000.</p>
-<p>[2] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.</p>
+<p><strong>Reference</strong></p>
+<p>[1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.</p>
 
 
 </div>
@@ -984,9 +983,8 @@ Note
 <li><p><code>nothing</code></p>
 </li>
 </ul>
-<p><strong>References</strong></p>
-<p>[1] D.J. Ewins, "Modal Testing: Theory, Practice and Application", 2nd Edition, Research Studies Press, 2000.</p>
-<p>[2] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.</p>
+<p><strong>Reference</strong></p>
+<p>[1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.</p>
 
 
 </div>
@@ -1005,8 +1003,7 @@ Note
 <li><p><code>nothing</code></p>
 </li>
 </ul>
-<p><strong>Reference</strong></p>
-<p>[1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.</p>
+<p><strong>Reference</strong> [1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.</p>
 
 
 </div>
@@ -1045,7 +1042,7 @@ Note
 <li><p><code>nothing</code></p>
 </li>
 </ul>
-<p><strong>References</strong></p>
+<p><strong>Reference</strong></p>
 <p>[1] P. Guillaume, P. Verboven, S. Vanlanduit, H. Van der Auweraer, and B. Peeters, "A poly-reference implementation of the least-squares complex frequency-domain estimator". In Proceedings of IMAC XXI. Kissimmee, FL, 2003.</p>
 <p>[2] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY</p>
 
@@ -1066,7 +1063,7 @@ Note
 <li><p><code>nothing</code></p>
 </li>
 </ul>
-<p><strong>References</strong></p>
+<p><strong>Reference</strong></p>
 <p>[1] P. Guillaume, P. Verboven, S. Vanlanduit, H. Van der Auweraer, and B. Peeters, "A poly-reference implementation of the least-squares complex frequency-domain estimator". In Proceedings of IMAC XXI. Kissimmee, FL, 2003.</p>
 <p>[2] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY</p>
 
@@ -1081,8 +1078,9 @@ Note
 <hr>
 <div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">poles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)
+<div class="markdown"><pre><code class="language-julia">poles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices)
 poles_extraction(prob::MdofProblem, order, alg; stabdiag)</code></pre>
+<p>Extract poles from the Bode diagram fitting method</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>prob::EMAProblem</code> or <code>prob::MdofProblem</code>: EMA problem containing FRF data and frequency vector</p>
@@ -1122,8 +1120,6 @@ poles_extraction(prob::MdofProblem, order, alg; stabdiag)</code></pre>
 <li><p><code>max_prom::Real</code>: Maximum peak prominence (only for Sdof methods, default: Inf)</p>
 </li>
 <li><p><code>pks_indices::Vector{Int}</code>: Indices of peaks to consider (only for Sdof methods, default: empty vector)</p>
-</li>
-<li><p><code>scaling::Function</code>: Function to scale the FRF data before peak detection (only for Sdof methods, default: identity)</p>
 </li>
 </ul>
 <p><strong>Outputs</strong></p>
