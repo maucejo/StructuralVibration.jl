@@ -11,9 +11,11 @@ Peak picking method for Sdof modal extraction
 **Fields**
 * `nothing`
 
-**Reference**
+**References**
 
-[1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
+[1] D.J. Ewins, "Modal Testing: Theory, Practice and Application", 2nd Edition, Research Studies Press, 2000.
+
+[2] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
 """
 struct PeakPicking <: SdofEMA end
 
@@ -25,9 +27,11 @@ Circle fitting method for Sdof modal extraction
 **Fields**
 * `nothing`
 
-**Reference**
+**References**
 
-[1] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
+[1] D.J. Ewins, "Modal Testing: Theory, Practice and Application", 2nd Edition, Research Studies Press, 2000.
+
+[2] D. J. Inman, "Engineering Vibration", 4th Edition, Pearson, 2013.
 """
 struct CircleFit <: SdofEMA end
 
@@ -40,6 +44,7 @@ Least squares fitting method for Sdof modal extraction
 * `nothing`
 
 **Reference**
+
 [1] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
 struct LSFit <: SdofEMA end
@@ -69,7 +74,7 @@ Least Squares Complex Frequency method for Mdof modal extraction
 **Fields**
 * `nothing`
 
-**Reference**
+**References**
 
 [1] P. Guillaume, P. Verboven, S. Vanlanduit, H. Van der Auweraer, and B. Peeters, "A poly-reference implementation of the least-squares complex frequency-domain estimator". In Proceedings of IMAC XXI. Kissimmee, FL, 2003.
 
@@ -85,7 +90,7 @@ Polyreference Least Squares Complex Frequency method for Mdof modal extraction
 **Fields**
 * `nothing`
 
-**Reference**
+**References**
 
 [1] P. Guillaume, P. Verboven, S. Vanlanduit, H. Van der Auweraer, and B. Peeters, "A poly-reference implementation of the least-squares complex frequency-domain estimator". In Proceedings of IMAC XXI. Kissimmee, FL, 2003.
 
@@ -121,7 +126,7 @@ Covariance-driven Stochastic Subspace Identification method for OMA modal extrac
 **Fields**
 * `nothing`
 
-**Reference**
+**References**
 
 [1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 
@@ -139,7 +144,7 @@ Data-driven Stochastic Subspace Identification method for OMA modal extraction
 **Fields**
 * `nothing`
 
-**Reference**
+**References**
 
 [1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 

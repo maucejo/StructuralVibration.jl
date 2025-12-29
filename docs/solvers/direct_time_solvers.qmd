@@ -345,8 +345,8 @@ ShareAdd.make_importable("OrdinaryDiffEqTsit5", "OrdinaryDiffEqRosenbrock")
 ```{julia}
 #| output: false
 # To avoid name conflicts
-import OrdinaryDiffEqTsit5 as Odet
-import OrdinaryDiffEqRosenbrock as Oder
+import OrdinaryDiffEqTsit5 as DET
+import OrdinaryDiffEqRosenbrock as DER
 
 # First-order ODE function
 function ode_solve!(du, u, p, t)
@@ -357,8 +357,8 @@ end
 
 u0 = [x0; v0]
 css = ss_model(Kbc, Mbc, Cbc)
-prob_ode = Odet.ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
-sol_ode = Odet.solve(prob_ode, Odet.AutoTsit5(Oder.Rosenbrock23()))
+prob_ode = DET.ODEProblem(ode_solve!, u0, (t[1], t[end]), (css,))
+sol_ode = DET.solve(prob_ode, DET.AutoTsit5(DER.Rosenbrock23()))
 u_ode = sol_ode(t)[1:nddl, :]
 
 # Second-order ODE function
@@ -370,8 +370,8 @@ function sde_solve!(ddu, du, u, p, t)
     ddu .= M\(-C*du .- K*u)
 end
 
-prob_sde = Odet.SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
-sol_sde = Odet.solve(prob_sde, Odet.AutoTsit5(Oder.Rosenbrock23()))
+prob_sde = DET.SecondOrderODEProblem(sde_solve!, v0, x0, (t[1], t[end]), (Mbc, Kbc, Cbc))
+sol_sde = DET.solve(prob_sde, DET.AutoTsit5(DER.Rosenbrock23()))
 u_sde = sol_sde(t)[nddl+1:2*nddl, :]
 ```
 

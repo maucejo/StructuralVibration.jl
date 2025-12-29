@@ -80,7 +80,7 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
     end
 
     # Compute the coefficients of the characteristic polynomial
-    α = [A\b; 1.]
+    α = [qr(A)\b; 1.]
 
     # Compute the poles
     V = roots(Polynomial(α))
@@ -152,7 +152,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
     # Extract submatrices for denominator solve
     A = -M[1:order, 1:order]
     b = M[1:order, nmodel]
-    α = [A\b; 1.]
+    α = [qr(A)\b; 1.]
 
     # Compute poles from polynomial roots
     V = roots(Polynomial(α))
@@ -248,7 +248,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
     #     inv_S = [s > tol ? 1/s : 0.0 for s in F.S]
     #     α = F.V * Diagonal(inv_S) * F.U' * b
     # else
-    α = A\b
+    α = qr(A)\b
     # end
 
     # Construct the companion matrix

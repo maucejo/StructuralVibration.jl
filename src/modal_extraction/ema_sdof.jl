@@ -2,8 +2,6 @@
     poles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)
     poles_extraction(prob::MdofProblem, order, alg; stabdiag)
 
-Extract poles from the Bode diagram fitting method
-
 **Inputs**
 * `prob::EMAProblem` or `prob::MdofProblem`: EMA problem containing FRF data and frequency vector
 * `order`: Order of the model (only for Mdof methods)
