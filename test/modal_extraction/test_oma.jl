@@ -37,7 +37,7 @@ force = zeros(length(x), length(t))
 force[2, :] .= excitation(chirp, t)
 
 # Response calculation
-prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'force, (zeros(length(x)), zeros(length(x))), t)
+prob = ForcedModalTimeProblem(ωn, ms_ref, ξ*ones(length(kn)), ms_ref'*force, (zeros(length(x)), zeros(length(x))), t)
 y = solve(prob).u
 
 
