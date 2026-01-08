@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="JuliaSettingsState">
-    <option name="juliaSdkPath" value="$USER_HOME$/.julia/juliaup/julia-1.12.3+0.aarch64.apple.darwin14/bin/julia" />
-    <option name="juliaVersion" value="1.12.3" />
-    <option name="replProjectPath" value="$PROJECT_DIR$" />
-  </component>
-</project>

@@ -190,7 +190,8 @@ Generalized-α time solver
             (ρ > 1.) ? throw(ArgumentError("ρ must be in [0, 1]")) : nothing
 
             αf = ρ/(ρ + 1.)
-            αm = (2ρ - 1.)/(ρ + 1.)
+            # αm = (2ρ - 1.)/(ρ + 1.)
+            αm = 3αf - 1.
         end
 
         return new{T}(αf, αm, γ0, β0, "Direct Time Problem - Generalized-α...")
