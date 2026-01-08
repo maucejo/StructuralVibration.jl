@@ -336,7 +336,7 @@ Data structure defining the inputs for Operational Modal Analysis (OMA) methods.
 - `y::AbstractMatrix{Real}`: Matrix of measured outputs (no x nt)
 - `yref::AbstractMatrix{Real}`: Matrix of reference outputs (nref x nt)
 - `t::AbstractArray{Real}`: Time vector corresponding to the measurements
-- `fs::Real`: Sampling frequency (Hz)
+- `fs::Int`: Sampling frequency (Hz)
 - `bs::Int`: Block size for CSD estimation
 - `frange::AbstractVector{Real}`: Frequency range to consider for analysis (default: [0., fs/2.56])
 - `win::Function`: Window function for CSD estimation (default: hanning)
