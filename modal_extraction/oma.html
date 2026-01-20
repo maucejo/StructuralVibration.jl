@@ -870,7 +870,8 @@ spectral density matrix Gyy.</code></pre>
 <li><p><code>poles::Vector{Complex}</code>: Extracted poles</p>
 </li>
 </ul>
-<p><strong>References</strong> [1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.</p>
+<p><strong>References</strong></p>
+<p>[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.</p>
 <p>[2] P. Peeters and G. De Roeck. "Reference-based stochastic subspace identification for output-only modal analysis". Mechanical Systems and Signal Processing, 13(6):855-878, 1999.</p>
 <p>[3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.</p>
 
@@ -886,7 +887,7 @@ spectral density matrix Gyy.</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modes_extraction(prob, alg::SdofOMA; width, min_prom, max_prom , pks_indices, min_mac, avg_alg)
 modes_extraction(prob, order, alg::MdofOMA; stabdiag)</code></pre>
-<p>Extract modes from an Operational Modal Analysis problem using the Full Spectrum Decomposition and Decay (FSDD) method</p>
+<p>Extract poles using Sdof or Mdof operational modal analysis methods</p>
 <p><strong>Inputs</strong></p>
 <ul>
 <li><p><code>prob::OMAProblem</code>: OMA problem containing the CSD matrix and frequency lines.</p>
