@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd
+using StructuralVibration, ShareAdd, Statistics
 @usingany CairoMakie
 ```
 
@@ -244,6 +244,14 @@ The least squares fit method consists of the following steps:
 In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the real and imaginary parts are separated to solve a real system of double size.
 
 :::
+
+#### Practical considerations
+
+When using Sdof methods for modal parameter extraction, the detection of the resonance peaks is a crucial step. The accuracy of the extracted modal parameters heavily depends on the correct identification of these peaks. It is therefore recommended to visually inspect the detected peaks using the `peaks_plot` function from `StructuralVibration.jl` to ensure that they correspond to actual resonances in the FRF.
+
+Internally, `poles_extraction` functions use the `Peaks.jl` package for peak detection. The parameters for peak detection (such as minimum prominence and width) can be adjusted to improve the accuracy of peak identification. In this functions, the average FRF amplitude across all measurement points converted in dB scale, i.e. $\bar{H}(f) = 20 \log_{10} \left( \frac{1}{n_o n_i} \sum_{o=1}^{n_o} \sum_{i=1}^{n_i} |H_{oi}(f)| \right)$, is used for peak detection.
+
+It results that when using `peaks_plot`, it is recommended to display $\bar{H}(f)$ to be consistent with the peak detection performed in `poles_extraction`.
 
 ### Mode shape extraction
 
@@ -784,7 +792,7 @@ H = solve(prob).u
 #### Peak detection checking
 
 ```{julia}
-Habs_dB = 20log10.(abs.(H[1, 2, :]))
+Habs_dB = vec(20log10.(mean(abs, H, dims = [1, 2])))
 peaks_plot(freq, Habs_dB, xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)")
 ```
 

@@ -10,10 +10,11 @@ format:
 
 **New features**
 
-**Minor changes**
+- Simplify `poles_extraction` method by removing `scaling` argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.
 
-- Improve `peak_proms!` function to better handle non-strict local extrema.
-- Fix a minor bug in `peak_widths!` function.
+**Internals**
+
+- Remove `peak_proms!` and `peak_widths!` from `StructuralVibration.jl`.
 
 ## 1.5.0
 

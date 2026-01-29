@@ -21,7 +21,6 @@ Extract poles using Sdof or Mdof experimental modal analysis methods
 * `min_prom::Real`: Minimum peak prominence (only for Sdof methods, default: 0. dB)
 * `max_prom::Real`: Maximum peak prominence (only for Sdof methods, default: Inf)
 * `pks_indices::Vector{Int}`: Indices of peaks to consider (only for Sdof methods, default: empty vector)
-* `scaling::Function`: Function to scale the FRF data before peak detection (only for Sdof methods, default: identity)
 
 **Outputs**
 * `poles`: Vector of extracted complex poles
@@ -91,9 +90,6 @@ Extract poles from the peak picking method
     * `CircleFit`: Circle fitting method
     * `LSFit`: Least squares fitting method
 * `pks`: NamedTuple containing indices, heights, prominences, widths, edges
-* `width::Int`: Half-width of the peaks
-* `min_prom::Real`: Minimum peak prominence
-* `max_prom::Real`: Maximum peak prominence
 
 **Outputs**
 * `poles`: Extracted poles
@@ -234,8 +230,8 @@ function compute_poles(H, freq, alg::LSFit, pks)
 
     A = similar(Hitp, nfreq_itp, 3)
     b = similar(Hitp, nfreq_itp)
-    # Sa = similar(Hitp, 2nfreq_itp, 3)
-    # Sb = similar(Hitp, 2nfreq_itp)
+    Sa = similar(Hitp, 2nfreq_itp, 3)
+    Sb = similar(Hitp, 2nfreq_itp)
     res = similar(b, 3)
     for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
@@ -262,7 +258,9 @@ function compute_poles(H, freq, alg::LSFit, pks)
         # Solve the system
         # Tips: Solving the complex system directly can lead to numerical issues
         # so we only use the real part of the system
-        res .= qr(real(A))\real(b)
+        Sa .= [real(A); imag(A)]
+        Sb .= [real(b); imag(b)]
+        res .= qr(Sa)\Sb
 
         # Calculation of the natural frequency and damping ratio
         if real(res[1]) ≤ 0.
