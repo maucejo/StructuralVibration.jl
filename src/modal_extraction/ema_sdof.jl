@@ -2,6 +2,8 @@
     poles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)
     poles_extraction(prob::MdofProblem, order, alg; stabdiag)
 
+Extract poles using Sdof or Mdof experimental modal analysis methods
+
 **Inputs**
 * `prob::EMAProblem` or `prob::MdofProblem`: EMA problem containing FRF data and frequency vector
 * `order`: Order of the model (only for Mdof methods)
@@ -40,8 +42,12 @@ function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_pr
     else
         npeak = 0
         for Hv in eachrow(Hr)
-            np = length(findmaxima(scaling.(abs.(Hv)), width).indices)
-            npeak = max(npeak, np)
+            pks = findmaxima(scaling.(abs.(Hv)), width)
+            if isempty(pks.indices)
+                continue
+            end
+            pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
+            npeak = max(npeak, length(pks.indices))
         end
     end
 
@@ -103,16 +109,17 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks
 
     if !isempty(pks_indices)
         # No peaks
-        if var(Habs) == 0.
+        if var(Habs) < eps()
             return Complex{eltype(freq)}[]
         end
 
         pks = (indices = pks_indices, heights = scaling.(Habs[pks_indices]), data = scaling.(Habs))
+
         # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
         pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
 
         # Peaks not found - Compute the relative prominence to the peak heights
-        if any(pks.proms .< 0.15pks.heights)
+        if any(pks.proms .< 0.01pks.heights)
             return Complex{eltype(freq)}[]
         end
     else
@@ -124,7 +131,7 @@ function compute_poles(H, freq, alg::PeakPicking, width, min_prom, max_prom, pks
             return Complex{eltype(freq)}[]
         end
 
-        # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+        # Define a peak prominence threshold to filter spurious peaks
         pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
     end
 
@@ -172,24 +179,30 @@ function compute_poles(H, freq, alg::CircleFit, width, min_prom, max_prom, pks_i
 
     Habs = abs.(H)
     if !isempty(pks_indices)
-        pks = (indices = pks_indices, heights = scaling.(Habs[pks_indices]), data = scaling.(Habs))
-
         # No peaks
-        if var(pks.heights) == 0.
+        if var(Habs) < eps()
             return Complex{eltype(freq)}[]
         end
 
-        # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
+        pks = (indices = pks_indices, heights = scaling.(Habs[pks_indices]), data = scaling.(Habs))
+
+        # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a strict local extremum
         pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
+
+        # Peaks not found - Compute the relative prominence to the peak heights
+        if any(pks.proms .< 0.01pks.heights)
+            return Complex{eltype(freq)}[]
+        end
     else
         # Find peaks in the FRF
         pks = findmaxima(scaling.(Habs), width)
+
         # Peaks not found
         if isempty(pks.indices)
             return Complex{eltype(freq)}[]
         end
 
-        # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+        # Define a peak prominence threshold to filter spurious peaks
         pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
     end
 
@@ -249,23 +262,30 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
 
     Habs = abs.(H)
     if !isempty(pks_indices)
-        pks = (indices = pks_indices, heights = scaling.(Habs[pks_indices]), data = scaling.(Habs))
         # No peaks
-        if var(pks.heights) == 0.
+        if var(Habs) < eps()
             return Complex{eltype(freq)}[]
         end
 
+        pks = (indices = pks_indices, heights = scaling.(Habs[pks_indices]), data = scaling.(Habs))
+
         # Use custom functions to compute peak widths and prominences, because Peaks.jl throws errors when the peak is not a local extremum
         pks = peak_proms!(pks, min = min_prom, max = max_prom) |> peak_widths!
+
+        # Peaks not found - Compute the relative prominence to the peak heights
+        if any(pks.proms .< 0.01pks.heights)
+            return Complex{eltype(freq)}[]
+        end
     else
         # Find peaks in the FRF
         pks = findmaxima(scaling.(Habs), width)
+
         # Peaks not found
         if isempty(pks.indices)
             return Complex{eltype(freq)}[]
         end
 
-        # Define a peak prominence threshold to filter spurious peaks (0.5 dB here)
+        # Define a peak prominence threshold to filter spurious peaks
         pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
     end
 
@@ -281,8 +301,8 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
 
     A = similar(Hitp, nfreq_itp, 3)
     b = similar(Hitp, nfreq_itp)
-    Sa = similar(Hitp, 2nfreq_itp, 3)
-    Sb = similar(Hitp, 2nfreq_itp)
+    # Sa = similar(Hitp, 2nfreq_itp, 3)
+    # Sb = similar(Hitp, 2nfreq_itp)
     res = similar(b, 3)
      for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
@@ -309,11 +329,10 @@ function compute_poles(H, freq, alg::LSFit, width, min_prom, max_prom, pks_indic
         # Solve the system
         # Tips: Solving the complex system directly can lead to numerical issues
         # so we separate the real and imaginary parts to solve a real system of double size using
-        Sa .= [real(A); imag(A)]
-        Sb .= [real(b); imag(b)]
-        res .= qr(Sa)\Sb
-        # Actually, only one of the two parts can be used to solve the system
-        # res .= real(A)\real(b)
+        # Sa .= [real(A); imag(A)]
+        # Sb .= [real(b); imag(b)]
+        # res .= qr(Sa)\Sb
+        res .= qr(real(A))\real(b)
 
         # Calculation of the natural frequency and damping ratio
         fn[n] = √res[1]

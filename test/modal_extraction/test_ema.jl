@@ -30,7 +30,6 @@ freq = 1.:0.1:fmax
 prob = ModalFRFProblem(ωn, ξ, freq, ms_m, ms_exc)
 H = solve(prob).u
 
-
 ## Sdof methods
 # Natural frequencies and damping ratios extraction
 prob_sdof = EMAProblem(H, freq)

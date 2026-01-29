@@ -6,6 +6,15 @@ format:
     number-sections: false
 ---
 
+## 1.6.0
+
+**New features**
+
+**Minor changes**
+
+- Improve `peak_proms!` function to better handle non-strict local extrema.
+- Fix a minor bug in `peak_widths!` function.
+
 ## 1.5.0
 
 **Breaking changes**

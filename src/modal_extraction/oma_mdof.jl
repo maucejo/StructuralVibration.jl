@@ -15,6 +15,7 @@ Extract poles using Stochastic System Identification methods.
 - `poles::Vector{Complex}`: Extracted poles
 
 **References**
+
 [1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
 
 [2] P. Peeters and G. De Roeck. "Reference-based stochastic subspace identification for output-only modal analysis". Mechanical Systems and Signal Processing, 13(6):855-878, 1999.
@@ -27,14 +28,14 @@ function poles_extraction(prob::OMAProblem, order::Int, method::MdofOMA = CovSSI
 end
 
 """
-    modes_extraction(prob, order, method; stabdiag)
+    modes_extraction(prob, order, alg; stabdiag)
 
 Extract modes using Stochastic System Identification methods.
 
 **Inputs**
 - `prob::OMAProblem`: Structure containing half-spectrum data and frequency vector
 - `order::Int`: Order of the system to identify
-- `method`: OMA method to use for pole extraction
+- `alg`: OMA method to use for pole extraction
     - `CovSSI`: Covariance-based SSI (default)
     - `DataSSI`: Data-based SSI
 - `stabdiag::Bool`: Whether to compute stabilization diagram (default: false)

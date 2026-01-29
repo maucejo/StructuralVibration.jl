@@ -1,24 +1,39 @@
 """
-    modes_extraction(prob, alg::FSDD; width, min_prom, max_prom , pks_indices, min_mac, avg_alg)
+    modes_extraction(prob, alg::SdofOMA; width, min_prom, max_prom , pks_indices, min_mac, avg_alg)
+    modes_extraction(prob, order, alg::MdofOMA; stabdiag)
 
-Extract modes from an Operational Modal Analysis problem using the Full Spectrum Decomposition and Decay (FSDD) method
+Extract poles using Sdof or Mdof operational modal analysis methods
 
 **Inputs**
 - `prob::OMAProblem`: OMA problem containing the CSD matrix and frequency lines.
-- `alg::SdofOMA`: OMA method to use for pole extraction
-    - `FSDD`: Frequency-spatial Domain Decomposition)
-- `width::Int = 1`: Width parameter for peak detection in the singular value spectrum
-- `min_prom::Float64 = 0.`: Minimum peak prominence for peak detection
-- `max_prom::Float64 = Inf`: Maximum peak prominence for peak detection
-- `pks_indices::Vector{Int} = Int[]`: Predefined indices of peaks
-- `min_mac::Float64 = 0.9`: Minimum MAC value to consider neighboring frequencies for mode shape estimation
-- `avg_alg::Symbol = :sv`: Averaging algorithm to use for mode shape estimation
+* `alg`: Algorithm to extract the poles
+    * Sdof methods:
+        * `FSDD`: Frequency-spatial Domain Decomposition)
+    * Mdof methods:
+        * `LSCF`: Least Squares Complex Frequency method (default for Mdof methods)
+        * `CovSSI`: Covariance-based SSI (default)
+        * `DataSSI`: Data-based SSI
+- `width::Int`: Width parameter for peak detection in the singular value spectrum (only for Sdof methods, default: 1)
+- `min_prom::Float64`: Minimum peak prominence for peak detection (only for Sdof methods, default: 0)
+- `max_prom::Float64`: Maximum peak prominence for peak detection (only for Sdof methods, default: Inf)
+- `pks_indices::Vector{Int}`: Predefined indices of peaks (only for Sdof methods, default: empty vector)
+- `min_mac::Float64`: Minimum MAC value to consider neighboring frequencies for mode shape estimation (only for Sdof methods, default: 0.9)
+- `avg_alg::Symbol`: Averaging algorithm to use for mode shape estimation (only for Sdof methods, default: :sv)
     - `:sv`: Weighted averaging using singular values
     - `:lin`: Linear averaging
+- `stabdiag::Bool`: Whether to compute stabilization diagram (only for Mdof methods, default: false)
 
 **Outputs**
 - `poles::Vector{ComplexF64}`: Extracted poles
 - `ms::Array{ComplexF64, 2}`: Extracted mode shapes
+
+**References**
+
+[1] C. Rainieri and G. Fabbrocino. "Operational Modal Analysis of Civil Engineering Structures: An Introduction and Guide for Applications". Springer, 2014.
+
+[2] P. Peeters and G. De Roeck. "Reference-based stochastic subspace identification for output-only modal analysis". Mechanical Systems and Signal Processing, 13(6):855-878, 1999.
+
+[3] L. Hermans and H. Van der Auweraer. "Modal testing and analysis of structures under operational conditions: Industrial applications". Mechanical Systems and Signal Processing, 13(2):193-216, 1999.
 """
 function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[], min_mac = 0.9, avg_alg = :sv)
 

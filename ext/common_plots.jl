@@ -279,6 +279,7 @@ Plot data with detected peaks.
 
 **Output**
 * `fig`: Figure
+* `pks`: Detected peaks
 """
 function peaks_plot(x, y; width = 1, min_prom = 0., max_prom = Inf, xlabel = "x", ylabel = "y")
     pks = findmaxima(y, width)
