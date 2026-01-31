@@ -104,6 +104,8 @@ function compute_poles(H, freq, alg::PeakPicking, pks)
 
     # Flat FRF - No peaks
     Habs = abs.(H)
+
+    # Check if maximum and minimum are the same or if the coefficient of variation is too low
     if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < 0.1mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
@@ -155,6 +157,8 @@ function compute_poles(H, freq, alg::CircleFit, pks)
 
     # Flat FRF - No peaks
     Habs = abs.(H)
+
+    # Check if maximum and minimum are the same or if the coefficient of variation is too low
     if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < 0.1mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
@@ -218,6 +222,8 @@ function compute_poles(H, freq, alg::LSFit, pks)
 
     # Flat FRF - No peaks
     Habs = abs.(H)
+
+    # Check if maximum and minimum are the same or if the coefficient of variation is too low
     if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < 0.1mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
