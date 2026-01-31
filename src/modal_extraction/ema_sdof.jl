@@ -53,23 +53,24 @@ function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_pr
     # Initialization
     pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
-    keeprow = trues(no*ni)
+    # keeprow = trues(no*ni)
     poles = similar(frf, Complex{eltype(freq)}, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
         p = compute_poles(Hv, freq, alg, pks)
 
         nk = length(p)
         poles .= [p; fill(complex(NaN, NaN), npeak - nk)]
-        if any(isnan.(poles))
-            keeprow[k] = false
-        end
+        # if any(isnan.(poles))
+        #     keeprow[k] = false
+        # end
 
         pk[k, :] .= poles
     end
 
     # Average the results from different FRFs
     for i in 1:npeak
-        pn[i] = mean(skipnan(pk[keeprow, i]))
+        # pn[i] = mean(skipnan(pk[keeprow, i]))
+        pn[i] = mean(skipnan(pk[:, i]))
     end
 
     return pn
@@ -100,11 +101,10 @@ Extract poles from the peak picking method
 [2] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
 function compute_poles(H, freq, alg::PeakPicking, pks)
-    # Find peaks in the FRF
-    Habs = abs.(H)
 
     # Flat FRF - No peaks
-    if var(Habs) < eps()
+    Habs = abs.(H)
+    if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < 0.1mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
 
@@ -140,6 +140,9 @@ function compute_poles(H, freq, alg::PeakPicking, pks)
 
         # A structural damping is supposed η = 2ξ. So ξ = η/2
         ξn[n] = (fmax^2 - fmin^2)/4f^2
+        if ξn[n] > 1. || ξn[n] < 0.
+            ξn[n] = NaN
+        end
 
         # Correction of the natural frequency due to damping
         fn[n] = ftemp[n]/√(1 - ξn[n]^2)
@@ -150,10 +153,9 @@ end
 
 function compute_poles(H, freq, alg::CircleFit, pks)
 
-    Habs = abs.(H)
-
     # Flat FRF - No peaks
-    if var(Habs) < eps()
+    Habs = abs.(H)
+    if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < 0.1mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
 
@@ -192,18 +194,21 @@ function compute_poles(H, freq, alg::CircleFit, pks)
 
         # Angular frequency such that θ₁ = π/2
         pos1 = argmin(@. abs(θ - π/2))
-        f₁ = freq_itp[pos1]
-        θ₁ = θ[pos1]
+        f1 = freq_itp[pos1]
+        θ1 = θ[pos1]
 
         # Angular frequency such that θ₂ = -π/2
         pos2 = argmin(@. abs(θ + π/2))
-        f₂ = freq_itp[pos2]
-        θ₂ = θ[pos2]
+        f2 = freq_itp[pos2]
+        θ2 = θ[pos2]
 
         # Calculation of the natural frequency and damping ratio
-        fn[n] = √((f₁^2*tan(θ₂/2) - f₂^2*tan(θ₁/2))/(tan(θ₂/2) - tan(θ₁/2)))
-        ξn[n] = (f₂^2 - f₁^2)/(2fn[n]^2*(tan(θ₁/2) - tan(θ₂/2)))
+        fn[n] = √((f1^2*tan(θ2/2) - f2^2*tan(θ1/2))/(tan(θ2/2) - tan(θ1/2)))
+        ξn[n] = (f2^2 - f1^2)/(2fn[n]^2*(tan(θ1/2) - tan(θ2/2)))
 
+        if ξn[n] > 1. || ξn[n] < 0.
+            ξn[n] = NaN
+        end
     end
 
     return modal2poles(fn, ξn)
@@ -211,10 +216,9 @@ end
 
 function compute_poles(H, freq, alg::LSFit, pks)
 
-    Habs = abs.(H)
-
     # Flat FRF - No peaks
-    if var(Habs) < eps()
+    Habs = abs.(H)
+    if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < 0.1mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
 
@@ -230,9 +234,9 @@ function compute_poles(H, freq, alg::LSFit, pks)
 
     A = similar(Hitp, nfreq_itp, 3)
     b = similar(Hitp, nfreq_itp)
-    Sa = similar(Hitp, 2nfreq_itp, 3)
-    Sb = similar(Hitp, 2nfreq_itp)
-    res = similar(b, 3)
+    # Sa = similar(Hitp, 2nfreq_itp, 3)
+    # Sb = similar(Hitp, 2nfreq_itp)
+    res = similar(fn, 3)
     for (n, edg) in enumerate(pks.edges)
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
@@ -258,22 +262,21 @@ function compute_poles(H, freq, alg::LSFit, pks)
         # Solve the system
         # Tips: Solving the complex system directly can lead to numerical issues
         # so we only use the real part of the system
-        Sa .= [real(A); imag(A)]
-        Sb .= [real(b); imag(b)]
-        res .= qr(Sa)\Sb
+        # Sa .= [real(A); imag(A)]
+        # Sb .= [real(b); imag(b)]
+        # res .= qr(Sa)\Sb
+        res .= qr(real(A))\real(b)
 
         # Calculation of the natural frequency and damping ratio
         if real(res[1]) ≤ 0.
             fn[n] = NaN
-            ξn[n] = NaN
-            continue
+        else
+            fn[n] = √res[1]
         end
 
-        fn[n] = √real(res[1])
-        ξn[n] = real(res[2])/fn[n]
+        ξn[n] = res[2]/fn[n]
 
         if ξn[n] > 1. || ξn[n] < 0.
-            fn[n] = NaN
             ξn[n] = NaN
         end
     end

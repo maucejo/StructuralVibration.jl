@@ -241,7 +241,7 @@ The least squares fit method consists of the following steps:
 
 ::: {.callout-note}
 
-In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the real and imaginary parts are separated to solve a real system of double size.
+In practice, the least squares solution is not directly computed using complex numbers, as this can lead to numerical issues. Instead, the only the real part is used to solve a real system of the same size.
 
 :::
 
@@ -808,7 +808,7 @@ poles_lsf = poles_extraction(prob_sdof, LSFit())
 
 # Mode shape extraction
 dpi = [1, 2]
-ms_id = modeshape_extraction(prob_sdof, poles_pp, PeakPicking(), dpi = dpi)
+ms_id = modeshape_extraction(prob_sdof, poles_lsf, LSFit(), dpi = dpi)
 ```
 
 ```{julia}
