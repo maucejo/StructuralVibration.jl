@@ -67,6 +67,7 @@ struct DerricoEst <: NoiseEstimation end
 
 """
     varest(x, method::NoiseEstimation; batch_size = 0, summary = mean)
+    varest(x; batch_size = 0, summary = mean)
 
 Estimates the noise variance of a signal `x` using a given method
 
@@ -76,9 +77,16 @@ Estimates the noise variance of a signal `x` using a given method
     * `BayesianEst`: Bayesian noise estimation (To be implemented)
     * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
     * `LCurveEst`: L-curve noise estimation
-    * `DerricoEst`: D'Errico noise estimation
+    * `DerricoEst`: D'Errico noise estimation (default)
 * `batch_size::Int`: Batch size for batch processing (default = 0)
 * `summary`: Summary function for batch processing (default = mean)
+
+**Output**
+* `noisevar`: Noise variance - Vector{Real}
+
+
+**Note**
+* varest(x; ...) = varest(x, DerricoEst(); ...)
 """
 function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
     varestfun = let
@@ -93,7 +101,7 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
         return varestfun(x)
     else
         # Check type of x
-        x isa Vector ? x = transpose(x) : nothing
+        x isa Vector ? x = reshape(x, 1, :) : nothing
 
         nr, nc = size(x)
         batches = Vector{typeof(x)}[x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
@@ -112,7 +120,7 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
 end
 
 # Default method
-varest(x) = varest(x, BayesianEst())
+varest(x; batch_size::Int = 0, summary = mean) = varest(x, DerricoEst(), batch_size = batch_size, summary = summary)
 
 """
     varest_bayesian(x, method::OptimFamily)
@@ -379,7 +387,7 @@ function varest_derrico(x)
     end
 
     ndim = ndims(x)
-    ndim == 1 ? x = transpose(x) : nothing
+    ndim == 1 ? x = reshape(x, 1, :) : nothing
 
     nd, ns = size(x)
 
