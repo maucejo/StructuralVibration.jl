@@ -104,14 +104,19 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
         x isa Vector ? x = reshape(x, 1, :) : nothing
 
         nr, nc = size(x)
-        batches = Vector{typeof(x)}[x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
+
+        # Create batches
+        batches_candidate = Vector{typeof(x)}[x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
+
+        # Valid batches
+        len_b = length.(batches_candidate)
+        valid_batches = findall(@. len_b .≥ batch_size)
+
+        batches = batches_candidate[valid_batches]
         nb = length(batches)
 
-        noisevar = similar(x, nr, nb)
+        noisevar = similar(real(x), nr, nb)
         for (b, batch) in enumerate(batches)
-            if length(batch) < batch_size
-                continue
-            end
             noisevar[:, b] .= varestfun(batch)
         end
 
@@ -382,10 +387,33 @@ Estimates the noise variance of a signal `x` using the method proposed by John D
 [1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023.
 """
 function varest_derrico(x)
+
+    noisevar = similar(real(x), size(x, 1))
     if !isreal(x)
-        return varest_derrico(real(x)) + varest_derrico(imag(x))
+        noisevar .= varest_derrico_real(real(x)) + varest_derrico_real(imag(x))
+    else
+        noisevar .= varest_derrico_real(x)
     end
 
+    return noisevar
+end
+
+"""
+    varest_derrico_real(x)
+
+Estimates the noise variance of a real signal `x` using the method proposed by John D'Errico in [1].
+
+# Input
+* `x`: Real signal
+
+**Output**
+* `noisevar`: Noise variance
+
+**Reference**
+
+[1] John D'Errico (2023). Estimatenoise (https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise), MATLAB Central File Exchange. Retrieved December 7, 2023.
+"""
+function varest_derrico_real(x)
     ndim = ndims(x)
     ndim == 1 ? x = reshape(x, 1, :) : nothing
 
@@ -399,7 +427,7 @@ function varest_derrico(x)
     # iid, N(0,σ²), then we can try to back out the noise variance.
     nfda = 6
     np = 14
-    fda = Vector{Real}[similar(x, i+1) for i in 1:nfda]
+    fda = Vector{eltype(x)}[similar(x, i+1) for i in 1:nfda]
     # Normalization to unit norm
     fda[1] .= [1., -1.]./√2.
     fda[2] .= [1., -2., 1.]./√6.
@@ -447,12 +475,14 @@ function varest_derrico(x)
     notnan = findall(@. !isnan(@view σe[1, :]))
 
     # Use median of these estimates to get a noise estimate.
-    noisevar .= median(σe[:, notnan], dims = 2).^2.
+    noisevar .= vec(median(σe[:, notnan], dims = 2).^2.)
 
     # Use an adhoc correction to remove the bias in the noise estimate. This correction was determined by examination of a large number of random samples.
     noisevar ./= (1. + 15(ns + 1.225)^(-1.245))
 
-    return ndim == 1 ? only(noisevar) : noisevar
+    # return ndim == 1 ? only(noisevar) : noisevar
+
+    return noisevar
 end
 
 """
