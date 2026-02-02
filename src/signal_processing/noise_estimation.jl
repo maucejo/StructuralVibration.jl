@@ -390,7 +390,7 @@ function varest_derrico(x)
 
     noisevar = similar(real(x), size(x, 1))
     if !isreal(x)
-        noisevar .= varest_derrico_real(real(x)) + varest_derrico_real(imag(x))
+        noisevar .= varest_derrico_real(real(x)) .+ varest_derrico_real(imag(x))
     else
         noisevar .= varest_derrico_real(x)
     end
@@ -475,7 +475,7 @@ function varest_derrico_real(x)
     notnan = findall(@. !isnan(@view σe[1, :]))
 
     # Use median of these estimates to get a noise estimate.
-    noisevar .= vec(median(σe[:, notnan], dims = 2).^2.)
+    noisevar .= median(σe[:, notnan], dims = 2).^2.
 
     # Use an adhoc correction to remove the bias in the noise estimate. This correction was determined by examination of a large number of random samples.
     noisevar ./= (1. + 15(ns + 1.225)^(-1.245))
