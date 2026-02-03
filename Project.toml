@@ -45,7 +45,7 @@ Statistics = "1.11.1"
 Test = "1.11.0"
 TestItems = "1.0.0"
 ToeplitzMatrices = "0.8.5"
-julia = "1.12"
+julia = "1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
