@@ -15,6 +15,7 @@ format:
 **Internals**
 
 - Remove `peak_proms!` and `peak_widths!` from `StructuralVibration.jl`.
+- Fix type instability issues in `varest` function.
 
 ## 1.5.0
 

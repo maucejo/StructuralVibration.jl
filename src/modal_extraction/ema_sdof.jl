@@ -53,23 +53,19 @@ function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_pr
     # Initialization
     pk = similar(frf, no*ni, npeak)
     pn = similar(frf, npeak)
-    # keeprow = trues(no*ni)
-    poles = similar(frf, Complex{eltype(freq)}, npeak)
+    poles = similar(frf, npeak)
     for (k, Hv) in enumerate(eachrow(Hr))
         p = compute_poles(Hv, freq, alg, pks)
 
         nk = length(p)
         poles .= [p; fill(complex(NaN, NaN), npeak - nk)]
-        # if any(isnan.(poles))
-        #     keeprow[k] = false
-        # end
+
 
         pk[k, :] .= poles
     end
 
     # Average the results from different FRFs
     for i in 1:npeak
-        # pn[i] = mean(skipnan(pk[keeprow, i]))
         pn[i] = mean(skipnan(pk[:, i]))
     end
 
@@ -100,13 +96,13 @@ Extract poles from the peak picking method
 
 [2] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
-function compute_poles(H, freq, alg::PeakPicking, pks)
+function compute_poles(H, freq, alg::PeakPicking, pks) :: Vector{eltype(H)}
 
     # Flat FRF - No peaks
     Habs = abs.(H)
 
     # Check if maximum and minimum are the same or if the coefficient of variation is too low
-    if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < eltype(freq)(0.1)*mean(Habs[Habs .> 0])
+    if maximum(Habs) == minimum(Habs) || std(Habs[Habs .> 0]) < eltype(Habs)(0.1)*mean(Habs[Habs .> 0])
         return Complex{eltype(freq)}[]
     end
 
@@ -153,7 +149,7 @@ function compute_poles(H, freq, alg::PeakPicking, pks)
     return modal2poles(fn, ξn)
 end
 
-function compute_poles(H, freq, alg::CircleFit, pks)
+function compute_poles(H, freq, alg::CircleFit, pks) :: Vector{eltype(H)}
 
     # Flat FRF - No peaks
     Habs = abs.(H)
@@ -218,7 +214,7 @@ function compute_poles(H, freq, alg::CircleFit, pks)
     return modal2poles(fn, ξn)
 end
 
-function compute_poles(H, freq, alg::LSFit, pks)
+function compute_poles(H, freq, alg::LSFit, pks) :: Vector{eltype(H)}
 
     # Flat FRF - No peaks
     Habs = abs.(H)
