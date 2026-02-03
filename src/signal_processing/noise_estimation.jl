@@ -110,7 +110,7 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
 
         # Valid batches
         len_b = length.(batches_candidate)
-        valid_batches = findall(@. len_b .≥ batch_size)
+        valid_batches = findall(len_b .≥ batch_size)
 
         batches = batches_candidate[valid_batches]
         nb = length(batches)
