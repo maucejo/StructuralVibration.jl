@@ -311,9 +311,9 @@ Data structure summarizing the results of the stabilization analysis.
 
 This structure is returned by the `stabilization` function after performing a stabilization diagram analysis and used by `stabilization_plot` for visualization.
 """
-@show_data struct StabilizationAnalysis{Tp <: Complex, Tf <: Real}
+@show_data struct StabilizationAnalysis{Tc <: Complex, Tf <: Real}
     prob::MdofProblem           # EMA-MDOF problem containing FRF data and frequency vector
-    poles::Vector{Vector{Tp}}   # Extracted poles at each model order
+    poles::Vector{Vector{Tc}}   # Extracted poles at each model order
     modefn::Matrix{Tf}          # Natural frequencies (used for plotting)
     mode_stabfn::BitMatrix      # Stability of natural frequencies
     mode_stabdr::BitMatrix      # Stability of damping ratios

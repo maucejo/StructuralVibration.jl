@@ -11,7 +11,7 @@ Convert natural frequencies and damping ratios to complex poles.
 - `poles`: Vector of complex poles
 """
 function modal2poles(fn, ξn)
-    ωn = 2π*fn
+    ωn = eltype(fn).(2π*fn)
 
     return @. -ξn*ωn + 1im*ωn*√(1 - ξn^2)
 end
@@ -32,7 +32,7 @@ function poles2modal(poles)
     ωn = abs.(poles)
     fn = ωn/(2π)
     ξn = @. -real(poles)/ωn
-    return fn, ξn
+    return eltype(ξn).(fn), ξn
 end
 
 """
@@ -138,5 +138,5 @@ function poles_validity(raw_poles, order, freq, stabdiag)
     poles = length(p) ≤ order ? p : p[1:order]
 
     # If Stability diagram
-    return stabdiag ? [poles; fill(complex(NaN, NaN), order - length(poles))] : poles
+    return stabdiag ? [poles; fill(eltype(poles)(complex(NaN, NaN)), order - length(poles))] : poles
 end

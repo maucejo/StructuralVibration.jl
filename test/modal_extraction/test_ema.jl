@@ -65,6 +65,7 @@ ms_ema = sol_ema.ms
 ## Mdof methods
 # EMA problem
 prob_mdof = EMAProblem(H, freq)
+# prob_mdof = EMAProblem(Complex{Float32}.(H), Float32.(freq))
 
 # Poles extraction
 order = 10 # Model order

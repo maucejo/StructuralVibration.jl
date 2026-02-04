@@ -43,7 +43,7 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
 **Output**
 - `poles`: Vector of extracted complex poles
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false) :: Vector{ComplexF64}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false) :: Vector{Complex{eltype(prob.freq)}}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -106,7 +106,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 **Reference**
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false) :: Vector{ComplexF64}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false) :: Vector{Complex{eltype(prob.freq)}}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -155,7 +155,7 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
     α = [qr(A)\b; 1.]
 
     # Compute poles from polynomial roots
-    V = roots(Polynomial(α))
+    V = eltype(FRF).(roots(Polynomial(α)))
     p = similar(frf, order)
     try
         p .= -log.(V)/Δt
@@ -185,7 +185,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::pLSCF; stabdiag = false) :: Vector{ComplexF64}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::pLSCF; stabdiag = false) :: Vector{Complex{eltype(prob.freq)}}
     # Extract FRF and frequency from problem
     if prob isa EMAProblem
         (; frf, freq) = prob
@@ -261,7 +261,7 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
     try
         p .= -log.(eigvals(C))/Δt
     catch e
-        return fill(complex(NaN, NaN), order)
+        return fill(eltype(frf)(complex(NaN, NaN)), order)
     end
 
     return poles_validity(p, order, freq, stabdiag)
@@ -293,14 +293,8 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 """
 function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofEMA, MdofOMA} = LSCF(); stabcrit = [0.01, 0.05], progress = false)
 
-    # Extract FRF and frequency from problem
-    if prob isa EMAProblem
-        frf = prob.frf
-    elseif prob isa OMAProblem
-        frf = prob.halfspec
-    else
-        error("Unsupported problem type for LSCF method.")
-    end
+    # Extract FRF and frequency from problem - Ternary is used to avoid type instability observed with standard if else blocks
+    frf = prob isa EMAProblem ? prob.frf : (prob isa OMAProblem ? prob.halfspec : throw(ArgumentError("Unsupported problem type for stabilization analysis.")))
 
     # Initialization
     max_order += 1 # For having stability information from order 1 to max_order
@@ -314,20 +308,20 @@ function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofEMA, Md
     p = Progress(max_order, desc = "Stabilization analysis: ", showspeed = true)
     for order in 1:max_order
         progress ? next!(p) : nothing
-        try
-            poles[order] .= poles_extraction(prob, order, alg, stabdiag = true)
-        catch e
-            poles[order] .= fill(complex(NaN, NaN), order)
-        end
+        # try
+        poles[order] = poles_extraction(prob, order, alg, stabdiag = true)
+        # catch e
+        #     poles[order] .= fill(eltype(frf)(complex(NaN, NaN)), order)
+        # end
 
-        fne, dre = poles2modal(poles[order])
+        fne, dre = poles2modal(eltype(frf).(poles[order]))
         fn[order] .= fne
         dr[order] .= dre
         modefn[1:order, order] .= fn[order]
 
         if order > 1
             Nm = length(fn[order-1])
-            mode_stabfn[1:Nm, order-1], mode_stabdr[1:Nm, order-1] = check_stability(fn[order], fn[order-1], dr[order], dr[order-1], stabcrit)
+            mode_stabfn[1:Nm, order-1], mode_stabdr[1:Nm, order-1] = check_stability(fn[order], fn[order-1], dr[order], dr[order-1], eltype(prob.freq).(stabcrit))
         end
     end
 
@@ -356,6 +350,10 @@ function check_stability(fn_new, fn_old, dr_new, dr_old, stabcrit)
     Nmodes_old = length(fn_old)
     stabfn = falses(Nmodes_old)
     stabdr = falses(Nmodes_old)
+
+    if all(isnan.(fn_new))
+        return stabfn, stabdr
+    end
 
     for i in 1:Nmodes_old
         if isnan(fn_old[i])
