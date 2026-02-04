@@ -1,6 +1,6 @@
 module StructuralVibration
-       # using DispatchDoctor
-       # @stable begin
+       using DispatchDoctor
+       @stable begin
 
        using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim,
              Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
@@ -122,4 +122,4 @@ module StructuralVibration
        # include("precompilation/precompilation.jl")
 end
 
-# end
+end
