@@ -6,6 +6,10 @@ format:
     number-sections: false
 ---
 
+## 1.6.2
+
+- Fix type instability issues in `stabilization` function.
+
 ## 1.6.1
 
 - Remove `DispatchDoctor` from dependencies
