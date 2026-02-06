@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -107,7 +107,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
@@ -338,8 +338,55 @@ Note
 <hr>
 <div id="4" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">FreeModalTimeProblem(K, M, ξn, n = size(K, 1); ismodal = false)</code></pre>
+<div class="markdown"><pre><code class="language-julia">FreeModalTimeProblem(K, M, ξn, n)
+FreeModalTimeProblem(ωn, ϕn, ξn, n)</code></pre>
 <p>Structure containing data for the modal time solver</p>
+<p><strong>Constructor</strong></p>
+<ul>
+<li><p><code>K::Matrix{Real}</code>: Stiffness matrix</p>
+</li>
+<li><p><code>M::AbstractMatrix</code>: Mass matrix</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+<li><p><code>u0::Tuple</code>: Initial conditions</p>
+<ul>
+<li><p><code>u0[1]</code>: Initial displacement</p>
+</li>
+<li><p><code>u0[2]</code>: Initial velocity</p>
+</li>
+</ul>
+</li>
+<li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>freq::Real</code>: Excitation frequency</p>
+</li>
+<li><p><code>n::Int</code>: Number of modes to retain in the modal basis (default: size(K, 1))</p>
+</li>
+</ul>
+<p><strong>Alternative constructor</strong></p>
+<ul>
+<li><p><code>ωn::Vector{Real}</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ϕn::AbstractMatrix</code>: Mass-normalized mode shapes</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+<li><p><code>u0::Tuple</code>: Modal initial conditions</p>
+<ul>
+<li><p><code>u0[1]</code>: Modal initial displacement</p>
+</li>
+<li><p><code>u0[2]</code>: Modal initial velocity</p>
+</li>
+</ul>
+</li>
+<li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>freq::Real</code>: Excitation frequency</p>
+</li>
+<li><p><code>n::Int</code>: Number of modes to retain in the modal basis (default: length(ωn))</p>
+</li>
+</ul>
 <p><strong>Fields</strong></p>
 <ul>
 <li><p><code>K::VecOrMat{Real}</code>:</p>
@@ -369,8 +416,6 @@ Note
 </ul>
 </li>
 <li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
-</li>
-<li><p><code>F::Matrix{Real}</code>: External force matrix (or modal force matrix)</p>
 </li>
 <li><p><code>n::Int</code>: Number of modes to retain in the modal basis</p>
 </li>
@@ -450,7 +495,7 @@ Note
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>x0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>x0</span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>v0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>v0</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (x0m, v0m)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>prob_modal <span class="op">=</span> <span class="fu">FreeModalTimeProblem</span>(ωm, Φm, ξ, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>prob_modal <span class="op">=</span> <span class="fu">FreeModalTimeProblem</span>(ωm, Φm, ξ, u0m, t)</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>x_free <span class="op">=</span> <span class="fu">solve</span>(prob).u</span>
@@ -479,50 +524,62 @@ Note
 <hr>
 <div id="12" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div class="markdown"><pre><code class="language-julia">HarmonicModalTimeProblem(K, M, ξn, u0, t, F, ω = 0., n = size(K, 1); ismodal = false)</code></pre>
+<div class="markdown"><pre><code class="language-julia">HarmonicModalTimeProblem(K, M, ξn, u0, t, F, freq, n)
+HarmonicModalTimeProblem(ωn, ϕn, ξn, u0, t, Fn, freq, n)</code></pre>
 <p>Structure containing data for the modal time solver for computing the forced response due to an harmonic excitation</p>
 <p><strong>Constructor</strong></p>
 <ul>
-<li><p><code>K::VecOrMat{Real}</code>:</p>
-<ul>
-<li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
+<li><p><code>K::Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Natural angular frequencies</p>
-</li>
-</ul>
-</li>
-<li><p><code>M::AbtractMatrix</code>:</p>
-<ul>
-<li><p>If <code>ismodal = false</code>: Mass matrix</p>
-</li>
-<li><p>If <code>ismodal = true</code>: Mass-normalized mode shapes</p>
-</li>
-</ul>
+<li><p><code>M::AbstractMatrix</code>: Mass matrix</p>
 </li>
 <li><p><code>ξn</code>: Damping ratios</p>
 </li>
 <li><p><code>u0::Tuple</code>: Initial conditions</p>
 <ul>
-<li><p><code>u0[1]</code>: Initial displacement (or modal displacement)</p>
+<li><p><code>u0[1]</code>: Initial displacement</p>
 </li>
-<li><p><code>u0[2]</code>: Initial velocity (or modal velocity)</p>
+<li><p><code>u0[2]</code>: Initial velocity</p>
 </li>
 </ul>
 </li>
 <li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
 </li>
-<li><p><code>F::Real</code>: External force matrix (or modal participation factors)</p>
+<li><p><code>F::Real</code>: External force matrix</p>
 </li>
 <li><p><code>freq::Real</code>: Excitation frequency</p>
 </li>
-<li><p><code>n::Int</code>: Number of modes to retain in the modal basis</p>
+<li><p><code>n::Int</code>: Number of modes to retain in the modal basis (default: size(K, 1))</p>
 </li>
-<li><p><code>ismodal::Bool</code>: Flag to indicate if the problem contains modal data</p>
+</ul>
+<p><strong>Alternative constructor</strong></p>
+<ul>
+<li><p><code>ωn::Vector{Real}</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ϕn::AbstractMatrix</code>: Mass-normalized mode shapes</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+<li><p><code>u0::Tuple</code>: Modal initial conditions</p>
+<ul>
+<li><p><code>u0[1]</code>: Modal initial displacement</p>
+</li>
+<li><p><code>u0[2]</code>: Modal initial velocity</p>
+</li>
+</ul>
+</li>
+<li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>F::Real</code>: Modal participation factors</p>
+</li>
+<li><p><code>freq::Real</code>: Excitation frequency</p>
+</li>
+<li><p><code>n::Int</code>: Number of modes to retain in the modal basis (default: length(ωn))</p>
 </li>
 </ul>
 <p><strong>Fields</strong></p>
 <ul>
-<li><p><code>K</code>: Stiffness matrix (or modal stiffness matrix)</p>
+<li><p><code>K</code>: Stiffness matrix (or natural angular frequencies)</p>
 </li>
 <li><p><code>M</code>: Mass matrix (or mass-normalized mode shapes)</p>
 </li>
@@ -615,7 +672,7 @@ Note
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>v0m <span class="op">=</span> Φm<span class="op">'*</span>M<span class="op">*</span>v0</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (x0m, v0m)</span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>Lm <span class="op">=</span> Φm<span class="op">'*</span>F</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>prob_harmo_modal <span class="op">=</span> <span class="fu">HarmonicModalTimeProblem</span>(ωm, Φm, ξ, Lm, <span class="fl">2</span>π<span class="op">*</span>freq, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>prob_harmo_modal <span class="op">=</span> <span class="fu">HarmonicModalTimeProblem</span>(ωm, Φm, ξ, Lm, <span class="fl">2</span>π<span class="op">*</span>freq, u0m, t)</span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>x_harmo <span class="op">=</span> <span class="fu">solve</span>(prob_harmo).u</span>
@@ -640,23 +697,55 @@ Note
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">ForcedModalTimeProblem(K, M, ξn, F, u0, t,  n = size(K, 1); ismodal = false)</code></pre>
 <p>Structure containing data for modal time solver for computing the forced response due to an arbitrary excitation</p>
-<p><strong>Fields</strong></p>
+<p><strong>Constructor</strong></p>
 <ul>
-<li><p><code>K::VecOrMat{Real}</code>:</p>
-<ul>
-<li><p>If <code>ismodal = false</code> then <code>Matrix{Real}</code>: Stiffness matrix</p>
+<li><p><code>K::Matrix{Real}</code>: Stiffness matrix</p>
 </li>
-<li><p>If <code>ismodal = true</code> then <code>Vector{Real}</code>: Natural angular frequencies</p>
+<li><p><code>M::AbstractMatrix</code>: Mass matrix</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+<li><p><code>F::Matrix{Real}</code>: Modal participation factors</p>
+</li>
+<li><p><code>u0::Tuple</code>: Initial conditions</p>
+<ul>
+<li><p><code>u0[1]</code>: Initial displacement</p>
+</li>
+<li><p><code>u0[2]</code>: Initial velocity</p>
 </li>
 </ul>
 </li>
-<li><p><code>M::AbtractMatrix</code>:</p>
-<ul>
-<li><p>If <code>ismodal = false</code>: Mass matrix</p>
+<li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
 </li>
-<li><p>If <code>ismodal = true</code>: Mass-normalized mode shapes</p>
+<li><p><code>n::Int</code>: Number of modes to retain in the modal basis (default: size(K, 1))</p>
 </li>
 </ul>
+<p><strong>Alternative constructor</strong></p>
+<ul>
+<li><p><code>ωn::Vector{Real}</code>: Natural angular frequencies</p>
+</li>
+<li><p><code>ϕn::AbstractMatrix</code>: Mass-normalized mode shapes</p>
+</li>
+<li><p><code>ξn</code>: Damping ratios</p>
+</li>
+<li><p><code>F::Matrix{Real}</code>: Modal participation factors</p>
+</li>
+<li><p><code>u0::Tuple</code>: Modal initial conditions</p>
+<ul>
+<li><p><code>u0[1]</code>: Modal initial displacement</p>
+</li>
+<li><p><code>u0[2]</code>: Modal initial velocity</p>
+</li>
+</ul>
+</li>
+<li><p><code>t::AbstractRange</code>: Time points at which to evaluate the response</p>
+</li>
+<li><p><code>n::Int</code>: Number of modes to retain in the modal basis (default: length(ωn))</p>
+</li>
+</ul>
+<p><strong>Fields</strong>     * <code>K::VecOrMat{Real}</code>: Stiffness matrix (or natural angular frequencies)</p>
+<ul>
+<li><p><code>M::AbtractMatrix</code>: Mass matrix (or mass-normalized mode shapes)</p>
 </li>
 <li><p><code>ξn</code>: Damping ratios</p>
 </li>
@@ -748,7 +837,7 @@ Note
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>ωm, Φm <span class="op">=</span> <span class="fu">eigenmode</span>(K, M)</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>u0m <span class="op">=</span> (<span class="fu">zeros</span>(<span class="fl">2</span>), <span class="fu">zeros</span>(<span class="fl">2</span>))</span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>Lm <span class="op">=</span> Φm<span class="op">'*</span>F</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(ωm, Φm, ξ, Lm, u0m, t, ismodal <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>prob_forced_modal <span class="op">=</span> <span class="fu">ForcedModalTimeProblem</span>(ωm, Φm, ξ, Lm, u0m, t)</span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution</span></span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>x_forced <span class="op">=</span> <span class="fu">solve</span>(prob_forced).u</span>
