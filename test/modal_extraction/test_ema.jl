@@ -56,16 +56,16 @@ H_sdof = frf_reconstruction(res_pp, poles_pp, freq)
 lr, ur = compute_residuals(prob_sdof, res_pp, poles_pp)
 H_sdof2 = frf_reconstruction(res_pp, poles_pp, freq, lr = lr, ur = ur)
 
-prob_ema = AutoEMASdofProblem(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
-sol_ema = solve(prob_ema)
-fn_ema, ξn_ema = poles2modal(sol_ema.poles)
-ms_ema = sol_ema.ms
+# prob_sdof_ema = AutoEMASdofProblem(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
+# sol_ema = solve(prob_sdof_ema)
+sol_sdof_ema = solve(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
+fn_sdof_ema, ξn_sdof_ema = poles2modal(sol_sdof_ema.poles)
+ms_sdof_ema = sol_sdof_ema.ms
 
 
 ## Mdof methods
 # EMA problem
 prob_mdof = EMAProblem(H, freq)
-# prob_mdof = EMAProblem(Complex{Float32}.(H), Float32.(freq))
 
 # Poles extraction
 order = 10 # Model order
@@ -98,3 +98,6 @@ H_mdof = frf_reconstruction(res_lscf, p_lscf, freq)
 # FRF reconstruction - with residuals
 lr, ur = compute_residuals(prob_mdof, res_lscf, p_lscf)
 H_mdof2 = frf_reconstruction(res_lscf, p_lscf, freq, lr = lr, ur = ur)
+
+# prob_mdof_ema = AutoEMAMdofProblem(prob_mdof, 10, LSCF(), dpi = dpi)
+sol_mdof_ema = solve(prob_mdof, 10, LSCF(), dpi = dpi)

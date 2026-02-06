@@ -140,7 +140,8 @@ function assembly(model::Mdof)
         flag ? C[i:i+1, i:i+1] .+= element_matrix(c[i]) : nothing
     end
 
-    return flag ? (K, M, C) : (K, M)
+    # return flag ? (K, M, C) : (K, M)
+    return K, M, C
 end
 
 """

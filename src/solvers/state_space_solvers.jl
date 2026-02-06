@@ -295,7 +295,13 @@ function solve(prob::StateSpaceFRFProblem; type = :dis, progress = true)
 
     # Initialisation
     (; css, freq, So, Se) = prob
-    (; Ac, Bc) = css
+
+    # For type stability
+    Ac = similar(freq, size(css.Ac))
+    Bc = similar(freq, size(css.Bc))
+    Ac .= css.Ac
+    Bc .= css.Bc
+
     no = size(So, 1)
     ne = size(Se, 1)
     nstate, nu = size(Bc)
@@ -351,7 +357,13 @@ function solve(prob::StateSpaceModalFRFProblem; type = :dis, progress = true)
 
     # Initialisation
     (; css, freq, So, Se, n) = prob
-    (; Ac, Bc) = css
+
+    # For type stability
+    Ac = similar(freq, size(css.Ac))
+    Bc = similar(freq, size(css.Bc))
+    Ac .= css.Ac
+    Bc .= css.Bc
+
     no = size(So, 1)
     ne = size(Se, 1)
     nstate, nu = size(Bc)
@@ -420,7 +432,13 @@ Computes the frequency response by direct or modal method
 function solve(prob::StateSpaceFreqProblem; type = :dis, progress = true)
     # Initialisation
     (; css, freq, F, So) = prob
-    (; Ac, Bc) = css
+
+    # For type stability
+    Ac = similar(freq, size(css.Ac))
+    Bc = similar(freq, size(css.Bc))
+    Ac .= css.Ac
+    Bc .= css.Bc
+
     no = size(So, 1)
     nstate, nu = size(Bc)
     ns = nstate ÷ 2
@@ -474,7 +492,13 @@ Computes the frequency response by direct or modal method
 function solve(prob::StateSpaceModalFreqProblem; type = :dis, progress = true)
     # Initialisation
     (; css, F, freq, So, n) = prob
-    (; Ac, Bc) = css
+
+    # For type stability
+    Ac = similar(freq, size(css.Ac))
+    Bc = similar(freq, size(css.Bc))
+    Ac .= css.Ac
+    Bc .= css.Bc
+
     no = size(So, 1)
     nstate, nu = size(Bc)
     ns = nstate ÷ 2

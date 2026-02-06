@@ -41,7 +41,7 @@ Structure containing data for the modal time solver
 * `n::Int`: Number of modes to retain in the modal basis
 * `ismodal::Bool`: Flag to indicate if the problem contains modal data
 """
-@show_data struct FreeModalTimeProblem{Tk <: Real, Tm <: AbstractMatrix, Tx <:Real, Tu <: AbstractVector, Tt <: AbstractRange}
+@show_data struct FreeModalTimeProblem{Tk <: Real, Tm <: AbstractMatrix, Tx <: Real, Tu <: AbstractVector, Tt <: AbstractRange}
     K::VecOrMat{Tk}
     M::Tm
     ξn::Vector{Tx}

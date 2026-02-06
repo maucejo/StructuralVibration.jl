@@ -67,7 +67,7 @@ function ods(y::Matrix{T}, freq, pks_indices, min_mac) where {T <: Complex}
             candidate .= ods(y, freq, lp)[1]
 
             # Compute the MAC value
-            mac_val = mac(candidate, ods_ref)
+            mac_val = only(mac(candidate, ods_ref))
 
             navg += 1
             c = msf(candidate, ods_ref)
@@ -82,7 +82,7 @@ function ods(y::Matrix{T}, freq, pks_indices, min_mac) where {T <: Complex}
             candidate .= ods(y, freq, rp)[1]
 
             # Compute the MAC value
-            mac_val = mac(candidate, ods_ref)
+            mac_val = only(mac(candidate, ods_ref))
 
 
             # Alignment for averaging
@@ -161,7 +161,7 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where 
             candidate .= F.U[:, 1]
 
             # Compute the MAC value
-            mac_val = mac(candidate, ods_ref)
+            mac_val = only(mac(candidate, ods_ref))
 
             # Alignement for averaging
             c = msf(candidate, ods_ref)
@@ -184,7 +184,7 @@ function ods(Gyy::Array{T, 3}, freq, pks_indices, min_mac; avg_alg = :sv) where 
             candidate .= F.U[:, 1]
 
             # Compute the MAC value
-            mac_val = mac(candidate, ods_ref)
+            mac_val = only(mac(candidate, ods_ref))
 
             # Alignment for averaging
             c = msf(candidate, ods_ref)

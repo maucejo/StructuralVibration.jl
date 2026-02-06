@@ -137,7 +137,16 @@ Computes the eigen of a continuous-time state-space model
 
 function eigenmode(Ac, n::Int = size(Ac, 1) ÷ 2)
 
-    λ, Ψ = eigen(Ac)
+    # For mechanical systems with real-valued state-space matrices, the eigenvalues and eigenvectors come in complex conjugate pairs. To ensure type stability, we determine the appropriate type for the eigenvalues and eigenvectors based on whether `Ac` is real or complex.
+    t = if isreal(Ac)
+        Complex{eltype(Ac)}
+    else
+        eltype(Ac)
+    end
+
+    # Compute eigenmodes and ensure type stability
+    res = eigen(Ac)
+    λ, Ψ = t.(res.values), t.(res.vectors)
     sort_idx = sortperm(abs.(λ))
 
     return λ[sort_idx][1:2n], Ψ[:, sort_idx][:, 1:2n]

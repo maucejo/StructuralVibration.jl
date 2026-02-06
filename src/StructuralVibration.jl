@@ -33,8 +33,7 @@ module StructuralVibration
        export BayesDenoising, GCVDenoising, KalmanDenoising, LCurveDenoising
 
        # Structs - Modal extraction
-       export AutoEMAMdofProblem, AutoEMASdofProblem, EMAProblem,
-              EMASolution, OMAProblem, StabilizationAnalysis
+       export EMAProblem, EMASolution, OMAProblem, StabilizationAnalysis
 
        export CircleFit, CovSSI, DataSSI, FSDD, LSCE, LSCF, LSFit, PeakPicking, pLSCF
 

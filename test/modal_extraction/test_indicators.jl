@@ -29,7 +29,6 @@ freq = 1.:0.1:fmax
 prob = ModalFRFProblem(ωn, ξ, freq, ms_m, ms_th)
 H = solve(prob).u
 
-
 # EMA problem
 prob_mdof = EMAProblem(H, freq)
 
@@ -62,13 +61,13 @@ mpd_indicator = mpd(ms)
 
 
 ## Correlation indicators
-mac_indicator = mac(ms[:, 1], ms_th[ :, 1])
+mac_indicator = only(mac(ms[:, 1], ms_th[ :, 1]))
 mac_matrix = mac(ms, ms_th[:, 1:size(ms, 2)])
 comac_indicator = comac(ms, ms_th[:, 1:size(ms, 2)])
-ecomac_indicator = ecomac(ms, ms_th[:, 1:size(ms, 2)])
-frac_indicator = frac(H_est, H)
+ecomac_indicator = vec(ecomac(ms, ms_th[:, 1:size(ms, 2)]))
+frac_indicator = vec(frac(H_est, H))
 
 
 ## Indicator functions
-cmif_indicator = cmif(H)
+cmif_indicator = vec(cmif(H))
 psif_indicator = psif(H)

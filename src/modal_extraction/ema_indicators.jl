@@ -25,7 +25,7 @@ function mof(fn, dr)
         end
     end
 
-    return length(mof) == 1 ? mof[1] : mof
+    return mof
 end
 
 ## Mode complexity
@@ -68,7 +68,7 @@ function mov(poles, ms, ci)
         mov[i] = sum(s.*abs2.(phi))/sum(abs2, phi)
     end
 
-    return length(mov) == 1 ? mov[1] : mov
+    return mov
 end
 
 """
@@ -113,7 +113,7 @@ function mpc(ms)
         mpc[i] = ((λ1 - λ2)/(λ1 + λ2))^2
     end
 
-    return length(mpc) == 1 ? mpc[1] : mpc
+    return mpc
 end
 
 """
@@ -153,7 +153,7 @@ function mcf(ms)
         mcf[i] = 1 - ((Sxx - Syy)^2 + 4Sxy^2)/(Sxx + Syy)^2
     end
 
-    return length(mcf) == 1 ? mcf[1] : mcf
+    return mcf
 end
 
 """
@@ -198,7 +198,7 @@ function mpd(ms)
         mpd[i] = real(sum(skipnan(num))/den)
     end
 
-    return length(mpd) == 1 ? only(mpd) : mpd
+    return mpd
 end
 
 ## Correlation functions
@@ -245,7 +245,7 @@ function msf(ms_exp, ms_ref)
         msf[i] = num/den
     end
 
-    return length(msf) == 1 ? only(msf) : msf
+    return msf
 end
 
 """
@@ -289,7 +289,7 @@ function comac(ms_exp, ms_ref)
         comac[p] = real(num/den)
     end
 
-    return length(comac) == 1 ? only(comac) : vec(comac)
+    return comac
 end
 
 """
@@ -328,7 +328,7 @@ function ecomac(ms_exp, ms_ref)
     ms_exp_scaled = ms_exp .* msf(ms_exp, ms_ref)'
     ecomac = mean(abs, ms_ref .- ms_exp_scaled, dims = 2)/2
 
-    return length(ecomac) == 1 ? only(ecomac) : vec(ecomac)
+    return ecomac
 end
 
 """
@@ -370,7 +370,7 @@ function mac(ms_exp, ms_ref)
         mac[i, j] = num/real(den)
     end
 
-    return sum(size(mac)) == 2 ? only(mac) : mac
+    return mac
 end
 
 """
@@ -404,7 +404,7 @@ function frac(frf_exp, frf_ref)
         frac[i, j] = num/real(den)
     end
 
-    return ne == 1 || me == 1 ? vec(frac) : frac
+    return frac
 end
 
 ## Indicator functions
@@ -436,7 +436,7 @@ function cmif(frf; type = :dis)
         end
     end
 
-    return size(cmif, 1) == 1 ? vec(cmif) : cmif
+    return cmif
 end
 
 """

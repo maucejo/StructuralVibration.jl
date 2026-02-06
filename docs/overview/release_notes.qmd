@@ -6,9 +6,18 @@ format:
     number-sections: false
 ---
 
-## 1.6.2
+## 1.7.0
 
-- Fix type instability issues in `stabilization` function.
+**Breaking changes**
+
+- Remove `AutoEMASdofProblem` and `AutoEMAMdofProblem` structures
+- Refactor `solve` function for automatic modal extraction to take an `EMAProblem` and a `SdofEMA` or `MdofEMA` method as arguments instead of separate `AutoEMAProblem` structures.
+
+These changes have been made to solve type instability issues in the `solve` function for automatic modal extraction.
+
+**Internals**
+
+- Fix various type instability issues.
 
 ## 1.6.1
 

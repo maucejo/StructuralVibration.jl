@@ -230,69 +230,69 @@ Structure containing the solution of the automatic experimental modal analysis u
 end
 
 ## Structures for EMA-SDOF modal extraction
-"""
-    AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
+# """
+#     AutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
 
-Structure containing the input data for automatic experimental modal analysis using Sdof methods
+# Structure containing the input data for automatic experimental modal analysis using Sdof methods
 
-**Fields**
-* `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector
-* `alg::SdofModalExtraction`: Method to extract the poles
-    * `PeakPicking`: Peak picking method (default)
-    * `CircleFit`: Circle fitting method
-    * `LSFit`: Least squares fitting method
-* `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
-    * `dpi[1]`: Driving point index on the measurement mesh
-    * `dpi[2]`: Driving point index on the excitation mesh
-* `idx_m::AbstractArray{Int}`: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)
-* `idx_e::AbstractArray{Int}`: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)
-* `width::Int`: Half-width of the peaks (default: 1)
-* `min_prom::Real`: Minimum peak prominence (default: 0.)
-* `max_prom::Real`: Maximum peak prominence (default: Inf)
-* `pks_indices::Vector{Int}`: Predefined peak indices (default: empty vector)
-"""
-@show_data struct AutoEMASdofProblem{R <: Real}
-    prob::EMAProblem
-    alg::SdofEMA
-    dpi:: Vector{Int}
-    idx_m::AbstractArray{Int}
-    idx_e::AbstractArray{Int}
-    width::Int
-    min_prom::R
-    max_prom::R
-    pks_indices::Vector{Int}
+# **Fields**
+# * `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector
+# * `alg::SdofModalExtraction`: Method to extract the poles
+#     * `PeakPicking`: Peak picking method (default)
+#     * `CircleFit`: Circle fitting method
+#     * `LSFit`: Least squares fitting method
+# * `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
+#     * `dpi[1]`: Driving point index on the measurement mesh
+#     * `dpi[2]`: Driving point index on the excitation mesh
+# * `idx_m::AbstractArray{Int}`: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)
+# * `idx_e::AbstractArray{Int}`: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)
+# * `width::Int`: Half-width of the peaks (default: 1)
+# * `min_prom::Real`: Minimum peak prominence (default: 0.)
+# * `max_prom::Real`: Maximum peak prominence (default: Inf)
+# * `pks_indices::Vector{Int}`: Predefined peak indices (default: empty vector)
+# """
+# @show_data struct AutoEMASdofProblem{R <: Real}
+#     prob::EMAProblem
+#     alg::SdofEMA
+#     dpi:: Vector{Int}
+#     idx_m::AbstractArray{Int}
+#     idx_e::AbstractArray{Int}
+#     width::Int
+#     min_prom::R
+#     max_prom::R
+#     pks_indices::Vector{Int}
 
-    AutoEMASdofProblem(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf, pks_indices::Vector{Int} = Int[]) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
-end
+#     AutoEMASdofProblem(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi::Vector{Int} = [1, 1], idx_m::AbstractArray{Int} = 1:size(prob.frf, 1), idx_e::AbstractArray{Int} = 1:size(prob.frf, 2), width::Int = 1, min_prom::R = 0., max_prom::R = Inf, pks_indices::Vector{Int} = Int[]) where {R <: Real} = new{R}(prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
+# end
 
 ## Structures for EMA-MDOF modal extraction
-"""
-    AutoEMAMdofProblem(prob, dpi, method; modetype)
+# """
+#     AutoEMAMdofProblem(prob, dpi, method; modetype)
 
-Structure containing the input data for automatic experimental modal analysis using Mdof methods
+# Structure containing the input data for automatic experimental modal analysis using Mdof methods
 
-**Fields**
-* `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
-* `order::Int`: Model order (number of poles to extract)
-* `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
-    * `dpi[1]`: Driving point index on the measurement mesh
-    * `dpi[2]`: Driving point index on the excitation mesh
-* `alg::MdofEMA`: Method to extract the poles
-    * `LSCE`: Least Squares Complex Exponential method
-    * `LSCF``: Least Squares Complex Frequency method (default)
-    * `PLSCF`: Polyreference Least Squares Complex Frequency method
-* `modetype::Symbol`: Type of mode shapes to extract
-    * `:real`: Real mode shapes (default)
-    * `:complex`: Complex mode shapes
-"""
-@show_data struct AutoEMAMdofProblem
-    prob::EMAProblem
-    order::Int
-    dpi:: Vector{Int}
-    alg::MdofEMA
+# **Fields**
+# * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
+# * `order::Int`: Model order (number of poles to extract)
+# * `dpi::Vector{Int}`: Driving point indices - default = [1, 1]
+#     * `dpi[1]`: Driving point index on the measurement mesh
+#     * `dpi[2]`: Driving point index on the excitation mesh
+# * `alg::MdofEMA`: Method to extract the poles
+#     * `LSCE`: Least Squares Complex Exponential method
+#     * `LSCF``: Least Squares Complex Frequency method (default)
+#     * `PLSCF`: Polyreference Least Squares Complex Frequency method
+# * `modetype::Symbol`: Type of mode shapes to extract
+#     * `:real`: Real mode shapes (default)
+#     * `:complex`: Complex mode shapes
+# """
+# @show_data struct AutoEMAMdofProblem
+#     prob::EMAProblem
+#     order::Int
+#     alg::MdofEMA
+#     dpi:: Vector{Int}
 
-    AutoEMAMdofProblem(prob::EMAProblem, order::Int, dpi::Vector{Int} = [1, 1], alg::MdofEMA = LSCF()) = new(prob, order, dpi, alg)
-end
+#     AutoEMAMdofProblem(prob::EMAProblem, order::Int, alg::MdofEMA = LSCF(); dpi::Vector{Int} = [1, 1]) = new(prob, order, alg, dpi)
+# end
 
 """
     StabilizationAnalysis(prob, poles, modefn, mode_stabfn, mode_stabdr)

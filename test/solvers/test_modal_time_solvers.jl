@@ -22,7 +22,7 @@ prob = FreeModalTimeProblem(K, M, ξ, u0, t)
 x0m = Φm'*M*x0
 v0m = Φm'*M*v0
 u0m = (x0m, v0m)
-prob_modal = FreeModalTimeProblem(ωm, Φm, ξ, u0m, t, ismodal = true)
+prob_modal = FreeModalTimeProblem(ωm, Φm, ξ, u0m, t)
 
 # Solution
 x_free = solve(prob).u
@@ -56,7 +56,7 @@ x0m = Φm'*M*x0
 v0m = Φm'*M*v0
 u0m = (x0m, v0m)
 Lm = Φm'*F
-prob_harmo_modal = HarmonicModalTimeProblem(ωm, Φm, ξ, Lm, 2π*freq, u0m, t, ismodal = true)
+prob_harmo_modal = HarmonicModalTimeProblem(ωm, Φm, ξ, Lm, 2π*freq, u0m, t)
 
 # Solution
 x_harmo = solve(prob_harmo).u
@@ -91,7 +91,7 @@ prob_forced = ForcedModalTimeProblem(K, M, ξ, F, u0, t)
 ωm, Φm = eigenmode(K, M)
 u0m = (zeros(2), zeros(2))
 Lm = Φm'*F
-prob_forced_modal = ForcedModalTimeProblem(ωm, Φm, ξ, Lm, u0m, t, ismodal = true)
+prob_forced_modal = ForcedModalTimeProblem(ωm, Φm, ξ, Lm, u0m, t)
 
 # Solution
 x_forced = solve(prob_forced).u

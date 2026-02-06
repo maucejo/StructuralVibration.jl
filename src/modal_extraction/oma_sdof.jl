@@ -43,11 +43,11 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
     # Compute first the singular value and left singular vector w.r.t frequency
     no, ni = size(fullspec)[1:2]
 
-    if no < ni
-        Gyy = permutedims(fullspec, (2, 1, 3))
-    else
-        Gyy = fullspec
-    end
+    Gyy = if no < ni
+            permutedims(fullspec, (2, 1, 3))
+        else
+            fullspec
+        end
     no, ni, nf = size(Gyy)
 
     sv, U, V = compute_sv(Gyy)
@@ -55,7 +55,7 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
     # Estimate the peaks properties in the singular value spectrum
     if isempty(pks_indices)
         # Find peaks in the FRF
-        pks = findmaxima(log10.(sv), width)
+        pks = findmaxima(20log10.(sv), width)
 
         # Define a peak prominence threshold to filter spurious peaks
         pks = peakproms!(pks, min = min_prom, max = max_prom) |> peakwidths!
@@ -173,7 +173,7 @@ function estimate_bell(sv, U, V, idx_peak, min_mac, avg_alg)
     # Search for all the candidates in a frequency band defined by MAC values
     id_bell = [idx_peak]
     if min_mac == 1.
-        return u_ref, id_bell
+        return u_ref, V[:, idx_peak], id_bell
     end
 
     # Search left
@@ -181,7 +181,7 @@ function estimate_bell(sv, U, V, idx_peak, min_mac, avg_alg)
     mac_val = 1.
     while lp ≥ 1 && mac_val ≥ min_mac
         # Compute the MAC value
-        mac_val = mac(U[:, lp], u_ref)
+        mac_val = only(mac(U[:, lp], u_ref))
         push!(id_bell, lp)
         lp -= 1
     end
@@ -191,7 +191,7 @@ function estimate_bell(sv, U, V, idx_peak, min_mac, avg_alg)
     mac_val = 1.
     while rp ≤ nf && mac_val ≥ min_mac
         # Compute the MAC value
-        mac_val = mac(U[:, rp], u_ref)
+        mac_val = only(mac(U[:, rp], u_ref))
         push!(id_bell, rp)
         rp += 1
     end
@@ -204,8 +204,8 @@ function estimate_bell(sv, U, V, idx_peak, min_mac, avg_alg)
         u_avg = (U[:, id_bell]*sv[id_bell])/sum(sv[id_bell])
         v_avg = (V[:, id_bell]*sv[id_bell])/sum(sv[id_bell])
     else
-        u_avg = mean(U[:, id_bell], dims = 2)
-        v_avg = mean(V[:, id_bell], dims = 2)
+        u_avg = vec(mean(U[:, id_bell], dims = 2))
+        v_avg = vec(mean(V[:, id_bell], dims = 2))
     end
 
     return u_avg, v_avg, id_bell

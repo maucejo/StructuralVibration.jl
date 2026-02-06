@@ -1,6 +1,6 @@
 """
     poles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)
-    poles_extraction(prob::MdofProblem, order, alg; stabdiag)
+    poles_extraction(prob::EMAProblem, order, alg; stabdiag)
 
 Extract poles using Sdof or Mdof experimental modal analysis methods
 
@@ -30,7 +30,9 @@ Extract poles using Sdof or Mdof experimental modal analysis methods
 """
 function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
     # Extract FRF and frequency from problem
-    (; frf, freq) = prob
+    frf = prob.frf
+    freq = prob.freq
+    # (; frf, freq) = prob
 
     no, ni, nf = size(frf)
     Hr = reshape(frf, no*ni, nf)
@@ -96,7 +98,7 @@ Extract poles from the peak picking method
 
 [2] A. Brandt, "Noise and Vibration Analysis: Signal Analysis and Experimental Procedures", Wiley, 2011.
 """
-function compute_poles(H, freq, alg::PeakPicking, pks) :: Vector{eltype(H)}
+function compute_poles(H, freq, alg::PeakPicking, pks)
 
     # Flat FRF - No peaks
     Habs = abs.(H)
@@ -149,7 +151,7 @@ function compute_poles(H, freq, alg::PeakPicking, pks) :: Vector{eltype(H)}
     return modal2poles(fn, ξn)
 end
 
-function compute_poles(H, freq, alg::CircleFit, pks) :: Vector{eltype(H)}
+function compute_poles(H, freq, alg::CircleFit, pks)
 
     # Flat FRF - No peaks
     Habs = abs.(H)
@@ -214,7 +216,7 @@ function compute_poles(H, freq, alg::CircleFit, pks) :: Vector{eltype(H)}
     return modal2poles(fn, ξn)
 end
 
-function compute_poles(H, freq, alg::LSFit, pks) :: Vector{eltype(H)}
+function compute_poles(H, freq, alg::LSFit, pks)
 
     # Flat FRF - No peaks
     Habs = abs.(H)
@@ -399,21 +401,76 @@ function circfit(x, y)
     return xc, yc, R
 end
 
+# """
+#     solve(prob_ema::AutoEMASdofProblem)
+#     solve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)
+
+# Solve automatically experimental modal analysis problem using Sdof or Mdof methods
+
+# **Inputs**
+# * `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
+
+# **Outputs**
+# * `sol::EMASolution`: Structure containing the solution of the automatic experimental modal analysis using Sdof or Mdof methods
+# """
+# function solve(prob_ema::AutoEMASdofProblem)
+#     # Unpack problem data
+#     # (; prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices) = prob_ema
+#     prob = prob_ema.prob
+#     alg = prob_ema.alg
+#     dpi = prob_ema.dpi
+#     idx_m = prob_ema.idx_m
+#     idx_e = prob_ema.idx_e
+#     width = prob_ema.width
+#     min_prom = prob_ema.min_prom
+#     max_prom = prob_ema.max_prom
+#     pks_indices = prob_ema.pks_indices
+
+#     # Extraction of natural frequencies and damping ratios
+#     poles = poles_extraction(prob, alg, width = width, min_prom = min_prom, max_prom = max_prom, pks_indices = pks_indices)
+
+#     # Extraction of mode shapes
+#     phi = modeshape_extraction(prob, poles, alg, dpi = dpi)
+
+#     res, ci = mode2residues(phi, poles, idx_m, idx_e)
+
+#     lr, ur = compute_residuals(prob, res, poles)
+
+#     return  EMASolution(poles, phi, ci, res, lr, ur)
+# end
+
 """
-    solve(prob_ema::AutoEMASdofProblem)
-    solve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)
+    solve(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)
+    solve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)
 
 Solve automatically experimental modal analysis problem using Sdof or Mdof methods
 
-**Inputs**
-* `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
+**Inputs for Sdof methods**
+* `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
+* `alg::SdofEMA`: Sdof experimental modal analysis method (default: PeakPicking())
+* `dpi`: Driving point indices - default = [1, 1]
+    * `dpi[1]`: Driving point index on the measurement mesh
+    * `dpi[2]`: Driving point index on the excitation mesh
+* `idx_m`: Indices of the mode shapes to consider for the mode residues estimation (default: [1])
+* `idx_e`: Indices of the excitation points to consider for the mode residues estimation (default: [1])
+* `width::Int`: Half-width of the peaks (default: 1)
+* `min_prom::Real`: Minimum peak prominence (default: 0. dB)
+* `max_prom::Real`: Maximum peak prominence (default: Inf)
+* `pks_indices::Vector{Int}`: Indices of peaks to consider (default: empty vector)
+
+**Inputs for Mdof methods**
+* `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
+* `order`: Order of the model
+* `alg::MdofEMA`: Mdof experimental modal analysis method (default: LSCF())
+* `dpi`: Driving point indices - default = [1, 1]
+    * `dpi[1]`: Driving point index on the measurement mesh
+    * `dpi[2]`: Driving point index on the excitation mesh
 
 **Outputs**
-* `sol::EMASolution`: Structure containing the solution of the automatic experimental modal analysis using Sdof or Mdof methods
+* `sol::EMASolution`: Structure containing the solution of the experimental modal analysis using Sdof or Mddof methods
 """
-function solve(prob_ema::AutoEMASdofProblem)
-    # Unpack problem data
-    (; prob, alg, dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices) = prob_ema
+function solve(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi = [1, 1], idx_m = [1], idx_e = [1], width = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
+
 
     # Extraction of natural frequencies and damping ratios
     poles = poles_extraction(prob, alg, width = width, min_prom = min_prom, max_prom = max_prom, pks_indices = pks_indices)
@@ -425,5 +482,5 @@ function solve(prob_ema::AutoEMASdofProblem)
 
     lr, ur = compute_residuals(prob, res, poles)
 
-    return EMASolution(poles, phi, ci, res, lr, ur)
+    return  EMASolution(poles, phi, ci, res, lr, ur)
 end

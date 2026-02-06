@@ -325,6 +325,9 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 **Data types**
 
 ::: {.api}
+**OMAProblem**
+
+---
 ```{julia}
 #| echo: false
 @doc OMAProblem
@@ -332,6 +335,9 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 :::
 
 ::: {.api}
+**FSDD**
+
+---
 ```{julia}
 #| echo: false
 @doc FSDD
@@ -339,6 +345,9 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 :::
 
 ::: {.api}
+**CovSSI**
+
+---
 ```{julia}
 #| echo: false
 @doc CovSSI
@@ -346,6 +355,9 @@ If a set of reference signals $\mathbf{y}_{ref}$ is provided, the past data matr
 :::
 
 ::: {.api}
+**DataSSI**
+
+---
 ```{julia}
 #| echo: false
 @doc DataSSI

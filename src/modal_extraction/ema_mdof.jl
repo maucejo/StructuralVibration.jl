@@ -43,16 +43,16 @@ Perform Least Squares Complex Exponential (LSCE) method to extract complex poles
 **Output**
 - `poles`: Vector of extracted complex poles
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false) :: Vector{Complex{eltype(prob.freq)}}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCE; stabdiag = false)
     # Extract FRF and frequency from problem
-    if prob isa EMAProblem
-        (; frf, freq) = prob
-    elseif prob isa OMAProblem
-        frf = prob.halfspec
-        freq = prob.freq
-    else
-        error("Unsupported problem type for LSCE method.")
-    end
+    frf = if prob isa EMAProblem
+            prob.frf
+        elseif prob isa OMAProblem
+            prob.halfspec
+        else
+            error("Unsupported problem type for LSCE method.")
+        end
+    freq = prob.freq
 
     # Approximate sampling frequency of the truncated signal
     fsred = 2.56*(freq[end]-freq[1])
@@ -106,16 +106,16 @@ Perform Least Squares Complex Frequency (LSCF) method to extract complex poles f
 **Reference**
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false) :: Vector{Complex{eltype(prob.freq)}}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::LSCF; stabdiag = false)
     # Extract FRF and frequency from problem
-    if prob isa EMAProblem
-        (; frf, freq) = prob
-    elseif prob isa OMAProblem
-        frf = prob.halfspec
-        freq = prob.freq
-    else
-        error("Unsupported problem type for LSCF method.")
-    end
+    frf = if prob isa EMAProblem
+            prob.frf
+        elseif prob isa OMAProblem
+            prob.halfspec
+        else
+            error("Unsupported problem type for LSCF method.")
+        end
+    freq = prob.freq
 
     # FRF post-processing - Reshape FRF matrix
     (no, ni, nf) = size(frf)
@@ -185,16 +185,16 @@ Perform Polyreference Least Squares Complex Frequency (pLSCF) method to extract 
 
 [1] El-Kafafy M., Guillaume P., Peeters B., Marra F., Coppotelli G. (2012).Advanced Frequency-Domain Modal Analysis for Dealing with Measurement Noise and Parameter Uncertainty. In: Allemang R., De Clerck J., Niezrecki C., Blough J. (eds) Topics in Modal Analysis I, Volume 5. Conference Proceedings of the Society for Experimental Mechanics Series. Springer, New York, NY
 """
-@views function compute_poles(prob::MdofProblem, order::Int, alg::pLSCF; stabdiag = false) :: Vector{Complex{eltype(prob.freq)}}
+@views function compute_poles(prob::MdofProblem, order::Int, alg::pLSCF; stabdiag = false)
     # Extract FRF and frequency from problem
-    if prob isa EMAProblem
-        (; frf, freq) = prob
-    elseif prob isa OMAProblem
-        frf = prob.halfspec
-        freq = prob.freq
-    else
-        error("Unsupported problem type for PLSCF method.")
-    end
+    frf = if prob isa EMAProblem
+            prob.frf
+        elseif prob isa OMAProblem
+            prob.halfspec
+        else
+            error("Unsupported problem type for PLSCF method.")
+        end
+    freq = prob.freq
 
     # FRF post-processing - Reshape FRF matrix
     (no, ni, nf) = size(frf)
@@ -293,8 +293,14 @@ Perform stabilization diagram analysis using the specified modal extraction meth
 """
 function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofEMA, MdofOMA} = LSCF(); stabcrit = [0.01, 0.05], progress = false)
 
-    # Extract FRF and frequency from problem - Ternary is used to avoid type instability observed with standard if else blocks
-    frf = prob isa EMAProblem ? prob.frf : (prob isa OMAProblem ? prob.halfspec : throw(ArgumentError("Unsupported problem type for stabilization analysis.")))
+    # Extract FRF and frequency from problem
+    frf = if prob isa EMAProblem
+            prob.frf
+        elseif prob isa OMAProblem
+            prob.halfspec
+        else
+            throw(ArgumentError("Unsupported problem type for stabilization analysis."))
+        end
 
     # Initialization
     max_order += 1 # For having stability information from order 1 to max_order
@@ -308,11 +314,11 @@ function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofEMA, Md
     p = Progress(max_order, desc = "Stabilization analysis: ", showspeed = true)
     for order in 1:max_order
         progress ? next!(p) : nothing
-        # try
-        poles[order] = poles_extraction(prob, order, alg, stabdiag = true)
-        # catch e
-        #     poles[order] .= fill(eltype(frf)(complex(NaN, NaN)), order)
-        # end
+        try
+            poles[order] = poles_extraction(prob, order, alg, stabdiag = true)
+        catch e
+            poles[order] .= fill(eltype(frf)(complex(NaN, NaN)), order)
+        end
 
         fne, dre = poles2modal(eltype(frf).(poles[order]))
         fn[order] .= fne
@@ -526,7 +532,7 @@ function modeshape_extraction(residues, poles::Vector{T}, alg::MdofEMA; dpi = [1
                     candidate = F.U[:, idx]
 
                     # Compute MAC with all previous modes
-                    mac_prev = [mac(candidate, ms[:, j]) for j in 1:(i-1)]
+                    mac_prev = [only(mac(candidate, ms[:, j])) for j in 1:(i-1)]
 
                     # Select mode with the lowest MAC to previous modes
                     if maximum(mac_prev) < 0.3  # Orthogonality
@@ -543,22 +549,53 @@ function modeshape_extraction(residues, poles::Vector{T}, alg::MdofEMA; dpi = [1
     return ms, ci
 end
 
-"""
-    solve(prob_ema::AutoEMASdofProblem)
-    solve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)
+# """
+#     solve(prob_ema::AutoEMASdofProblem)
+#     solve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)
 
-Solve automatically experimental modal analysis problem using Sdof or Mdof methods
+# Solve automatically experimental modal analysis problem using Sdof or Mdof methods
+
+# **Inputs**
+# * `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
+
+# **Outputs**
+# * `sol::EMASolution`: Structure containing the solution of the automatic experimental modal analysis using Sdof methods
+# """
+# function solve(prob_ema::AutoEMAMdofProblem)
+#     # Unpack problem data
+#     (; prob, order, dpi, alg) = prob_ema
+
+#     # Extraction of natural frequencies and damping ratios
+#     poles = poles_extraction(prob, order, alg)
+
+#     # Extraction of mode shapes
+#     res = mode_residues(prob, poles)
+
+#     # Compute the residuals separately for accuracy
+#     lr, ur = compute_residuals(prob, res, poles)
+
+#     phi, ci = modeshape_extraction(res, poles, alg, dpi = dpi, modetype = :emar)
+
+#     return EMASolution(poles, real_normalization(phi), ci, res, lr, ur)
+# end
+
+"""
+    solve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)
+
+Solve automatically experimental modal analysis problem using Mdof methods
 
 **Inputs**
-* `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods
+* `prob::EMAProblem`: EMA problem containing FRF data and frequency vector
+* `order`: Order of the model (number of modes to extract)
+* `alg::MdofEMA`: Modal extraction algorithm (default: LSCF())
+* `dpi`: Driving point indices - default = [1, 1]
+    * `dpi[1]`: Driving point index on the measurement mesh
+    * `dpi[2]`: Driving point index on the excitation mesh
 
-**Outputs**
-* `sol::EMASolution`: Structure containing the solution of the automatic experimental modal analysis using Sdof methods
+**Output**
+* `sol::EMASolution`: Structure containing the solution of the experimental modal analysis using Mdof methods
 """
-function solve(prob_ema::AutoEMAMdofProblem)
-    # Unpack problem data
-    (; prob, order, dpi, alg) = prob_ema
-
+function solve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi = [1, 1])
     # Extraction of natural frequencies and damping ratios
     poles = poles_extraction(prob, order, alg)
 

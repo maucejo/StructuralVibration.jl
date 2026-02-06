@@ -559,7 +559,7 @@ where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = 
 ```
 :::
 
-::: {.api}
+<!-- ::: {.api}
 **AutoEMASdofProblem**
 
 ---
@@ -577,7 +577,7 @@ where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = 
 #| echo: false
 @doc AutoEMAMdofProblem
 ```
-:::
+::: -->
 
 ::: {.api}
 **EMASolution**
@@ -717,7 +717,7 @@ where $\phi_i(x_p)$ is the mode shape of the mode $i$ at point $x_p$ and $c_i = 
 ---
 ```{julia}
 #| echo: false
-@doc solve(::AutoEMASdofProblem)
+@doc solve(::EMAProblem, ::PeakPicking)
 ```
 :::
 
@@ -893,8 +893,7 @@ display(fig);
 #### Automatic Sdof EMA
 
 ```julia
-prob_ema = AutoEMASdofProblem(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
-sol_ema = solve(prob_ema)
+sol_ema = solve(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
 fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ms_ema = sol_ema.ms
 ```
@@ -1029,8 +1028,7 @@ display(fig1);
 #### Automatic Mdof EMA
 
 ```julia
-prob_ema = AutoEMAMdofProblem(prob_mdof, order, dpi, LSCF())
-sol_ema = solve(prob_ema)
+sol_ema = solve(prob_mdof, 10, LSCF(), dpi = [1, 2])
 fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ms_ema = sol_ema.ms
 ```
