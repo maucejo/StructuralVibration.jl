@@ -182,10 +182,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.7.0</a></li>
-  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.6.1</a></li>
-  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.6.0</a></li>
-  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.5.0</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.8.0</a></li>
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.7.0</a></li>
+  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.6.1</a></li>
+  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.6.0</a></li>
+  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.5.0</a></li>
   <li><a href="#v1.4.1" id="toc-v1.4.1" class="nav-link" data-scroll-target="#v1.4.1">v1.4.1</a></li>
   <li><a href="#v1.4.0" id="toc-v1.4.0" class="nav-link" data-scroll-target="#v1.4.0">v1.4.0</a></li>
   <li><a href="#v1.3.0" id="toc-v1.3.0" class="nav-link" data-scroll-target="#v1.3.0">v1.3.0</a></li>
@@ -227,7 +228,14 @@ ul.task-list li input[type="checkbox"] {
 
 
 <section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section">1.7.0</h2>
+<h2 class="anchored" data-anchor-id="section">1.8.0</h2>
+<p><strong>New features</strong></p>
+<ul>
+<li>Add <code>wave_parameters</code> function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.</li>
+</ul>
+</section>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1">1.7.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Remove <code>AutoEMASdofProblem</code> and <code>AutoEMAMdofProblem</code> structures</li>
@@ -239,14 +247,14 @@ ul.task-list li input[type="checkbox"] {
 <li>Fix various type instability issues.</li>
 </ul>
 </section>
-<section id="section-1" class="level2">
-<h2 class="anchored" data-anchor-id="section-1">1.6.1</h2>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2">1.6.1</h2>
 <ul>
 <li>Remove <code>DispatchDoctor</code> from dependencies</li>
 </ul>
 </section>
-<section id="section-2" class="level2">
-<h2 class="anchored" data-anchor-id="section-2">1.6.0</h2>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3">1.6.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Simplify <code>poles_extraction</code> method by removing <code>scaling</code> argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.</li>
@@ -257,8 +265,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fix type instability issues in <code>varest</code> and <code>poles_extraction</code> functions.</li>
 </ul>
 </section>
-<section id="section-3" class="level2">
-<h2 class="anchored" data-anchor-id="section-3">1.5.0</h2>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4">1.5.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Refactor <code>poles_extraction</code> function to add <code>scaling::Function</code> argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection</li>
