@@ -100,6 +100,62 @@ Structure containing the data of a homogeneous and isotropic bending beam
 end
 
 """
+    wave_parameters(model::Bar, freq)
+    wave_parameters(model::Rod, freq)
+    wave_parameters(model::Strings, freq)
+    wave_parameters(model::Beam, freq)
+
+Computes the wave parameters of given model at a given frequency
+
+**Inputs**
+* `model`: Structure containing the bar data
+* `freq`: Frequency at which the wave parameters are calculated [Hz]
+
+**Outputs**
+* `ω`: Angular frequency [rad/s]
+* `c`: Wave speed [m/s]
+* `k`: Wavenumber [rad/m]
+* `λ`: Wavelength [m]
+"""
+function wave_parameters(model::WaveEquation, freq)
+    # Model parameters
+    (; m, D) = model
+
+    # Angular frequency
+    ω = 2π*freq
+
+    # Wave speed
+    c = sqrt(D/m)
+
+    # Wavenumber
+    k = ω/c
+
+    # Wavelength
+    λ = 2π/k
+
+    return ω, c, k, λ
+end
+
+function wave_parameters(model::Beam, freq)
+    # Model parameters
+    (; m, D) = model
+
+    # Angular frequency
+    ω = 2π*freq
+
+    # Wave number
+    k = (ω^2*m/D)^(1/4)
+
+    # Wave speed
+    c = ω/k
+
+    # Wavelength
+    λ = 2π/k
+
+    return ω, c, k, λ
+end
+
+"""
     modefreq(model::Bar, fmax, bc = :CC)
     modefreq(model::Rod, fmax, bc = :CC)
     modefreq(model::Strings, fmax, bc = :CC)

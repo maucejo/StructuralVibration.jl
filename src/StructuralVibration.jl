@@ -1,6 +1,6 @@
 module StructuralVibration
-       # using DispatchDoctor
-       # @stable begin
+       using DispatchDoctor
+       @stable begin
 
        using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim,
              Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
@@ -44,7 +44,7 @@ module StructuralVibration
        export excitation, impulse_response, solve, srs
 
        export apply_bc, assembly, eigenmode, modefreq, modeshape,
-              modal_damping_matrix, modal_effective_mass, modal_matrices, rayleigh_damping_matrix, selection_matrix
+              modal_damping_matrix, modal_effective_mass, modal_matrices, rayleigh_damping_matrix, selection_matrix, wave_parameters
 
        export acn, agwn, anti_alias, denoising, estimated_SNR, mgwn,
               mixed_noise, varest
@@ -121,4 +121,4 @@ module StructuralVibration
        # include("precompilation/precompilation.jl")
 end
 
-# end
+end

@@ -40,3 +40,9 @@ phi_bar = modeshape(bar, k_bar, x, :CC)
 phi_rod = modeshape(rod, k_rod, x, :FF)
 phi_strings = modeshape(strings, k_strings, x, :CC)
 phi_beam = modeshape(beam, k_beam, x, :SS)
+
+# Computation of the wave parameters
+ω_bar, c_bar, k_bar, λ_bar = wave_parameters(bar, 100.)
+ω_rod, c_rod, k_rod, λ_rod = wave_parameters(rod, 100.)
+ω_strings, c_strings, k_strings, λ_strings = wave_parameters(strings, 100.)
+ω_beam, c_beam, k_beam, λ_beam = wave_parameters(beam, 100.)

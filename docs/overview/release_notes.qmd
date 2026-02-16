@@ -6,6 +6,12 @@ format:
     number-sections: false
 ---
 
+## 1.8.0
+
+**New features**
+
+- Add `wave_parameters` function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.
+
 ## 1.7.0
 
 **Breaking changes**

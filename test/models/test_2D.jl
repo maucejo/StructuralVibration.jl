@@ -26,3 +26,7 @@ om_membrane, k_membrane = modefreq(membrane, fmax)[1:2]
 # Computation of the corresponding mode shapes
 phi_plate = modeshape(plate, k_plate, xp, yp)
 phi_membrane = modeshape(membrane, k_membrane, xp, yp)
+
+# Computation of the wave parameters
+om_plate, c_plate, k_plate, λ_plate = wave_parameters(plate, fmax)
+om_membrane, c_membrane, k_membrane, λ_membrane = wave_parameters(membrane, fmax)

@@ -36,6 +36,12 @@ end
 
 Structure containing the data of a homogeneous and isotropic rectangular membrane
 
+**Constructor parameters**
+* `L`: Length [m]
+* `b`: Width [m]
+* `m`: Surface mass [kg/m²]
+* `T`: Tension per unit length [N/m]
+
 **Fields**
 * `L`: Length [m]
 * `b`: Width [m]
@@ -47,6 +53,64 @@ Structure containing the data of a homogeneous and isotropic rectangular membran
     b::Float64
     m::Float64
     D::Float64
+
+    function Membrane(L::Tm, b::Tm, m::Tm, T::Tm) where Tm
+        return new(L, b, m, T)
+    end
+end
+
+"""
+    wave_parameters(model::Plate, freq)
+    wave_parameters(model::Membrane, freq)
+
+Computes the wave parameters of given model at a given frequency
+
+**Inputs**
+* `model`: Structure containing the bar data
+* `freq`: Frequency at which the wave parameters are calculated [Hz]
+
+**Outputs**
+* `ω`: Angular frequency [rad/s]
+* `c`: Wave speed [m/s]
+* `k`: Wavenumber [rad/m]
+* `λ`: Wavelength [m]
+"""
+function wave_parameters(model::Plate, freq)
+    # Model parameters
+    (; m, D) = model
+
+    # Angular frequency
+    ω = 2π*freq
+
+    # Wavenumber
+    k = (ω^2*m/D)^(1/4)
+
+    # Wave speed
+    c = ω/k
+
+    # Wavelength
+    λ = 2π/k
+
+    return ω, c, k, λ
+end
+
+function wave_parameters(model::Membrane, freq)
+    # Model parameters
+    (; m, D) = model
+
+    # Angular frequency
+    ω = 2π*freq
+
+    # Wave speed
+    c = sqrt(D/m)
+
+    # Wavenumber
+    k = ω/c
+
+    # Wavelength
+    λ = 2π/k
+
+    return ω, c, k, λ
 end
 
 """

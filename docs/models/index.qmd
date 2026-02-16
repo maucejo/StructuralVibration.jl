@@ -157,6 +157,16 @@ All the following data types are a subtype of the super type `OneDtype`.
 ```
 :::
 
+::: {.api}
+**wave_parameters**
+
+---
+```{julia}
+#| echo: false
+@doc wave_parameters(b::Bar, freq)
+```
+:::
+
 #### Example
 
 ```julia
@@ -199,6 +209,12 @@ beam = Beam(L, S, Iz, E, ρ)
 ϕ_rod = modeshape(rod, k_rod, x, :FF)
 ϕ_strings = modeshape(strings, k_strings, x, :CC)
 ϕ_beam = modeshape(beam, k_beam, x, :SS)
+
+# Computation of the wave parameters
+ω_bar, c_bar, k_bar, λ_bar = wave_parameters(bar, 100.)
+ω_rod, c_rod, k_rod, λ_rod = wave_parameters(rod, 100.)
+ω_strings, c_strings, k_strings, λ_strings = wave_parameters(strings, 100.)
+ω_beam, c_beam, k_beam, λ_beam = wave_parameters(beam, 100.)
 ```
 
 ### 2D models
@@ -285,6 +301,16 @@ All the following data types are a subtype of the super type `TwoDStructure`.
 ```
 :::
 
+::: {.api}
+**wave_parameters**
+
+---
+```{julia}
+#| echo: false
+@doc wave_parameters(p::Plate, freq)
+```
+:::
+
 #### Example
 
 ```julia
@@ -314,6 +340,10 @@ membrane = Membrane(Lp, bp, ρ*hp, 100.)
 # Computation of the corresponding mode shapes
 ϕ_plate = modeshape(plate, k_plate, xp, yp)
 ϕ_membrane = modeshape(membrane, k_membrane, xp, yp)
+
+# Computation of the wave parameters
+om_plate, c_plate, k_plate, λ_plate = wave_parameters(plate, fmax)
+om_membrane, c_membrane, k_membrane, λ_membrane = wave_parameters(membrane, fmax)
 ```
 
 ## Discrete models
