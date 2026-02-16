@@ -14,9 +14,7 @@ Adds a Gaussian White Noise (AGWN) to a signal `x` with a given SNR.
 function agwn(x, snr_dB; rst = true)
 
     # Reset the RNG if required
-    if rst
-        rng = MersenneTwister(1000)
-    end
+    rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     SNR = 10^(snr_dB/10.)                     # SNR in linear scale
     En = vec(mean(abs2, x, dims = ndims(x)))  # Signal energy
@@ -51,9 +49,7 @@ Adds a complex Random Colored Noise (ACN) to a signal `x` with a given SNR in th
 function acn(x::VecOrMat{T}, snr_dB, freq::AbstractVector, color = :pink; rst = true) where {T <: Complex}
 
     # Reset the RNG if required
-    if rst
-        rng = MersenneTwister(1000)
-    end
+    rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     ndx = ndims(x)
     SNR = 10^(snr_dB/10.)                     # SNR in linear scale
@@ -108,9 +104,7 @@ Adds a Colored Noise (ACN) to a signal `x` with a given SNR in the time domain
 function acn(x::VecOrMat{T}, snr_dB, fs, color = :pink; frange = T[], rst = true) where {T <: Real}
 
     # Reset the RNG if required
-    if rst
-        rng = MersenneTwister(1000)
-    end
+    rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     ndx = ndims(x)
     L = size(x, ndx)                        # Data dimensions
@@ -193,9 +187,7 @@ Adds a multiplicative Gaussian White Noise (MGWN) to a signal `x` with a given S
 function mgwn(x, snr_dB; rst = true)
 
     # Reset the RNG if required
-    if rst
-        rng = MersenneTwister(1000)
-    end
+    rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     SNR = 10^(snr_dB/10.)
     n = randn(rng, eltype(x), size(x))/sqrt(SNR)
@@ -219,9 +211,7 @@ Adds both additive and multiplicative Gaussian White Noise to a signal `x` with 
 function mixed_noise(x, snr_dB; rst = true)
 
     # Reset the RNG if required
-    if rst
-        rng = MersenneTwister(1000)
-    end
+    rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     SNR = 10^(snr_dB/10.)                      # SNR in linear scale
     En = mean(abs2, x, dims = ndims(x))[:]     # Signal energy

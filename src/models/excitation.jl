@@ -344,7 +344,7 @@ function excitation(type::SineWave, t)
             pos_end = argmin(@. (t - tstart - duration)^2.)
 
             # Check duration
-            tstart + duration ≥ t[end] ? Warn("The duration of the sine wave is too long to performed zero-end operation.") : nothing
+            tstart + duration ≥ t[end] ? throw(DomainError("The duration of the sine wave is too long to performed zero-end operation.")) : nothing
         else
             pos_end = argmin(@. (t - tsw)^2.)
         end
@@ -436,7 +436,7 @@ function excitation(type::SweptSine, t)
                 duration = n*log(fend/fstart)/(fend - fstart)
 
                 # Check duration
-                tstart + duration ≥ t[end] ? warning("The duration of the swept sine is too long to performed zero-end operation.") : nothing
+                tstart + duration ≥ t[end] ? throw(DomainError("The duration of the swept sine is too long to performed zero-end operation.")) : nothing
 
                 pos_end = argmin(@. (t - tstart - duration)^2.)
                 pos_exc_t = findall(@. t[pos_start] ≤ t ≤ t[pos_end])
@@ -484,11 +484,11 @@ function excitation(type::ColoredNoise, t)
     fs = 1/(t[2] - t[1])
 
     # Generate the fft of a white noise
+    freq = rfftfreq(N, fs)
     if color == :white
         Ft .= F .+ σ*randn(N)
     else
         white_fft = rfft(randn(N))
-        freq = rfftfreq(N, fs)
 
         scale = zeros(length(freq))
         if color == :pink
@@ -524,7 +524,7 @@ function excitation(type::ColoredNoise, t)
             # High-pass filter
             filter_type = DSP.Highpass(frange[1])
         else
-            return x .+ colored_noise
+            return Ft
         end
 
         df = DSP.digitalfilter(filter_type, DSP.Butterworth(4); fs)

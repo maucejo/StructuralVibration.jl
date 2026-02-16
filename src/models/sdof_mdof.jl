@@ -126,12 +126,12 @@ function assembly(model::Mdof)
 
     M = Diagonal(m)
     K = zeros(eltype(k), nm, nm)
+    C = zeros(eltype(k), nm, nm)
 
     if nc == 0
         flag = false
     else
         flag = true
-        C = zeros(eltype(k), nm, nm)
     end
 
     for (i, ki) in enumerate(k)

@@ -315,7 +315,7 @@ function stabilization(prob::MdofProblem, max_order::Int, alg::Union{MdofEMA, Md
     for order in 1:max_order
         progress ? next!(p) : nothing
         try
-            poles[order] = poles_extraction(prob, order, alg, stabdiag = true)
+            poles[order] .= poles_extraction(prob, order, alg, stabdiag = true)
         catch e
             poles[order] .= fill(eltype(frf)(complex(NaN, NaN)), order)
         end
