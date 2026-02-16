@@ -120,7 +120,6 @@ function assembly(model::Mdof)
 
     nm = length(m)
     nk = length(k)
-    nc = length(c)
 
     nk != nm - 1 ? error("The number of masses must be equal to the number of springs plus 1") : nothing
 
@@ -128,7 +127,7 @@ function assembly(model::Mdof)
     K = zeros(eltype(k), nm, nm)
     C = zeros(eltype(k), nm, nm)
 
-    if nc == 0
+    if isempty(c)
         flag = false
     else
         flag = true

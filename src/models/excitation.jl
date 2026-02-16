@@ -513,7 +513,7 @@ function excitation(type::ColoredNoise, t)
         @. Ft = F + colored_noise
     end
 
-    if length(frange) > 0
+    if !isempty(frange)
         if frange[1] > freq[1] && frange[2] < freq[end]
             # Band-pass filter
             filter_type = DSP.Bandpass(frange[1], frange[2])
