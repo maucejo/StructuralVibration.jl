@@ -644,6 +644,34 @@ wave_parameters(model::Beam, freq)</code></pre>
 </div>
 </div>
 </div>
+<div class="api">
+<p><strong>modal_density</strong></p>
+<hr>
+<div id="18" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">modal_density(model::Bar)
+modal_density(model::Rod)
+modal_density(model::Strings)
+modal_density(model::Beam, freq)</code></pre>
+<p>Computes the modal density w.r.t frequency of a given model</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the bar data</p>
+</li>
+<li><p><code>freq</code>: Frequency at which the modal density is calculated [Hz] (only for beams)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>md</code>: Modal density [modes/Hz]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="example" class="level4" data-number="1.1.4">
 <h4 data-number="1.1.4" class="anchored" data-anchor-id="example"><span class="header-section-number">1.1.4</span> Example</h4>
@@ -691,7 +719,13 @@ wave_parameters(model::Beam, freq)</code></pre>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>ω_bar, c_bar, k_bar, λ_bar <span class="op">=</span> <span class="fu">wave_parameters</span>(bar, <span class="fl">100</span>.)</span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>ω_rod, c_rod, k_rod, λ_rod <span class="op">=</span> <span class="fu">wave_parameters</span>(rod, <span class="fl">100</span>.)</span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>ω_strings, c_strings, k_strings, λ_strings <span class="op">=</span> <span class="fu">wave_parameters</span>(strings, <span class="fl">100</span>.)</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>ω_beam, c_beam, k_beam, λ_beam <span class="op">=</span> <span class="fu">wave_parameters</span>(beam, <span class="fl">100</span>.)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>ω_beam, c_beam, k_beam, λ_beam <span class="op">=</span> <span class="fu">wave_parameters</span>(beam, <span class="fl">100</span>.)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the modal density</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>md_bar <span class="op">=</span> <span class="fu">modal_density</span>(bar)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>md_rod <span class="op">=</span> <span class="fu">modal_density</span>(rod)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>md_strings <span class="op">=</span> <span class="fu">modal_density</span>(strings)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>md_beam <span class="op">=</span> <span class="fu">modal_density</span>(beam, <span class="fl">100</span>.)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="d-models" class="level3" data-number="1.2">
@@ -733,7 +767,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <div class="api">
 <p><strong>Membrane</strong></p>
 <hr>
-<div id="18" class="cell" data-execution_count="1">
+<div id="20" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">Membrane(L, b, m, D)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic rectangular membrane</p>
@@ -768,7 +802,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <div class="api">
 <p><strong>Plate</strong></p>
 <hr>
-<div id="20" class="cell" data-execution_count="1">
+<div id="22" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">Plate(L, b, h, E, ρ, ν)</code></pre>
 <p>Structure containing the data of a homogeneous and isotropic bending plate</p>
@@ -806,7 +840,7 @@ m \ddot w(x, y, t) + D \Delta^2 w(x, y, t) = p(x, y, t),
 <div class="api">
 <p><strong>modefreq</strong></p>
 <hr>
-<div id="22" class="cell" data-execution_count="1">
+<div id="24" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modefreq(model::Plate, fmax)
 modefreq(model::Membrane, fmax)</code></pre>
@@ -836,7 +870,7 @@ modefreq(model::Membrane, fmax)</code></pre>
 <div class="api">
 <p><strong>modeshape</strong></p>
 <hr>
-<div id="24" class="cell" data-execution_count="1">
+<div id="26" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modeshape(model::Plate, kpq, x, y)
 modeshape(model::Membrane, kpq, x, y)</code></pre>
@@ -864,7 +898,7 @@ modeshape(model::Membrane, kpq, x, y)</code></pre>
 <div class="api">
 <p><strong>wave_parameters</strong></p>
 <hr>
-<div id="26" class="cell" data-execution_count="1">
+<div id="28" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">wave_parameters(model::Plate, freq)
 wave_parameters(model::Membrane, freq)</code></pre>
@@ -885,6 +919,32 @@ wave_parameters(model::Membrane, freq)</code></pre>
 <li><p><code>k</code>: Wavenumber [rad/m]</p>
 </li>
 <li><p><code>λ</code>: Wavelength [m]</p>
+</li>
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="api">
+<p><strong>modal_density</strong></p>
+<hr>
+<div id="30" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="markdown"><pre><code class="language-julia">modal_density(model::Plate)
+modal_density(model::Membrane, freq)</code></pre>
+<p>Compute the modal density of a given model</p>
+<p><strong>Inputs</strong></p>
+<ul>
+<li><p><code>model</code>: Structure containing the data related to the structure</p>
+</li>
+<li><p><code>freq</code>: Frequency at which the modal density is calculated [Hz] (only for membrane)</p>
+</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><p><code>md</code>: Modal density of the structure</p>
 </li>
 </ul>
 
@@ -925,7 +985,11 @@ wave_parameters(model::Membrane, freq)</code></pre>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the wave parameters</span></span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>om_plate, c_plate, k_plate, λ_plate <span class="op">=</span> <span class="fu">wave_parameters</span>(plate, fmax)</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>om_membrane, c_membrane, k_membrane, λ_membrane <span class="op">=</span> <span class="fu">wave_parameters</span>(membrane, fmax)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>om_membrane, c_membrane, k_membrane, λ_membrane <span class="op">=</span> <span class="fu">wave_parameters</span>(membrane, fmax)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Computation of the modal density</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>md_plate <span class="op">=</span> <span class="fu">modal_density</span>(plate)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>md_membrane <span class="op">=</span> <span class="fu">modal_density</span>(membrane, fmax)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 </section>
@@ -958,7 +1022,7 @@ Figure&nbsp;1: Classical representation of an Sdof system
 <div class="api">
 <p><strong>Sdof</strong></p>
 <hr>
-<div id="28" class="cell" data-execution_count="1">
+<div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">Sdof(m, ω0, ξ)</code></pre>
 <p>Structure containing the data of a sdof system</p>
@@ -1035,7 +1099,7 @@ k_1 &amp; -k_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>Mdof</strong></p>
 <hr>
-<div id="30" class="cell" data-execution_count="1">
+<div id="34" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">Mdof(k, m, c = Float64[])</code></pre>
 <p>Structure containing the data for building a mdof system</p>
@@ -1082,7 +1146,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>MdofMesh</strong></p>
 <hr>
-<div id="32" class="cell" data-execution_count="1">
+<div id="36" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">MdofMesh(Elt, constrained_dofs, free_dofs)</code></pre>
 <p>Structure containing the data for building a mdof mesh</p>
@@ -1120,7 +1184,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>assembly</strong></p>
 <hr>
-<div id="34" class="cell" data-execution_count="1">
+<div id="38" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">assembly(model::Mdof)</code></pre>
 <p>Assembly of the mass, stiffness and damping matrices of a mdof system</p>
@@ -1147,7 +1211,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>apply_bc</strong></p>
 <hr>
-<div id="36" class="cell" data-execution_count="1">
+<div id="40" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">apply_bc(A, mesh)</code></pre>
 <p>Apply boundary conditions to a given matrix</p>
@@ -1172,7 +1236,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>eigenmode</strong></p>
 <hr>
-<div id="38" class="cell" data-execution_count="1">
+<div id="42" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">eigenmode(K, M, n = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
@@ -1201,7 +1265,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>modal_matrices</strong></p>
 <hr>
-<div id="40" class="cell" data-execution_count="1">
+<div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modal_matrices(ωn, ξn)</code></pre>
 <p>Computes the modal mass, stiffness, and damping matrices</p>
@@ -1230,7 +1294,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>modal_effective_mass</strong></p>
 <hr>
-<div id="42" class="cell" data-execution_count="1">
+<div id="46" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modal_effective_mass(M, ϕn, r)</code></pre>
 <p>Computes the effective mass of a mode</p>
@@ -1296,7 +1360,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>OneDMesh</strong></p>
 <hr>
-<div id="44" class="cell" data-execution_count="1">
+<div id="48" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">OneDMesh(model, xmin, Nelt, bc)</code></pre>
 <p>Construct a mesh for a beam with Nelt elements, length L and starting at xmin.</p>
@@ -1354,7 +1418,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>assemby</strong></p>
 <hr>
-<div id="46" class="cell" data-execution_count="1">
+<div id="50" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">assembly(model::OneDStructure, mesh::OneDMesh)</code></pre>
 <p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>
@@ -1387,7 +1451,7 @@ c_1 &amp; -c_1 &amp; 0 &amp; \ldots &amp; 0 &amp; 0 \\
 <div class="api">
 <p><strong>rayleigh_damping_matrix</strong></p>
 <hr>
-<div id="48" class="cell" data-execution_count="1">
+<div id="52" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">rayleigh_damping_matrix(M, K, α, β)
 rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
@@ -1437,7 +1501,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>modal_damping_matrix</strong></p>
 <hr>
-<div id="50" class="cell" data-execution_count="1">
+<div id="54" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modal_damping_matrix(M, ωn, ξn, Φn)</code></pre>
 <p>Compute the damping matrix C from modal parameters</p>
@@ -1466,7 +1530,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>Selection matrix</strong></p>
 <hr>
-<div id="52" class="cell" data-execution_count="1">
+<div id="56" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">selection_matrix(mesh, selected_dofs)</code></pre>
 <p>Compute the selection matrix for the selected dofs.</p>
@@ -1593,7 +1657,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>ContinuousStateSpace</strong></p>
 <hr>
-<div id="54" class="cell" data-execution_count="1">
+<div id="58" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">ContinuousStateSpace(Ac, Bc)</code></pre>
 <p>Continuous-time state-space model</p>
@@ -1614,7 +1678,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>ss_model</strong></p>
 <hr>
-<div id="56" class="cell" data-execution_count="1">
+<div id="60" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">ss_model(K, M, C)</code></pre>
 <p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
@@ -1641,7 +1705,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>ss_modal_model</strong></p>
 <hr>
-<div id="58" class="cell" data-execution_count="1">
+<div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">ss_modal_model(ωn, ξn, ϕn)</code></pre>
 <p>Generates a continuous-time state-space model from the mass, damping, and stiffness matrices</p>
@@ -1668,7 +1732,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>eigenmode</strong></p>
 <hr>
-<div id="60" class="cell" data-execution_count="1">
+<div id="64" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">eigenmode(K, M, n = size(K, 1))</code></pre>
 <p>Computes the eigenmodes of a system defined by its mass and stiffness matrices.</p>
@@ -1697,7 +1761,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>modal_parameters</strong></p>
 <hr>
-<div id="62" class="cell" data-execution_count="1">
+<div id="66" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">modal_parameters(λ)</code></pre>
 <p>Computes the natural angular frequencies and damping ratios from the complex eigenvalues</p>
@@ -1793,7 +1857,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>DiscreteStateSpace</strong></p>
 <hr>
-<div id="64" class="cell" data-execution_count="1">
+<div id="68" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">DiscreteStateSpace(Ad, Bd, Bdp)</code></pre>
 <p>Discrete-time state-space model</p>
@@ -1816,7 +1880,7 @@ rayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)</code></pre>
 <div class="api">
 <p><strong>c2d</strong></p>
 <hr>
-<div id="66" class="cell" data-execution_count="1">
+<div id="70" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="markdown"><pre><code class="language-julia">c2d(css::ContinuouStateSpace, h::Float64, method::Symbol)</code></pre>
 <p>Converts a continuous-time state-space model to a discrete-time state-space model.</p>
