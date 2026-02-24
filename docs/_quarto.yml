@@ -54,6 +54,7 @@ website:
         - modal_extraction/oma.qmd
         - modal_extraction/ods.qmd
         - modal_extraction/indicators.qmd
+        - modal_extraction/modal_density.qmd
 
     - title: "Signal processing"
       contents:

@@ -54,6 +54,16 @@ SNR_est2 = mean(estimated_SNR(y, v2))
 v3 = varest(y, DerricoEst())
 SNR_est3 = mean(estimated_SNR(y, v3))
 
+table_noise = begin
+    data = ["$SNR_ref dB" "$SNR_est1 dB" "$SNR_est2 dB" "$SNR_est3 dB"]
+    header = ["Reference", "GCV", "L-curve", "D'Errico"]
+    pretty_table(
+      data,
+      column_labels = header,
+      alignment = :c
+    )
+end
+
 ## Denoising
 # Beam definition
 L = 1.

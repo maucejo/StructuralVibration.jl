@@ -125,14 +125,14 @@ function compute_poles(H, freq, alg::PeakPicking, pks)
         edge2 = ceil(Int, edg[2])
 
         # Left side of the peak
-        itp_left = linear_interpolation(freq[edge1:idmax], Habs[edge1:idmax])
+        itp_left = LinearInterpolation(Habs[edge1:idmax], freq[edge1:idmax])
         freq_left .= LinRange(freq[edge1], f, nfreq_itp)
         @. Hleft = itp_left(freq_left)
         posleft = argmin(abs.(Hleft .- Hmax/√2))
         fmin = freq_left[posleft]
 
         # Right side of the peak
-        itp_right = linear_interpolation(freq[idmax:edge2], Habs[idmax:edge2])
+        itp_right = LinearInterpolation(Habs[idmax:edge2], freq[idmax:edge2])
         freq_right .= LinRange(f, freq[edge2], nfreq_itp)
         @. Hright = itp_right(freq_right)
         posright = argmin(abs.(Hright .- Hmax/√2))
@@ -183,8 +183,8 @@ function compute_poles(H, freq, alg::CircleFit, pks)
         ImH = imag(H[edge1:edge2])
 
         # Circle fitting
-        itp_real = linear_interpolation(freqs, ReH)
-        itp_imag = linear_interpolation(freqs, ImH)
+        itp_real = LinearInterpolation(ReH, freqs)
+        itp_imag = LinearInterpolation(ImH, freqs)
 
         freq_itp .= LinRange(freqs[1], freqs[end], nfreq_itp)
         ReH_itp .= itp_real(freq_itp)
@@ -252,8 +252,8 @@ function compute_poles(H, freq, alg::LSFit, pks)
         ReH = real(H[edge1:edge2])
         ImH = imag(H[edge1:edge2])
 
-        itp_real = linear_interpolation(freqs, ReH)
-        itp_imag = linear_interpolation(freqs, ImH)
+        itp_real = LinearInterpolation(ReH, freqs)
+        itp_imag = LinearInterpolation(ImH, freqs)
 
         freq_itp .= LinRange(freqs[1], freqs[end], nfreq_itp)
         ReH_itp .= itp_real(freq_itp)

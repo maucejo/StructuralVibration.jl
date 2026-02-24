@@ -1,9 +1,9 @@
 module StructuralVibration
-       # using DispatchDoctor
-       # @stable begin
+       using DispatchDoctor
+       @stable begin
 
-       using FastGaussQuadrature, FFTW, Interpolations, LinearAlgebra, Optim,
-             Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
+       using DataInterpolations, FastGaussQuadrature, FFTW, LinearAlgebra,
+             Optim, Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
 
        using DSP: conv, filt, filtfilt, remez, rms, hilbert
 
@@ -33,7 +33,8 @@ module StructuralVibration
        export BayesDenoising, GCVDenoising, KalmanDenoising, LCurveDenoising
 
        # Structs - Modal extraction
-       export EMAProblem, EMASolution, OMAProblem, StabilizationAnalysis
+       export EMAProblem, EMASolution, OMAProblem, StabilizationAnalysis,
+              FDFit, PolyFit, Lowess, CSFit
 
        export CircleFit, CovSSI, DataSSI, FSDD, LSCE, LSCF, LSFit, PeakPicking, pLSCF
 
@@ -53,7 +54,7 @@ module StructuralVibration
 
        # Modal extraction
        export cmif, comac, compute_residuals, convert_csd, csd_from_tf, ecomac,
-              frac, frf_reconstruction, half_csd, half_csd_reconstruction, impulse_response, mac, mcf, modal2poles, mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, ods, poles_extraction, poles2modal, psif, real_normalization, stabilization, xcorr
+              frac, frf_reconstruction, half_csd, half_csd_reconstruction, impulse_response, mac, mcf, modal2poles, modal_density,mode_residues, mode2residues, modes_extraction, modeshape_extraction, mof, mpc, mpd, msf, mov, ods, poles_extraction, poles2modal, psif, real_normalization, stabilization, xcorr
 
        # Signal processing
        export bartlett, bartlett_hann, blackman, blackman_harris,
@@ -94,6 +95,7 @@ module StructuralVibration
        include("modal_extraction/oma_mdof.jl")
        include("modal_extraction/oma_halfspec.jl")
        include("modal_extraction/ods.jl")
+       include("modal_extraction/modal_density.jl")
 
        # Include files - Sdof
        include("models/sdof_mdof.jl")
@@ -116,9 +118,6 @@ module StructuralVibration
 
        # Include files - Visualization
        include("utils/visualization.jl")
-
-       # Include files - Precompilation
-       # include("precompilation/precompilation.jl")
 end
 
-# end
+end

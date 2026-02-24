@@ -459,7 +459,7 @@ function varest_derrico_real(x)
             p .= (0.5 .+ collect(Float64, 1:ntrim))./(ntrim + 0.5)
 
             for (k, nk) in enumerate(eachrow(noisedata))
-                itp = linear_interpolation(p, nk, extrapolation_bc = Line())
+                itp = LinearInterpolation(nk, p, extrapolation = ExtrapolationType.Extension)
                 @. Q[k, :] = (itp(1 - perc) - itp(perc))/2z
             end
 

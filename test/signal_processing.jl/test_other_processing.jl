@@ -16,6 +16,11 @@ y2_lin = detrend(x2, y2, 1)
 ## Gradient
 # Signal
 x = LinRange(0., 3π, 100)
+
+# N = 30
+# idx = round.(Int, (N - 1)rand(N) .+ 1) |> sort |> unique
+# x = x[idx]
+
 y = sin.(x)
 
 # True gradient

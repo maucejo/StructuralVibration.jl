@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, Statistics, Markdown
+using StructuralVibration, ShareAdd, Statistics, PrettyTables
 @usingany CairoMakie
 ```
 
@@ -185,15 +185,20 @@ SNR_est3 = mean(estimated_SNR(y, v3))
 #| echo: false
 #| tbl-cap: Noise variance estimation
 
-s1 = round(SNR_est1, digits=2)
-s2 = round(SNR_est2, digits=2)
-s3 = round(SNR_est3, digits=2)
+s1 = round(SNR_est1, digits = 2)
+s2 = round(SNR_est2, digits = 2)
+s3 = round(SNR_est3, digits = 2)
 
-Markdown.parse("""
-|  Reference  |   GCV  |L-curve |D'Errico|
-|:-----------:|:------:|:------:|:------:|
-| $SNR_ref dB | $s1 dB | $s2 dB | $s3 dB |
-""")
+table_noise = begin
+    data = ["$SNR_ref dB" "$s1 dB" "$s2 dB" "$s3 dB"]
+    header = ["Reference", "GCV", "L-curve", "D'Errico"]
+    pretty_table(
+      HTML,
+      data,
+      column_labels = header,
+      alignment = :c
+    )
+end
 ```
 
 ## Signal denoising

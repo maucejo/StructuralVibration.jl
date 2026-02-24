@@ -6,6 +6,17 @@ format:
     number-sections: false
 ---
 
+## 1.9.0
+
+**New features**
+
+- Add `modal_density` function to compute the modal density of a structure from the knowledge of its resonance frequencies.
+- Add `modal_density` function for 1D structures (bars, rods, strings and beams) and 2D structures (plates and membranes) based on the analytical expression of the modal density for these structures.
+
+**Internals**
+
+- Replace `Interpolations.jl` with `DataInterpolations.jl` for interpolation.
+
 ## 1.8.0
 
 **New features**

@@ -1,0 +1,315 @@
+---
+title: Modal density estimation
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd, Statistics, PrettyTables
+@usingany CairoMakie
+```
+
+The modal density of a structure is defined as the number of modes per unit frequency. It is an important parameter in structural dynamics, as it provides information about the distribution of the modes of a structure. This information is useful for instance to determine the frequency range of interest for modal analysis, to estimate the number of modes that can be extracted from a given frequency range, or to assess the complexity of a structure. It is also a key parameter in Statistical Energy Analysis (SEA).
+
+## Definition
+
+The modal density of a structure is defined as the number of modes per unit frequency. It can be estimated from the knowledge of the resonance frequencies of a structure, which can be obtained from experimental modal analysis or from numerical simulations. The modal density can be estimated using the following formula:
+$$
+n(f) = \frac{dN(f)}{df},
+$$
+where $N(f)$ is the number of modes up to frequency $f$.
+
+The modal density is mainly calculated analytically for simple structures such as bars, rods, strings, beams, plates and membranes (see [Continuous models](../models/index.qmd#continuous-models)). For more complex structures, the modal density can be estimated from the knowledge of the resonance frequencies using numerical procedures.
+
+## Estimation algorithms
+
+`StructuralVibration.jl` provides the `modal_density` function to compute the modal density of a structure from the knowledge of its resonance frequencies. Three algorithms are implemented to estimate the modal density from the resonance frequencies:
+
+- Finite difference method
+- Global cubic polynomial fitting
+- Local Weighted Scatterplot Smoothing (LOWESS)
+- Cubic spline interpolation
+
+### Finite difference method
+
+The finite difference method estimates the modal density by computing the finite difference of the number of modes over a moving window (i.e. over a given frequency range). From a mathematical point of view, the modal density is estimated as follows:
+$$
+n(f) \approx \begin{cases}
+\frac{N(f + \Delta f) - N(f)}{\Delta f}, & \text{if } f_\text{min} > f - \Delta f, \\
+\frac{N(f) - N(f - \Delta f)}{\Delta f}, & \text{if } f_\text{max} < f + \Delta f, \\
+\frac{N(f + \Delta f) - N(f - \Delta f)}{2\Delta f}, & \text{otherwise} \\
+\end{cases}
+$$
+where $\Delta f$ is the window size. The choice of the window size is crucial for the accuracy of the estimation.
+
+This method is simple and fast, but it can be sensitive to noise. A small window size can lead to a noisy estimation, while a large window size can lead to a biased estimation. The optimal window size depends on the distribution of the resonance frequencies and the desired level of smoothing.
+
+### Global cubic polynomial fitting
+
+The global cubic polynomial fitting method estimates the modal density by fitting a cubic polynomial to the number of modes as a function of frequency. The modal density is then obtained by differentiating the fitted polynomial.
+
+The idea behind this approach is to approximate the number of modes $N(f)$ by a cubic polynomial of the form:
+$$
+N(f) \approx a_0 + a_1 f + a_2 f^2 + a_3 f^3,
+$$
+where $a_0$, $a_1$, $a_2$ and $a_3$ are the coefficients of the polynomial. The modal density is then estimated as follows:
+$$
+n(f) \approx a_1 + 2 a_2 f + 3 a_3 f^2.
+$$
+
+To compute the coefficients of the cubic polynomial, a least-squares fitting procedure is used.
+
+::: {.callout-note}
+From a numerical point of view, we operate a change of variable to improve the conditioning of the problem. Here, the number of modes is parameterized as a function of the variable $t \in [0,1]$ defined as follows:
+$$
+t = \frac{f - f_\text{min}}{f_\text{max} - f_\text{min}},
+$$
+where $f_\text{min}$ and $f_\text{max}$ are the minimum and maximum frequencies of interest, respectively. The number of modes is then approximated by a cubic polynomial of the variable $t$:
+$$
+N(t) \approx a_0 + a_1 t + a_2 t^2 + a_3 t^3,
+$$
+and the modal density is estimated as follows:
+
+Noting that $\frac{dt}{df} = \frac{1}{f_\text{max} - f_\text{min}}$, we have:
+$$
+n(f) \approx \frac{dN}{dt} \cdot \frac{dt}{df} = \frac{a_1 + 2 a_2 t + 3 a_3 t^2}{f_\text{max} - f_\text{min}}.
+$$
+:::
+
+This method assumes that the function $N(f)$ is smooth, which is not always the case for real structures. If the modal density varies significantly over the frequency range of interest, a global polynomial fitting leads to a biased estimation.
+
+### Local Weighted Scatterplot Smoothing
+
+Local Weighted Scatterplot Smoothing[^1] (LOWESS) is a non-pararametric regression method that has been proposed by Cleveland in 1979 to fit a smooth curve to a scatterplot. The idea behind LOWESS is to fit a local polynomial to the data points in a neighborhood of each point of interest. The local polynomial is weighted by a kernel function that gives more weight to the points closer to the point of interest.
+
+In the context of modal density estimation, LOWESS is adapted to directly estimate the modal density from the regression model. Here, the number of modes at a frequency $f$ around a point of interest $f_i$ is approximated by the following :
+$$
+  N(f) \approx  N(f_i) + \left.\frac{dN}{df}\right|_{f=f_i} (f - f_i).
+$$
+To apply the LOWESS method, the previous expansion is rewritten as follows:
+$$
+N(f) \approx a_0 + a_1 (f - f_i),
+$$
+where $a_0$ and $a_1$ are the coefficients to be estimated. The modal density is then estimated as follows:
+$$
+n(f_i) = a_1.
+$$
+
+In the LOWESS method, the coefficients $a_0$ and $a_1$ are estimated by minimizing the following weighted least-squares problem:
+$$
+(\hat{a}_0, \hat{a}_1) = \underset{(a_0, a_1)}{\text{argmin}} \sum_{j=1}^N w_j(f_i) \left[N(f_j) - a_0 - a_1 (f_j - f_i)\right]^2,
+$$
+where $w_j$ is the weight associated to the point $f_j$. The weights are computed using a kernel function that gives more weight to the points closer to $f_i$. The choice of the kernel function and the bandwidth (i.e. the size of the neighborhood) is crucial for the accuracy of the estimation. In LOWESS, the tricube kernel is commonly used, which is defined as follows:
+$$
+w_j(f_i) = \begin{cases}
+\left(1 - \left|\frac{f_j - f_i}{\Delta f}\right|^3\right)^3, & \text{if } |f_j - f_i| < \Delta f, \\
+0, & \text{otherwise}
+\end{cases}
+$$
+where $\Delta f$ is the bandwidth (i.e. the size of the neighborhood).
+
+The LOWESS method has several advantages over the previous methods. It does not assume any global functional form for the number of modes, which makes it more flexible and less biased. It is also more robust to noise, as it gives more weight to the points closer to the point of interest. However, it can be computationally expensive, especially for large datasets, as it requires solving a weighted least-squares problem for each point of interest.
+
+[^1]: W. S. Cleveland, "Robust Locally Weighted Regression and Smoothing Scatterplots," Journal of the American Statistical Association, vol. 74, no. 368, pp. 829-836, 1979.
+
+### Cubic spline interpolation
+
+The cubic spline interpolation method estimates the modal density by fitting a cubic spline to the number of modes as a function of frequency. The modal density is then obtained by differentiating the fitted spline.
+
+This method is implemented using the `DataInterpolations.jl` package, which provides a convenient interface to perform cubic spline interpolation and first-order derivation.
+
+The cubic spline interpolation offers a good compromise between the global polynomial fitting and the LOWESS method, since it is globally smooth but loccaly controlled. However, best estimation results are obtained when the number of modes is a smooth function of frequency, which is not always the case for real structures.
+
+## API
+
+**Data types**
+
+::: {.api}
+**FDFit**
+
+---
+```{julia}
+#| echo: false
+@doc FDFit
+```
+:::
+
+::: {.api}
+**PolyFit**
+
+---
+```{julia}
+#| echo: false
+@doc PolyFit
+```
+:::
+
+::: {.api}
+**Lowess**
+
+---
+```{julia}
+#| echo: false
+@doc Lowess
+```
+:::
+
+::: {.api}
+**CSFit**
+
+---
+```{julia}
+#| echo: false
+@doc CSFit
+```
+:::
+
+**Related function**
+
+::: {.api}
+**modal_density**
+
+---
+```{julia}
+#| echo: false
+@doc modal_density(::Vector{<:Real}, method::FDFit)
+```
+:::
+
+## Examples
+
+### Clamped-Clamped string
+```{julia}
+#| output: false
+# Geometry and material parameters
+L = 5.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+ρ = 2698.   # Density
+
+# Create a Strings struct
+strings = Strings(L, S, 1e4, ρ)
+
+# Reference modal density
+md_ref_string = round(modal_density(strings), digits = 5)
+
+# Modal density estimation from the frequencies
+ωn_string = modefreq(strings, 1e3)[1]
+fn_string = ωn_string./2π
+
+md_fd_string = round.(modal_density(fn_string, FDFit())[1], digits = 5)
+md_poly_string = round.(modal_density(fn_string, PolyFit())[1], digits = 5)
+md_lowess_string = round.(modal_density(fn_string, Lowess())[1], digits = 5)
+md_csfit_string = round.(modal_density(fn_string, CSFit())[1], digits = 5)
+```
+
+```{julia}
+#| echo: false
+fig_string = begin
+    fig = Figure()
+    ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Modal density (modes/Hz)", title = "Clamped-Clamped string")
+    sc1 = scatter!(ax, fn_string, md_fd_string)
+    sc2 = scatter!(ax, fn_string, md_poly_string, marker = :star5)
+    sc3 = scatter!(ax, fn_string, md_lowess_string, marker = :xcross)
+    sc4 = scatter!(ax, fn_string, md_csfit_string, marker = :diamond)
+    h1 = hlines!(ax, [md_ref_string], color = :black)
+    xlims!(ax, minimum(fn_string), maximum(fn_string))
+    axislegend(ax, [h1, sc1, sc2, sc3, sc4], ["Reference", "FDFit", "PolyFit", "Lowess", "CSFit"])
+
+    fig
+end
+```
+
+```{julia}
+#| echo: false
+#| tbl-cap: Modal density estimation for a clamped-clamped string
+
+table_string = begin
+    data = [md_ref_string mean(md_fd_string) mean(md_poly_string) mean(md_lowess_string) mean(md_csfit_string)]
+    header = ["Reference", "FDFit", "PolyFit", "Lowess", "CSFit"]
+    pretty_table(
+      HTML,
+      data,
+      column_labels = header,
+      alignment = :c
+    )
+end
+```
+
+### Simply-supported beam
+```{julia}
+#| output: false
+# Geometry and material parameters
+# Geometry and material parameters
+L = 1.        # Length
+b = 0.03      # Width
+h = 0.01      # Thickness
+S = b*h       # Cross-section area
+Iz = b*h^3/12 # Moment of inertia
+E = 2.1e11  # Young's modulus
+ρ = 7850.   # Density
+
+# Create a Beam struct
+beam = Beam(L, S, Iz, E, ρ)
+fmax = 5000.
+
+# Theoretical resonance frequencies
+ωn_beam = modefreq(beam, fmax)[1]
+fn_beam = ωn_beam./2π
+
+# Reference modal density
+freq_beam = LinRange(minimum(fn_beam), maximum(fn_beam), 1000)
+md_ref_beam = round.(modal_density.(Ref(beam), freq_beam), digits = 4)
+
+# Modal density estimation from the frequencies
+ωn_beam = modefreq(beam, fmax)[1]
+fn_beam = ωn_beam./2π
+
+md_fd_beam = round.(modal_density(fn_beam, FDFit(2))[1], digits = 4)
+md_poly_beam = round.(modal_density(fn_beam, PolyFit())[1], digits = 4)
+md_lowess_beam = round.(modal_density(fn_beam, Lowess(0.1))[1], digits = 4)
+md_csfit_beam = round.(modal_density(fn_beam, CSFit())[1], digits = 4)
+```
+
+```{julia}
+#| echo: false
+fig_beam = begin
+    fig = Figure()
+    ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Modal density (modes/Hz)", title = "Simply-supported beam")
+    lines!(ax, freq_beam, md_ref_beam, color = :black, label = "Reference")
+    scatter!(ax, fn_beam, md_fd_beam, label = "FDFit")
+    scatter!(ax, fn_beam, md_poly_beam, marker = :star5, label = "PolyFit")
+    scatter!(ax, fn_beam, md_lowess_beam, marker = :xcross, label = "Lowess")
+    scatter!(ax, fn_beam, md_csfit_beam, marker = :diamond, label = "CSFit")
+    xlims!(ax, minimum(fn_beam), maximum(fn_beam))
+    axislegend(ax)
+
+    fig
+end
+```
+
+```{julia}
+#| echo: false
+#| tbl-cap: Average modal density estimation for a simply-supported beam
+
+md_ref_b = round.(modal_density.(Ref(beam), fn_beam), digits = 4)
+table_beam = begin
+    data = [round(mean(md_ref_b), digits = 4) round(mean(md_fd_beam), digits = 4) round(mean(md_poly_beam), digits = 4) round(mean(md_lowess_beam), digits = 4) round(mean(md_csfit_beam), digits = 4)]
+    header = ["Reference", "FDFit", "PolyFit", "Lowess", "CSFit"]
+    pretty_table(
+      HTML,
+      data,
+      column_labels = header,
+      alignment = :c
+    )
+end
+```

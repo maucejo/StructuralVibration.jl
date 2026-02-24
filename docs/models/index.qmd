@@ -167,6 +167,16 @@ All the following data types are a subtype of the super type `OneDtype`.
 ```
 :::
 
+::: {.api}
+**modal_density**
+
+---
+```{julia}
+#| echo: false
+@doc modal_density(b::Bar)
+```
+:::
+
 #### Example
 
 ```julia
@@ -215,6 +225,12 @@ beam = Beam(L, S, Iz, E, ρ)
 ω_rod, c_rod, k_rod, λ_rod = wave_parameters(rod, 100.)
 ω_strings, c_strings, k_strings, λ_strings = wave_parameters(strings, 100.)
 ω_beam, c_beam, k_beam, λ_beam = wave_parameters(beam, 100.)
+
+# Computation of the modal density
+md_bar = modal_density(bar)
+md_rod = modal_density(rod)
+md_strings = modal_density(strings)
+md_beam = modal_density(beam, 100.)
 ```
 
 ### 2D models
@@ -311,6 +327,16 @@ All the following data types are a subtype of the super type `TwoDStructure`.
 ```
 :::
 
+::: {.api}
+**modal_density**
+
+---
+```{julia}
+#| echo: false
+@doc modal_density(p::Plate)
+```
+:::
+
 #### Example
 
 ```julia
@@ -344,6 +370,10 @@ membrane = Membrane(Lp, bp, ρ*hp, 100.)
 # Computation of the wave parameters
 om_plate, c_plate, k_plate, λ_plate = wave_parameters(plate, fmax)
 om_membrane, c_membrane, k_membrane, λ_membrane = wave_parameters(membrane, fmax)
+
+# Computation of the modal density
+md_plate = modal_density(plate)
+md_membrane = modal_density(membrane, fmax)
 ```
 
 ## Discrete models

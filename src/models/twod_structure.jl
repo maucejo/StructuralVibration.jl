@@ -114,6 +114,45 @@ function wave_parameters(model::Membrane, freq)
 end
 
 """
+    modal_density(model::Plate)
+    modal_density(model::Membrane, freq)
+
+Compute the modal density of a given model
+
+**Inputs**
+* `model`: Structure containing the data related to the structure
+* `freq`: Frequency at which the modal density is calculated [Hz] (only for membrane)
+
+**Output**
+* `md`: Modal density of the structure
+"""
+function modal_density(model::Plate)
+    # Model parameters
+    (; L, b, m, D) = model
+
+    # Modal density
+    md = L*b*sqrt(m/D)/2.
+
+    return md
+end
+
+function modal_density(model::Membrane, freq)
+    # Model parameters
+    (; L, b) = model
+
+    # Wave speed
+    c = wave_parameters(model, freq)[2]
+
+    # Modal density
+    ω = 2π*freq
+    md = L*b*ω/c^2
+
+    return md
+end
+
+
+
+"""
     modefreq(model::Plate, fmax)
     modefreq(model::Membrane, fmax)
 

@@ -12,7 +12,7 @@ format:
 
 <br/>
 
-[![Generic badge](https://img.shields.io/badge/Version-1.8.0-cornflowerblue.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-1.9.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
@@ -165,6 +165,12 @@ The package provides the following features:
     - Estimation of the FRF/Half-spectrum residuals
     - Reconstruct FRF/Half-spectrum from modal parameters
 
+- **Modal density estimation**
+  - Finite difference method
+  - Global polynomial fitting
+  - LOWESS
+  - Cubic spline interpolation
+
 ### Visualization
 
 - Bode plot
@@ -182,15 +188,16 @@ The package provides the following features:
 Project StructuralVibration v1.1.2
 Status
   [717857b8] DSP v0.8.4
+  [82cc6244] DataInterpolations v8.9.0
+  [8d63f2c5] DispatchDoctor v0.4.28
   [7a1cc6ca] FFTW v1.10.0
   [442a2c76] FastGaussQuadrature v1.1.0
-  [a98d9a8b] Interpolations v0.15.1
-  [429524aa] Optim v1.13.2
-  [18e31ff7] Peaks v0.5.3
+  [429524aa] Optim v2.0.1
+  [18e31ff7] Peaks v0.6.1
   [f27b6e38] Polynomials v4.1.0
   [92933f4c] ProgressMeter v1.11.0
   [aed68c70] SkipNan v0.2.0
-  [276daf66] SpecialFunctions v2.6.1
+  [276daf66] SpecialFunctions v2.7.1
   [10745b16] Statistics v1.11.1
   [c751599d] ToeplitzMatrices v0.8.5
   [37e2e46d] LinearAlgebra v1.12.0
@@ -203,8 +210,8 @@ Status
 # Julia version and machine information
 
 ```julia
-Julia Version 1.12.1
-Commit ba1e628ee49 (2025-10-17 13:02 UTC)
+Julia Version 1.12.5
+Commit 5fe89b8ddc1 (2026-02-09 16:05 UTC)
 Build Info:
   Official https://julialang.org release
 Platform Info:
@@ -215,9 +222,9 @@ Platform Info:
   GC: Built with stock GC
 Threads: 1 default, 1 interactive, 1 GC (on 12 virtual cores)
 Environment:
-  JULIA_PKG_SERVER = https://juliahub.com
   JULIA_EDITOR = code
   JULIA_VSCODE_REPL = 1
+  JULIA_PKG_SERVER = https://juliahub.com
 ```
 :::
 

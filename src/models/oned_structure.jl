@@ -156,6 +156,45 @@ function wave_parameters(model::Beam, freq)
 end
 
 """
+    modal_density(model::Bar)
+    modal_density(model::Rod)
+    modal_density(model::Strings)
+    modal_density(model::Beam, freq)
+
+Computes the modal density w.r.t frequency of a given model
+
+**Inputs**
+* `model`: Structure containing the bar data
+* `freq`: Frequency at which the modal density is calculated [Hz] (only for beams)
+
+**Output**
+* `md`: Modal density [modes/Hz]
+"""
+function modal_density(model::WaveEquation)
+    # Import length
+    L = model.L
+
+    # Wave speed
+    c = wave_parameters(model, 1)[2]
+
+    # Modal density
+    md = 2L/c
+
+    return md
+end
+
+function modal_density(model::Beam, freq)
+    # Import length
+    (; L, D, m) = model
+
+    # Modal density
+    ω = 2π*freq
+    md = L*(m/D)^(1/4)/sqrt(ω)
+
+    return md
+end
+
+"""
     modefreq(model::Bar, fmax, bc = :CC)
     modefreq(model::Rod, fmax, bc = :CC)
     modefreq(model::Strings, fmax, bc = :CC)

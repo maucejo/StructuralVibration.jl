@@ -22,13 +22,13 @@ Compute the gradient of a function `f` at points `t`.
 If `method` is `:cubic`, `t` must be an `AbstractRange`.
 """
 function gradient(f::Vector{T}, t; method = :cubic) where {T <: Real}
-    if (method == :cubic) && (t isa AbstractRange)
-        itp = cubic_spline_interpolation(t, f)
+    if (method == :cubic)
+        itp = CubicSpline(f, t)
     elseif method == :linear
-        itp = linear_interpolation(t, f)
+        itp = LinearInterpolation(f, t)
     end
 
-    return only.(Interpolations.gradient.(Ref(itp), t))
+    return only.(DataInterpolations.derivative.(Ref(itp), t)) :: typeof(f)
 end
 
 function gradient(f::Matrix{T}, t; method = :cubic, dims = 1) where {T <: Real}

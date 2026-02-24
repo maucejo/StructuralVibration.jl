@@ -355,6 +355,84 @@
             "source": [
                 ":::\n",
                 "\n",
+                "::: {.api}\n",
+                "**wave_parameters**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "16",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc wave_parameters(b::Bar, freq)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mwave_parameters(model::Bar, freq)\u001b[39m\n  \u001b[36mwave_parameters(model::Rod, freq)\u001b[39m\n  \u001b[36mwave_parameters(model::Strings, freq)\u001b[39m\n  \u001b[36mwave_parameters(model::Beam, freq)\u001b[39m\n\n  Computes the wave parameters of given model at a given frequency\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the bar data\n    \u001b[34m• \u001b[39m \u001b[36mfreq\u001b[39m: Frequency at which the wave parameters are calculated [Hz]\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mω\u001b[39m: Angular frequency [rad/s]\n    \u001b[34m• \u001b[39m \u001b[36mc\u001b[39m: Wave speed [m/s]\n    \u001b[34m• \u001b[39m \u001b[36mk\u001b[39m: Wavenumber [rad/m]\n    \u001b[34m• \u001b[39m \u001b[36mλ\u001b[39m: Wavelength [m]",
+                        "text/markdown": "```julia\nwave_parameters(model::Bar, freq)\nwave_parameters(model::Rod, freq)\nwave_parameters(model::Strings, freq)\nwave_parameters(model::Beam, freq)\n```\n\nComputes the wave parameters of given model at a given frequency\n\n**Inputs**\n\n  * `model`: Structure containing the bar data\n  * `freq`: Frequency at which the wave parameters are calculated [Hz]\n\n**Outputs**\n\n  * `ω`: Angular frequency [rad/s]\n  * `c`: Wave speed [m/s]\n  * `k`: Wavenumber [rad/m]\n  * `λ`: Wavelength [m]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">wave_parameters&#40;model::Bar, freq&#41;\nwave_parameters&#40;model::Rod, freq&#41;\nwave_parameters&#40;model::Strings, freq&#41;\nwave_parameters&#40;model::Beam, freq&#41;</code></pre>\n<p>Computes the wave parameters of given model at a given frequency</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the bar data</p>\n</li>\n<li><p><code>freq</code>: Frequency at which the wave parameters are calculated &#91;Hz&#93;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ω</code>: Angular frequency &#91;rad/s&#93;</p>\n</li>\n<li><p><code>c</code>: Wave speed &#91;m/s&#93;</p>\n</li>\n<li><p><code>k</code>: Wavenumber &#91;rad/m&#93;</p>\n</li>\n<li><p><code>λ</code>: Wavelength &#91;m&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nwave_parameters(model::Bar, freq)\nwave_parameters(model::Rod, freq)\nwave_parameters(model::Strings, freq)\nwave_parameters(model::Beam, freq)\n\\end{verbatim}\nComputes the wave parameters of given model at a given frequency\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the bar data\n\n\n\\item \\texttt{freq}: Frequency at which the wave parameters are calculated [Hz]\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ω}: Angular frequency [rad/s]\n\n\n\\item \\texttt{c}: Wave speed [m/s]\n\n\n\\item \\texttt{k}: Wavenumber [rad/m]\n\n\n\\item \\texttt{λ}: Wavelength [m]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "17",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_density**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "18",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modal_density(b::Bar)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodal_density(model::Bar)\u001b[39m\n  \u001b[36mmodal_density(model::Rod)\u001b[39m\n  \u001b[36mmodal_density(model::Strings)\u001b[39m\n  \u001b[36mmodal_density(model::Beam, freq)\u001b[39m\n\n  Computes the modal density w.r.t frequency of a given model\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the bar data\n    \u001b[34m• \u001b[39m \u001b[36mfreq\u001b[39m: Frequency at which the modal density is calculated [Hz]\n       (only for beams)\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmd\u001b[39m: Modal density [modes/Hz]",
+                        "text/markdown": "```julia\nmodal_density(model::Bar)\nmodal_density(model::Rod)\nmodal_density(model::Strings)\nmodal_density(model::Beam, freq)\n```\n\nComputes the modal density w.r.t frequency of a given model\n\n**Inputs**\n\n  * `model`: Structure containing the bar data\n  * `freq`: Frequency at which the modal density is calculated [Hz] (only for beams)\n\n**Output**\n\n  * `md`: Modal density [modes/Hz]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modal_density&#40;model::Bar&#41;\nmodal_density&#40;model::Rod&#41;\nmodal_density&#40;model::Strings&#41;\nmodal_density&#40;model::Beam, freq&#41;</code></pre>\n<p>Computes the modal density w.r.t frequency of a given model</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the bar data</p>\n</li>\n<li><p><code>freq</code>: Frequency at which the modal density is calculated &#91;Hz&#93; &#40;only for beams&#41;</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>md</code>: Modal density &#91;modes/Hz&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodal_density(model::Bar)\nmodal_density(model::Rod)\nmodal_density(model::Strings)\nmodal_density(model::Beam, freq)\n\\end{verbatim}\nComputes the modal density w.r.t frequency of a given model\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the bar data\n\n\n\\item \\texttt{freq}: Frequency at which the modal density is calculated [Hz] (only for beams)\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{md}: Modal density [modes/Hz]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "19",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
                 "#### Example\n",
                 "\n",
                 "```julia\n",
@@ -397,6 +475,18 @@
                 "ϕ_rod = modeshape(rod, k_rod, x, :FF)\n",
                 "ϕ_strings = modeshape(strings, k_strings, x, :CC)\n",
                 "ϕ_beam = modeshape(beam, k_beam, x, :SS)\n",
+                "\n",
+                "# Computation of the wave parameters\n",
+                "ω_bar, c_bar, k_bar, λ_bar = wave_parameters(bar, 100.)\n",
+                "ω_rod, c_rod, k_rod, λ_rod = wave_parameters(rod, 100.)\n",
+                "ω_strings, c_strings, k_strings, λ_strings = wave_parameters(strings, 100.)\n",
+                "ω_beam, c_beam, k_beam, λ_beam = wave_parameters(beam, 100.)\n",
+                "\n",
+                "# Computation of the modal density\n",
+                "md_bar = modal_density(bar)\n",
+                "md_rod = modal_density(rod)\n",
+                "md_strings = modal_density(strings)\n",
+                "md_beam = modal_density(beam, 100.)\n",
                 "```\n",
                 "\n",
                 "### 2D models\n",
@@ -448,7 +538,7 @@
             ]
         },
         {
-            "id": "16",
+            "id": "20",
             "cell_type": "code",
             "metadata": {
             },
@@ -461,10 +551,10 @@
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mMembrane(L, b, m, D)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic rectangular\n  membrane\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mb\u001b[39m: Width [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Surface mass [kg/m²]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Tension per unit length [N/m]",
-                        "text/markdown": "```julia\nMembrane(L, b, m, D)\n```\n\nStructure containing the data of a homogeneous and isotropic rectangular membrane\n\n**Fields**\n\n  * `L`: Length [m]\n  * `b`: Width [m]\n  * `m`: Surface mass [kg/m²]\n  * `D`: Tension per unit length [N/m]\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Membrane&#40;L, b, m, D&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic rectangular membrane</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>b</code>: Width &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Surface mass &#91;kg/m²&#93;</p>\n</li>\n<li><p><code>D</code>: Tension per unit length &#91;N/m&#93;</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nMembrane(L, b, m, D)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic rectangular membrane\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{b}: Width [m]\n\n\n\\item \\texttt{m}: Surface mass [kg/m²]\n\n\n\\item \\texttt{D}: Tension per unit length [N/m]\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mMembrane(L, b, m, D)\u001b[39m\n\n  Structure containing the data of a homogeneous and isotropic rectangular\n  membrane\n\n  \u001b[1mConstructor parameters\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mb\u001b[39m: Width [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Surface mass [kg/m²]\n    \u001b[34m• \u001b[39m \u001b[36mT\u001b[39m: Tension per unit length [N/m]\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mL\u001b[39m: Length [m]\n    \u001b[34m• \u001b[39m \u001b[36mb\u001b[39m: Width [m]\n    \u001b[34m• \u001b[39m \u001b[36mm\u001b[39m: Surface mass [kg/m²]\n    \u001b[34m• \u001b[39m \u001b[36mD\u001b[39m: Tension per unit length [N/m]",
+                        "text/markdown": "```julia\nMembrane(L, b, m, D)\n```\n\nStructure containing the data of a homogeneous and isotropic rectangular membrane\n\n**Constructor parameters**\n\n  * `L`: Length [m]\n  * `b`: Width [m]\n  * `m`: Surface mass [kg/m²]\n  * `T`: Tension per unit length [N/m]\n\n**Fields**\n\n  * `L`: Length [m]\n  * `b`: Width [m]\n  * `m`: Surface mass [kg/m²]\n  * `D`: Tension per unit length [N/m]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">Membrane&#40;L, b, m, D&#41;</code></pre>\n<p>Structure containing the data of a homogeneous and isotropic rectangular membrane</p>\n<p><strong>Constructor parameters</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>b</code>: Width &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Surface mass &#91;kg/m²&#93;</p>\n</li>\n<li><p><code>T</code>: Tension per unit length &#91;N/m&#93;</p>\n</li>\n</ul>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>L</code>: Length &#91;m&#93;</p>\n</li>\n<li><p><code>b</code>: Width &#91;m&#93;</p>\n</li>\n<li><p><code>m</code>: Surface mass &#91;kg/m²&#93;</p>\n</li>\n<li><p><code>D</code>: Tension per unit length &#91;N/m&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nMembrane(L, b, m, D)\n\\end{verbatim}\nStructure containing the data of a homogeneous and isotropic rectangular membrane\n\n\\textbf{Constructor parameters}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{b}: Width [m]\n\n\n\\item \\texttt{m}: Surface mass [kg/m²]\n\n\n\\item \\texttt{T}: Tension per unit length [N/m]\n\n\\end{itemize}\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{L}: Length [m]\n\n\n\\item \\texttt{b}: Width [m]\n\n\n\\item \\texttt{m}: Surface mass [kg/m²]\n\n\n\\item \\texttt{D}: Tension per unit length [N/m]\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -473,7 +563,7 @@
             "execution_count": 1
         },
         {
-            "id": "17",
+            "id": "21",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -487,7 +577,7 @@
             ]
         },
         {
-            "id": "18",
+            "id": "22",
             "cell_type": "code",
             "metadata": {
             },
@@ -512,7 +602,7 @@
             "execution_count": 1
         },
         {
-            "id": "19",
+            "id": "23",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -528,7 +618,7 @@
             ]
         },
         {
-            "id": "20",
+            "id": "24",
             "cell_type": "code",
             "metadata": {
             },
@@ -553,7 +643,7 @@
             "execution_count": 1
         },
         {
-            "id": "21",
+            "id": "25",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -567,7 +657,7 @@
             ]
         },
         {
-            "id": "22",
+            "id": "26",
             "cell_type": "code",
             "metadata": {
             },
@@ -592,7 +682,85 @@
             "execution_count": 1
         },
         {
-            "id": "23",
+            "id": "27",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**wave_parameters**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "28",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc wave_parameters(p::Plate, freq)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mwave_parameters(model::Plate, freq)\u001b[39m\n  \u001b[36mwave_parameters(model::Membrane, freq)\u001b[39m\n\n  Computes the wave parameters of given model at a given frequency\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the bar data\n    \u001b[34m• \u001b[39m \u001b[36mfreq\u001b[39m: Frequency at which the wave parameters are calculated [Hz]\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mω\u001b[39m: Angular frequency [rad/s]\n    \u001b[34m• \u001b[39m \u001b[36mc\u001b[39m: Wave speed [m/s]\n    \u001b[34m• \u001b[39m \u001b[36mk\u001b[39m: Wavenumber [rad/m]\n    \u001b[34m• \u001b[39m \u001b[36mλ\u001b[39m: Wavelength [m]",
+                        "text/markdown": "```julia\nwave_parameters(model::Plate, freq)\nwave_parameters(model::Membrane, freq)\n```\n\nComputes the wave parameters of given model at a given frequency\n\n**Inputs**\n\n  * `model`: Structure containing the bar data\n  * `freq`: Frequency at which the wave parameters are calculated [Hz]\n\n**Outputs**\n\n  * `ω`: Angular frequency [rad/s]\n  * `c`: Wave speed [m/s]\n  * `k`: Wavenumber [rad/m]\n  * `λ`: Wavelength [m]\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">wave_parameters&#40;model::Plate, freq&#41;\nwave_parameters&#40;model::Membrane, freq&#41;</code></pre>\n<p>Computes the wave parameters of given model at a given frequency</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the bar data</p>\n</li>\n<li><p><code>freq</code>: Frequency at which the wave parameters are calculated &#91;Hz&#93;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>ω</code>: Angular frequency &#91;rad/s&#93;</p>\n</li>\n<li><p><code>c</code>: Wave speed &#91;m/s&#93;</p>\n</li>\n<li><p><code>k</code>: Wavenumber &#91;rad/m&#93;</p>\n</li>\n<li><p><code>λ</code>: Wavelength &#91;m&#93;</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nwave_parameters(model::Plate, freq)\nwave_parameters(model::Membrane, freq)\n\\end{verbatim}\nComputes the wave parameters of given model at a given frequency\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the bar data\n\n\n\\item \\texttt{freq}: Frequency at which the wave parameters are calculated [Hz]\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{ω}: Angular frequency [rad/s]\n\n\n\\item \\texttt{c}: Wave speed [m/s]\n\n\n\\item \\texttt{k}: Wavenumber [rad/m]\n\n\n\\item \\texttt{λ}: Wavelength [m]\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "29",
+            "cell_type": "markdown",
+            "metadata": {
+            },
+            "source": [
+                ":::\n",
+                "\n",
+                "::: {.api}\n",
+                "**modal_density**\n",
+                "\n",
+                "---"
+            ]
+        },
+        {
+            "id": "30",
+            "cell_type": "code",
+            "metadata": {
+            },
+            "source": [
+                "#| echo: false\n",
+                "@doc modal_density(p::Plate)"
+            ],
+            "outputs": [
+                {
+                    "output_type": "execute_result",
+                    "execution_count": 1,
+                    "data": {
+                        "text/plain": "  \u001b[36mmodal_density(model::Plate)\u001b[39m\n  \u001b[36mmodal_density(model::Membrane, freq)\u001b[39m\n\n  Compute the modal density of a given model\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: Structure containing the data related to the structure\n    \u001b[34m• \u001b[39m \u001b[36mfreq\u001b[39m: Frequency at which the modal density is calculated [Hz]\n       (only for membrane)\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmd\u001b[39m: Modal density of the structure",
+                        "text/markdown": "```julia\nmodal_density(model::Plate)\nmodal_density(model::Membrane, freq)\n```\n\nCompute the modal density of a given model\n\n**Inputs**\n\n  * `model`: Structure containing the data related to the structure\n  * `freq`: Frequency at which the modal density is calculated [Hz] (only for membrane)\n\n**Output**\n\n  * `md`: Modal density of the structure\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">modal_density&#40;model::Plate&#41;\nmodal_density&#40;model::Membrane, freq&#41;</code></pre>\n<p>Compute the modal density of a given model</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: Structure containing the data related to the structure</p>\n</li>\n<li><p><code>freq</code>: Frequency at which the modal density is calculated &#91;Hz&#93; &#40;only for membrane&#41;</p>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>md</code>: Modal density of the structure</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nmodal_density(model::Plate)\nmodal_density(model::Membrane, freq)\n\\end{verbatim}\nCompute the modal density of a given model\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: Structure containing the data related to the structure\n\n\n\\item \\texttt{freq}: Frequency at which the modal density is calculated [Hz] (only for membrane)\n\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{md}: Modal density of the structure\n\n\\end{itemize}\n"
+                    },
+                    "metadata": {
+                    }
+                }
+            ],
+            "execution_count": 1
+        },
+        {
+            "id": "31",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -628,6 +796,14 @@
                 "# Computation of the corresponding mode shapes\n",
                 "ϕ_plate = modeshape(plate, k_plate, xp, yp)\n",
                 "ϕ_membrane = modeshape(membrane, k_membrane, xp, yp)\n",
+                "\n",
+                "# Computation of the wave parameters\n",
+                "om_plate, c_plate, k_plate, λ_plate = wave_parameters(plate, fmax)\n",
+                "om_membrane, c_membrane, k_membrane, λ_membrane = wave_parameters(membrane, fmax)\n",
+                "\n",
+                "# Computation of the modal density\n",
+                "md_plate = modal_density(plate)\n",
+                "md_membrane = modal_density(membrane, fmax)\n",
                 "```\n",
                 "\n",
                 "## Discrete models\n",
@@ -663,7 +839,7 @@
             ]
         },
         {
-            "id": "24",
+            "id": "32",
             "cell_type": "code",
             "metadata": {
             },
@@ -688,7 +864,7 @@
             "execution_count": 1
         },
         {
-            "id": "25",
+            "id": "33",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -752,7 +928,7 @@
             ]
         },
         {
-            "id": "26",
+            "id": "34",
             "cell_type": "code",
             "metadata": {
             },
@@ -777,7 +953,7 @@
             "execution_count": 1
         },
         {
-            "id": "27",
+            "id": "35",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -805,7 +981,7 @@
             ]
         },
         {
-            "id": "28",
+            "id": "36",
             "cell_type": "code",
             "metadata": {
             },
@@ -830,7 +1006,7 @@
             "execution_count": 1
         },
         {
-            "id": "29",
+            "id": "37",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -846,7 +1022,7 @@
             ]
         },
         {
-            "id": "30",
+            "id": "38",
             "cell_type": "code",
             "metadata": {
             },
@@ -872,7 +1048,7 @@
             "execution_count": 1
         },
         {
-            "id": "31",
+            "id": "39",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -886,7 +1062,7 @@
             ]
         },
         {
-            "id": "32",
+            "id": "40",
             "cell_type": "code",
             "metadata": {
             },
@@ -912,7 +1088,7 @@
             "execution_count": 1
         },
         {
-            "id": "33",
+            "id": "41",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -926,7 +1102,7 @@
             ]
         },
         {
-            "id": "34",
+            "id": "42",
             "cell_type": "code",
             "metadata": {
             },
@@ -952,7 +1128,7 @@
             "execution_count": 1
         },
         {
-            "id": "35",
+            "id": "43",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -966,7 +1142,7 @@
             ]
         },
         {
-            "id": "36",
+            "id": "44",
             "cell_type": "code",
             "metadata": {
             },
@@ -991,7 +1167,7 @@
             "execution_count": 1
         },
         {
-            "id": "37",
+            "id": "45",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1005,7 +1181,7 @@
             ]
         },
         {
-            "id": "38",
+            "id": "46",
             "cell_type": "code",
             "metadata": {
             },
@@ -1030,7 +1206,7 @@
             "execution_count": 1
         },
         {
-            "id": "39",
+            "id": "47",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1083,7 +1259,7 @@
             ]
         },
         {
-            "id": "40",
+            "id": "48",
             "cell_type": "code",
             "metadata": {
             },
@@ -1109,7 +1285,7 @@
             "execution_count": 1
         },
         {
-            "id": "41",
+            "id": "49",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1125,7 +1301,7 @@
             ]
         },
         {
-            "id": "42",
+            "id": "50",
             "cell_type": "code",
             "metadata": {
             },
@@ -1139,10 +1315,10 @@
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36massembly(model::OneDstructure, mesh::OneDMesh)\u001b[39m\n\n  Compute the global stiffness and mass matrices for a 1D structure with a\n  given mesh.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36mBeam\u001b[39m: Beam model\n       \u001b[34m• \u001b[39m \u001b[36mWaveEquation\u001b[39m: Bar, Rod or String model\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: OneDMesh\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: global stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: global mass matrix",
-                        "text/markdown": "```julia\nassembly(model::OneDstructure, mesh::OneDMesh)\n```\n\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n**Inputs**\n\n  * `model`: OneDStructure\n\n      * `Beam`: Beam model\n      * `WaveEquation`: Bar, Rod or String model\n  * `mesh`: OneDMesh\n\n**Outputs**\n\n  * `K`: global stiffness matrix\n  * `M`: global mass matrix\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">assembly&#40;model::OneDstructure, mesh::OneDMesh&#41;</code></pre>\n<p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: OneDStructure</p>\n<ul>\n<li><p><code>Beam</code>: Beam model</p>\n</li>\n<li><p><code>WaveEquation</code>: Bar, Rod or String model</p>\n</li>\n</ul>\n</li>\n<li><p><code>mesh</code>: OneDMesh</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>K</code>: global stiffness matrix</p>\n</li>\n<li><p><code>M</code>: global mass matrix</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nassembly(model::OneDstructure, mesh::OneDMesh)\n\\end{verbatim}\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{Beam}: Beam model\n\n\n\\item \\texttt{WaveEquation}: Bar, Rod or String model\n\n\\end{itemize}\n\n\\item \\texttt{mesh}: OneDMesh\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: global stiffness matrix\n\n\n\\item \\texttt{M}: global mass matrix\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36massembly(model::OneDStructure, mesh::OneDMesh)\u001b[39m\n\n  Compute the global stiffness and mass matrices for a 1D structure with a\n  given mesh.\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mmodel\u001b[39m: OneDStructure\n       \n       \u001b[34m• \u001b[39m \u001b[36mBeam\u001b[39m: Beam model\n       \u001b[34m• \u001b[39m \u001b[36mWaveEquation\u001b[39m: Bar, Rod or String model\n    \u001b[34m• \u001b[39m \u001b[36mmesh\u001b[39m: OneDMesh\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: global stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: global mass matrix",
+                        "text/markdown": "```julia\nassembly(model::OneDStructure, mesh::OneDMesh)\n```\n\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n**Inputs**\n\n  * `model`: OneDStructure\n\n      * `Beam`: Beam model\n      * `WaveEquation`: Bar, Rod or String model\n  * `mesh`: OneDMesh\n\n**Outputs**\n\n  * `K`: global stiffness matrix\n  * `M`: global mass matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">assembly&#40;model::OneDStructure, mesh::OneDMesh&#41;</code></pre>\n<p>Compute the global stiffness and mass matrices for a 1D structure with a given mesh.</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>model</code>: OneDStructure</p>\n<ul>\n<li><p><code>Beam</code>: Beam model</p>\n</li>\n<li><p><code>WaveEquation</code>: Bar, Rod or String model</p>\n</li>\n</ul>\n</li>\n<li><p><code>mesh</code>: OneDMesh</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>K</code>: global stiffness matrix</p>\n</li>\n<li><p><code>M</code>: global mass matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nassembly(model::OneDStructure, mesh::OneDMesh)\n\\end{verbatim}\nCompute the global stiffness and mass matrices for a 1D structure with a given mesh.\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{model}: OneDStructure\n\n\\begin{itemize}\n\\item \\texttt{Beam}: Beam model\n\n\n\\item \\texttt{WaveEquation}: Bar, Rod or String model\n\n\\end{itemize}\n\n\\item \\texttt{mesh}: OneDMesh\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: global stiffness matrix\n\n\n\\item \\texttt{M}: global mass matrix\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1151,7 +1327,7 @@
             "execution_count": 1
         },
         {
-            "id": "43",
+            "id": "51",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1165,24 +1341,24 @@
             ]
         },
         {
-            "id": "44",
+            "id": "52",
             "cell_type": "code",
             "metadata": {
             },
             "source": [
                 "#| echo: false\n",
                 "\n",
-                "@doc rayleigh_damping_matrix(K, M, α::Float64, β::Float64)"
+                "@doc rayleigh_damping_matrix(M, K, α::Float64, β::Float64)"
             ],
             "outputs": [
                 {
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mrayleigh_damping_matrix(K, M, α, β)\u001b[39m\n  \u001b[36mrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\u001b[39m\n\n  Compute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m Construction parameters\n       \n       \u001b[34m• \u001b[39m Method 1\n       \n       \u001b[34m• \u001b[39m \u001b[36mα\u001b[39m: Mass proportional damping coefficient\n       \u001b[34m• \u001b[39m \u001b[36mβ\u001b[39m: Stiffness proportional damping coefficient\n       \u001b[34m• \u001b[39m Method 2\n       \n       \u001b[34m• \u001b[39m \u001b[36mω1\u001b[39m: First natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mω2\u001b[39m: Second natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ1\u001b[39m: Damping ratio for the first natural\n       frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ2\u001b[39m: Damping ratio for the second natural\n       frequency\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Rayleigh damping matrix",
-                        "text/markdown": "```julia\nrayleigh_damping_matrix(K, M, α, β)\nrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\n```\n\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n**Inputs**\n\n  * `K`: Stiffness matrix\n  * `M`: Mass matrix\n  * Construction parameters\n\n      * Method 1\n\n          * `α`: Mass proportional damping coefficient\n          * `β`: Stiffness proportional damping coefficient\n      * Method 2\n\n          * `ω1`: First natural frequency\n          * `ω2`: Second natural frequency\n          * `ξ1`: Damping ratio for the first natural frequency\n          * `ξ2`: Damping ratio for the second natural frequency\n\n**Output**\n\n  * `C`: Rayleigh damping matrix\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">rayleigh_damping_matrix&#40;K, M, α, β&#41;\nrayleigh_damping_matrix&#40;K, M, ω1, ω2, ξ1, ξ2&#41;</code></pre>\n<p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p>Construction parameters</p>\n<ul>\n<li><p>Method 1</p>\n<ul>\n<li><p><code>α</code>: Mass proportional damping coefficient</p>\n</li>\n<li><p><code>β</code>: Stiffness proportional damping coefficient</p>\n</li>\n</ul>\n</li>\n<li><p>Method 2</p>\n<ul>\n<li><p><code>ω1</code>: First natural frequency</p>\n</li>\n<li><p><code>ω2</code>: Second natural frequency</p>\n</li>\n<li><p><code>ξ1</code>: Damping ratio for the first natural frequency</p>\n</li>\n<li><p><code>ξ2</code>: Damping ratio for the second natural frequency</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>C</code>: Rayleigh damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nrayleigh_damping_matrix(K, M, α, β)\nrayleigh_damping_matrix(K, M, ω1, ω2, ξ1, ξ2)\n\\end{verbatim}\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item \\texttt{M}: Mass matrix\n\n\n\\item Construction parameters\n\n\\begin{itemize}\n\\item Method 1\n\n\\begin{itemize}\n\\item \\texttt{α}: Mass proportional damping coefficient\n\n\n\\item \\texttt{β}: Stiffness proportional damping coefficient\n\n\\end{itemize}\n\n\\item Method 2\n\n\\begin{itemize}\n\\item \\texttt{ω1}: First natural frequency\n\n\n\\item \\texttt{ω2}: Second natural frequency\n\n\n\\item \\texttt{ξ1}: Damping ratio for the first natural frequency\n\n\n\\item \\texttt{ξ2}: Damping ratio for the second natural frequency\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{C}: Rayleigh damping matrix\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mrayleigh_damping_matrix(M, K, α, β)\u001b[39m\n  \u001b[36mrayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)\u001b[39m\n\n  Compute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mM\u001b[39m: Mass matrix\n    \u001b[34m• \u001b[39m \u001b[36mK\u001b[39m: Stiffness matrix\n    \u001b[34m• \u001b[39m Construction parameters\n       \n       \u001b[34m• \u001b[39m Method 1\n       \n       \u001b[34m• \u001b[39m \u001b[36mα\u001b[39m: Mass proportional damping coefficient\n       \u001b[34m• \u001b[39m \u001b[36mβ\u001b[39m: Stiffness proportional damping coefficient\n       \u001b[34m• \u001b[39m Method 2\n       \n       \u001b[34m• \u001b[39m \u001b[36mω1\u001b[39m: First natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mω2\u001b[39m: Second natural frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ1\u001b[39m: Damping ratio for the first natural\n       frequency\n       \u001b[34m• \u001b[39m \u001b[36mξ2\u001b[39m: Damping ratio for the second natural\n       frequency\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mC\u001b[39m: Rayleigh damping matrix",
+                        "text/markdown": "```julia\nrayleigh_damping_matrix(M, K, α, β)\nrayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)\n```\n\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n**Inputs**\n\n  * `M`: Mass matrix\n  * `K`: Stiffness matrix\n  * Construction parameters\n\n      * Method 1\n\n          * `α`: Mass proportional damping coefficient\n          * `β`: Stiffness proportional damping coefficient\n      * Method 2\n\n          * `ω1`: First natural frequency\n          * `ω2`: Second natural frequency\n          * `ξ1`: Damping ratio for the first natural frequency\n          * `ξ2`: Damping ratio for the second natural frequency\n\n**Output**\n\n  * `C`: Rayleigh damping matrix\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">rayleigh_damping_matrix&#40;M, K, α, β&#41;\nrayleigh_damping_matrix&#40;M, K, ω1, ω2, ξ1, ξ2&#41;</code></pre>\n<p>Compute the Rayleigh damping matrix for a given stiffness and mass matrices</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>M</code>: Mass matrix</p>\n</li>\n<li><p><code>K</code>: Stiffness matrix</p>\n</li>\n<li><p>Construction parameters</p>\n<ul>\n<li><p>Method 1</p>\n<ul>\n<li><p><code>α</code>: Mass proportional damping coefficient</p>\n</li>\n<li><p><code>β</code>: Stiffness proportional damping coefficient</p>\n</li>\n</ul>\n</li>\n<li><p>Method 2</p>\n<ul>\n<li><p><code>ω1</code>: First natural frequency</p>\n</li>\n<li><p><code>ω2</code>: Second natural frequency</p>\n</li>\n<li><p><code>ξ1</code>: Damping ratio for the first natural frequency</p>\n</li>\n<li><p><code>ξ2</code>: Damping ratio for the second natural frequency</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>C</code>: Rayleigh damping matrix</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nrayleigh_damping_matrix(M, K, α, β)\nrayleigh_damping_matrix(M, K, ω1, ω2, ξ1, ξ2)\n\\end{verbatim}\nCompute the Rayleigh damping matrix for a given stiffness and mass matrices\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{M}: Mass matrix\n\n\n\\item \\texttt{K}: Stiffness matrix\n\n\n\\item Construction parameters\n\n\\begin{itemize}\n\\item Method 1\n\n\\begin{itemize}\n\\item \\texttt{α}: Mass proportional damping coefficient\n\n\n\\item \\texttt{β}: Stiffness proportional damping coefficient\n\n\\end{itemize}\n\n\\item Method 2\n\n\\begin{itemize}\n\\item \\texttt{ω1}: First natural frequency\n\n\n\\item \\texttt{ω2}: Second natural frequency\n\n\n\\item \\texttt{ξ1}: Damping ratio for the first natural frequency\n\n\n\\item \\texttt{ξ2}: Damping ratio for the second natural frequency\n\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{C}: Rayleigh damping matrix\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1191,7 +1367,7 @@
             "execution_count": 1
         },
         {
-            "id": "45",
+            "id": "53",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1205,7 +1381,7 @@
             ]
         },
         {
-            "id": "46",
+            "id": "54",
             "cell_type": "code",
             "metadata": {
             },
@@ -1231,7 +1407,7 @@
             "execution_count": 1
         },
         {
-            "id": "47",
+            "id": "55",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1245,7 +1421,7 @@
             ]
         },
         {
-            "id": "48",
+            "id": "56",
             "cell_type": "code",
             "metadata": {
             },
@@ -1271,7 +1447,7 @@
             "execution_count": 1
         },
         {
-            "id": "49",
+            "id": "57",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1329,7 +1505,7 @@
                 "ωfe, Φfe = eigenmode(Kbc, Mbc)\n",
                 "\n",
                 "# Calculation of the damping matrix\n",
-                "Cray = rayleigh_damping_matrix(Kbc, Mbc, 1., 1.)\n",
+                "Cray = rayleigh_damping_matrix(Mbc, Kbc, 1., 1.)\n",
                 "Cmodal = modal_damping_matrix(Mbc, ωfe, 0.01, Φfe)\n",
                 "```\n",
                 "\n",
@@ -1405,7 +1581,7 @@
             ]
         },
         {
-            "id": "50",
+            "id": "58",
             "cell_type": "code",
             "metadata": {
             },
@@ -1430,7 +1606,7 @@
             "execution_count": 1
         },
         {
-            "id": "51",
+            "id": "59",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1446,7 +1622,7 @@
             ]
         },
         {
-            "id": "52",
+            "id": "60",
             "cell_type": "code",
             "metadata": {
             },
@@ -1471,7 +1647,7 @@
             "execution_count": 1
         },
         {
-            "id": "53",
+            "id": "61",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1485,7 +1661,7 @@
             ]
         },
         {
-            "id": "54",
+            "id": "62",
             "cell_type": "code",
             "metadata": {
             },
@@ -1510,7 +1686,7 @@
             "execution_count": 1
         },
         {
-            "id": "55",
+            "id": "63",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1524,7 +1700,7 @@
             ]
         },
         {
-            "id": "56",
+            "id": "64",
             "cell_type": "code",
             "metadata": {
             },
@@ -1549,7 +1725,7 @@
             "execution_count": 1
         },
         {
-            "id": "57",
+            "id": "65",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1563,7 +1739,7 @@
             ]
         },
         {
-            "id": "58",
+            "id": "66",
             "cell_type": "code",
             "metadata": {
             },
@@ -1588,7 +1764,7 @@
             "execution_count": 1
         },
         {
-            "id": "59",
+            "id": "67",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1700,7 +1876,7 @@
             ]
         },
         {
-            "id": "60",
+            "id": "68",
             "cell_type": "code",
             "metadata": {
             },
@@ -1726,7 +1902,7 @@
             "execution_count": 1
         },
         {
-            "id": "61",
+            "id": "69",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1742,7 +1918,7 @@
             ]
         },
         {
-            "id": "62",
+            "id": "70",
             "cell_type": "code",
             "metadata": {
             },
@@ -1768,7 +1944,7 @@
             "execution_count": 1
         },
         {
-            "id": "63",
+            "id": "71",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1783,7 +1959,7 @@
             ]
         }
     ],
-    "timestamp": "2025-12-05T09:16:53.821",
+    "timestamp": "2026-02-23T18:39:49.165",
     "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/models/index.qmd",
     "qnr_schema_version": "1.0.0"
 }
