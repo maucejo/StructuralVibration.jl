@@ -28,7 +28,7 @@ function gradient(f::Vector{T}, t; method = :cubic) where {T <: Real}
         itp = LinearInterpolation(f, t)
     end
 
-    return only.(DataInterpolations.derivative.(Ref(itp), t)) :: typeof(f)
+    return DataInterpolations.derivative.(Ref(itp), t)
 end
 
 function gradient(f::Matrix{T}, t; method = :cubic, dims = 1) where {T <: Real}

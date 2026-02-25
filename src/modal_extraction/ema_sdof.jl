@@ -124,6 +124,13 @@ function compute_poles(H, freq, alg::PeakPicking, pks)
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
 
+        # Check if the peak is valid
+        if any(Habs[edge1:edge2] .> Hmax) || edge1 == edge2
+            fn[n] = NaN
+            ξn[n] = NaN
+            continue
+        end
+
         # Left side of the peak
         itp_left = LinearInterpolation(Habs[edge1:idmax], freq[edge1:idmax])
         freq_left .= LinRange(freq[edge1], f, nfreq_itp)
@@ -171,10 +178,17 @@ function compute_poles(H, freq, alg::CircleFit, pks)
     freq_itp = similar(ReH_itp)
     α = similar(ReH_itp)
     θ = similar(ReH_itp)
-    for (n, edg) in enumerate(pks.edges)
+    for (n, (idmax, edg)) in enumerate(zip(pks.indices, pks.edges))
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
+
+        # Check if the peak is valid
+        if any(Habs[edge1:edge2] .> Habs[idmax]) || edge1 == edge2
+            fn[n] = NaN
+            ξn[n] = NaN
+            continue
+        end
 
         freqs = freq[edge1:edge2]
 
@@ -241,10 +255,17 @@ function compute_poles(H, freq, alg::LSFit, pks)
     # Sa = similar(Hitp, 2nfreq_itp, 3)
     # Sb = similar(Hitp, 2nfreq_itp)
     res = similar(fn, 3)
-    for (n, edg) in enumerate(pks.edges)
+    for (n, (idmax, edg)) in enumerate(zip(pks.indices, pks.edges))
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
+
+        # Check if the peak is valid
+        if any(Habs[edge1:edge2] .> Habs[idmax]) || edge1 == edge2
+            fn[n] = NaN
+            ξn[n] = NaN
+            continue
+        end
 
         freqs = freq[edge1:edge2]
 
