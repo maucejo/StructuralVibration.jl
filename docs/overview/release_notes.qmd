@@ -6,6 +6,11 @@ format:
     number-sections: false
 ---
 
+## 1.9.1
+
+- Fix type instability issues in `gradient` function.
+- Improve `compute_poles` functions for `SdofEMA`.
+
 ## 1.9.0
 
 **New features**
