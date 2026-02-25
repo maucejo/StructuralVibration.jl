@@ -818,7 +818,7 @@
     "href": "overview/release_notes.html",
     "title": "Release Notes",
     "section": "",
-    "text": "New features\n\nAdd modal_density function to compute the modal density of a structure from the knowledge of its resonance frequencies.\nAdd modal_density function for 1D structures (bars, rods, strings and beams) and 2D structures (plates and membranes) based on the analytical expression of the modal density for these structures.\n\nInternals\n\nReplace Interpolations.jl with DataInterpolations.jl for interpolation.",
+    "text": "Fix type instability issues in gradient function.\nImprove compute_poles functions for SdofEMA.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -829,7 +829,7 @@
     "href": "overview/release_notes.html#section",
     "title": "Release Notes",
     "section": "",
-    "text": "New features\n\nAdd modal_density function to compute the modal density of a structure from the knowledge of its resonance frequencies.\nAdd modal_density function for 1D structures (bars, rods, strings and beams) and 2D structures (plates and membranes) based on the analytical expression of the modal density for these structures.\n\nInternals\n\nReplace Interpolations.jl with DataInterpolations.jl for interpolation.",
+    "text": "Fix type instability issues in gradient function.\nImprove compute_poles functions for SdofEMA.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -839,8 +839,8 @@
     "objectID": "overview/release_notes.html#section-1",
     "href": "overview/release_notes.html#section-1",
     "title": "Release Notes",
-    "section": "1.8.0",
-    "text": "1.8.0\nNew features\n\nAdd wave_parameters function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.",
+    "section": "1.9.0",
+    "text": "1.9.0\nNew features\n\nAdd modal_density function to compute the modal density of a structure from the knowledge of its resonance frequencies.\nAdd modal_density function for 1D structures (bars, rods, strings and beams) and 2D structures (plates and membranes) based on the analytical expression of the modal density for these structures.\n\nInternals\n\nReplace Interpolations.jl with DataInterpolations.jl for interpolation.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -850,8 +850,8 @@
     "objectID": "overview/release_notes.html#section-2",
     "href": "overview/release_notes.html#section-2",
     "title": "Release Notes",
-    "section": "1.7.0",
-    "text": "1.7.0\nBreaking changes\n\nRemove AutoEMASdofProblem and AutoEMAMdofProblem structures\nRefactor solve function for automatic modal extraction to take an EMAProblem and a SdofEMA or MdofEMA method as arguments instead of separate AutoEMAProblem structures.\n\nThese changes have been made to solve type instability issues in the solve function for automatic modal extraction.\nInternals\n\nFix various type instability issues.",
+    "section": "1.8.0",
+    "text": "1.8.0\nNew features\n\nAdd wave_parameters function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -861,8 +861,8 @@
     "objectID": "overview/release_notes.html#section-3",
     "href": "overview/release_notes.html#section-3",
     "title": "Release Notes",
-    "section": "1.6.1",
-    "text": "1.6.1\n\nRemove DispatchDoctor from dependencies",
+    "section": "1.7.0",
+    "text": "1.7.0\nBreaking changes\n\nRemove AutoEMASdofProblem and AutoEMAMdofProblem structures\nRefactor solve function for automatic modal extraction to take an EMAProblem and a SdofEMA or MdofEMA method as arguments instead of separate AutoEMAProblem structures.\n\nThese changes have been made to solve type instability issues in the solve function for automatic modal extraction.\nInternals\n\nFix various type instability issues.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -872,8 +872,8 @@
     "objectID": "overview/release_notes.html#section-4",
     "href": "overview/release_notes.html#section-4",
     "title": "Release Notes",
-    "section": "1.6.0",
-    "text": "1.6.0\nBreaking changes\n\nSimplify poles_extraction method by removing scaling argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.\n\nInternals\n\nRemove peak_proms! and peak_widths! from StructuralVibration.jl.\nFix type instability issues in varest and poles_extraction functions.",
+    "section": "1.6.1",
+    "text": "1.6.1\n\nRemove DispatchDoctor from dependencies",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -882,6 +882,17 @@
   {
     "objectID": "overview/release_notes.html#section-5",
     "href": "overview/release_notes.html#section-5",
+    "title": "Release Notes",
+    "section": "1.6.0",
+    "text": "1.6.0\nBreaking changes\n\nSimplify poles_extraction method by removing scaling argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.\n\nInternals\n\nRemove peak_proms! and peak_widths! from StructuralVibration.jl.\nFix type instability issues in varest and poles_extraction functions.",
+    "crumbs": [
+      "Overview",
+      "Release Notes"
+    ]
+  },
+  {
+    "objectID": "overview/release_notes.html#section-6",
+    "href": "overview/release_notes.html#section-6",
     "title": "Release Notes",
     "section": "1.5.0",
     "text": "1.5.0\nBreaking changes\n\nRefactor poles_extraction function to add scaling::Function argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection",
