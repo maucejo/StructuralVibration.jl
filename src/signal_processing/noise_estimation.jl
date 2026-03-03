@@ -83,12 +83,8 @@ Estimates the noise variance of a signal `x` using a given method
 
 **Output**
 * `noisevar`: Noise variance - Vector{Real}
-
-
-**Note**
-* varest(x; ...) = varest(x, DerricoEst(); ...)
 """
-function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
+function varest(x, method::NoiseEstimation = DerricoEst(); batch_size::Int = 0, summary = mean)
     varestfun = let
         if method isa OptimFamily
             x -> varest_optim(x, method)
@@ -123,9 +119,6 @@ function varest(x, method::NoiseEstimation; batch_size::Int = 0, summary = mean)
         return vec(summary(noisevar, dims = 2))
     end
 end
-
-# Default method
-varest(x; batch_size::Int = 0, summary = mean) = varest(x, DerricoEst(), batch_size = batch_size, summary = summary)
 
 """
     varest_bayesian(x, method::OptimFamily)

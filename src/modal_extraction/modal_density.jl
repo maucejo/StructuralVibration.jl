@@ -59,6 +59,9 @@ Compute the modal density of a structure from the knowledge of its resonance fre
 **Outputs**
 * `md::Vector{Real}`: Modal density values corresponding to the input frequencies
 * `freqs::Vector{Real}`: Sorted frequencies corresponding to the modal density values
+
+**Note**
+* modal_density(frequencies) = modal_density(frequencies, Lowess())
 """
 function modal_density(frequencies::Vector{T}, method::FDFit) where T <: Real
     # Validation
@@ -170,3 +173,5 @@ function modal_density(frequencies::Vector{T}, method::CSFit) where T <: Real
 
     return md, freqs
 end
+
+modal_density(frequencies) = modal_density(frequencies, Lowess())

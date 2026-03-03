@@ -66,6 +66,9 @@ module StructuralVibration
        export bode_plot, nyquist_plot, peaks_plot, stabilization_plot, sv_plot,
               theme_choice, waterfall_plot
 
+       # Functions for mesh animation
+       export animate_mesh, build_mesh, deformed_grid, detrend_mesh, detrend_plane, viz_mesh, renumber_element_connectivity
+
        # Include files - Utils
        include("utils/macro_utils.jl")
 
@@ -118,6 +121,10 @@ module StructuralVibration
 
        # Include files - Visualization
        include("utils/visualization.jl")
+
+       # Include files - Meshes
+       include("utils/mesh_utils.jl")
+       include("utils/animation_utils.jl")
 end
 
 # end

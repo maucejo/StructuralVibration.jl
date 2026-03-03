@@ -23,8 +23,6 @@ nyquist_plot(H)
 # Nyquist plot - 3D
 nyquist_plot(freq, H, projection = true)
 
-
-
 ## Waterfall plot
 x = range(0., 2π, 100)
 y = range(0., 1., 5)
@@ -38,8 +36,6 @@ for i in eachindex(y)
 end
 
 waterfall_plot(x, y, z, xlim = [-0.1, 2π + 0.1], ylim = [-0.1, 1.1])
-
-
 
 ## SV plot
 x = range(0., 2π, 100)

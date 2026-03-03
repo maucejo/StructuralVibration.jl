@@ -31,7 +31,7 @@ prob = ModalFreqProblem(ωn, ξ, Fn, freq, ms_m)
 y = solve(prob).u
 
 pks_indices = [225, 929, 2101, 3743]
-ods_complex, freq_peaks = ods(y, freq, pks_indices)
+ods_complex, freq_peaks = ods(y, freq, pks_indices, 0.9)
 ods_real = real_normalization(ods_complex)
 
 scaling = msf(ods_real, ms_m[:, 1:size(ods_real, 2)])

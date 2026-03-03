@@ -18,8 +18,8 @@ website:
         file: modal_extraction/index.qmd
       - text: "Signal processing"
         file: signal_processing/index.qmd
-      - text: "Visualization"
-        file: visualization/index.qmd
+      - text: "Extensions"
+        file: extensions/index.qmd
       - text: "References"
         file: references/index.qmd
     right:
@@ -62,9 +62,9 @@ website:
       - signal_processing/noise.qmd
       - signal_processing/other.qmd
 
-    - title: "Visualization"
+    - title: "Enxtensions"
       contents:
-        - visualization/index.qmd
+        - extensions/index.qmd
 
     - title: "References"
       contents:

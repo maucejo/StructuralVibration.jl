@@ -1,11 +1,11 @@
 # StructuralVibration.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://maucejo.github.io/StructuralVibration.jl/)
-[![Generic badge](https://img.shields.io/badge/Version-1.9.1-cornflowerblue.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-1.10.0-cornflowerblue.svg)]()
 [![MIT License](https://img.shields.io/badge/License-MIT-forestgreen)](https://github.com/maucejo/elsearticle/blob/main/LICENSE)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![DispatchDoctor](https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white)](https://github.com/MilesCranmer/DispatchDoctor.jl)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18772531.svg)](https://doi.org/10.5281/zenodo.18772531)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18850296.svg)](https://doi.org/10.5281/zenodo.18850296)
 
 `StructuralVibration.jl` is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.
 
@@ -165,6 +165,7 @@ The package provides the following features:
 - 2D and 3D Nyquist plot
 - Waterfall plot
 - General 2D plot
+- Mesh animation of the deformed shape of a structure
 
 ## License
 

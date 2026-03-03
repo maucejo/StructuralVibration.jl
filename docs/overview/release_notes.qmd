@@ -6,6 +6,21 @@ format:
     number-sections: false
 ---
 
+## 1.10.0
+
+**New features**
+
+- Add mesh manipulation functions in `SVMeshExt.jl` extension:
+    - `detrend_mesh` to detrend a mesh by removing the rigid body motion
+    - `renumber_element_connectivity` to renumber the elements of a mesh
+    - `construct_mesh` to construct a `Mesh` object from the nodes and elements of a mesh
+    - `deformed_grid` to compute the deformed grid of a mesh from the nodal displacements
+- Add `animate_mesh` function in `SVAnimExt.jl` extension to create an animation of the deformed mesh over time from the nodal displacements and values to be plotted on the mesh (e.g., modal shapes, ODS, etc.).
+
+**Internals**
+
+- Simplify the implementation of `ods` function.
+
 ## 1.9.1
 
 - Fix type instability issues in `gradient` function.

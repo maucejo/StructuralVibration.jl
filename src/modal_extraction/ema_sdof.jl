@@ -9,9 +9,9 @@ Extract poles using Sdof or Mdof experimental modal analysis methods
 * `order`: Order of the model (only for Mdof methods)
 * `alg`: Algorithm to extract the poles
     * Sdof methods:
-        * `PeakPicking`: Peak picking method (default for Sdof methods)
+        * `PeakPicking`: Peak picking method
         * `CircleFit`: Circle fitting method
-        * `LSFit`: Least squares fitting method
+        * `LSFit`: Least squares fitting method (default for Sdof methods)
     * Mdof methods:
         * `LSCF`: Least Squares Complex Frequency method (default for Mdof methods)
         * `PLSCF`: Polyreference Least Squares Complex Frequency method
@@ -28,7 +28,7 @@ Extract poles using Sdof or Mdof experimental modal analysis methods
 **Note**
 - For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.
 """
-function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
+function poles_extraction(prob::EMAProblem, alg::SdofEMA = LSFit(); width::Int = 1, min_prom = 0., max_prom = Inf, pks_indices = Int[])
     # Extract FRF and frequency from problem
     frf = prob.frf
     freq = prob.freq
@@ -61,7 +61,6 @@ function poles_extraction(prob::EMAProblem, alg::SdofEMA; width::Int = 1, min_pr
 
         nk = length(p)
         poles .= [p; fill(complex(NaN, NaN), npeak - nk)]
-
 
         pk[k, :] .= poles
     end
@@ -124,13 +123,6 @@ function compute_poles(H, freq, alg::PeakPicking, pks)
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
 
-        # Check if the peak is valid
-        if any(Habs[edge1:edge2] .> Hmax) || edge1 == edge2
-            fn[n] = NaN
-            ξn[n] = NaN
-            continue
-        end
-
         # Left side of the peak
         itp_left = LinearInterpolation(Habs[edge1:idmax], freq[edge1:idmax])
         freq_left .= LinRange(freq[edge1], f, nfreq_itp)
@@ -182,14 +174,6 @@ function compute_poles(H, freq, alg::CircleFit, pks)
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
-
-        # Check if the peak is valid
-        if any(Habs[edge1:edge2] .> Habs[idmax]) || edge1 == edge2
-            fn[n] = NaN
-            ξn[n] = NaN
-            continue
-        end
-
         freqs = freq[edge1:edge2]
 
         # Real and imaginary parts of the frequency response function
@@ -252,21 +236,11 @@ function compute_poles(H, freq, alg::LSFit, pks)
 
     A = similar(Hitp, nfreq_itp, 3)
     b = similar(Hitp, nfreq_itp)
-    # Sa = similar(Hitp, 2nfreq_itp, 3)
-    # Sb = similar(Hitp, 2nfreq_itp)
     res = similar(fn, 3)
     for (n, (idmax, edg)) in enumerate(zip(pks.indices, pks.edges))
         # Frequency range around the peak
         edge1 = floor(Int, edg[1])
         edge2 = ceil(Int, edg[2])
-
-        # Check if the peak is valid
-        if any(Habs[edge1:edge2] .> Habs[idmax]) || edge1 == edge2
-            fn[n] = NaN
-            ξn[n] = NaN
-            continue
-        end
-
         freqs = freq[edge1:edge2]
 
         # Real and imaginary parts of the frequency response function
@@ -285,11 +259,6 @@ function compute_poles(H, freq, alg::LSFit, pks)
         A .= [Hitp 2im*freq_itp.*Hitp -one.(Hitp)]
         @. b = freq_itp^2*Hitp
         # Solve the system
-        # Tips: Solving the complex system directly can lead to numerical issues
-        # so we only use the real part of the system
-        # Sa .= [real(A); imag(A)]
-        # Sb .= [real(b); imag(b)]
-        # res .= qr(Sa)\Sb
         res .= qr(real(A))\real(b)
 
         # Calculation of the natural frequency and damping ratio
