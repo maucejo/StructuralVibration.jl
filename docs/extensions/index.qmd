@@ -334,17 +334,14 @@ plate = Plate(Lp, bp, hp, E, ρ, ν)
 ```{julia}
 # Helper function to create a quadrilateral mesh
 function create_quad_mesh(xp::Vector, yp::Vector, nx::Int, ny::Int)
-    # Vérification
-    @assert length(xp) == length(yp) == nx * ny "Les dimensions ne correspondent pas"
-
-    # Nombre de quadrangles
+    # Number of quadrangles
     n_quads = (nx - 1) * (ny - 1)
     quads = Vector{Vector{Int}}(undef, n_quads)
 
     quad_idx = 1
     for j in 1:(ny-1)
         for i in 1:(nx-1)
-            # Indices des 4 nœuds du quadrangle (sens anti-horaire)
+            # Indices of the nodes of the quadrangle in counter-clockwise order
             n1 = (j-1) * nx + i
             n2 = (j-1) * nx + i + 1
             n3 = j * nx + i + 1
@@ -385,7 +382,7 @@ ms_deformed[3:3:end] .= ms
 dpoints = deformed_grid(nodes, ms_deformed, 0.15)
 
 color_data = [norm(ms_deformed[3*i-2:3*i]) for i in 1:size(nodes, 1)]
-fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = color_data, colormap = :jet1, alpha = 1., zlim = (-0.15, 0.15), title = "Deformed mesh of the plate")
+fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = color_data, colormap = :jet1, alpha = 1., zlim = (-0.2, 0.2), title = "Deformed mesh of the plate")
 ```
 
 #### Animating the mode shape

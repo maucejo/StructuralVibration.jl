@@ -3,17 +3,14 @@ using StructuralVibration, LinearAlgebra
 
 ## Helper function to create a mesh
 function create_quad_mesh(xp::Vector, yp::Vector, nx::Int, ny::Int)
-    # Vérification
-    @assert length(xp) == length(yp) == nx * ny "Les dimensions ne correspondent pas"
-
-    # Nombre de quadrangles
+    # Number of quadrangles
     n_quads = (nx - 1) * (ny - 1)
     quads = Vector{Vector{Int}}(undef, n_quads)
 
     quad_idx = 1
     for j in 1:(ny-1)
         for i in 1:(nx-1)
-            # Indices des 4 nœuds du quadrangle (sens anti-horaire)
+            # Indices of the nodes of the quadrangle in counter-clockwise order
             n1 = (j-1) * nx + i
             n2 = (j-1) * nx + i + 1
             n3 = j * nx + i + 1
