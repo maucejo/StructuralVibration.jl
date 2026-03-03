@@ -165,7 +165,8 @@ The package provides the following features:
 - 2D and 3D Nyquist plot
 - Waterfall plot
 - General 2D plot
-- Mesh animation of the deformed shape of a structure
+- Mesh visualization
+- Mesh animation
 
 ## License
 
