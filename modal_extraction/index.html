@@ -184,8 +184,8 @@ window.Quarto = {
 <span class="menu-text">Signal processing</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../visualization/index.html"> 
-<span class="menu-text">Visualization</span></a>
+    <a class="nav-link" href="../extensions/index.html"> 
+<span class="menu-text">Extensions</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../references/index.html"> 
@@ -377,7 +377,7 @@ Note
 <ol type="1">
 <li><p><strong>Identification of natural frequencies</strong></p>
 <p>They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using <code>Peaks.jl</code>.</p>
-<p>To check the peak detection, one can use the <code>peaksplot</code> function from <code>StructuralVibration.jl</code> (see <a href="../visualization/index.html#peaks-plot">Peaks plot</a> for more details).</p></li>
+<p>To check the peak detection, one can use the <code>peaksplot</code> function from <code>StructuralVibration.jl</code> (see <a href="../extensions/index.html#peaks-plot">Peaks plot</a> for more details).</p></li>
 <li><p><strong>Estimation of modal damping factors</strong></p>
 <p>To estimate the value of the damping factor for mode <span class="math inline">\(i\)</span>, the half power bandwidth method is used. This procedure, valid for low damping (<span class="math inline">\(\eta_i &lt; 0.1\)</span>), first determines the frequencies <span class="math inline">\(\omega_1\)</span> and <span class="math inline">\(\omega_2\)</span> such that: <span class="math display">\[
 \vert H_{pq}(\omega_1)\vert = \vert H_{pq}(\omega_2)\vert = \frac{\vert H_{pq}(\omega_i)\vert}{\sqrt{2}},
@@ -665,7 +665,7 @@ J(\boldsymbol{\theta}) = \sum_{o=1}^{n_o} \Vert\mathbf{E}_o(\boldsymbol{\theta})
 <h4 data-number="3.1.4" class="anchored" data-anchor-id="stabilization-diagram"><span class="header-section-number">3.1.4</span> Stabilization diagram</h4>
 <p>When carrying out an EMA, the main question that arises is how many modes (or, more precisely, poles) are contained within the frequency band of interest. Analyzing the frequency response functions (transfer functions) provides an initial estimate. However, it is difficult to distinguish between multiple or nearby modes.</p>
 <p>The stabilisation diagram is a fundamental EMA tool as it provides a clear and concise presentation of the poles of the system under study. The idea is to adjust the transfer function model by increasing the number of poles and displaying the results on a graph. Broadly speaking, increasing the order of the model (i.e.&nbsp;the number of poles) causes the true vibration modes to converge to a stable value, whereas the numerical modes appear inconsistently or randomly on the graph. Thus, as the poles converge to stable ones, markers appear on the graph to indicate the identified poles, as the order of the model is gradually increased. The selection of poles is generally based on the stability of natural frequencies, modal damping and/or mode shapes, moving from a model order <span class="math inline">\(n\)</span> to an order <span class="math inline">\(n + 1\)</span>. In this package, the stability of the natural frequencies and damping ratios is used to identify the physical poles of the system. The stability criterion is set to 1% for the natural frequencies and 5% for the damping ratios, following common practice in the EMA field.</p>
-<p>In <code>StructuralVibration.jl</code>, the stabilization diagram can be obtained using the <code>stabilization</code> function along with any of the Mdof methods described above. The identified stable poles can then be visualized using the <code>stabilization_plot</code> function (see <a href="../visualization/index.html#stabilization-plot">Stabilization plot</a>). The <code>stabilization</code> function returns an <code>StabilizationAnalysis</code> structure that contains all the information related to the stabilization analysis, which allows the user to manually select the appropriate poles and to further analyze (e.g.&nbsp;by using quality and analysis indicators) and visualize the results.</p>
+<p>In <code>StructuralVibration.jl</code>, the stabilization diagram can be obtained using the <code>stabilization</code> function along with any of the Mdof methods described above. The identified stable poles can then be visualized using the <code>stabilization_plot</code> function (see <a href="../extensions/index.html#stabilization-plot">Stabilization plot</a>). The <code>stabilization</code> function returns an <code>StabilizationAnalysis</code> structure that contains all the information related to the stabilization analysis, which allows the user to manually select the appropriate poles and to further analyze (e.g.&nbsp;by using quality and analysis indicators) and visualize the results.</p>
 </section>
 </section>
 <section id="mode-shape-extraction-1" class="level3" data-number="3.2">
@@ -815,7 +815,7 @@ Note
 **AutoEMASdofProblem**
 
 ---
-```lpbnzkj
+```ltfdqux
 #| echo: false
 @doc AutoEMASdofProblem
 ```
@@ -825,7 +825,7 @@ Note
 **AutoEMAMdofProblem**
 
 ---
-```lpbnzkj
+```ltfdqux
 #| echo: false
 @doc AutoEMAMdofProblem
 ```
