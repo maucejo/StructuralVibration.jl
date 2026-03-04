@@ -94,6 +94,8 @@ In the latter case, the initial conditions must be expressed in the modal space.
 ```{julia}
 #| output: false
 
+# using LinearAlgebra
+
 # System parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -183,6 +185,8 @@ The solution of the previous equation can be found in [Sdof solvers - Section 1.
 ```{julia}
 #| output: false
 
+# using LinearAlgebra
+
 # System parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -268,6 +272,8 @@ display(fig_harmo);
 ```{julia}
 #| output: false
 
+# using LinearAlgebra
+
 # System parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -346,6 +352,8 @@ where $h_n(t)$ is the modal impulse response of the mode $n$ computed as in [Sdo
 :::
 
 ```{julia}
+# using LinearAlgebra
+
 # System parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]

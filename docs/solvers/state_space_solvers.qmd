@@ -56,6 +56,8 @@ The second approach is to solve the problem using the continuous-time state equa
 
 ```{julia}
 #| output: false
+# using LinearAlgebra
+
 # Structural parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -119,6 +121,8 @@ display(fig);
 #### Forced response
 ```{julia}
 #| output: false
+# using LinearAlgebra
+
 # Structural parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]

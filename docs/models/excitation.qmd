@@ -612,6 +612,8 @@ Additional steps can be added such as:
 ```{julia}
 #| output: false
 
+# using FFTW
+
 # Time parameters
 Δt = 1e-4
 t = 0.:Δt:10.

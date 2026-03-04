@@ -168,6 +168,8 @@ The free response of a 2-dofs system is obtained by setting the external forces 
 
 ```{julia}
 #| output: false
+# using LinearAlgebra
+
 # System parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -226,6 +228,8 @@ The forced response of a 2-dofs system is obtained by applying a haversine excit
 
 ```{julia}
 #| output: false
+# using LinearAlgebra
+
 # System parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]

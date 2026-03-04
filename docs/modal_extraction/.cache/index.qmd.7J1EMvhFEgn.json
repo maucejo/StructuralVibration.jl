@@ -34,7 +34,7 @@
                 {
                     "output_type": "stream",
                     "name": "stdout",
-                    "text": "\u001b[91m\u001b[1m┌ \u001b[22m\u001b[39m\u001b[91m\u001b[1mError: \u001b[22m\u001b[39mError during loading of extension QuartoNotebookWorkerMakieExt of QuartoNotebookWorker, use `Base.retry_load_extensions()` to retry.\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m  exception =\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m1-element ExceptionStack:\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   InitError: MethodError: no method matching isless(::Nothing, ::VersionNumber)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   The function `isless` exists, but no method is defined for this combination of argument types.\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0mClosest candidates are:\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  isless(\u001b[91m::Missing\u001b[39m, ::Any)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m\u001b[90m   @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m\u001b[4mmissing.jl:87\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  isless(\u001b[91m::VersionNumber\u001b[39m, ::VersionNumber)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m\u001b[90m   @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m\u001b[4mversion.jl:201\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  isless(::Any, \u001b[91m::Missing\u001b[39m)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m\u001b[90m   @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m\u001b[4mmissing.jl:88\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  ...\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   Stacktrace:\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [1] \u001b[0m\u001b[1m<\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mx\u001b[39m::\u001b[0mNothing, \u001b[90my\u001b[39m::\u001b[0mVersionNumber\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4moperators.jl:399\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [2] \u001b[0m\u001b[1mconfigure\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[36mQuartoNotebookWorkerMakieExt\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/ext/\u001b[39m\u001b[90m\u001b[4mQuartoNotebookWorkerMakieExt.jl:22\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [3] \u001b[0m\u001b[1m__init__\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[36mQuartoNotebookWorkerMakieExt\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/ext/\u001b[39m\u001b[90m\u001b[4mQuartoNotebookWorkerMakieExt.jl:32\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [4] \u001b[0m\u001b[1mrun_module_init\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mmod\u001b[39m::\u001b[0mModule, \u001b[90mi\u001b[39m::\u001b[0mInt64\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1443\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [5] \u001b[0m\u001b[1mregister_restored_modules\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90msv\u001b[39m::\u001b[0mCore.SimpleVector, \u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90mpath\u001b[39m::\u001b[0mString\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1431\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [6] \u001b[0m\u001b[1m_include_from_serialized\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90mpath\u001b[39m::\u001b[0mString, \u001b[90mocachepath\u001b[39m::\u001b[0mString, \u001b[90mdepmods\u001b[39m::\u001b[0mVector\u001b[90m{Any}\u001b[39m; \u001b[90mregister\u001b[39m::\u001b[0mBool\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1319\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [7] \u001b[0m\u001b[1m_include_from_serialized\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1274\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [8] \u001b[0m\u001b[1m_require_search_from_serialized\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90msourcepath\u001b[39m::\u001b[0mString, \u001b[90mbuild_id\u001b[39m::\u001b[0mUInt128, \u001b[90mstalecheck\u001b[39m::\u001b[0mBool; \u001b[90mreasons\u001b[39m::\u001b[0mDict\u001b[90m{String, Int64}\u001b[39m, \u001b[90mDEPOT_PATH\u001b[39m::\u001b[0mVector\u001b[90m{String}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2115\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [9] \u001b[0m\u001b[1m__require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mNothing\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2627\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [10] \u001b[0m\u001b[1m_require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90muuidkey\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mNothing\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2493\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [11] \u001b[0m\u001b[1m_require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90muuidkey\u001b[39m::\u001b[0mBase.PkgId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2487\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [12] \u001b[0m\u001b[1mrun_extension_callbacks\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mextid\u001b[39m::\u001b[0mBase.ExtensionId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1607\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [13] \u001b[0m\u001b[1mrun_extension_callbacks\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkgid\u001b[39m::\u001b[0mBase.PkgId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1644\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [14] \u001b[0m\u001b[1mrun_package_callbacks\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mmodkey\u001b[39m::\u001b[0mBase.PkgId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1460\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [15] \u001b[0m\u001b[1m_require_search_from_serialized\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90msourcepath\u001b[39m::\u001b[0mString, \u001b[90mbuild_id\u001b[39m::\u001b[0mUInt128, \u001b[90mstalecheck\u001b[39m::\u001b[0mBool; \u001b[90mreasons\u001b[39m::\u001b[0mDict\u001b[90m{String, Int64}\u001b[39m, \u001b[90mDEPOT_PATH\u001b[39m::\u001b[0mVector\u001b[90m{String}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2134\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [16] \u001b[0m\u001b[1m_require_search_from_serialized\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2009\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [17] \u001b[0m\u001b[1m__require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mString\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2627\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [18] \u001b[0m\u001b[1m_require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90muuidkey\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mString\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2493\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [19] \u001b[0m\u001b[1mmacro expansion\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2421\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [20] \u001b[0m\u001b[1mmacro expansion\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mlock.jl:376\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [21] \u001b[0m\u001b[1m__require\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90minto\u001b[39m::\u001b[0mModule, \u001b[90mmod\u001b[39m::\u001b[0mSymbol\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2386\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [22] \u001b[0m\u001b[1mrequire\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90minto\u001b[39m::\u001b[0mModule, \u001b[90mmod\u001b[39m::\u001b[0mSymbol\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2362\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [23] top-level scope\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/modal_extraction/\u001b[39m\u001b[90m\u001b[4mindex.qmd:17\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [24] \u001b[0m\u001b[1meval\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mm\u001b[39m::\u001b[0mModule, \u001b[90me\u001b[39m::\u001b[0mAny\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mCore\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mboot.jl:489\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [25] \u001b[0m\u001b[1m(::QuartoNotebookWorker.var\"#21#22\"{Module, Expr})\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:222\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [26] \u001b[0m\u001b[1m(::QuartoNotebookWorker.Packages.IOCapture.var\"#12#13\"{Type{InterruptException}, QuartoNotebookWorker.var\"#21#22\"{Module, Expr}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}})\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker.Packages.IOCapture\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/vendor/IOCapture/src/\u001b[39m\u001b[90m\u001b[4mIOCapture.jl:170\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [27] \u001b[0m\u001b[1mwith_logstate\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mQuartoNotebookWorker.Packages.IOCapture.var\"#12#13\"\u001b[90m{Type{InterruptException}, QuartoNotebookWorker.var\"#21#22\"{Module, Expr}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}}\u001b[39m, \u001b[90mlogstate\u001b[39m::\u001b[0mBase.CoreLogging.LogState\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase.CoreLogging\u001b[39m \u001b[90m./logging/\u001b[39m\u001b[90m\u001b[4mlogging.jl:542\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [28] \u001b[0m\u001b[1mwith_logger\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mFunction, \u001b[90mlogger\u001b[39m::\u001b[0mBase.CoreLogging.ConsoleLogger\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase.CoreLogging\u001b[39m \u001b[90m./logging/\u001b[39m\u001b[90m\u001b[4mlogging.jl:653\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [29] \u001b[0m\u001b[1mcapture\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mQuartoNotebookWorker.var\"#21#22\"\u001b[90m{Module, Expr}\u001b[39m; \u001b[90mrethrow\u001b[39m::\u001b[0mType, \u001b[90mcolor\u001b[39m::\u001b[0mBool, \u001b[90mpassthrough\u001b[39m::\u001b[0mBool, \u001b[90mcapture_buffer\u001b[39m::\u001b[0mIOBuffer, \u001b[90mio_context\u001b[39m::\u001b[0mVector\u001b[90m{Pair{Symbol, Any}}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker.Packages.IOCapture\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/vendor/IOCapture/src/\u001b[39m\u001b[90m\u001b[4mIOCapture.jl:167\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [30] \u001b[0m\u001b[1mcapture\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:248\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [31] \u001b[0m\u001b[1mio_capture\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mFunction; \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m, \u001b[90mkws\u001b[39m::\u001b[0m@Kwargs\u001b[90m{rethrow::DataType, color::Bool, io_context::Vector{Pair{Symbol, Any}}}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:250\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [32] \u001b[0m\u001b[1mio_capture\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:246\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [33] \u001b[0m\u001b[1minclude_str\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mmod\u001b[39m::\u001b[0mModule, \u001b[90mcode\u001b[39m::\u001b[0mString; \u001b[90mfile\u001b[39m::\u001b[0mString, \u001b[90mline\u001b[39m::\u001b[0mInt64, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:201\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [34] \u001b[0m\u001b[1m#invokelatest_gr#232\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mreflection.jl:1297\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [35] \u001b[0m\u001b[1minvokelatest_gr\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mreflection.jl:1289\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [36] \u001b[0m\u001b[1m#7\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:18\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [37] \u001b[0m\u001b[1mwith_inline_display\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mQuartoNotebookWorker.var\"#7#8\"\u001b[90m{String, String, Int64, Dict{Any, Any}}\u001b[39m, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mInlineDisplay.jl:31\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [38] \u001b[0m\u001b[1m_render_thunk\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mthunk\u001b[39m::\u001b[0mFunction, \u001b[90mcode\u001b[39m::\u001b[0mString, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m, \u001b[90mis_expansion_ref\u001b[39m::\u001b[0mBase.RefValue\u001b[90m{Bool}\u001b[39m; \u001b[90minline\u001b[39m::\u001b[0mBool\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:43\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [39] \u001b[0m\u001b[1m_render_thunk\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:35\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [40] \u001b[0m\u001b[1mrender\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mcode\u001b[39m::\u001b[0mString, \u001b[90mfile\u001b[39m::\u001b[0mString, \u001b[90mline\u001b[39m::\u001b[0mInt64, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m; \u001b[90minline\u001b[39m::\u001b[0mBool\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:15\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [41] \u001b[0m\u001b[1mrender\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mcode\u001b[39m::\u001b[0mString, \u001b[90mfile\u001b[39m::\u001b[0mString, \u001b[90mline\u001b[39m::\u001b[0mInt64, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:1\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [42] \u001b[0m\u001b[1mrender\u001b[22m\u001b[0m\u001b[1m(\u001b[22m::\u001b[0mString, ::\u001b[0mVararg\u001b[90m{Any}\u001b[39m; \u001b[90mkwargs\u001b[39m::\u001b[0m@Kwargs\u001b[90m{}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[33mMain\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/\u001b[39m\u001b[90m\u001b[4mstartup.jl:145\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [43] top-level scope\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m\u001b[4mnone:1\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [44] \u001b[0m\u001b[1meval\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mm\u001b[39m::\u001b[0mModule, \u001b[90me\u001b[39m::\u001b[0mAny\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mCore\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mboot.jl:489\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [45] \u001b[0m\u001b[1m(::Main.var\"#22#23\")\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mchan\u001b[39m::\u001b[0mChannel\u001b[90m{Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[33mMain\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/\u001b[39m\u001b[90m\u001b[4mstartup.jl:158\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [46] \u001b[0m\u001b[1m(::Base.var\"#562#563\"{Main.var\"#22#23\", Channel{Any}})\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mchannels.jl:141\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   during initialization of module QuartoNotebookWorkerMakieExt\n\u001b[91m\u001b[1m└ \u001b[22m\u001b[39m\u001b[90m@ Base loading.jl:1617\u001b[39m\n"
+                    "text": "\u001b[91m\u001b[1m┌ \u001b[22m\u001b[39m\u001b[91m\u001b[1mError: \u001b[22m\u001b[39mError during loading of extension QuartoNotebookWorkerMakieExt of QuartoNotebookWorker, use `Base.retry_load_extensions()` to retry.\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m  exception =\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m1-element ExceptionStack:\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   InitError: MethodError: no method matching isless(::Nothing, ::VersionNumber)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   The function `isless` exists, but no method is defined for this combination of argument types.\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0mClosest candidates are:\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  isless(\u001b[91m::Missing\u001b[39m, ::Any)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m\u001b[90m   @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m\u001b[4mmissing.jl:87\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  isless(\u001b[91m::VersionNumber\u001b[39m, ::VersionNumber)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m\u001b[90m   @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m\u001b[4mversion.jl:201\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  isless(::Any, \u001b[91m::Missing\u001b[39m)\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m\u001b[90m   @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m\u001b[4mmissing.jl:88\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[0m  ...\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   Stacktrace:\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [1] \u001b[0m\u001b[1m<\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mx\u001b[39m::\u001b[0mNothing, \u001b[90my\u001b[39m::\u001b[0mVersionNumber\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4moperators.jl:399\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [2] \u001b[0m\u001b[1mconfigure\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[36mQuartoNotebookWorkerMakieExt\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/ext/\u001b[39m\u001b[90m\u001b[4mQuartoNotebookWorkerMakieExt.jl:22\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [3] \u001b[0m\u001b[1m__init__\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[36mQuartoNotebookWorkerMakieExt\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/ext/\u001b[39m\u001b[90m\u001b[4mQuartoNotebookWorkerMakieExt.jl:32\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [4] \u001b[0m\u001b[1mrun_module_init\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mmod\u001b[39m::\u001b[0mModule, \u001b[90mi\u001b[39m::\u001b[0mInt64\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1443\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [5] \u001b[0m\u001b[1mregister_restored_modules\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90msv\u001b[39m::\u001b[0mCore.SimpleVector, \u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90mpath\u001b[39m::\u001b[0mString\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1431\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [6] \u001b[0m\u001b[1m_include_from_serialized\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90mpath\u001b[39m::\u001b[0mString, \u001b[90mocachepath\u001b[39m::\u001b[0mString, \u001b[90mdepmods\u001b[39m::\u001b[0mVector\u001b[90m{Any}\u001b[39m; \u001b[90mregister\u001b[39m::\u001b[0mBool\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1319\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [7] \u001b[0m\u001b[1m_include_from_serialized\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1274\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [8] \u001b[0m\u001b[1m_require_search_from_serialized\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90msourcepath\u001b[39m::\u001b[0mString, \u001b[90mbuild_id\u001b[39m::\u001b[0mUInt128, \u001b[90mstalecheck\u001b[39m::\u001b[0mBool; \u001b[90mreasons\u001b[39m::\u001b[0mDict\u001b[90m{String, Int64}\u001b[39m, \u001b[90mDEPOT_PATH\u001b[39m::\u001b[0mVector\u001b[90m{String}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2115\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m     [9] \u001b[0m\u001b[1m__require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mNothing\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2609\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [10] \u001b[0m\u001b[1m_require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90muuidkey\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mNothing\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2493\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [11] \u001b[0m\u001b[1m_require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90muuidkey\u001b[39m::\u001b[0mBase.PkgId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2487\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [12] \u001b[0m\u001b[1mrun_extension_callbacks\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mextid\u001b[39m::\u001b[0mBase.ExtensionId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1607\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [13] \u001b[0m\u001b[1mrun_extension_callbacks\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkgid\u001b[39m::\u001b[0mBase.PkgId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1644\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [14] \u001b[0m\u001b[1mrun_package_callbacks\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mmodkey\u001b[39m::\u001b[0mBase.PkgId\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:1460\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [15] \u001b[0m\u001b[1m_require_search_from_serialized\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90msourcepath\u001b[39m::\u001b[0mString, \u001b[90mbuild_id\u001b[39m::\u001b[0mUInt128, \u001b[90mstalecheck\u001b[39m::\u001b[0mBool; \u001b[90mreasons\u001b[39m::\u001b[0mDict\u001b[90m{String, Int64}\u001b[39m, \u001b[90mDEPOT_PATH\u001b[39m::\u001b[0mVector\u001b[90m{String}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2134\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [16] \u001b[0m\u001b[1m_require_search_from_serialized\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2009\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [17] \u001b[0m\u001b[1m__require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mpkg\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mString\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2627\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [18] \u001b[0m\u001b[1m_require_prelocked\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90muuidkey\u001b[39m::\u001b[0mBase.PkgId, \u001b[90menv\u001b[39m::\u001b[0mString\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2493\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [19] \u001b[0m\u001b[1mmacro expansion\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2421\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [20] \u001b[0m\u001b[1mmacro expansion\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mlock.jl:376\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [21] \u001b[0m\u001b[1m__require\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90minto\u001b[39m::\u001b[0mModule, \u001b[90mmod\u001b[39m::\u001b[0mSymbol\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2386\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [22] \u001b[0m\u001b[1mrequire\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90minto\u001b[39m::\u001b[0mModule, \u001b[90mmod\u001b[39m::\u001b[0mSymbol\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mloading.jl:2362\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [23] top-level scope\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/modal_extraction/\u001b[39m\u001b[90m\u001b[4mindex.qmd:17\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [24] \u001b[0m\u001b[1meval\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mm\u001b[39m::\u001b[0mModule, \u001b[90me\u001b[39m::\u001b[0mAny\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mCore\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mboot.jl:489\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [25] \u001b[0m\u001b[1m(::QuartoNotebookWorker.var\"#21#22\"{Module, Expr})\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:222\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [26] \u001b[0m\u001b[1m(::QuartoNotebookWorker.Packages.IOCapture.var\"#12#13\"{Type{InterruptException}, QuartoNotebookWorker.var\"#21#22\"{Module, Expr}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}})\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker.Packages.IOCapture\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/vendor/IOCapture/src/\u001b[39m\u001b[90m\u001b[4mIOCapture.jl:170\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [27] \u001b[0m\u001b[1mwith_logstate\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mQuartoNotebookWorker.Packages.IOCapture.var\"#12#13\"\u001b[90m{Type{InterruptException}, QuartoNotebookWorker.var\"#21#22\"{Module, Expr}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}}\u001b[39m, \u001b[90mlogstate\u001b[39m::\u001b[0mBase.CoreLogging.LogState\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase.CoreLogging\u001b[39m \u001b[90m./logging/\u001b[39m\u001b[90m\u001b[4mlogging.jl:542\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [28] \u001b[0m\u001b[1mwith_logger\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mFunction, \u001b[90mlogger\u001b[39m::\u001b[0mBase.CoreLogging.ConsoleLogger\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase.CoreLogging\u001b[39m \u001b[90m./logging/\u001b[39m\u001b[90m\u001b[4mlogging.jl:653\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [29] \u001b[0m\u001b[1mcapture\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mQuartoNotebookWorker.var\"#21#22\"\u001b[90m{Module, Expr}\u001b[39m; \u001b[90mrethrow\u001b[39m::\u001b[0mType, \u001b[90mcolor\u001b[39m::\u001b[0mBool, \u001b[90mpassthrough\u001b[39m::\u001b[0mBool, \u001b[90mcapture_buffer\u001b[39m::\u001b[0mIOBuffer, \u001b[90mio_context\u001b[39m::\u001b[0mVector\u001b[90m{Pair{Symbol, Any}}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker.Packages.IOCapture\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/vendor/IOCapture/src/\u001b[39m\u001b[90m\u001b[4mIOCapture.jl:167\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [30] \u001b[0m\u001b[1mcapture\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:248\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [31] \u001b[0m\u001b[1mio_capture\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mFunction; \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m, \u001b[90mkws\u001b[39m::\u001b[0m@Kwargs\u001b[90m{rethrow::DataType, color::Bool, io_context::Vector{Pair{Symbol, Any}}}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:250\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [32] \u001b[0m\u001b[1mio_capture\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:246\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [33] \u001b[0m\u001b[1minclude_str\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mmod\u001b[39m::\u001b[0mModule, \u001b[90mcode\u001b[39m::\u001b[0mString; \u001b[90mfile\u001b[39m::\u001b[0mString, \u001b[90mline\u001b[39m::\u001b[0mInt64, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:201\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [34] \u001b[0m\u001b[1m#invokelatest_gr#232\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mreflection.jl:1297\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [35] \u001b[0m\u001b[1minvokelatest_gr\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mreflection.jl:1289\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [36] \u001b[0m\u001b[1m#7\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:18\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [37] \u001b[0m\u001b[1mwith_inline_display\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mf\u001b[39m::\u001b[0mQuartoNotebookWorker.var\"#7#8\"\u001b[90m{String, String, Int64, Dict{Any, Any}}\u001b[39m, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mInlineDisplay.jl:31\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [38] \u001b[0m\u001b[1m_render_thunk\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mthunk\u001b[39m::\u001b[0mFunction, \u001b[90mcode\u001b[39m::\u001b[0mString, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m, \u001b[90mis_expansion_ref\u001b[39m::\u001b[0mBase.RefValue\u001b[90m{Bool}\u001b[39m; \u001b[90minline\u001b[39m::\u001b[0mBool\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:43\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [39] \u001b[0m\u001b[1m_render_thunk\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:35\u001b[24m\u001b[39m\u001b[90m [inlined]\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [40] \u001b[0m\u001b[1mrender\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mcode\u001b[39m::\u001b[0mString, \u001b[90mfile\u001b[39m::\u001b[0mString, \u001b[90mline\u001b[39m::\u001b[0mInt64, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m; \u001b[90minline\u001b[39m::\u001b[0mBool\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:15\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [41] \u001b[0m\u001b[1mrender\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mcode\u001b[39m::\u001b[0mString, \u001b[90mfile\u001b[39m::\u001b[0mString, \u001b[90mline\u001b[39m::\u001b[0mInt64, \u001b[90mcell_options\u001b[39m::\u001b[0mDict\u001b[90m{Any, Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[32mQuartoNotebookWorker\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/QuartoNotebookWorker/src/\u001b[39m\u001b[90m\u001b[4mrender.jl:1\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [42] \u001b[0m\u001b[1mrender\u001b[22m\u001b[0m\u001b[1m(\u001b[22m::\u001b[0mString, ::\u001b[0mVararg\u001b[90m{Any}\u001b[39m; \u001b[90mkwargs\u001b[39m::\u001b[0m@Kwargs\u001b[90m{}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[33mMain\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/\u001b[39m\u001b[90m\u001b[4mstartup.jl:145\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [43] top-level scope\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90m\u001b[4mnone:1\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [44] \u001b[0m\u001b[1meval\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mm\u001b[39m::\u001b[0mModule, \u001b[90me\u001b[39m::\u001b[0mAny\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mCore\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mboot.jl:489\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [45] \u001b[0m\u001b[1m(::Main.var\"#22#23\")\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[90mchan\u001b[39m::\u001b[0mChannel\u001b[90m{Any}\u001b[39m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[33mMain\u001b[39m \u001b[90m~/.julia/packages/QuartoNotebookRunner/fVEXT/src/\u001b[39m\u001b[90m\u001b[4mstartup.jl:158\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m    [46] \u001b[0m\u001b[1m(::Base.var\"#562#563\"{Main.var\"#22#23\", Channel{Any}})\u001b[22m\u001b[0m\u001b[1m(\u001b[22m\u001b[0m\u001b[1m)\u001b[22m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   \u001b[90m    @\u001b[39m \u001b[90mBase\u001b[39m \u001b[90m./\u001b[39m\u001b[90m\u001b[4mchannels.jl:141\u001b[24m\u001b[39m\n\u001b[91m\u001b[1m│ \u001b[22m\u001b[39m   during initialization of module QuartoNotebookWorkerMakieExt\n\u001b[91m\u001b[1m└ \u001b[22m\u001b[39m\u001b[90m@ Base loading.jl:1617\u001b[39m\n"
                 }
             ],
             "execution_count": 1
@@ -123,7 +123,7 @@
                 "\n",
                 "    They are identified from the peaks of the amplitude of the FRF. The natural frequencies are identified as the frequencies at which the FRF has a local maximum. The local maxima are determined using `Peaks.jl`.\n",
                 "\n",
-                "    To check the peak detection, one can use the `peaksplot` function from `StructuralVibration.jl` (see [Peaks plot](../visualization/index.qmd#peaks-plot) for more details).\n",
+                "    To check the peak detection, one can use the `peaksplot` function from `StructuralVibration.jl` (see [Peaks plot](../extensions/index.qmd#peaks-plot) for more details).\n",
                 "\n",
                 "2. **Estimation of modal damping factors**\n",
                 "\n",
@@ -460,7 +460,7 @@
                 "\n",
                 "The stabilisation diagram is a fundamental EMA tool as it provides a clear and concise presentation of the poles of the system under study. The idea is to adjust the transfer function model by increasing the number of poles and displaying the results on a graph. Broadly speaking, increasing the order of the model (i.e. the number of poles) causes the true vibration modes to converge to a stable value, whereas the numerical modes appear inconsistently or randomly on the graph. Thus, as the poles converge to stable ones, markers appear on the graph to indicate the identified poles, as the order of the model is gradually increased. The selection of poles is generally based on the stability of natural frequencies, modal damping and/or mode shapes, moving from a model order $n$ to an order $n + 1$. In this package, the stability of the natural frequencies and damping ratios is used to identify the physical poles of the system. The stability criterion is set to 1% for the natural frequencies and 5% for the damping ratios, following common practice in the EMA field.\n",
                 "\n",
-                "In `StructuralVibration.jl`, the stabilization diagram can be obtained using the `stabilization` function along with any of the Mdof methods described above. The identified stable poles can then be visualized using the `stabilization_plot` function (see [Stabilization plot](../visualization/index.qmd#stabilization-plot)). The `stabilization` function returns an `StabilizationAnalysis` structure that contains all the information related to the stabilization analysis, which allows the user to manually select the appropriate poles and to further analyze (e.g. by using quality and analysis indicators) and visualize the results.\n",
+                "In `StructuralVibration.jl`, the stabilization diagram can be obtained using the `stabilization` function along with any of the Mdof methods described above. The identified stable poles can then be visualized using the `stabilization_plot` function (see [Stabilization plot](../extensions/index.qmd#stabilization-plot)). The `stabilization` function returns an `StabilizationAnalysis` structure that contains all the information related to the stabilization analysis, which allows the user to manually select the appropriate poles and to further analyze (e.g. by using quality and analysis indicators) and visualize the results.\n",
                 "\n",
                 "### Mode shape extraction\n",
                 "\n",
@@ -617,83 +617,25 @@
             "source": [
                 ":::\n",
                 "\n",
-                "::: {.api}\n",
+                "<!-- ::: {.api}\n",
                 "**AutoEMASdofProblem**\n",
                 "\n",
-                "---"
-            ]
-        },
-        {
-            "id": "6",
-            "cell_type": "code",
-            "metadata": {
-            },
-            "source": [
+                "---\n",
+                "```{julia}\n",
                 "#| echo: false\n",
-                "@doc AutoEMASdofProblem"
-            ],
-            "outputs": [
-                {
-                    "output_type": "execute_result",
-                    "execution_count": 1,
-                    "data": {
-                        "text/plain": "  \u001b[36mAutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)\u001b[39m\n\n  Structure containing the input data for automatic experimental modal\n  analysis using Sdof methods\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMASdofProblem\u001b[39m: EMA-SDOF problem containing FRF data and\n       frequency vector\n    \u001b[34m• \u001b[39m \u001b[36malg::SdofModalExtraction\u001b[39m: Method to extract the poles\n       \n       \u001b[34m• \u001b[39m \u001b[36mPeakPicking\u001b[39m: Peak picking method (default)\n       \u001b[34m• \u001b[39m \u001b[36mCircleFit\u001b[39m: Circle fitting method\n       \u001b[34m• \u001b[39m \u001b[36mLSFit\u001b[39m: Least squares fitting method\n    \u001b[34m• \u001b[39m \u001b[36mdpi::Vector{Int}\u001b[39m: Driving point indices - default = [1, 1]\n       \n       \u001b[34m• \u001b[39m \u001b[36mdpi[1]\u001b[39m: Driving point index on the measurement mesh\n       \u001b[34m• \u001b[39m \u001b[36mdpi[2]\u001b[39m: Driving point index on the excitation mesh\n    \u001b[34m• \u001b[39m \u001b[36midx_m::AbstractArray{Int}\u001b[39m: Indices of measurement DOFs used for\n       residues computation (default: all measurement DOFs)\n    \u001b[34m• \u001b[39m \u001b[36midx_e::AbstractArray{Int}\u001b[39m: Indices of excitation DOFs used for\n       residues computation (default: all excitation DOFs)\n    \u001b[34m• \u001b[39m \u001b[36mwidth::Int\u001b[39m: Half-width of the peaks (default: 1)\n    \u001b[34m• \u001b[39m \u001b[36mmin_prom::Real\u001b[39m: Minimum peak prominence (default: 0.)\n    \u001b[34m• \u001b[39m \u001b[36mmax_prom::Real\u001b[39m: Maximum peak prominence (default: Inf)\n    \u001b[34m• \u001b[39m \u001b[36mpks_indices::Vector{Int}\u001b[39m: Predefined peak indices (default: empty\n       vector)",
-                        "text/markdown": "```julia\nAutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)\n```\n\nStructure containing the input data for automatic experimental modal analysis using Sdof methods\n\n**Fields**\n\n  * `prob::EMASdofProblem`: EMA-SDOF problem containing FRF data and frequency vector\n  * `alg::SdofModalExtraction`: Method to extract the poles\n\n      * `PeakPicking`: Peak picking method (default)\n      * `CircleFit`: Circle fitting method\n      * `LSFit`: Least squares fitting method\n  * `dpi::Vector{Int}`: Driving point indices - default = [1, 1]\n\n      * `dpi[1]`: Driving point index on the measurement mesh\n      * `dpi[2]`: Driving point index on the excitation mesh\n  * `idx_m::AbstractArray{Int}`: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)\n  * `idx_e::AbstractArray{Int}`: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)\n  * `width::Int`: Half-width of the peaks (default: 1)\n  * `min_prom::Real`: Minimum peak prominence (default: 0.)\n  * `max_prom::Real`: Maximum peak prominence (default: Inf)\n  * `pks_indices::Vector{Int}`: Predefined peak indices (default: empty vector)\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">AutoEMASdofProblem&#40;prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices&#41;</code></pre>\n<p>Structure containing the input data for automatic experimental modal analysis using Sdof methods</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>prob::EMASdofProblem</code>: EMA-SDOF problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>alg::SdofModalExtraction</code>: Method to extract the poles</p>\n<ul>\n<li><p><code>PeakPicking</code>: Peak picking method &#40;default&#41;</p>\n</li>\n<li><p><code>CircleFit</code>: Circle fitting method</p>\n</li>\n<li><p><code>LSFit</code>: Least squares fitting method</p>\n</li>\n</ul>\n</li>\n<li><p><code>dpi::Vector&#123;Int&#125;</code>: Driving point indices - default &#61; &#91;1, 1&#93;</p>\n<ul>\n<li><p><code>dpi&#91;1&#93;</code>: Driving point index on the measurement mesh</p>\n</li>\n<li><p><code>dpi&#91;2&#93;</code>: Driving point index on the excitation mesh</p>\n</li>\n</ul>\n</li>\n<li><p><code>idx_m::AbstractArray&#123;Int&#125;</code>: Indices of measurement DOFs used for residues computation &#40;default: all measurement DOFs&#41;</p>\n</li>\n<li><p><code>idx_e::AbstractArray&#123;Int&#125;</code>: Indices of excitation DOFs used for residues computation &#40;default: all excitation DOFs&#41;</p>\n</li>\n<li><p><code>width::Int</code>: Half-width of the peaks &#40;default: 1&#41;</p>\n</li>\n<li><p><code>min_prom::Real</code>: Minimum peak prominence &#40;default: 0.&#41;</p>\n</li>\n<li><p><code>max_prom::Real</code>: Maximum peak prominence &#40;default: Inf&#41;</p>\n</li>\n<li><p><code>pks_indices::Vector&#123;Int&#125;</code>: Predefined peak indices &#40;default: empty vector&#41;</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nAutoEMASdofProblem(prob, alg; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)\n\\end{verbatim}\nStructure containing the input data for automatic experimental modal analysis using Sdof methods\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMASdofProblem}: EMA-SDOF problem containing FRF data and frequency vector\n\n\n\\item \\texttt{alg::SdofModalExtraction}: Method to extract the poles\n\n\\begin{itemize}\n\\item \\texttt{PeakPicking}: Peak picking method (default)\n\n\n\\item \\texttt{CircleFit}: Circle fitting method\n\n\n\\item \\texttt{LSFit}: Least squares fitting method\n\n\\end{itemize}\n\n\\item \\texttt{dpi::Vector\\{Int\\}}: Driving point indices - default = [1, 1]\n\n\\begin{itemize}\n\\item \\texttt{dpi[1]}: Driving point index on the measurement mesh\n\n\n\\item \\texttt{dpi[2]}: Driving point index on the excitation mesh\n\n\\end{itemize}\n\n\\item \\texttt{idx\\_m::AbstractArray\\{Int\\}}: Indices of measurement DOFs used for residues computation (default: all measurement DOFs)\n\n\n\\item \\texttt{idx\\_e::AbstractArray\\{Int\\}}: Indices of excitation DOFs used for residues computation (default: all excitation DOFs)\n\n\n\\item \\texttt{width::Int}: Half-width of the peaks (default: 1)\n\n\n\\item \\texttt{min\\_prom::Real}: Minimum peak prominence (default: 0.)\n\n\n\\item \\texttt{max\\_prom::Real}: Maximum peak prominence (default: Inf)\n\n\n\\item \\texttt{pks\\_indices::Vector\\{Int\\}}: Predefined peak indices (default: empty vector)\n\n\\end{itemize}\n"
-                    },
-                    "metadata": {
-                    }
-                }
-            ],
-            "execution_count": 1
-        },
-        {
-            "id": "7",
-            "cell_type": "markdown",
-            "metadata": {
-            },
-            "source": [
+                "@doc AutoEMASdofProblem\n",
+                "```\n",
                 ":::\n",
                 "\n",
                 "::: {.api}\n",
                 "**AutoEMAMdofProblem**\n",
                 "\n",
-                "---"
-            ]
-        },
-        {
-            "id": "8",
-            "cell_type": "code",
-            "metadata": {
-            },
-            "source": [
+                "---\n",
+                "```{julia}\n",
                 "#| echo: false\n",
-                "@doc AutoEMAMdofProblem"
-            ],
-            "outputs": [
-                {
-                    "output_type": "execute_result",
-                    "execution_count": 1,
-                    "data": {
-                        "text/plain": "  \u001b[36mAutoEMAMdofProblem(prob, dpi, method; modetype)\u001b[39m\n\n  Structure containing the input data for automatic experimental modal\n  analysis using Mdof methods\n\n  \u001b[1mFields\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMAProblem\u001b[39m: EMA problem containing FRF data and frequency\n       vector\n    \u001b[34m• \u001b[39m \u001b[36morder::Int\u001b[39m: Model order (number of poles to extract)\n    \u001b[34m• \u001b[39m \u001b[36mdpi::Vector{Int}\u001b[39m: Driving point indices - default = [1, 1]\n       \n       \u001b[34m• \u001b[39m \u001b[36mdpi[1]\u001b[39m: Driving point index on the measurement mesh\n       \u001b[34m• \u001b[39m \u001b[36mdpi[2]\u001b[39m: Driving point index on the excitation mesh\n    \u001b[34m• \u001b[39m \u001b[36malg::MdofEMA\u001b[39m: Method to extract the poles\n       \n       \u001b[34m• \u001b[39m \u001b[36mLSCE\u001b[39m: Least Squares Complex Exponential method\n       \u001b[34m• \u001b[39m \u001b[36mLSCF\u001b[39m`: Least Squares Complex Frequency method (default)\n       \u001b[34m• \u001b[39m \u001b[36mPLSCF\u001b[39m: Polyreference Least Squares Complex Frequency\n       method\n    \u001b[34m• \u001b[39m \u001b[36mmodetype::Symbol\u001b[39m: Type of mode shapes to extract\n       \n       \u001b[34m• \u001b[39m \u001b[36m:real\u001b[39m: Real mode shapes (default)\n       \u001b[34m• \u001b[39m \u001b[36m:complex\u001b[39m: Complex mode shapes",
-                        "text/markdown": "```julia\nAutoEMAMdofProblem(prob, dpi, method; modetype)\n```\n\nStructure containing the input data for automatic experimental modal analysis using Mdof methods\n\n**Fields**\n\n  * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector\n  * `order::Int`: Model order (number of poles to extract)\n  * `dpi::Vector{Int}`: Driving point indices - default = [1, 1]\n\n      * `dpi[1]`: Driving point index on the measurement mesh\n      * `dpi[2]`: Driving point index on the excitation mesh\n  * `alg::MdofEMA`: Method to extract the poles\n\n      * `LSCE`: Least Squares Complex Exponential method\n      * `LSCF``: Least Squares Complex Frequency method (default)\n      * `PLSCF`: Polyreference Least Squares Complex Frequency method\n  * `modetype::Symbol`: Type of mode shapes to extract\n\n      * `:real`: Real mode shapes (default)\n      * `:complex`: Complex mode shapes\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">AutoEMAMdofProblem&#40;prob, dpi, method; modetype&#41;</code></pre>\n<p>Structure containing the input data for automatic experimental modal analysis using Mdof methods</p>\n<p><strong>Fields</strong></p>\n<ul>\n<li><p><code>prob::EMAProblem</code>: EMA problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>order::Int</code>: Model order &#40;number of poles to extract&#41;</p>\n</li>\n<li><p><code>dpi::Vector&#123;Int&#125;</code>: Driving point indices - default &#61; &#91;1, 1&#93;</p>\n<ul>\n<li><p><code>dpi&#91;1&#93;</code>: Driving point index on the measurement mesh</p>\n</li>\n<li><p><code>dpi&#91;2&#93;</code>: Driving point index on the excitation mesh</p>\n</li>\n</ul>\n</li>\n<li><p><code>alg::MdofEMA</code>: Method to extract the poles</p>\n<ul>\n<li><p><code>LSCE</code>: Least Squares Complex Exponential method</p>\n</li>\n<li><p><code>LSCF</code>&#96;: Least Squares Complex Frequency method &#40;default&#41;</p>\n</li>\n<li><p><code>PLSCF</code>: Polyreference Least Squares Complex Frequency method</p>\n</li>\n</ul>\n</li>\n<li><p><code>modetype::Symbol</code>: Type of mode shapes to extract</p>\n<ul>\n<li><p><code>:real</code>: Real mode shapes &#40;default&#41;</p>\n</li>\n<li><p><code>:complex</code>: Complex mode shapes</p>\n</li>\n</ul>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nAutoEMAMdofProblem(prob, dpi, method; modetype)\n\\end{verbatim}\nStructure containing the input data for automatic experimental modal analysis using Mdof methods\n\n\\textbf{Fields}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMAProblem}: EMA problem containing FRF data and frequency vector\n\n\n\\item \\texttt{order::Int}: Model order (number of poles to extract)\n\n\n\\item \\texttt{dpi::Vector\\{Int\\}}: Driving point indices - default = [1, 1]\n\n\\begin{itemize}\n\\item \\texttt{dpi[1]}: Driving point index on the measurement mesh\n\n\n\\item \\texttt{dpi[2]}: Driving point index on the excitation mesh\n\n\\end{itemize}\n\n\\item \\texttt{alg::MdofEMA}: Method to extract the poles\n\n\\begin{itemize}\n\\item \\texttt{LSCE}: Least Squares Complex Exponential method\n\n\n\\item \\texttt{LSCF}`: Least Squares Complex Frequency method (default)\n\n\n\\item \\texttt{PLSCF}: Polyreference Least Squares Complex Frequency method\n\n\\end{itemize}\n\n\\item \\texttt{modetype::Symbol}: Type of mode shapes to extract\n\n\\begin{itemize}\n\\item \\texttt{:real}: Real mode shapes (default)\n\n\n\\item \\texttt{:complex}: Complex mode shapes\n\n\\end{itemize}\n\\end{itemize}\n"
-                    },
-                    "metadata": {
-                    }
-                }
-            ],
-            "execution_count": 1
-        },
-        {
-            "id": "9",
-            "cell_type": "markdown",
-            "metadata": {
-            },
-            "source": [
-                ":::\n",
+                "@doc AutoEMAMdofProblem\n",
+                "```\n",
+                "::: -->\n",
                 "\n",
                 "::: {.api}\n",
                 "**EMASolution**\n",
@@ -702,7 +644,7 @@
             ]
         },
         {
-            "id": "10",
+            "id": "6",
             "cell_type": "code",
             "metadata": {
             },
@@ -727,7 +669,7 @@
             "execution_count": 1
         },
         {
-            "id": "11",
+            "id": "7",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -741,7 +683,7 @@
             ]
         },
         {
-            "id": "12",
+            "id": "8",
             "cell_type": "code",
             "metadata": {
             },
@@ -766,7 +708,7 @@
             "execution_count": 1
         },
         {
-            "id": "13",
+            "id": "9",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -780,7 +722,7 @@
             ]
         },
         {
-            "id": "14",
+            "id": "10",
             "cell_type": "code",
             "metadata": {
             },
@@ -805,7 +747,7 @@
             "execution_count": 1
         },
         {
-            "id": "15",
+            "id": "11",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -819,7 +761,7 @@
             ]
         },
         {
-            "id": "16",
+            "id": "12",
             "cell_type": "code",
             "metadata": {
             },
@@ -844,7 +786,7 @@
             "execution_count": 1
         },
         {
-            "id": "17",
+            "id": "13",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -858,7 +800,7 @@
             ]
         },
         {
-            "id": "18",
+            "id": "14",
             "cell_type": "code",
             "metadata": {
             },
@@ -883,7 +825,7 @@
             "execution_count": 1
         },
         {
-            "id": "19",
+            "id": "15",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -897,7 +839,7 @@
             ]
         },
         {
-            "id": "20",
+            "id": "16",
             "cell_type": "code",
             "metadata": {
             },
@@ -922,7 +864,7 @@
             "execution_count": 1
         },
         {
-            "id": "21",
+            "id": "17",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -936,7 +878,7 @@
             ]
         },
         {
-            "id": "22",
+            "id": "18",
             "cell_type": "code",
             "metadata": {
             },
@@ -961,7 +903,7 @@
             "execution_count": 1
         },
         {
-            "id": "23",
+            "id": "19",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -975,7 +917,7 @@
             ]
         },
         {
-            "id": "24",
+            "id": "20",
             "cell_type": "code",
             "metadata": {
             },
@@ -1000,7 +942,7 @@
             "execution_count": 1
         },
         {
-            "id": "25",
+            "id": "21",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1016,7 +958,7 @@
             ]
         },
         {
-            "id": "26",
+            "id": "22",
             "cell_type": "code",
             "metadata": {
             },
@@ -1029,10 +971,10 @@
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36mpoles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)\u001b[39m\n  \u001b[36mpoles_extraction(prob::MdofProblem, order, alg; stabdiag)\u001b[39m\n\n  Extract poles using Sdof or Mdof experimental modal analysis methods\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMAProblem\u001b[39m or \u001b[36mprob::MdofProblem\u001b[39m: EMA problem containing FRF\n       data and frequency vector\n    \u001b[34m• \u001b[39m \u001b[36morder\u001b[39m: Order of the model (only for Mdof methods)\n    \u001b[34m• \u001b[39m \u001b[36malg\u001b[39m: Algorithm to extract the poles\n       \n       \u001b[34m• \u001b[39m Sdof methods:\n       \n       \u001b[34m• \u001b[39m \u001b[36mPeakPicking\u001b[39m: Peak picking method (default for\n       Sdof methods)\n       \u001b[34m• \u001b[39m \u001b[36mCircleFit\u001b[39m: Circle fitting method\n       \u001b[34m• \u001b[39m \u001b[36mLSFit\u001b[39m: Least squares fitting method\n       \u001b[34m• \u001b[39m Mdof methods:\n       \n       \u001b[34m• \u001b[39m \u001b[36mLSCF\u001b[39m: Least Squares Complex Frequency method\n       (default for Mdof methods)\n       \u001b[34m• \u001b[39m \u001b[36mPLSCF\u001b[39m: Polyreference Least Squares Complex\n       Frequency method\n       \u001b[34m• \u001b[39m \u001b[36mLSCE\u001b[39m: Least Squares Complex Exponential method\n       (only for Mdof methods)\n    \u001b[34m• \u001b[39m \u001b[36mstabdiag::Bool\u001b[39m: Boolean to indicate the function is used to build\n       a stability diagram (Only for Mdof methods, default: false)\n    \u001b[34m• \u001b[39m \u001b[36mwidth::Int\u001b[39m: Half-width of the peaks (only for Sdof methods,\n       default: 1)\n    \u001b[34m• \u001b[39m \u001b[36mmin_prom::Real\u001b[39m: Minimum peak prominence (only for Sdof methods,\n       default: 0. dB)\n    \u001b[34m• \u001b[39m \u001b[36mmax_prom::Real\u001b[39m: Maximum peak prominence (only for Sdof methods,\n       default: Inf)\n    \u001b[34m• \u001b[39m \u001b[36mpks_indices::Vector{Int}\u001b[39m: Indices of peaks to consider (only for\n       Sdof methods, default: empty vector)\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mpoles\u001b[39m: Vector of extracted complex poles\n\n  \u001b[1mNote\u001b[22m\n\n    \u001b[34m• \u001b[39m For Sdof methods, the natural frequencies and damping ratios are\n       extracted from each FRF (each row of the matrix) and then\n       averaged. The number of FRF used for averaging are those having\n       the maximum (and same) number of peaks detected.",
-                        "text/markdown": "```julia\npoles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)\npoles_extraction(prob::MdofProblem, order, alg; stabdiag)\n```\n\nExtract poles using Sdof or Mdof experimental modal analysis methods\n\n**Inputs**\n\n  * `prob::EMAProblem` or `prob::MdofProblem`: EMA problem containing FRF data and frequency vector\n  * `order`: Order of the model (only for Mdof methods)\n  * `alg`: Algorithm to extract the poles\n\n      * Sdof methods:\n\n          * `PeakPicking`: Peak picking method (default for Sdof methods)\n          * `CircleFit`: Circle fitting method\n          * `LSFit`: Least squares fitting method\n      * Mdof methods:\n\n          * `LSCF`: Least Squares Complex Frequency method (default for Mdof methods)\n          * `PLSCF`: Polyreference Least Squares Complex Frequency method\n          * `LSCE`: Least Squares Complex Exponential method (only for Mdof methods)\n  * `stabdiag::Bool`: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)\n  * `width::Int`: Half-width of the peaks (only for Sdof methods, default: 1)\n  * `min_prom::Real`: Minimum peak prominence (only for Sdof methods, default: 0. dB)\n  * `max_prom::Real`: Maximum peak prominence (only for Sdof methods, default: Inf)\n  * `pks_indices::Vector{Int}`: Indices of peaks to consider (only for Sdof methods, default: empty vector)\n\n**Outputs**\n\n  * `poles`: Vector of extracted complex poles\n\n**Note**\n\n  * For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">poles_extraction&#40;prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling&#41;\npoles_extraction&#40;prob::MdofProblem, order, alg; stabdiag&#41;</code></pre>\n<p>Extract poles using Sdof or Mdof experimental modal analysis methods</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>prob::EMAProblem</code> or <code>prob::MdofProblem</code>: EMA problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>order</code>: Order of the model &#40;only for Mdof methods&#41;</p>\n</li>\n<li><p><code>alg</code>: Algorithm to extract the poles</p>\n<ul>\n<li><p>Sdof methods:</p>\n<ul>\n<li><p><code>PeakPicking</code>: Peak picking method &#40;default for Sdof methods&#41;</p>\n</li>\n<li><p><code>CircleFit</code>: Circle fitting method</p>\n</li>\n<li><p><code>LSFit</code>: Least squares fitting method</p>\n</li>\n</ul>\n</li>\n<li><p>Mdof methods:</p>\n<ul>\n<li><p><code>LSCF</code>: Least Squares Complex Frequency method &#40;default for Mdof methods&#41;</p>\n</li>\n<li><p><code>PLSCF</code>: Polyreference Least Squares Complex Frequency method</p>\n</li>\n<li><p><code>LSCE</code>: Least Squares Complex Exponential method &#40;only for Mdof methods&#41;</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n<li><p><code>stabdiag::Bool</code>: Boolean to indicate the function is used to build a stability diagram &#40;Only for Mdof methods, default: false&#41;</p>\n</li>\n<li><p><code>width::Int</code>: Half-width of the peaks &#40;only for Sdof methods, default: 1&#41;</p>\n</li>\n<li><p><code>min_prom::Real</code>: Minimum peak prominence &#40;only for Sdof methods, default: 0. dB&#41;</p>\n</li>\n<li><p><code>max_prom::Real</code>: Maximum peak prominence &#40;only for Sdof methods, default: Inf&#41;</p>\n</li>\n<li><p><code>pks_indices::Vector&#123;Int&#125;</code>: Indices of peaks to consider &#40;only for Sdof methods, default: empty vector&#41;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>poles</code>: Vector of extracted complex poles</p>\n</li>\n</ul>\n<p><strong>Note</strong></p>\n<ul>\n<li><p>For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF &#40;each row of the matrix&#41; and then averaged. The number of FRF used for averaging are those having the maximum &#40;and same&#41; number of peaks detected.</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\npoles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)\npoles_extraction(prob::MdofProblem, order, alg; stabdiag)\n\\end{verbatim}\nExtract poles using Sdof or Mdof experimental modal analysis methods\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMAProblem} or \\texttt{prob::MdofProblem}: EMA problem containing FRF data and frequency vector\n\n\n\\item \\texttt{order}: Order of the model (only for Mdof methods)\n\n\n\\item \\texttt{alg}: Algorithm to extract the poles\n\n\\begin{itemize}\n\\item Sdof methods:\n\n\\begin{itemize}\n\\item \\texttt{PeakPicking}: Peak picking method (default for Sdof methods)\n\n\n\\item \\texttt{CircleFit}: Circle fitting method\n\n\n\\item \\texttt{LSFit}: Least squares fitting method\n\n\\end{itemize}\n\n\\item Mdof methods:\n\n\\begin{itemize}\n\\item \\texttt{LSCF}: Least Squares Complex Frequency method (default for Mdof methods)\n\n\n\\item \\texttt{PLSCF}: Polyreference Least Squares Complex Frequency method\n\n\n\\item \\texttt{LSCE}: Least Squares Complex Exponential method (only for Mdof methods)\n\n\\end{itemize}\n\\end{itemize}\n\n\\item \\texttt{stabdiag::Bool}: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)\n\n\n\\item \\texttt{width::Int}: Half-width of the peaks (only for Sdof methods, default: 1)\n\n\n\\item \\texttt{min\\_prom::Real}: Minimum peak prominence (only for Sdof methods, default: 0. dB)\n\n\n\\item \\texttt{max\\_prom::Real}: Maximum peak prominence (only for Sdof methods, default: Inf)\n\n\n\\item \\texttt{pks\\_indices::Vector\\{Int\\}}: Indices of peaks to consider (only for Sdof methods, default: empty vector)\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{poles}: Vector of extracted complex poles\n\n\\end{itemize}\n\\textbf{Note}\n\n\\begin{itemize}\n\\item For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36mpoles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)\u001b[39m\n  \u001b[36mpoles_extraction(prob::EMAProblem, order, alg; stabdiag)\u001b[39m\n\n  Extract poles using Sdof or Mdof experimental modal analysis methods\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMAProblem\u001b[39m or \u001b[36mprob::MdofProblem\u001b[39m: EMA problem containing FRF\n       data and frequency vector\n    \u001b[34m• \u001b[39m \u001b[36morder\u001b[39m: Order of the model (only for Mdof methods)\n    \u001b[34m• \u001b[39m \u001b[36malg\u001b[39m: Algorithm to extract the poles\n       \n       \u001b[34m• \u001b[39m Sdof methods:\n       \n       \u001b[34m• \u001b[39m \u001b[36mPeakPicking\u001b[39m: Peak picking method\n       \u001b[34m• \u001b[39m \u001b[36mCircleFit\u001b[39m: Circle fitting method\n       \u001b[34m• \u001b[39m \u001b[36mLSFit\u001b[39m: Least squares fitting method (default\n       for Sdof methods)\n       \u001b[34m• \u001b[39m Mdof methods:\n       \n       \u001b[34m• \u001b[39m \u001b[36mLSCF\u001b[39m: Least Squares Complex Frequency method\n       (default for Mdof methods)\n       \u001b[34m• \u001b[39m \u001b[36mPLSCF\u001b[39m: Polyreference Least Squares Complex\n       Frequency method\n       \u001b[34m• \u001b[39m \u001b[36mLSCE\u001b[39m: Least Squares Complex Exponential method\n       (only for Mdof methods)\n    \u001b[34m• \u001b[39m \u001b[36mstabdiag::Bool\u001b[39m: Boolean to indicate the function is used to build\n       a stability diagram (Only for Mdof methods, default: false)\n    \u001b[34m• \u001b[39m \u001b[36mwidth::Int\u001b[39m: Half-width of the peaks (only for Sdof methods,\n       default: 1)\n    \u001b[34m• \u001b[39m \u001b[36mmin_prom::Real\u001b[39m: Minimum peak prominence (only for Sdof methods,\n       default: 0. dB)\n    \u001b[34m• \u001b[39m \u001b[36mmax_prom::Real\u001b[39m: Maximum peak prominence (only for Sdof methods,\n       default: Inf)\n    \u001b[34m• \u001b[39m \u001b[36mpks_indices::Vector{Int}\u001b[39m: Indices of peaks to consider (only for\n       Sdof methods, default: empty vector)\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mpoles\u001b[39m: Vector of extracted complex poles\n\n  \u001b[1mNote\u001b[22m\n\n    \u001b[34m• \u001b[39m For Sdof methods, the natural frequencies and damping ratios are\n       extracted from each FRF (each row of the matrix) and then\n       averaged. The number of FRF used for averaging are those having\n       the maximum (and same) number of peaks detected.",
+                        "text/markdown": "```julia\npoles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)\npoles_extraction(prob::EMAProblem, order, alg; stabdiag)\n```\n\nExtract poles using Sdof or Mdof experimental modal analysis methods\n\n**Inputs**\n\n  * `prob::EMAProblem` or `prob::MdofProblem`: EMA problem containing FRF data and frequency vector\n  * `order`: Order of the model (only for Mdof methods)\n  * `alg`: Algorithm to extract the poles\n\n      * Sdof methods:\n\n          * `PeakPicking`: Peak picking method\n          * `CircleFit`: Circle fitting method\n          * `LSFit`: Least squares fitting method (default for Sdof methods)\n      * Mdof methods:\n\n          * `LSCF`: Least Squares Complex Frequency method (default for Mdof methods)\n          * `PLSCF`: Polyreference Least Squares Complex Frequency method\n          * `LSCE`: Least Squares Complex Exponential method (only for Mdof methods)\n  * `stabdiag::Bool`: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)\n  * `width::Int`: Half-width of the peaks (only for Sdof methods, default: 1)\n  * `min_prom::Real`: Minimum peak prominence (only for Sdof methods, default: 0. dB)\n  * `max_prom::Real`: Maximum peak prominence (only for Sdof methods, default: Inf)\n  * `pks_indices::Vector{Int}`: Indices of peaks to consider (only for Sdof methods, default: empty vector)\n\n**Outputs**\n\n  * `poles`: Vector of extracted complex poles\n\n**Note**\n\n  * For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">poles_extraction&#40;prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling&#41;\npoles_extraction&#40;prob::EMAProblem, order, alg; stabdiag&#41;</code></pre>\n<p>Extract poles using Sdof or Mdof experimental modal analysis methods</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>prob::EMAProblem</code> or <code>prob::MdofProblem</code>: EMA problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>order</code>: Order of the model &#40;only for Mdof methods&#41;</p>\n</li>\n<li><p><code>alg</code>: Algorithm to extract the poles</p>\n<ul>\n<li><p>Sdof methods:</p>\n<ul>\n<li><p><code>PeakPicking</code>: Peak picking method</p>\n</li>\n<li><p><code>CircleFit</code>: Circle fitting method</p>\n</li>\n<li><p><code>LSFit</code>: Least squares fitting method &#40;default for Sdof methods&#41;</p>\n</li>\n</ul>\n</li>\n<li><p>Mdof methods:</p>\n<ul>\n<li><p><code>LSCF</code>: Least Squares Complex Frequency method &#40;default for Mdof methods&#41;</p>\n</li>\n<li><p><code>PLSCF</code>: Polyreference Least Squares Complex Frequency method</p>\n</li>\n<li><p><code>LSCE</code>: Least Squares Complex Exponential method &#40;only for Mdof methods&#41;</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n<li><p><code>stabdiag::Bool</code>: Boolean to indicate the function is used to build a stability diagram &#40;Only for Mdof methods, default: false&#41;</p>\n</li>\n<li><p><code>width::Int</code>: Half-width of the peaks &#40;only for Sdof methods, default: 1&#41;</p>\n</li>\n<li><p><code>min_prom::Real</code>: Minimum peak prominence &#40;only for Sdof methods, default: 0. dB&#41;</p>\n</li>\n<li><p><code>max_prom::Real</code>: Maximum peak prominence &#40;only for Sdof methods, default: Inf&#41;</p>\n</li>\n<li><p><code>pks_indices::Vector&#123;Int&#125;</code>: Indices of peaks to consider &#40;only for Sdof methods, default: empty vector&#41;</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>poles</code>: Vector of extracted complex poles</p>\n</li>\n</ul>\n<p><strong>Note</strong></p>\n<ul>\n<li><p>For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF &#40;each row of the matrix&#41; and then averaged. The number of FRF used for averaging are those having the maximum &#40;and same&#41; number of peaks detected.</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\npoles_extraction(prob::EMAProblem, alg; width, min_prom, max_prom, pks_indices, scaling)\npoles_extraction(prob::EMAProblem, order, alg; stabdiag)\n\\end{verbatim}\nExtract poles using Sdof or Mdof experimental modal analysis methods\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMAProblem} or \\texttt{prob::MdofProblem}: EMA problem containing FRF data and frequency vector\n\n\n\\item \\texttt{order}: Order of the model (only for Mdof methods)\n\n\n\\item \\texttt{alg}: Algorithm to extract the poles\n\n\\begin{itemize}\n\\item Sdof methods:\n\n\\begin{itemize}\n\\item \\texttt{PeakPicking}: Peak picking method\n\n\n\\item \\texttt{CircleFit}: Circle fitting method\n\n\n\\item \\texttt{LSFit}: Least squares fitting method (default for Sdof methods)\n\n\\end{itemize}\n\n\\item Mdof methods:\n\n\\begin{itemize}\n\\item \\texttt{LSCF}: Least Squares Complex Frequency method (default for Mdof methods)\n\n\n\\item \\texttt{PLSCF}: Polyreference Least Squares Complex Frequency method\n\n\n\\item \\texttt{LSCE}: Least Squares Complex Exponential method (only for Mdof methods)\n\n\\end{itemize}\n\\end{itemize}\n\n\\item \\texttt{stabdiag::Bool}: Boolean to indicate the function is used to build a stability diagram (Only for Mdof methods, default: false)\n\n\n\\item \\texttt{width::Int}: Half-width of the peaks (only for Sdof methods, default: 1)\n\n\n\\item \\texttt{min\\_prom::Real}: Minimum peak prominence (only for Sdof methods, default: 0. dB)\n\n\n\\item \\texttt{max\\_prom::Real}: Maximum peak prominence (only for Sdof methods, default: Inf)\n\n\n\\item \\texttt{pks\\_indices::Vector\\{Int\\}}: Indices of peaks to consider (only for Sdof methods, default: empty vector)\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{poles}: Vector of extracted complex poles\n\n\\end{itemize}\n\\textbf{Note}\n\n\\begin{itemize}\n\\item For Sdof methods, the natural frequencies and damping ratios are extracted from each FRF (each row of the matrix) and then averaged. The number of FRF used for averaging are those having the maximum (and same) number of peaks detected.\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1041,7 +983,7 @@
             "execution_count": 1
         },
         {
-            "id": "27",
+            "id": "23",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1055,7 +997,7 @@
             ]
         },
         {
-            "id": "28",
+            "id": "24",
             "cell_type": "code",
             "metadata": {
             },
@@ -1080,7 +1022,7 @@
             "execution_count": 1
         },
         {
-            "id": "29",
+            "id": "25",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1094,7 +1036,7 @@
             ]
         },
         {
-            "id": "30",
+            "id": "26",
             "cell_type": "code",
             "metadata": {
             },
@@ -1119,7 +1061,7 @@
             "execution_count": 1
         },
         {
-            "id": "31",
+            "id": "27",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1133,7 +1075,7 @@
             ]
         },
         {
-            "id": "32",
+            "id": "28",
             "cell_type": "code",
             "metadata": {
             },
@@ -1158,7 +1100,7 @@
             "execution_count": 1
         },
         {
-            "id": "33",
+            "id": "29",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1172,7 +1114,7 @@
             ]
         },
         {
-            "id": "34",
+            "id": "30",
             "cell_type": "code",
             "metadata": {
             },
@@ -1197,7 +1139,7 @@
             "execution_count": 1
         },
         {
-            "id": "35",
+            "id": "31",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1211,23 +1153,23 @@
             ]
         },
         {
-            "id": "36",
+            "id": "32",
             "cell_type": "code",
             "metadata": {
             },
             "source": [
                 "#| echo: false\n",
-                "@doc solve(::AutoEMASdofProblem)"
+                "@doc solve(::EMAProblem, ::PeakPicking)"
             ],
             "outputs": [
                 {
                     "output_type": "execute_result",
                     "execution_count": 1,
                     "data": {
-                        "text/plain": "  \u001b[36msolve(prob_ema::AutoEMASdofProblem)\u001b[39m\n  \u001b[36msolve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)\u001b[39m\n\n  Solve automatically experimental modal analysis problem using Sdof or Mdof\n  methods\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob_ema\u001b[39m: Structure containing the input data for automatic\n       experimental modal analysis using Sdof methods\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36msol::EMASolution\u001b[39m: Structure containing the solution of the\n       automatic experimental modal analysis using Sdof or Mdof methods",
-                        "text/markdown": "```julia\nsolve(prob_ema::AutoEMASdofProblem)\nsolve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)\n```\n\nSolve automatically experimental modal analysis problem using Sdof or Mdof methods\n\n**Inputs**\n\n  * `prob_ema`: Structure containing the input data for automatic experimental modal analysis using Sdof methods\n\n**Outputs**\n\n  * `sol::EMASolution`: Structure containing the solution of the automatic experimental modal analysis using Sdof or Mdof methods\n",
-                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">solve&#40;prob_ema::AutoEMASdofProblem&#41;\nsolve&#40;prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting&#41;</code></pre>\n<p>Solve automatically experimental modal analysis problem using Sdof or Mdof methods</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>prob_ema</code>: Structure containing the input data for automatic experimental modal analysis using Sdof methods</p>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>sol::EMASolution</code>: Structure containing the solution of the automatic experimental modal analysis using Sdof or Mdof methods</p>\n</li>\n</ul>\n\n\n</div>",
-                        "text/latex": "\\begin{verbatim}\nsolve(prob_ema::AutoEMASdofProblem)\nsolve(prob_ema::AutoEMAMdofProblem, order::Int; stabdiag, weighting)\n\\end{verbatim}\nSolve automatically experimental modal analysis problem using Sdof or Mdof methods\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{prob\\_ema}: Structure containing the input data for automatic experimental modal analysis using Sdof methods\n\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{sol::EMASolution}: Structure containing the solution of the automatic experimental modal analysis using Sdof or Mdof methods\n\n\\end{itemize}\n"
+                        "text/plain": "  \u001b[36msolve(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)\u001b[39m\n  \u001b[36msolve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)\u001b[39m\n\n  Solve automatically experimental modal analysis problem using Sdof or Mdof\n  methods\n\n  \u001b[1mInputs for Sdof methods\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMAProblem\u001b[39m: EMA problem containing FRF data and frequency\n       vector\n    \u001b[34m• \u001b[39m \u001b[36malg::SdofEMA\u001b[39m: Sdof experimental modal analysis method (default:\n       PeakPicking())\n    \u001b[34m• \u001b[39m \u001b[36mdpi\u001b[39m: Driving point indices - default = [1, 1]\n       \n       \u001b[34m• \u001b[39m \u001b[36mdpi[1]\u001b[39m: Driving point index on the measurement mesh\n       \u001b[34m• \u001b[39m \u001b[36mdpi[2]\u001b[39m: Driving point index on the excitation mesh\n    \u001b[34m• \u001b[39m \u001b[36midx_m\u001b[39m: Indices of the mode shapes to consider for the mode\n       residues estimation (default: [1])\n    \u001b[34m• \u001b[39m \u001b[36midx_e\u001b[39m: Indices of the excitation points to consider for the mode\n       residues estimation (default: [1])\n    \u001b[34m• \u001b[39m \u001b[36mwidth::Int\u001b[39m: Half-width of the peaks (default: 1)\n    \u001b[34m• \u001b[39m \u001b[36mmin_prom::Real\u001b[39m: Minimum peak prominence (default: 0. dB)\n    \u001b[34m• \u001b[39m \u001b[36mmax_prom::Real\u001b[39m: Maximum peak prominence (default: Inf)\n    \u001b[34m• \u001b[39m \u001b[36mpks_indices::Vector{Int}\u001b[39m: Indices of peaks to consider (default:\n       empty vector)\n\n  \u001b[1mInputs for Mdof methods\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMAProblem\u001b[39m: EMA problem containing FRF data and frequency\n       vector\n    \u001b[34m• \u001b[39m \u001b[36morder\u001b[39m: Order of the model\n    \u001b[34m• \u001b[39m \u001b[36malg::MdofEMA\u001b[39m: Mdof experimental modal analysis method (default:\n       LSCF())\n    \u001b[34m• \u001b[39m \u001b[36mdpi\u001b[39m: Driving point indices - default = [1, 1]\n       \n       \u001b[34m• \u001b[39m \u001b[36mdpi[1]\u001b[39m: Driving point index on the measurement mesh\n       \u001b[34m• \u001b[39m \u001b[36mdpi[2]\u001b[39m: Driving point index on the excitation mesh\n\n  \u001b[1mOutputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36msol::EMASolution\u001b[39m: Structure containing the solution of the\n       experimental modal analysis using Sdof or Mddof methods\n\n  \u001b[90m────────────────────────────────────────────────────────────────────────────\u001b[39m\n\n  \u001b[36msolve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)\u001b[39m\n\n  Solve automatically experimental modal analysis problem using Mdof methods\n\n  \u001b[1mInputs\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36mprob::EMAProblem\u001b[39m: EMA problem containing FRF data and frequency\n       vector\n    \u001b[34m• \u001b[39m \u001b[36morder\u001b[39m: Order of the model (number of modes to extract)\n    \u001b[34m• \u001b[39m \u001b[36malg::MdofEMA\u001b[39m: Modal extraction algorithm (default: LSCF())\n    \u001b[34m• \u001b[39m \u001b[36mdpi\u001b[39m: Driving point indices - default = [1, 1]\n       \n       \u001b[34m• \u001b[39m \u001b[36mdpi[1]\u001b[39m: Driving point index on the measurement mesh\n       \u001b[34m• \u001b[39m \u001b[36mdpi[2]\u001b[39m: Driving point index on the excitation mesh\n\n  \u001b[1mOutput\u001b[22m\n\n    \u001b[34m• \u001b[39m \u001b[36msol::EMASolution\u001b[39m: Structure containing the solution of the\n       experimental modal analysis using Mdof methods",
+                        "text/markdown": "```julia\nsolve(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)\nsolve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)\n```\n\nSolve automatically experimental modal analysis problem using Sdof or Mdof methods\n\n**Inputs for Sdof methods**\n\n  * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector\n  * `alg::SdofEMA`: Sdof experimental modal analysis method (default: PeakPicking())\n  * `dpi`: Driving point indices - default = [1, 1]\n\n      * `dpi[1]`: Driving point index on the measurement mesh\n      * `dpi[2]`: Driving point index on the excitation mesh\n  * `idx_m`: Indices of the mode shapes to consider for the mode residues estimation (default: [1])\n  * `idx_e`: Indices of the excitation points to consider for the mode residues estimation (default: [1])\n  * `width::Int`: Half-width of the peaks (default: 1)\n  * `min_prom::Real`: Minimum peak prominence (default: 0. dB)\n  * `max_prom::Real`: Maximum peak prominence (default: Inf)\n  * `pks_indices::Vector{Int}`: Indices of peaks to consider (default: empty vector)\n\n**Inputs for Mdof methods**\n\n  * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector\n  * `order`: Order of the model\n  * `alg::MdofEMA`: Mdof experimental modal analysis method (default: LSCF())\n  * `dpi`: Driving point indices - default = [1, 1]\n\n      * `dpi[1]`: Driving point index on the measurement mesh\n      * `dpi[2]`: Driving point index on the excitation mesh\n\n**Outputs**\n\n  * `sol::EMASolution`: Structure containing the solution of the experimental modal analysis using Sdof or Mddof methods\n\n```julia\nsolve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)\n```\n\nSolve automatically experimental modal analysis problem using Mdof methods\n\n**Inputs**\n\n  * `prob::EMAProblem`: EMA problem containing FRF data and frequency vector\n  * `order`: Order of the model (number of modes to extract)\n  * `alg::MdofEMA`: Modal extraction algorithm (default: LSCF())\n  * `dpi`: Driving point indices - default = [1, 1]\n\n      * `dpi[1]`: Driving point index on the measurement mesh\n      * `dpi[2]`: Driving point index on the excitation mesh\n\n**Output**\n\n  * `sol::EMASolution`: Structure containing the solution of the experimental modal analysis using Mdof methods\n",
+                        "text/html": "<div class=\"markdown\"><pre><code class=\"language-julia\">solve&#40;prob::EMAProblem, alg::SdofEMA &#61; PeakPicking&#40;&#41;; dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices&#41;\nsolve&#40;prob::EMAProblem, order, alg::MdofEMA &#61; LSCF&#40;&#41;; dpi&#41;</code></pre>\n<p>Solve automatically experimental modal analysis problem using Sdof or Mdof methods</p>\n<p><strong>Inputs for Sdof methods</strong></p>\n<ul>\n<li><p><code>prob::EMAProblem</code>: EMA problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>alg::SdofEMA</code>: Sdof experimental modal analysis method &#40;default: PeakPicking&#40;&#41;&#41;</p>\n</li>\n<li><p><code>dpi</code>: Driving point indices - default &#61; &#91;1, 1&#93;</p>\n<ul>\n<li><p><code>dpi&#91;1&#93;</code>: Driving point index on the measurement mesh</p>\n</li>\n<li><p><code>dpi&#91;2&#93;</code>: Driving point index on the excitation mesh</p>\n</li>\n</ul>\n</li>\n<li><p><code>idx_m</code>: Indices of the mode shapes to consider for the mode residues estimation &#40;default: &#91;1&#93;&#41;</p>\n</li>\n<li><p><code>idx_e</code>: Indices of the excitation points to consider for the mode residues estimation &#40;default: &#91;1&#93;&#41;</p>\n</li>\n<li><p><code>width::Int</code>: Half-width of the peaks &#40;default: 1&#41;</p>\n</li>\n<li><p><code>min_prom::Real</code>: Minimum peak prominence &#40;default: 0. dB&#41;</p>\n</li>\n<li><p><code>max_prom::Real</code>: Maximum peak prominence &#40;default: Inf&#41;</p>\n</li>\n<li><p><code>pks_indices::Vector&#123;Int&#125;</code>: Indices of peaks to consider &#40;default: empty vector&#41;</p>\n</li>\n</ul>\n<p><strong>Inputs for Mdof methods</strong></p>\n<ul>\n<li><p><code>prob::EMAProblem</code>: EMA problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>order</code>: Order of the model</p>\n</li>\n<li><p><code>alg::MdofEMA</code>: Mdof experimental modal analysis method &#40;default: LSCF&#40;&#41;&#41;</p>\n</li>\n<li><p><code>dpi</code>: Driving point indices - default &#61; &#91;1, 1&#93;</p>\n<ul>\n<li><p><code>dpi&#91;1&#93;</code>: Driving point index on the measurement mesh</p>\n</li>\n<li><p><code>dpi&#91;2&#93;</code>: Driving point index on the excitation mesh</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Outputs</strong></p>\n<ul>\n<li><p><code>sol::EMASolution</code>: Structure containing the solution of the experimental modal analysis using Sdof or Mddof methods</p>\n</li>\n</ul>\n\n\n<pre><code class=\"language-julia\">solve&#40;prob::EMAProblem, order, alg::MdofEMA &#61; LSCF&#40;&#41;; dpi&#41;</code></pre>\n<p>Solve automatically experimental modal analysis problem using Mdof methods</p>\n<p><strong>Inputs</strong></p>\n<ul>\n<li><p><code>prob::EMAProblem</code>: EMA problem containing FRF data and frequency vector</p>\n</li>\n<li><p><code>order</code>: Order of the model &#40;number of modes to extract&#41;</p>\n</li>\n<li><p><code>alg::MdofEMA</code>: Modal extraction algorithm &#40;default: LSCF&#40;&#41;&#41;</p>\n</li>\n<li><p><code>dpi</code>: Driving point indices - default &#61; &#91;1, 1&#93;</p>\n<ul>\n<li><p><code>dpi&#91;1&#93;</code>: Driving point index on the measurement mesh</p>\n</li>\n<li><p><code>dpi&#91;2&#93;</code>: Driving point index on the excitation mesh</p>\n</li>\n</ul>\n</li>\n</ul>\n<p><strong>Output</strong></p>\n<ul>\n<li><p><code>sol::EMASolution</code>: Structure containing the solution of the experimental modal analysis using Mdof methods</p>\n</li>\n</ul>\n\n\n</div>",
+                        "text/latex": "\\begin{verbatim}\nsolve(prob::EMAProblem, alg::SdofEMA = PeakPicking(); dpi, idx_m, idx_e, width, min_prom, max_prom, pks_indices)\nsolve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)\n\\end{verbatim}\nSolve automatically experimental modal analysis problem using Sdof or Mdof methods\n\n\\textbf{Inputs for Sdof methods}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMAProblem}: EMA problem containing FRF data and frequency vector\n\n\n\\item \\texttt{alg::SdofEMA}: Sdof experimental modal analysis method (default: PeakPicking())\n\n\n\\item \\texttt{dpi}: Driving point indices - default = [1, 1]\n\n\\begin{itemize}\n\\item \\texttt{dpi[1]}: Driving point index on the measurement mesh\n\n\n\\item \\texttt{dpi[2]}: Driving point index on the excitation mesh\n\n\\end{itemize}\n\n\\item \\texttt{idx\\_m}: Indices of the mode shapes to consider for the mode residues estimation (default: [1])\n\n\n\\item \\texttt{idx\\_e}: Indices of the excitation points to consider for the mode residues estimation (default: [1])\n\n\n\\item \\texttt{width::Int}: Half-width of the peaks (default: 1)\n\n\n\\item \\texttt{min\\_prom::Real}: Minimum peak prominence (default: 0. dB)\n\n\n\\item \\texttt{max\\_prom::Real}: Maximum peak prominence (default: Inf)\n\n\n\\item \\texttt{pks\\_indices::Vector\\{Int\\}}: Indices of peaks to consider (default: empty vector)\n\n\\end{itemize}\n\\textbf{Inputs for Mdof methods}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMAProblem}: EMA problem containing FRF data and frequency vector\n\n\n\\item \\texttt{order}: Order of the model\n\n\n\\item \\texttt{alg::MdofEMA}: Mdof experimental modal analysis method (default: LSCF())\n\n\n\\item \\texttt{dpi}: Driving point indices - default = [1, 1]\n\n\\begin{itemize}\n\\item \\texttt{dpi[1]}: Driving point index on the measurement mesh\n\n\n\\item \\texttt{dpi[2]}: Driving point index on the excitation mesh\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Outputs}\n\n\\begin{itemize}\n\\item \\texttt{sol::EMASolution}: Structure containing the solution of the experimental modal analysis using Sdof or Mddof methods\n\n\\end{itemize}\n\\begin{verbatim}\nsolve(prob::EMAProblem, order, alg::MdofEMA = LSCF(); dpi)\n\\end{verbatim}\nSolve automatically experimental modal analysis problem using Mdof methods\n\n\\textbf{Inputs}\n\n\\begin{itemize}\n\\item \\texttt{prob::EMAProblem}: EMA problem containing FRF data and frequency vector\n\n\n\\item \\texttt{order}: Order of the model (number of modes to extract)\n\n\n\\item \\texttt{alg::MdofEMA}: Modal extraction algorithm (default: LSCF())\n\n\n\\item \\texttt{dpi}: Driving point indices - default = [1, 1]\n\n\\begin{itemize}\n\\item \\texttt{dpi[1]}: Driving point index on the measurement mesh\n\n\n\\item \\texttt{dpi[2]}: Driving point index on the excitation mesh\n\n\\end{itemize}\n\\end{itemize}\n\\textbf{Output}\n\n\\begin{itemize}\n\\item \\texttt{sol::EMASolution}: Structure containing the solution of the experimental modal analysis using Mdof methods\n\n\\end{itemize}\n"
                     },
                     "metadata": {
                     }
@@ -1236,7 +1178,7 @@
             "execution_count": 1
         },
         {
-            "id": "37",
+            "id": "33",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1250,7 +1192,7 @@
             ]
         },
         {
-            "id": "38",
+            "id": "34",
             "cell_type": "code",
             "metadata": {
             },
@@ -1275,7 +1217,7 @@
             "execution_count": 1
         },
         {
-            "id": "39",
+            "id": "35",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1289,7 +1231,7 @@
             ]
         },
         {
-            "id": "40",
+            "id": "36",
             "cell_type": "code",
             "metadata": {
             },
@@ -1314,7 +1256,7 @@
             "execution_count": 1
         },
         {
-            "id": "41",
+            "id": "37",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1328,7 +1270,7 @@
             ]
         },
         {
-            "id": "42",
+            "id": "38",
             "cell_type": "code",
             "metadata": {
             },
@@ -1353,7 +1295,7 @@
             "execution_count": 1
         },
         {
-            "id": "43",
+            "id": "39",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1366,7 +1308,7 @@
             ]
         },
         {
-            "id": "44",
+            "id": "40",
             "cell_type": "code",
             "metadata": {
             },
@@ -1415,7 +1357,7 @@
             "execution_count": 1
         },
         {
-            "id": "45",
+            "id": "41",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1427,11 +1369,13 @@
             ]
         },
         {
-            "id": "46",
+            "id": "42",
             "cell_type": "code",
             "metadata": {
             },
             "source": [
+                "# using Statistics\n",
+                "\n",
                 "Habs_dB = vec(20log10.(mean(abs, H, dims = [1, 2])))\n",
                 "peaks_plot(freq, Habs_dB, xlabel = \"Frequency (Hz)\", ylabel = \"Admittance (dB, ref: 1 m/N)\")"
             ],
@@ -1454,7 +1398,7 @@
             "execution_count": 1
         },
         {
-            "id": "47",
+            "id": "43",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1464,7 +1408,7 @@
             ]
         },
         {
-            "id": "48",
+            "id": "44",
             "cell_type": "code",
             "metadata": {
             },
@@ -1494,7 +1438,7 @@
             "execution_count": 1
         },
         {
-            "id": "49",
+            "id": "45",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1502,7 +1446,7 @@
             ]
         },
         {
-            "id": "50",
+            "id": "46",
             "cell_type": "code",
             "metadata": {
             },
@@ -1587,7 +1531,7 @@
             "execution_count": 1
         },
         {
-            "id": "51",
+            "id": "47",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1597,7 +1541,7 @@
             ]
         },
         {
-            "id": "52",
+            "id": "48",
             "cell_type": "code",
             "metadata": {
             },
@@ -1627,7 +1571,7 @@
             "execution_count": 1
         },
         {
-            "id": "53",
+            "id": "49",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1635,7 +1579,7 @@
             ]
         },
         {
-            "id": "54",
+            "id": "50",
             "cell_type": "code",
             "metadata": {
             },
@@ -1669,7 +1613,7 @@
             "execution_count": 1
         },
         {
-            "id": "55",
+            "id": "51",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1678,8 +1622,7 @@
                 "#### Automatic Sdof EMA\n",
                 "\n",
                 "```julia\n",
-                "prob_ema = AutoEMASdofProblem(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)\n",
-                "sol_ema = solve(prob_ema)\n",
+                "sol_ema = solve(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)\n",
                 "fn_ema, ξn_ema = poles2modal(sol_ema.poles)\n",
                 "ms_ema = sol_ema.ms\n",
                 "```\n",
@@ -1690,7 +1633,7 @@
             ]
         },
         {
-            "id": "56",
+            "id": "52",
             "cell_type": "code",
             "metadata": {
             },
@@ -1729,7 +1672,7 @@
             "execution_count": 1
         },
         {
-            "id": "57",
+            "id": "53",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1737,7 +1680,7 @@
             ]
         },
         {
-            "id": "58",
+            "id": "54",
             "cell_type": "code",
             "metadata": {
             },
@@ -1784,7 +1727,7 @@
             "execution_count": 1
         },
         {
-            "id": "59",
+            "id": "55",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1794,7 +1737,7 @@
             ]
         },
         {
-            "id": "60",
+            "id": "56",
             "cell_type": "code",
             "metadata": {
             },
@@ -1827,7 +1770,7 @@
             "execution_count": 1
         },
         {
-            "id": "61",
+            "id": "57",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1835,7 +1778,7 @@
             ]
         },
         {
-            "id": "62",
+            "id": "58",
             "cell_type": "code",
             "metadata": {
             },
@@ -1885,7 +1828,7 @@
             "execution_count": 1
         },
         {
-            "id": "63",
+            "id": "59",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1895,7 +1838,7 @@
             ]
         },
         {
-            "id": "64",
+            "id": "60",
             "cell_type": "code",
             "metadata": {
             },
@@ -1931,7 +1874,7 @@
             "execution_count": 1
         },
         {
-            "id": "65",
+            "id": "61",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1939,7 +1882,7 @@
             ]
         },
         {
-            "id": "66",
+            "id": "62",
             "cell_type": "code",
             "metadata": {
             },
@@ -1973,7 +1916,7 @@
             "execution_count": 1
         },
         {
-            "id": "67",
+            "id": "63",
             "cell_type": "markdown",
             "metadata": {
             },
@@ -1982,15 +1925,14 @@
                 "#### Automatic Mdof EMA\n",
                 "\n",
                 "```julia\n",
-                "prob_ema = AutoEMAMdofProblem(prob_mdof, order, dpi, LSCF())\n",
-                "sol_ema = solve(prob_ema)\n",
+                "sol_ema = solve(prob_mdof, 10, LSCF(), dpi = [1, 2])\n",
                 "fn_ema, ξn_ema = poles2modal(sol_ema.poles)\n",
                 "ms_ema = sol_ema.ms\n",
                 "```"
             ]
         }
     ],
-    "timestamp": "2026-01-30T16:15:29.273",
+    "timestamp": "2026-03-04T13:09:40.136",
     "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/modal_extraction/index.qmd",
     "qnr_schema_version": "1.0.0"
 }

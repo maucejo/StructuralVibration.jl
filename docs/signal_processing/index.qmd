@@ -1106,6 +1106,8 @@ This example is based on the one provided in the `DSP.jl` documentation. It gene
 
 ```{julia}
 #| output: false
+# import DSP
+
 # Acquisition parameters
 fs = 1000
 bs = 100

@@ -60,9 +60,10 @@ ax = Axis(fig[1, 1],
           xlabel = "Time (s)",
           ylabel = "Signal",
           title = "Additive Gaussian White Noise")
-lines!(ax, t, y, label = "Original signal")
-lines!(ax, t, x, color = :red, label = "Noisy signal")
-Legend(fig[1, 2], ax)
+nsig = lines!(ax, t, y, color = :red)
+osig = lines!(ax, t, x, linewidth = 2)
+xlims!(ax, 0, 1)
+Legend(fig[1, 2], [osig, nsig], ["Original signal", "Noisy signal"])
 display(fig);
 ```
 
@@ -80,7 +81,7 @@ where $n$ is a colored noise defined as in [Excitation models - Colored noise](h
 ---
 ```{julia}
 #| echo: false
-@doc acn(x::VecOrMat{Float64}, snr_dB, fs, color = :pink; frange = Float64[], rst = true)
+@doc acn(x::VecOrMat{Real}, snr_dB::Real, fs::Real, color::Symbol)
 ```
 :::
 
@@ -90,7 +91,7 @@ where $n$ is a colored noise defined as in [Excitation models - Colored noise](h
 ---
 ```{julia}
 #| echo: false
-@doc acn(x::VecOrMat{Complex{Float64}}, snr_dB, freq::AbstractArray, color = :pink; rst = true)
+@doc acn(x::VecOrMat{Complex}, snr_dB::Real, freq::AbstractVector, color::Symbol)
 ```
 :::
 
@@ -118,9 +119,10 @@ ax = Axis(fig[1, 1],
           xlabel = "Time (s)",
           ylabel = "Signal",
           title = "Additive Colored Noise")
-lines!(ax, t, y, label = "Original signal")
-lines!(ax, t, x, color = :red, label = "Noisy signal")
-Legend(fig[1, 2], ax)
+nsig = lines!(ax, t, y, color = :red)
+osig = lines!(ax, t, x, linewidth = 2)
+xlims!(ax, 0, 1)
+Legend(fig[1, 2], [osig, nsig], ["Original signal", "Noisy signal"])
 display(fig);
 ```
 
@@ -164,9 +166,10 @@ ax = Axis(fig[1, 1],
           xlabel = "Time (s)",
           ylabel = "Signal",
           title = "Multiplicative Gaussian White Noise")
-lines!(ax, t, y, label = "Original signal")
-lines!(ax, t, x, color = :red, label = "Noisy signal")
-Legend(fig[1, 2], ax)
+nsig = lines!(ax, t, y, color = :red)
+osig = lines!(ax, t, x, linewidth = 2)
+xlims!(ax, 0, 1)
+Legend(fig[1, 2], [osig, nsig], ["Original signal", "Noisy signal"])
 display(fig);
 ```
 
@@ -211,7 +214,9 @@ ax = Axis(fig[1, 1],
           xlabel = "Time (s)",
           ylabel = "Signal",
           title = "Mixed Noise")
-lines!(ax, t, y, label = "Original signal")
-lines!(ax, t, x, color = :red, label = "Noisy signal")
-Legend(fig[1, 2], ax)
+nsig = lines!(ax, t, y, color = :red)
+osig = lines!(ax, t, x, linewidth = 2)
+xlims!(ax, 0, 1)
+Legend(fig[1, 2], [osig, nsig], ["Original signal", "Noisy signal"])
 display(fig);
+```

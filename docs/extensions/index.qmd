@@ -172,6 +172,12 @@ y = 3sinpi.(0.1t) + 2sinpi.(0.2t) + sinpi.(0.6t)
 peaks_plot(t, y)
 ```
 
+::: {.callout-note}
+`StructuralVibration.jl` uses the `Peaks.jl` package for peak detection. This package includes the functions `plotpeaks` and `peaksplot` for visualizing peaks and their properties, such as prominence and width. These functions require that the peak detection has been performed beforehand.
+
+The `peaks_plot` function in `StructuralVibration.jl` is a simplified version that provides a plotting function which first estimates the peaks and then plots the peaks.
+:::
+
 ### SV plot
 
 The SV plot (for _StructuralVibration plot_) is a general function for 2D plotting. It is a helper function aiming at simplifying the plotting process.
@@ -317,6 +323,8 @@ In this example, we will visualize the second mode shape of a simply supported p
 #### Data generation
 ```{julia}
 #| output: false
+# using LazyGrids, LinearAlgebra
+
 # Dimensions
 Lp = 0.6
 bp = 0.4

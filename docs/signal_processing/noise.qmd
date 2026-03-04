@@ -127,6 +127,8 @@ Heuristic-based noise estimation methods are based on a careful analysis of the 
 ### Example
 ```{julia}
 #| output: false
+# using Statistics
+
 # Beam definition
 L = 1.
 b = 3e-2

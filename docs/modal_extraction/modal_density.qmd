@@ -227,6 +227,8 @@ fig_string = begin
 
     fig
 end
+
+display(fig_string);
 ```
 
 ```{julia}
@@ -248,7 +250,6 @@ end
 ### Simply-supported beam
 ```{julia}
 #| output: false
-# Geometry and material parameters
 # Geometry and material parameters
 L = 1.        # Length
 b = 0.03      # Width
@@ -295,6 +296,8 @@ fig_beam = begin
 
     fig
 end
+
+display(fig_beam);
 ```
 
 ```{julia}

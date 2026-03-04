@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, FFTW
+using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 

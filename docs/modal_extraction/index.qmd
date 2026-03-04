@@ -792,6 +792,8 @@ H = solve(prob).u
 #### Peak detection checking
 
 ```{julia}
+# using Statistics
+
 Habs_dB = vec(20log10.(mean(abs, H, dims = [1, 2])))
 peaks_plot(freq, Habs_dB, xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)")
 ```

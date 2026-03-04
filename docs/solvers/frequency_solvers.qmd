@@ -85,6 +85,8 @@ $$
 
 ```{julia}
 #| output: false
+#using LinearAlgebra
+
 # Structural parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -186,6 +188,8 @@ where $\mathbf{L} = \mathbf{\Phi}^\mathsf{T}\mathbf{F}(\omega)$ is the modal par
 
 ```{julia}
 #| output: false
+# using LinearAlgebra
+
 # Structural parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
