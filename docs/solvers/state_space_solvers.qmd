@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, LinearAlgebra
+using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
@@ -56,7 +56,7 @@ The second approach is to solve the problem using the continuous-time state equa
 
 ```{julia}
 #| output: false
-# using LinearAlgebra
+using LinearAlgebra
 
 # Structural parameters
 M = Diagonal([2., 1.])
@@ -121,7 +121,7 @@ display(fig);
 #### Forced response
 ```{julia}
 #| output: false
-# using LinearAlgebra
+using LinearAlgebra
 
 # Structural parameters
 M = Diagonal([2., 1.])
@@ -284,6 +284,8 @@ $$
 
 ```{julia}
 #| output: false
+using LinearAlgebra
+
 # Structural parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]
@@ -384,6 +386,8 @@ $$
 
 ```{julia}
 #| output: false
+using LinearAlgebra
+
 # Structural parameters
 M = Diagonal([2., 1.])
 K = [6. -2.; -2. 4.]

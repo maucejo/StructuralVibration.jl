@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, LinearAlgebra
+using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
@@ -85,7 +85,7 @@ $$
 
 ```{julia}
 #| output: false
-#using LinearAlgebra
+using LinearAlgebra
 
 # Structural parameters
 M = Diagonal([2., 1.])
@@ -188,7 +188,7 @@ where $\mathbf{L} = \mathbf{\Phi}^\mathsf{T}\mathbf{F}(\omega)$ is the modal par
 
 ```{julia}
 #| output: false
-# using LinearAlgebra
+using LinearAlgebra
 
 # Structural parameters
 M = Diagonal([2., 1.])

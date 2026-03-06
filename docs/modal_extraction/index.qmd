@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, Statistics
+using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
@@ -792,7 +792,7 @@ H = solve(prob).u
 #### Peak detection checking
 
 ```{julia}
-# using Statistics
+using Statistics
 
 Habs_dB = vec(20log10.(mean(abs, H, dims = [1, 2])))
 peaks_plot(freq, Habs_dB, xlabel = "Frequency (Hz)", ylabel = "Admittance (dB, ref: 1 m/N)")
@@ -892,13 +892,13 @@ axislegend(ax; position = :rt)
 display(fig);
 ```
 
-#### Automatic Sdof EMA
+<!-- #### Automatic Sdof EMA
 
 ```julia
 sol_ema = solve(prob_sdof, PeakPicking(), dpi = dpi, idx_m = [2], idx_e = 1:21)
 fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ms_ema = sol_ema.ms
-```
+``` -->
 
 ### Mdof methods
 
@@ -1027,10 +1027,10 @@ axislegend(ax1; position = :rt)
 display(fig1);
 ```
 
-#### Automatic Mdof EMA
+<!-- #### Automatic Mdof EMA
 
 ```julia
 sol_ema = solve(prob_mdof, 10, LSCF(), dpi = [1, 2])
 fn_ema, ξn_ema = poles2modal(sol_ema.poles)
 ms_ema = sol_ema.ms
-```
+``` -->

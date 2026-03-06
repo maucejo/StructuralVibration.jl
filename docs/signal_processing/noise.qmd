@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, Statistics, PrettyTables
+using StructuralVibration, ShareAdd, PrettyTables
 @usingany CairoMakie
 ```
 
@@ -127,7 +127,7 @@ Heuristic-based noise estimation methods are based on a careful analysis of the 
 ### Example
 ```{julia}
 #| output: false
-# using Statistics
+using Statistics
 
 # Beam definition
 L = 1.

@@ -14,7 +14,6 @@ execute:
 #| echo: false
 #| output: false
 using StructuralVibration, FFTW, ShareAdd
-import DSP
 @usingany CairoMakie
 ```
 
@@ -1008,6 +1007,8 @@ The response spectrum is basically the Fourier transform of the response of a sy
 
 ```{julia}
 #| output: false
+using FFTW
+
 # Structural parameters
 m = 1.
 f0 = 25.
@@ -1106,7 +1107,7 @@ This example is based on the one provided in the `DSP.jl` documentation. It gene
 
 ```{julia}
 #| output: false
-# import DSP
+import DSP
 
 # Acquisition parameters
 fs = 1000

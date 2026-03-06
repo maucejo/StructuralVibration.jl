@@ -13,8 +13,8 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, LinearAlgebra
-@usingany CairoMakie, Meshes, LazyGrids
+using StructuralVibration, ShareAdd
+@usingany CairoMakie, Meshes
 ```
 
 `StructuralVibration.jl` is accompanied by a set of three extensions providing visualization capabilities. The extensions provide a set of functions to visualize the results of the structural dynamics analysis. The extensions are:
@@ -323,7 +323,7 @@ In this example, we will visualize the second mode shape of a simply supported p
 #### Data generation
 ```{julia}
 #| output: false
-# using LazyGrids
+using LazyGrids
 
 # Dimensions
 Lp = 0.6

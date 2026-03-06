@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd, LinearAlgebra
+using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
@@ -168,7 +168,7 @@ The free response of a 2-dofs system is obtained by setting the external forces 
 
 ```{julia}
 #| output: false
-# using LinearAlgebra
+using LinearAlgebra
 
 # System parameters
 M = Diagonal([2., 1.])
@@ -228,7 +228,7 @@ The forced response of a 2-dofs system is obtained by applying a haversine excit
 
 ```{julia}
 #| output: false
-# using LinearAlgebra
+using LinearAlgebra
 
 # System parameters
 M = Diagonal([2., 1.])

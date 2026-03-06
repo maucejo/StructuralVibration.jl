@@ -1,8 +1,11 @@
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 ShareAdd = "27c01619-3163-4fe3-a204-36d38c32eb7d"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StructuralVibration = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
 
 [sources]

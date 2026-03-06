@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, FFTW, ShareAdd
+using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
@@ -612,7 +612,7 @@ Additional steps can be added such as:
 ```{julia}
 #| output: false
 
-# using FFTW
+using FFTW
 
 # Time parameters
 Δt = 1e-4

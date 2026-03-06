@@ -2,7 +2,7 @@
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "3bbafaf1c606da42a7312fa7cb8aa7111810e64b"
+project_hash = "4238ff9e41d89f619a002bcb7c7404befb96067c"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -385,6 +385,12 @@ deps = ["Artifacts", "Pkg"]
 uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 version = "1.11.0"
 
+[[deps.LazyGrids]]
+deps = ["Statistics"]
+git-tree-sha1 = "36a141101bd70730ef57c8d763dca23a0ebf2f74"
+uuid = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
+version = "1.1.0"
+
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
@@ -727,7 +733,7 @@ version = "0.4.4"
 deps = ["DSP", "DataInterpolations", "FFTW", "FastGaussQuadrature", "LinearAlgebra", "Optim", "Peaks", "Polynomials", "ProgressMeter", "Random", "SkipNan", "SpecialFunctions", "Statistics", "ToeplitzMatrices"]
 path = ".."
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "1.10.0"
+version = "1.10.1"
 
     [deps.StructuralVibration.extensions]
     SVAnimExt = ["Meshes", "Makie"]
