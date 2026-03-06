@@ -176,12 +176,12 @@ window.Quarto = {
 <span class="menu-text">Solvers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../modal_extraction/index.html"> 
-<span class="menu-text">Modal extraction</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../signal_processing/index.html"> 
 <span class="menu-text">Signal processing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modal_extraction/index.html"> 
+<span class="menu-text">Modal extraction</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../extensions/index.html"> 
@@ -424,7 +424,7 @@ solve(prob::ModalFRFProblem; type = :dis, progress = true)</code></pre>
 <section id="example" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="example"><span class="header-section-number">1.2</span> Example</h3>
 <div id="10" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#using LinearAlgebra</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
@@ -560,7 +560,7 @@ solve(prob::ModalFreqProblem, type = :dis, progress = true)</code></pre>
 <section id="example-1" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="example-1"><span class="header-section-number">2.2</span> Example</h3>
 <div id="20" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># using LinearAlgebra</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Structural parameters</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>

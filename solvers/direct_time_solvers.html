@@ -177,12 +177,12 @@ window.Quarto = {
 <span class="menu-text">Solvers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../modal_extraction/index.html"> 
-<span class="menu-text">Modal extraction</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../signal_processing/index.html"> 
 <span class="menu-text">Signal processing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modal_extraction/index.html"> 
+<span class="menu-text">Modal extraction</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../extensions/index.html"> 
@@ -539,7 +539,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <h2 data-number="2" class="anchored" data-anchor-id="free-response"><span class="header-section-number">2</span> Free response</h2>
 <p>The free response of a 2-dofs system is obtained by setting the external forces to zero. In this condition, the motion of the system is initiated by non-zero initial conditions. In the following example, the response provided by the direct time solvers is compared with the solution obtained by the modal solver described in <a href="https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html">Modal time solvers - Section 1</a> for the purpose of cross-validation.</p>
 <div id="24" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># using LinearAlgebra</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
@@ -580,7 +580,7 @@ DirectTimeProblem(K, M, C, u0, t)</code></pre>
 <h2 data-number="3" class="anchored" data-anchor-id="forced-response"><span class="header-section-number">3</span> Forced response</h2>
 <p>The forced response of a 2-dofs system is obtained by applying a haversine excitation to the first dof of the system. As in the previous section, the response provided by the direct time solvers is compared with the solution obtained by the modal solver described in <a href="https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html">Modal time solvers - Section 2</a> for the purpose of cross-validation.</p>
 <div id="28" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># using LinearAlgebra</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># System parameters</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">2</span>., <span class="fl">1</span>.])</span>
