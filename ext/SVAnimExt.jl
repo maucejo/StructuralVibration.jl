@@ -1,5 +1,5 @@
 module SVAnimExt
-    using StructuralVibration, LinearAlgebra, Makie, Meshes
+    using StructuralVibration, Statistics, Makie, Meshes
 
     import StructuralVibration: animate_mesh, viz_mesh
 

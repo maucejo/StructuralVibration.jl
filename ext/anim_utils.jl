@@ -54,7 +54,7 @@ Visualize a 3D mesh with customizable options.
 **Output**
 - `fig::Figure`: The figure containing the visualized mesh.
 """
-function viz_mesh(mesh; xlabel = "x", ylabel = "y", zlabel = "z", title = "",color = :white, colormap = :jet1, alpha = 0.5, showsegments = true, segmentsize = 0.5, segmentcolor = :black, xlim = nothing, ylim = nothing, zlim = nothing)
+function viz_mesh(mesh; xlabel = "x", ylabel = "y", zlabel = "z", title = "",color = :white, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, xlim = nothing, ylim = nothing, zlim = nothing)
 
     fig, ax = create_figure(xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
     ax.title = title
@@ -112,7 +112,7 @@ Create an animation of a deformed mesh.
 
 - When `values` is a matrix and `x` is provided, the animation shows the evolution of the mesh deformation as a function of the parameter `x`, which can represent time, frequency, or any other relevant parameter. The title of the animation updates dynamically every 10 frames to reflect the current value of `x`.
 """
-function animate_mesh(nodes::Matrix{Td}, elts::Vector{Vector{Tn}}, values::Vector{Td}; title = "Animated mesh", xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, scale_factor = 100., framerate::Int = 35, frequency = float(framerate), filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Int, Td <: Real}
+function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Vector{Tv}; title = "Animated mesh", xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, scale_factor = 100., framerate::Int = 35, frequency = float(framerate), filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Real, Te <: Int, Tv <: Real}
 
     # Static mesh
     points, tris, quads = construct_mesh(nodes, elts)
@@ -141,7 +141,7 @@ function animate_mesh(nodes::Matrix{Td}, elts::Vector{Vector{Tn}}, values::Vecto
     n = size(nodes, 1)
     if isnothing(color)
         # Extract magnitude from values (3n vector)
-        color_data = [norm(values[3*i-2:3*i]) for i in 1:n]
+        color_data = [mean(values[3*i-2:3*i]) for i in 1:n]
     else
         if color isa Vector
             n == length(color) || throw(ArgumentError("Color vector length must match number of nodes"))
@@ -164,7 +164,7 @@ function animate_mesh(nodes::Matrix{Td}, elts::Vector{Vector{Tn}}, values::Vecto
     end
 end
 
-function animate_mesh(nodes::Matrix{Tv}, elts::Vector{Vector{Tn}}, values::Matrix{Tv}, x::AbstractVector{Tv}; xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, unit_x = "s", quantity_y = "Values", scale_factor = 100, framerate = 35, title_update_framerate = 10, filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Int, Tv <: Real}
+function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Matrix{Tv}, x::AbstractArray; xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, unit_x = "s", quantity_y = "Values", scale_factor = 100, framerate = 35, title_update_framerate = 10, filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Real, Te <: Int, Tv <: Real}
 
     # Static mesh
     points, tris, quads = construct_mesh(nodes, elts)
@@ -188,13 +188,13 @@ function animate_mesh(nodes::Matrix{Tv}, elts::Vector{Vector{Tn}}, values::Matri
     nx = length(x)
     if isnothing(color)
         # Extract magnitude from values (3n vector)
-        color_data = [norm(values[3*i-2:3*i, 1]) for i in 1:n]
+        color_data = permutedims(reduce(hcat, [vec(mean(values[3*i-2:3*i, :], dims = 1)) for i in 1:n]), [2, 1])
     else
         color_data = if color isa Matrix
             nr, nc = size(color)
             nr == n || throw(ArgumentError("Color matrix row count must match number of nodes"))
-            nc == length(x) || throw(ArgumentError("Color matrix column count must match length of x"))
-            color[:, 1]
+            nc == nx || throw(ArgumentError("Color matrix column count must match length of x"))
+            color
         else
             color
         end
@@ -202,7 +202,12 @@ function animate_mesh(nodes::Matrix{Tv}, elts::Vector{Vector{Tn}}, values::Matri
 
     # Create observables
     dmesh = Observable(smesh)
-    col = Observable(color_data)
+    if color_data isa Matrix
+        col = Observable(color_data[:, 1])
+    else
+        col = Observable(color_data)
+    end
+
     function update_title!(ax, val)
          ax.title = quantity_y*" @ "*string(round(val, digits = 4))*" "*unit_x
     end
@@ -214,7 +219,13 @@ function animate_mesh(nodes::Matrix{Tv}, elts::Vector{Vector{Tn}}, values::Matri
     record(fig, filename, eachindex(x), framerate = framerate) do i
         # Deformed mesh at time t[i]
         dpoints = deformed_grid(nodes, values[:, i], scale_factor)
-        col[] = values[:, i]
+
+        if color_data isa Matrix
+            col[] = color_data[:, i]
+        else
+            col[] = color_data
+        end
+
         if rem(i, title_update_framerate) == 0
             title_obs[] = update_title!(ax, x[i])
         end

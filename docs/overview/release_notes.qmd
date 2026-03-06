@@ -6,6 +6,10 @@ format:
     number-sections: false
 ---
 
+## 1.10.1
+
+- Fix minor bugs in `animate_mesh` function in `SVAnimExt.jl` extension.
+
 ## 1.10.0
 
 **New features**

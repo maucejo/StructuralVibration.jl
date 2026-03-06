@@ -1,4 +1,4 @@
-using StructuralVibration, LinearAlgebra
+using StructuralVibration
 @usingany LazyGrids, Meshes, CairoMakie
 
 ## Helper function to create a mesh
@@ -64,7 +64,6 @@ fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, c
 
 ## Animate the mesh
 dpoints_poster = deformed_grid(nodes, ms_deformed, 0.1)
-color_data = [norm(ms_deformed[3*i-2:3*i]) for i in 1:size(nodes, 1)]
-poster_fig = viz_mesh(SimpleMesh(dpoints_poster, mesh.topology.connec), color = color_data, colormap = :jet1, alpha = 1., zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate")
+poster_fig = viz_mesh(SimpleMesh(dpoints_poster, mesh.topology.connec), color = ms, colormap = :jet1, alpha = 1., zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate")
 
-animate_mesh(nodes, elts, ms_deformed, scale_factor = 0.1, zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate", framerate = 24, filename = "animated_plate.mp4")
+animate_mesh(nodes, elts, ms_deformed, scale_factor = 0.1, zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate", framerate = 24, filename = "animated_plate.mp4", color = ms)
