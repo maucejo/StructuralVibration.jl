@@ -1,4 +1,35 @@
 """
+    fast_cmap()
+
+Return the Paraview Fast Colormap as a color gradient.
+
+**Output**
+- `fast_cmap::ColorGradient`: The Paraview Fast Colormap as a color gradient that can be used for visualizations.
+
+**Reference**
+[1] F. Samsel, W.A. Scott, K. Moreland, A New Default Colormap for ParaView, in IEEE Computer Graphics and Applications, vol. 44, no. 04, pp. 150-160, 2024.
+
+**Link to colormap json file**
+
+https://github.com/kennethmoreland-com/kennethmoreland-com.github.io/blob/f0f50dcfda94c8e4c9c4927f78a98ff419fea450/content/color-advice/fast/fast.json
+"""
+function fast_cmap()
+    # Paraview Fast Colormap
+    fast_colors = [
+        RGBf(0.056399999999999992,0.056399999999999992, 0.46999999999999997),
+        RGBf(0.24300000000000013, 0.46035000000000043, 0.81000000000000005),
+        RGBf(0.35681438265435211, 0.74502464853631423, 0.95436770289372197),
+        RGBf(0.68820000000000003, 0.93000000000000005, 0.91790999999999989),
+        RGBf(0.89949595512059022, 0.944646394975174, 0.7686567142818399),
+        RGBf(0.92752075996107142, 0.62143890917391775, 0.31535705838676426),
+        RGBf(0.80000000000000004, 0.35200000000000009, 0.15999999999999998),
+        RGBf(0.58999999999999997, 0.076700000000000129, 0.11947499999999994)
+    ]
+
+    return fast_colors
+end
+
+"""
     create_figure(; title, xlabel, ylabel, zlabel)
 
 Create a 3D figure with specified axis labels.
@@ -42,7 +73,7 @@ Visualize a 3D mesh with customizable options.
 - `zlabel::String`: Label for the z-axis (default is "z").
 - `title::String`: Title of the plot (default is an empty string).
 - `color`: Color mapping for the mesh (default is :white).
-- `colormap::Symbol`: Colormap to use for coloring the mesh (default is :jet1).
+- `colormap::Symbol`: Colormap to use for coloring the mesh (default is `fast_cmap()`).
 - `alpha::Real`: Transparency level of the mesh (default is 0.5).
 - `showsegments::Bool`: Whether to show element segments (default is true).
 - `segmentsize::Real`: Size of the segments if shown (default is 0.5).
@@ -54,7 +85,7 @@ Visualize a 3D mesh with customizable options.
 **Output**
 - `fig::Figure`: The figure containing the visualized mesh.
 """
-function viz_mesh(mesh; xlabel = "x", ylabel = "y", zlabel = "z", title = "",color = :white, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, xlim = nothing, ylim = nothing, zlim = nothing)
+function viz_mesh(mesh; xlabel = "x", ylabel = "y", zlabel = "z", title = "",color = :white, colormap = fast_cmap(), alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, xlim = nothing, ylim = nothing, zlim = nothing)
 
     fig, ax = create_figure(xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
     ax.title = title
@@ -90,7 +121,7 @@ Create an animation of a deformed mesh.
 - `ylabel::String`: Label for the y-axis (default is "y").
 - `zlabel::String`: Label for the z-axis (default is "z").
 - `color`: Color mapping for the mesh (default is the values).
-- `colormap::Symbol`: Colormap to use for coloring the mesh (default is :jet1).
+- `colormap::Symbol`: Colormap to use for coloring the mesh (default is `fast_cmap()`).
 - alpha::Real: Transparency level of the mesh (default is 1.0).
 - `showsegments::Bool`: Whether to show element segments (default is true).
 - `segmentsize::Real`: Size of the segments if shown (default is 0.5).
@@ -112,7 +143,7 @@ Create an animation of a deformed mesh.
 
 - When `values` is a matrix and `x` is provided, the animation shows the evolution of the mesh deformation as a function of the parameter `x`, which can represent time, frequency, or any other relevant parameter. The title of the animation updates dynamically every 10 frames to reflect the current value of `x`.
 """
-function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Vector{Tv}; title = "Animated mesh", xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, scale_factor = 100., framerate::Int = 35, frequency = float(framerate), filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Real, Te <: Int, Tv <: Real}
+function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Vector{Tv}; title = "Animated mesh", xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = fast_cmap(), alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, scale_factor = 100., framerate::Int = 35, frequency = float(framerate), filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Real, Te <: Int, Tv <: Real}
 
     # Static mesh
     points, tris, quads = construct_mesh(nodes, elts)
@@ -164,7 +195,7 @@ function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Vecto
     end
 end
 
-function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Matrix{Tv}, x::AbstractArray; xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = :jet1, alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, unit_x = "s", quantity_y = "Values", scale_factor = 100, framerate = 35, title_update_framerate = 10, filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Real, Te <: Int, Tv <: Real}
+function animate_mesh(nodes::Matrix{Tn}, elts::Vector{Vector{Te}}, values::Matrix{Tv}, x::AbstractArray; xlabel = "x", ylabel = "y", zlabel = "z", color = nothing, colormap = fast_cmap(), alpha = 1., showsegments = true, segmentsize = 0.5, segmentcolor = :black, unit_x = "s", quantity_y = "Values", scale_factor = 100, framerate = 35, title_update_framerate = 10, filename = "animate_mesh.mp4", xlim = nothing, ylim = nothing, zlim = nothing) where {Tn <: Real, Te <: Int, Tv <: Real}
 
     # Static mesh
     points, tris, quads = construct_mesh(nodes, elts)

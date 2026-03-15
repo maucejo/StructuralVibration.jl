@@ -6,6 +6,12 @@ format:
     number-sections: false
 ---
 
+## 1.10.2
+
+**Internals**
+
+- Add Fast colormap from Paraview as the default colormap for mesh visualization and animation in `SVAnimExt.jl` extension. The `colormap` argument of `viz_mesh` and `animate_mesh` functions now defaults to `fast_cmap()` instead of `:jet1`.
+
 ## 1.10.1
 
 - Fix minor bugs in `animate_mesh` function in `SVAnimExt.jl` extension.

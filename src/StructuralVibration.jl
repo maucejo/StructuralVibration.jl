@@ -67,7 +67,7 @@ module StructuralVibration
               theme_choice, waterfall_plot
 
        # Functions for mesh animation
-       export animate_mesh, build_mesh, deformed_grid, detrend_mesh, detrend_plane, viz_mesh, renumber_element_connectivity
+       export animate_mesh, build_mesh, deformed_grid, detrend_mesh, detrend_plane, fast_cmap, renumber_element_connectivity, viz_mesh
 
        # Include files - Utils
        include("utils/macro_utils.jl")

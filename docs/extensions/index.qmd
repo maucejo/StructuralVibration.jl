@@ -389,7 +389,7 @@ ms_deformed[3:3:end] .= ms
 
 dpoints = deformed_grid(nodes, ms_deformed, 0.15)
 
-fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, colormap = :jet1, alpha = 1., zlim = (-0.2, 0.2), title = "Deformed mesh of the plate")
+fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, zlim = (-0.2, 0.2), title = "Deformed mesh of the plate")
 ```
 
 #### Animating the mode shape
@@ -398,6 +398,24 @@ animate_mesh(nodes, elts, ms_deformed, color = ms, scale_factor = 0.1, zlim = (-
 ```
 
 ![](../assets/images/animated_plate.mp4)
+
+#### Colormaps
+
+`StructuralVibration.jl` provides the Paraview Fast Colormap as a color gradient that can be used for visualizations. The colormap is implemented in the `fast_cmap` function.
+
+::: {.api}
+**fast_cmap**
+
+---
+```{julia}
+#| echo: false
+@doc fast_cmap
+```
+:::
+
+::: {.callout-warning}
+The `fast_cmap` function is a placeholder for the actual implementation of the Paraview Fast Colormap. The implementation of this colormap is not yet available in `ColorSchemes.jl`. A pull request has been submitted and merged in `ColorSchemes.jl`. Once the new version of `ColorSchemes.jl` is released, the `fast_cmap` function will be removed in favor of the `:fast` colormap from `ColorSchemes.jl`.
+:::
 
 ## Theming
 

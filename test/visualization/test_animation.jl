@@ -60,10 +60,10 @@ ms_deformed[3:3:end] .= ms
 
 dpoints = deformed_grid(nodes, ms_deformed, 0.15)
 
-fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, colormap = :jet1, alpha = 1., zlim = (-0.15, 0.15), title = "Deformed mesh of the plate")
+fig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, alpha = 1., zlim = (-0.15, 0.15), title = "Deformed mesh of the plate", colormap = fast_cmap())
 
 ## Animate the mesh
 dpoints_poster = deformed_grid(nodes, ms_deformed, 0.1)
-poster_fig = viz_mesh(SimpleMesh(dpoints_poster, mesh.topology.connec), color = ms, colormap = :jet1, alpha = 1., zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate")
+poster_fig = viz_mesh(SimpleMesh(dpoints_poster, mesh.topology.connec), color = ms_color, alpha = 1., zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate", colormap = fast_cmap())
 
-animate_mesh(nodes, elts, ms_deformed, scale_factor = 0.1, zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate", framerate = 24, filename = "animated_plate.mp4", color = ms)
+animate_mesh(nodes, elts, ms_deformed, scale_factor = 0.1, zlim = (-0.2, 0.2), title = "Second mode shape of a simply supported rectangular plate", framerate = 24, filename = "animated_plate.mp4", color = ms_color, colormap = fast_cmap())
