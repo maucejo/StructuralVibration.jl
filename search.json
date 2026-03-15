@@ -309,7 +309,7 @@
     "href": "extensions/index.html#mesh-visualization-and-animation",
     "title": "Extensions",
     "section": "3 Mesh visualization and animation",
-    "text": "3 Mesh visualization and animation\nTo access the mesh manipulation and animation functions, you need to activate the SVMeshExt.jl extension by running the following command:\nusing Meshes, CairoMakie\n\n# or\n\nusing Meshes, GLMakie\nThis extension provides functions for visualizing and animating meshes.\n\n3.1 Visualizing a mesh\nThe viz_mesh function allows you to visualize a static mesh.\n\nviz_mesh\n\n\n\nviz_mesh(mesh; xlabel, ylabel, zlabel, title, color, colormap, alpha, showsegments, segmentsize, segmentcolor, xlim, ylim, zlim)\nVisualize a 3D mesh with customizable options.\nInputs\n\nmesh: The mesh to visualize.\n\nxlabel::String: Label for the x-axis (default is \"x\").\n\nylabel::String: Label for the y-axis (default is \"y\").\n\nzlabel::String: Label for the z-axis (default is \"z\").\n\ntitle::String: Title of the plot (default is an empty string).\n\ncolor: Color mapping for the mesh (default is :white).\n\ncolormap::Symbol: Colormap to use for coloring the mesh (default is :jet1).\n\nalpha::Real: Transparency level of the mesh (default is 0.5).\n\nshowsegments::Bool: Whether to show element segments (default is true).\n\nsegmentsize::Real: Size of the segments if shown (default is 0.5).\n\nsegmentcolor: Color of the segments if shown (default is :black).\n\nxlim::Tuple{Real, Real}: Limits for the x-axis (default is no limits).\n\nylim::Tuple{Real, Real}: Limits for the y-axis (default is no limits).\n\nzlim::Tuple{Real, Real}: Limits for the z-axis (default is no limits).\n\n\nOutput\n\nfig::Figure: The figure containing the visualized mesh.\n\n\n\n\n\n\n\n\n\n\n3.2 Animating a mesh\nThe animate_mesh function allows you to animate a mesh by applying a set of values to its nodes. This is useful, for instance, for visualizing the deformation or mode shapes of a structure.\n\nanimate_mesh\n\n\n\nanimate_mesh(nodes, elts, values; title, xlabel, ylabel, zlabel, color, colormap, alpha, showsegments, scale_factor, frequency, framerate, filename, xlim, ylim, zlim)\n\nanimate_mesh(nodes, elts, values, x; xlabel, ylabel, zlabel, color, colormap, alpha, showsegments, unit_x, quantity_y, scale_factor, framerate, title_update_framerate, filename, xlim, ylim, zlim)\nCreate an animation of a deformed mesh.\nInputs\n\nnodes::Matrix{Real}: Original node coordinates.\n\nelts::Vector{Vector{Int}}: Element connectivity.\n\nvalues::VecOrMat{Real}: Values to apply to the nodes.\n\nx::AbstractVector{Real}: Parameter values corresponding to each set of values (e.g., time or frequency).\n\ntitle::String: Title of the animation (default is \"Animated mesh\").\n\nxlabel::String: Label for the x-axis (default is \"x\").\n\nylabel::String: Label for the y-axis (default is \"y\").\n\nzlabel::String: Label for the z-axis (default is \"z\").\n\ncolor: Color mapping for the mesh (default is the values).\n\ncolormap::Symbol: Colormap to use for coloring the mesh (default is :jet1).\n\nalpha::Real: Transparency level of the mesh (default is 1.0).\n\nshowsegments::Bool: Whether to show element segments (default is true).\n\nsegmentsize::Real: Size of the segments if shown (default is 0.5).\n\nsegmentcolor: Color of the segments if shown (default is :black).\n\nscale_factor::Real: Factor to scale the values (default is 100).\n\nframerate::Int: Frame rate of the animation in frames per second (default is 35).\n\nfrequency::Real: Frequency of the animated motion in Hz (default is framerate).\n\ntitle_update_framerate::Int: How often (in frames) to update the title of the animation (default is 10).\n\nfilename::String: Name of the output video file (default is \"animate_mesh.mp4\").\n\nxlim::Tuple{Real, Real}: Limits for the x-axis (default is no limits).\n\nylim::Tuple{Real, Real}: Limits for the y-axis (default is no limits).\n\nzlim::Tuple{Real, Real}: Limits for the z-axis (default is no limits).\n\n\nOutputs\n\nAnimation saved as a video file showing the deformed mesh over time.\n\n\nNotes\n\nWhen values is a vector of values and frequency is specified, the animation simulates a harmonic motion of the mesh based on the provided values and frequency. This is useful for visualizing mode shapes or operational deflection shapes in structural vibration analysis.\n\nWhen values is a matrix and x is provided, the animation shows the evolution of the mesh deformation as a function of the parameter x, which can represent time, frequency, or any other relevant parameter. The title of the animation updates dynamically every 10 frames to reflect the current value of x.\n\n\n\n\n\n\n\n\n\n\n3.3 Example\nIn this example, we will visualize the second mode shape of a simply supported plate.\n\n3.3.1 Data generation\n\nusing LazyGrids\n\n# Dimensions\nLp = 0.6\nbp = 0.4\nhp = 1e-3\n\n# Material parameters\nE = 2.1e11\nρ = 7800.\nν = 0.33\n\nplate = Plate(Lp, bp, hp, E, ρ, ν)\n\n\n\n3.3.2 Mesh creation\n\n# Helper function to create a quadrilateral mesh\nfunction create_quad_mesh(xp::Vector, yp::Vector, nx::Int, ny::Int)\n    # Number of quadrangles\n    n_quads = (nx - 1) * (ny - 1)\n    quads = Vector{Vector{Int}}(undef, n_quads)\n\n    quad_idx = 1\n    for j in 1:(ny-1)\n        for i in 1:(nx-1)\n            # Indices of the nodes of the quadrangle in counter-clockwise order\n            n1 = (j-1) * nx + i\n            n2 = (j-1) * nx + i + 1\n            n3 = j * nx + i + 1\n            n4 = j * nx + i\n\n            quads[quad_idx] = [n1, n2, n3, n4]\n            quad_idx += 1\n        end\n    end\n\n    return quads\nend\n\n# Create the mesh\nnx = 10\nny = 10\nx, y = ndgrid(range(0., Lp, nx), range(0., bp, ny))\nxp = x[:]\nyp = y[:]\nzp = zeros(length(xp))\n\nnodes = [xp yp zp]\nelts = create_quad_mesh(xp, yp, nx, ny)\nmesh = build_mesh(nodes, elts)\n\nfig_mesh = viz_mesh(mesh, zlim = (-0.15, 0.15), title = \"Mesh of the plate\")\n\n\n\n\n\n\n3.3.3 Visualization of the mode shape\n\n# Compute the second mode shape\nms = sin.(2π*xp/Lp) .* sin.(π*yp/bp)\n\n# Compute deformed grid\nms_deformed = zeros(3size(nodes, 1))\nms_deformed[3:3:end] .= ms\n\ndpoints = deformed_grid(nodes, ms_deformed, 0.15)\n\nfig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, colormap = :jet1, alpha = 1., zlim = (-0.2, 0.2), title = \"Deformed mesh of the plate\")\n\n\n\n\n\n\n3.3.4 Animating the mode shape\nanimate_mesh(nodes, elts, ms_deformed, color = ms, scale_factor = 0.1, zlim = (-0.2, 0.2), title = \"Second mode shape of a simply supported rectangular plate\", framerate = 24, filename = \"animated_plate.mp4\")\nVideo",
+    "text": "3 Mesh visualization and animation\nTo access the mesh manipulation and animation functions, you need to activate the SVMeshExt.jl extension by running the following command:\nusing Meshes, CairoMakie\n\n# or\n\nusing Meshes, GLMakie\nThis extension provides functions for visualizing and animating meshes.\n\n3.1 Visualizing a mesh\nThe viz_mesh function allows you to visualize a static mesh.\n\nviz_mesh\n\n\n\nviz_mesh(mesh; xlabel, ylabel, zlabel, title, color, colormap, alpha, showsegments, segmentsize, segmentcolor, xlim, ylim, zlim)\nVisualize a 3D mesh with customizable options.\nInputs\n\nmesh: The mesh to visualize.\n\nxlabel::String: Label for the x-axis (default is \"x\").\n\nylabel::String: Label for the y-axis (default is \"y\").\n\nzlabel::String: Label for the z-axis (default is \"z\").\n\ntitle::String: Title of the plot (default is an empty string).\n\ncolor: Color mapping for the mesh (default is :white).\n\ncolormap::Symbol: Colormap to use for coloring the mesh (default is fast_cmap()).\n\nalpha::Real: Transparency level of the mesh (default is 0.5).\n\nshowsegments::Bool: Whether to show element segments (default is true).\n\nsegmentsize::Real: Size of the segments if shown (default is 0.5).\n\nsegmentcolor: Color of the segments if shown (default is :black).\n\nxlim::Tuple{Real, Real}: Limits for the x-axis (default is no limits).\n\nylim::Tuple{Real, Real}: Limits for the y-axis (default is no limits).\n\nzlim::Tuple{Real, Real}: Limits for the z-axis (default is no limits).\n\n\nOutput\n\nfig::Figure: The figure containing the visualized mesh.\n\n\n\n\n\n\n\n\n\n\n3.2 Animating a mesh\nThe animate_mesh function allows you to animate a mesh by applying a set of values to its nodes. This is useful, for instance, for visualizing the deformation or mode shapes of a structure.\n\nanimate_mesh\n\n\n\nanimate_mesh(nodes, elts, values; title, xlabel, ylabel, zlabel, color, colormap, alpha, showsegments, scale_factor, frequency, framerate, filename, xlim, ylim, zlim)\n\nanimate_mesh(nodes, elts, values, x; xlabel, ylabel, zlabel, color, colormap, alpha, showsegments, unit_x, quantity_y, scale_factor, framerate, title_update_framerate, filename, xlim, ylim, zlim)\nCreate an animation of a deformed mesh.\nInputs\n\nnodes::Matrix{Real}: Original node coordinates.\n\nelts::Vector{Vector{Int}}: Element connectivity.\n\nvalues::VecOrMat{Real}: Values to apply to the nodes.\n\nx::AbstractVector{Real}: Parameter values corresponding to each set of values (e.g., time or frequency).\n\ntitle::String: Title of the animation (default is \"Animated mesh\").\n\nxlabel::String: Label for the x-axis (default is \"x\").\n\nylabel::String: Label for the y-axis (default is \"y\").\n\nzlabel::String: Label for the z-axis (default is \"z\").\n\ncolor: Color mapping for the mesh (default is the values).\n\ncolormap::Symbol: Colormap to use for coloring the mesh (default is fast_cmap()).\n\nalpha::Real: Transparency level of the mesh (default is 1.0).\n\nshowsegments::Bool: Whether to show element segments (default is true).\n\nsegmentsize::Real: Size of the segments if shown (default is 0.5).\n\nsegmentcolor: Color of the segments if shown (default is :black).\n\nscale_factor::Real: Factor to scale the values (default is 100).\n\nframerate::Int: Frame rate of the animation in frames per second (default is 35).\n\nfrequency::Real: Frequency of the animated motion in Hz (default is framerate).\n\ntitle_update_framerate::Int: How often (in frames) to update the title of the animation (default is 10).\n\nfilename::String: Name of the output video file (default is \"animate_mesh.mp4\").\n\nxlim::Tuple{Real, Real}: Limits for the x-axis (default is no limits).\n\nylim::Tuple{Real, Real}: Limits for the y-axis (default is no limits).\n\nzlim::Tuple{Real, Real}: Limits for the z-axis (default is no limits).\n\n\nOutputs\n\nAnimation saved as a video file showing the deformed mesh over time.\n\n\nNotes\n\nWhen values is a vector of values and frequency is specified, the animation simulates a harmonic motion of the mesh based on the provided values and frequency. This is useful for visualizing mode shapes or operational deflection shapes in structural vibration analysis.\n\nWhen values is a matrix and x is provided, the animation shows the evolution of the mesh deformation as a function of the parameter x, which can represent time, frequency, or any other relevant parameter. The title of the animation updates dynamically every 10 frames to reflect the current value of x.\n\n\n\n\n\n\n\n\n\n\n3.3 Example\nIn this example, we will visualize the second mode shape of a simply supported plate.\n\n3.3.1 Data generation\n\nusing LazyGrids\n\n# Dimensions\nLp = 0.6\nbp = 0.4\nhp = 1e-3\n\n# Material parameters\nE = 2.1e11\nρ = 7800.\nν = 0.33\n\nplate = Plate(Lp, bp, hp, E, ρ, ν)\n\n\n\n3.3.2 Mesh creation\n\n# Helper function to create a quadrilateral mesh\nfunction create_quad_mesh(xp::Vector, yp::Vector, nx::Int, ny::Int)\n    # Number of quadrangles\n    n_quads = (nx - 1) * (ny - 1)\n    quads = Vector{Vector{Int}}(undef, n_quads)\n\n    quad_idx = 1\n    for j in 1:(ny-1)\n        for i in 1:(nx-1)\n            # Indices of the nodes of the quadrangle in counter-clockwise order\n            n1 = (j-1) * nx + i\n            n2 = (j-1) * nx + i + 1\n            n3 = j * nx + i + 1\n            n4 = j * nx + i\n\n            quads[quad_idx] = [n1, n2, n3, n4]\n            quad_idx += 1\n        end\n    end\n\n    return quads\nend\n\n# Create the mesh\nnx = 10\nny = 10\nx, y = ndgrid(range(0., Lp, nx), range(0., bp, ny))\nxp = x[:]\nyp = y[:]\nzp = zeros(length(xp))\n\nnodes = [xp yp zp]\nelts = create_quad_mesh(xp, yp, nx, ny)\nmesh = build_mesh(nodes, elts)\n\nfig_mesh = viz_mesh(mesh, zlim = (-0.15, 0.15), title = \"Mesh of the plate\")\n\n\n\n\n\n\n3.3.3 Visualization of the mode shape\n\n# Compute the second mode shape\nms = sin.(2π*xp/Lp) .* sin.(π*yp/bp)\n\n# Compute deformed grid\nms_deformed = zeros(3size(nodes, 1))\nms_deformed[3:3:end] .= ms\n\ndpoints = deformed_grid(nodes, ms_deformed, 0.15)\n\nfig_deformed = viz_mesh(SimpleMesh(dpoints, mesh.topology.connec), color = ms, zlim = (-0.2, 0.2), title = \"Deformed mesh of the plate\")\n\n\n\n\n\n\n3.3.4 Animating the mode shape\nanimate_mesh(nodes, elts, ms_deformed, color = ms, scale_factor = 0.1, zlim = (-0.2, 0.2), title = \"Second mode shape of a simply supported rectangular plate\", framerate = 24, filename = \"animated_plate.mp4\")\nVideo\n\n\n3.3.5 Colors and colormaps\n\n3.3.5.1 Colormap\nStructuralVibration.jl provides the Paraview Fast Colormap as a color gradient that can be used for visualizations. The colormap is implemented in the fast_cmap function.\n\nfast_cmap\n\n\n\nfast_cmap()\nReturn the Paraview Fast Colormap as a color gradient.\nOutput\n\nfast_cmap::ColorGradient: The Paraview Fast Colormap as a color gradient that can be used for visualizations.\n\n\nReference [1] F. Samsel, W.A. Scott, K. Moreland, A New Default Colormap for ParaView, in IEEE Computer Graphics and Applications, vol. 44, no. 04, pp. 150-160, 2024.\nLink to colormap json file https://github.com/kennethmoreland-com/kennethmoreland-com.github.io/blob/f0f50dcfda94c8e4c9c4927f78a98ff419fea450/content/color-advice/fast/fast.json\n\n\n\n\n\n\n\n\n\n\n\n\nWarning\n\n\n\nThe fast_cmap function is a placeholder for the actual implementation of the Paraview Fast Colormap. The implementation of this colormap is not yet available in ColorSchemes.jl. A pull request has been submitted and merged in ColorSchemes.jl. Once the new version of ColorSchemes.jl is released, the fast_cmap function will be removed in favor of the :fast colormap from ColorSchemes.jl.",
     "crumbs": [
       "Extensions"
     ]
@@ -780,7 +780,7 @@
     "href": "overview/release_notes.html",
     "title": "Release Notes",
     "section": "",
-    "text": "Fix minor bugs in animate_mesh function in SVAnimExt.jl extension.",
+    "text": "Internals\n\nAdd Fast colormap from Paraview as the default colormap for mesh visualization and animation in SVAnimExt.jl extension. The colormap argument of viz_mesh and animate_mesh functions now defaults to fast_cmap() instead of :jet1.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -791,7 +791,7 @@
     "href": "overview/release_notes.html#section",
     "title": "Release Notes",
     "section": "",
-    "text": "Fix minor bugs in animate_mesh function in SVAnimExt.jl extension.",
+    "text": "Internals\n\nAdd Fast colormap from Paraview as the default colormap for mesh visualization and animation in SVAnimExt.jl extension. The colormap argument of viz_mesh and animate_mesh functions now defaults to fast_cmap() instead of :jet1.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -801,8 +801,8 @@
     "objectID": "overview/release_notes.html#section-1",
     "href": "overview/release_notes.html#section-1",
     "title": "Release Notes",
-    "section": "1.10.0",
-    "text": "1.10.0\nNew features\n\nAdd mesh manipulation functions in SVMeshExt.jl extension:\n\ndetrend_mesh to detrend a mesh by removing the rigid body motion\nrenumber_element_connectivity to renumber the elements of a mesh\nconstruct_mesh to construct a Mesh object from the nodes and elements of a mesh\ndeformed_grid to compute the deformed grid of a mesh from the nodal displacements\n\nAdd animate_mesh function in SVAnimExt.jl extension to create an animation of the deformed mesh over time from the nodal displacements and values to be plotted on the mesh (e.g., modal shapes, ODS, etc.).\n\nInternals\n\nSimplify the implementation of ods function.",
+    "section": "1.10.1",
+    "text": "1.10.1\n\nFix minor bugs in animate_mesh function in SVAnimExt.jl extension.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -812,8 +812,8 @@
     "objectID": "overview/release_notes.html#section-2",
     "href": "overview/release_notes.html#section-2",
     "title": "Release Notes",
-    "section": "1.9.1",
-    "text": "1.9.1\n\nFix type instability issues in gradient function.\nImprove compute_poles functions for SdofEMA.",
+    "section": "1.10.0",
+    "text": "1.10.0\nNew features\n\nAdd mesh manipulation functions in SVMeshExt.jl extension:\n\ndetrend_mesh to detrend a mesh by removing the rigid body motion\nrenumber_element_connectivity to renumber the elements of a mesh\nconstruct_mesh to construct a Mesh object from the nodes and elements of a mesh\ndeformed_grid to compute the deformed grid of a mesh from the nodal displacements\n\nAdd animate_mesh function in SVAnimExt.jl extension to create an animation of the deformed mesh over time from the nodal displacements and values to be plotted on the mesh (e.g., modal shapes, ODS, etc.).\n\nInternals\n\nSimplify the implementation of ods function.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -823,8 +823,8 @@
     "objectID": "overview/release_notes.html#section-3",
     "href": "overview/release_notes.html#section-3",
     "title": "Release Notes",
-    "section": "1.9.0",
-    "text": "1.9.0\nNew features\n\nAdd modal_density function to compute the modal density of a structure from the knowledge of its resonance frequencies.\nAdd modal_density function for 1D structures (bars, rods, strings and beams) and 2D structures (plates and membranes) based on the analytical expression of the modal density for these structures.\n\nInternals\n\nReplace Interpolations.jl with DataInterpolations.jl for interpolation.",
+    "section": "1.9.1",
+    "text": "1.9.1\n\nFix type instability issues in gradient function.\nImprove compute_poles functions for SdofEMA.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -834,8 +834,8 @@
     "objectID": "overview/release_notes.html#section-4",
     "href": "overview/release_notes.html#section-4",
     "title": "Release Notes",
-    "section": "1.8.0",
-    "text": "1.8.0\nNew features\n\nAdd wave_parameters function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.",
+    "section": "1.9.0",
+    "text": "1.9.0\nNew features\n\nAdd modal_density function to compute the modal density of a structure from the knowledge of its resonance frequencies.\nAdd modal_density function for 1D structures (bars, rods, strings and beams) and 2D structures (plates and membranes) based on the analytical expression of the modal density for these structures.\n\nInternals\n\nReplace Interpolations.jl with DataInterpolations.jl for interpolation.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -845,8 +845,8 @@
     "objectID": "overview/release_notes.html#section-5",
     "href": "overview/release_notes.html#section-5",
     "title": "Release Notes",
-    "section": "1.7.0",
-    "text": "1.7.0\nBreaking changes\n\nRemove AutoEMASdofProblem and AutoEMAMdofProblem structures\nRefactor solve function for automatic modal extraction to take an EMAProblem and a SdofEMA or MdofEMA method as arguments instead of separate AutoEMAProblem structures.\n\nThese changes have been made to solve type instability issues in the solve function for automatic modal extraction.\nInternals\n\nFix various type instability issues.",
+    "section": "1.8.0",
+    "text": "1.8.0\nNew features\n\nAdd wave_parameters function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -856,8 +856,8 @@
     "objectID": "overview/release_notes.html#section-6",
     "href": "overview/release_notes.html#section-6",
     "title": "Release Notes",
-    "section": "1.6.1",
-    "text": "1.6.1\n\nRemove DispatchDoctor from dependencies",
+    "section": "1.7.0",
+    "text": "1.7.0\nBreaking changes\n\nRemove AutoEMASdofProblem and AutoEMAMdofProblem structures\nRefactor solve function for automatic modal extraction to take an EMAProblem and a SdofEMA or MdofEMA method as arguments instead of separate AutoEMAProblem structures.\n\nThese changes have been made to solve type instability issues in the solve function for automatic modal extraction.\nInternals\n\nFix various type instability issues.",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -867,8 +867,8 @@
     "objectID": "overview/release_notes.html#section-7",
     "href": "overview/release_notes.html#section-7",
     "title": "Release Notes",
-    "section": "1.6.0",
-    "text": "1.6.0\nBreaking changes\n\nSimplify poles_extraction method by removing scaling argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.\n\nInternals\n\nRemove peak_proms! and peak_widths! from StructuralVibration.jl.\nFix type instability issues in varest and poles_extraction functions.",
+    "section": "1.6.1",
+    "text": "1.6.1\n\nRemove DispatchDoctor from dependencies",
     "crumbs": [
       "Overview",
       "Release Notes"
@@ -877,6 +877,17 @@
   {
     "objectID": "overview/release_notes.html#section-8",
     "href": "overview/release_notes.html#section-8",
+    "title": "Release Notes",
+    "section": "1.6.0",
+    "text": "1.6.0\nBreaking changes\n\nSimplify poles_extraction method by removing scaling argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.\n\nInternals\n\nRemove peak_proms! and peak_widths! from StructuralVibration.jl.\nFix type instability issues in varest and poles_extraction functions.",
+    "crumbs": [
+      "Overview",
+      "Release Notes"
+    ]
+  },
+  {
+    "objectID": "overview/release_notes.html#section-9",
+    "href": "overview/release_notes.html#section-9",
     "title": "Release Notes",
     "section": "1.5.0",
     "text": "1.5.0\nBreaking changes\n\nRefactor poles_extraction function to add scaling::Function argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection",
