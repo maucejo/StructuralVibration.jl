@@ -1073,10 +1073,8 @@ animate_mesh(nodes, elts, values, x; xlabel, ylabel, zlabel, color, colormap, al
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">animate_mesh</span>(nodes, elts, ms_deformed, color <span class="op">=</span> ms, scale_factor <span class="op">=</span> <span class="fl">0.1</span>, zlim <span class="op">=</span> (<span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.2</span>), title <span class="op">=</span> <span class="st">"Second mode shape of a simply supported rectangular plate"</span>, framerate <span class="op">=</span> <span class="fl">24</span>, filename <span class="op">=</span> <span class="st">"animated_plate.mp4"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><video src="../assets/images/animated_plate.mp4" class="img-fluid" controls=""><a href="../assets/images/animated_plate.mp4">Video</a></video></p>
 </section>
-<section id="colors-and-colormaps" class="level4" data-number="3.3.5">
-<h4 data-number="3.3.5" class="anchored" data-anchor-id="colors-and-colormaps"><span class="header-section-number">3.3.5</span> Colors and colormaps</h4>
-<section id="colormap" class="level5" data-number="3.3.5.1">
-<h5 data-number="3.3.5.1" class="anchored" data-anchor-id="colormap"><span class="header-section-number">3.3.5.1</span> Colormap</h5>
+<section id="colormaps" class="level4" data-number="3.3.5">
+<h4 data-number="3.3.5" class="anchored" data-anchor-id="colormaps"><span class="header-section-number">3.3.5</span> Colormaps</h4>
 <p><code>StructuralVibration.jl</code> provides the Paraview Fast Colormap as a color gradient that can be used for visualizations. The colormap is implemented in the <code>fast_cmap</code> function.</p>
 <div class="api">
 <p><strong>fast_cmap</strong></p>
@@ -1091,8 +1089,7 @@ animate_mesh(nodes, elts, values, x; xlabel, ylabel, zlabel, color, colormap, al
 </li>
 </ul>
 <p><strong>Reference</strong> [1] F. Samsel, W.A. Scott, K. Moreland, A New Default Colormap for ParaView, in IEEE Computer Graphics and Applications, vol. 44, no. 04, pp. 150-160, 2024.</p>
-<p><strong>Link to colormap json file</strong></p>
-<p>https://github.com/kennethmoreland-com/kennethmoreland-com.github.io/blob/f0f50dcfda94c8e4c9c4927f78a98ff419fea450/content/color-advice/fast/fast.json</p>
+<p><strong>Link to colormap json file</strong> https://github.com/kennethmoreland-com/kennethmoreland-com.github.io/blob/f0f50dcfda94c8e4c9c4927f78a98ff419fea450/content/color-advice/fast/fast.json</p>
 
 
 </div>
@@ -1112,7 +1109,6 @@ Warning
 <p>The <code>fast_cmap</code> function is a placeholder for the actual implementation of the Paraview Fast Colormap. The implementation of this colormap is not yet available in <code>ColorSchemes.jl</code>. A pull request has been submitted and merged in <code>ColorSchemes.jl</code>. Once the new version of <code>ColorSchemes.jl</code> is released, the <code>fast_cmap</code> function will be removed in favor of the <code>:fast</code> colormap from <code>ColorSchemes.jl</code>.</p>
 </div>
 </div>
-</section>
 </section>
 </section>
 </section>
