@@ -439,7 +439,7 @@ end
 ```
 
 ```{julia}
-with_theme(theme_choice(:makie)) do
+with_theme(theme_choice(:sv)) do
     sv_plot(x_sv, z_sv..., lw = 2., legend = (active = true,), title = ":sv theme")
 end
 ```

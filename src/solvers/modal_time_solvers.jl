@@ -471,7 +471,7 @@ function solve(prob::ForcedModalTimeProblem; method = :filt)
 end
 
 """
-    impulse_response(K::Matrix{Float64}, M::Matrix{Float64}, ξn, t, n = size(K, 1); ismat = false)
+    impulse_response(K::Matrix{Float64}, M::Matrix{Float64}, ξn, t, n = size(K, 1); ismodal = false)
 
 Compute the impulse response of a multi-degrees of freedom (Mdof) system using the modal approach
 
