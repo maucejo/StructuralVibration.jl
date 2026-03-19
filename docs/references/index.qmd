@@ -10,7 +10,7 @@ This section provides a list of references useful to understand and deepen the c
 
 ## Vibration theory
 
-[1] M. Géradin and D. Rixen, *Mechanical vibrations: Theory and aplication to structural dynamics*, 3rd edition, Wiley, 2015.
+[1] M. Géradin and D. Rixen, *Mechanical vibrations: Theory and application to structural dynamics*, 3rd edition, Wiley, 2015.
 
 [2] R. D. Blevins, *Formulas for natural frequency and mode shape*, Van Nostrand Reinhold Co, 1979.
 
