@@ -78,8 +78,6 @@ u = solve(prob_y).u
 # Spectrum stimation
 uest = spectrum(y, block_size, rect, fs = sample_rate)[1]
 
-
-
 ## Autopower & Cross-power spectral density
 # Acquisition parameters
 fs = 1000
