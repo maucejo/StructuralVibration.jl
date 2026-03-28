@@ -44,9 +44,7 @@ z_sv = ntuple(i -> sin.(i*x/2), 5)
 # SV plot
 sv_plot(x, z_sv..., lw = 2., legend = (active = true,))
 
-
 ## Theming
-
 # Makie theme
 with_theme(theme_choice(:makie)) do
     sv_plot(x, z_sv..., lw = 2., legend = (active = true,), title = ":makie theme")
