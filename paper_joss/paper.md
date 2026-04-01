@@ -30,9 +30,7 @@ Although many tools are available for structural vibration analysis, most are wr
 
 To the best of our knowledge, there is currently no package dedicated to structural vibration analysis available in the Julia programming language. `StructuralVibration.jl` aims to fill this gap by providing an accessible, package for generating and analyzing vibration data in Julia. It is designed to be user-friendly for beginners and experienced engineers alike, it is a valuable resource for education and research in the field of structural dynamics.
 
-`StructuralVibration.jl` has already been used for educational purposes in a structural dynamics course at the Conservatoire National des Arts et Métiers (Cnam) in Paris, France. It has also been used for research purposes in the context of force reconstruction from vibration data [@Auc:2025]. The package is open-source under an MIT license and available on GitHub, allowing for community contributions and future development.
-
-# Package design
+# Software design
 
 `StructuralVibration.jl` is designed according to certain guidelines to ensure that it is user-friendly, efficient, extensible, and composable. These guidelines include:
 
@@ -47,6 +45,10 @@ To the best of our knowledge, there is currently no package dedicated to structu
 - *Modularity*: The package is based on a modular architecture that clearly separates the different functionalities (Modelling & Simulation, Signal Processing, Modal Extraction, Visualization & Animation) and facilitates the maintenance and extension. The general architecture of the package is presented in \autoref{fig:architecture}.
 
 ![General architecture of StructuralVibration.jl.\label{fig:architecture}](sv_diagram.png)
+
+# Research impact statement
+
+`StructuralVibration.jl` has already been used for educational purposes in a structural dynamics course at the Conservatoire National des Arts et Métiers (Cnam) in Paris, France. It has also been used for research purposes in the context of force reconstruction from vibration data [@Auc:2025]. The package is open-source under an MIT license and available on GitHub, allowing for community contributions and future development.
 
 # Example
 
