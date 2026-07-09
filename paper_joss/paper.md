@@ -26,9 +26,11 @@ Structural vibration analysis is a crucial aspect of mechanical engineering, as 
 
 Analyzing the dynamic behavior requires a combination of theoretical knowledge in both mechanics [@Ger:2015] and signal processing [@Bra:2011], computational tools, and experimental techniques [@Avi:2018]. Mechanical engineers must be able to model the behavior of structures under different loading conditions, simulate their responses to various inputs, and analyze the resulting vibration data. This process can be complex and time-consuming.
 
-Although many tools are available for structural vibration analysis, most are written in languages such as Matlab or Python. For example, the Python ecosystem for structural vibration analysis is fragmented [@Sla:2025], with various libraries and tools available for different aspects of the analysis. These include `pyOMA2`, `pyFBS`, `OpenSeesPy` or `SDynPy`. This can make it difficult for engineers to find the right tools for their specific needs and to integrate them into a cohesive workflow.
-
 To the best of our knowledge, there is currently no package dedicated to structural vibration analysis available in the Julia programming language. `StructuralVibration.jl` aims to fill this gap by providing an accessible, package for generating and analyzing vibration data in Julia. It is designed to be user-friendly for beginners and experienced engineers alike, it is a valuable resource for education and research in the field of structural dynamics.
+
+# State of the field
+
+Many tools are available for structural vibration analysis. Most of them are written in languages such as Matlab or Python. For example, the Python ecosystem for structural vibration analysis is fragmented [@Sla:2025], with various libraries and tools available for different aspects of the analysis. These include `pyOMA2`, `pyFBS`, `OpenSeesPy` or `SDynPy`. In Matlab, one can cite `Structural Dynamics Toolbox` (SDTools) or the Matlab's `System Identification Toolbox`. This can make it difficult for engineers to find the right tools for their specific needs and to integrate them into a cohesive workflow.
 
 # Software design
 
@@ -128,6 +130,10 @@ sv_plot(
 ```
 
 ![Visualization example - Second mode shape of the beam.\label{fig:visu_example}](mode_shape_2.png){width=65%}
+
+# AI usage disclosure
+
+The author of the package wrote and proofread the codes and documentation of `StructuralVibration.jl`. No generative AI was used during development.
 
 # References
 
