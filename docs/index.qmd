@@ -24,6 +24,22 @@ format:
 The package is under active development and is developed as part of my research activities on source identification in structural dynamics and acoustics.
 :::
 
+## Software design
+
+`StructuralVibration.jl` is designed according to certain guidelines to ensure that it is user-friendly, efficient, extensible, and composable. These guidelines include:
+
+- *Type stability*: All of the package's functions are designed to ensure type stability, allowing for efficient execution and better performance.
+
+- *Type genericity*: The package is designed to be type-generic, enabling users to work with various data types, such as `Float64`, `ComplexF32`, while maintaining performance and flexibility.
+
+- *Composability*: The package is design to be compatible with other Julia packages. For example, users can define a state-space model using `StructuralVibration.jl` and perform the resolution using another package such as `DifferentialEquations.jl`.
+
+- *Reliability*: `StructuralVibration.jl` includes a comprehensive documentation and a test suite that ensures the reliability and correctness of the package. The documentation provides detailed explanations of the theoretical background of the package's features, as well as the API of the data types and functions implemented. Various examples are also provided to help users get started.
+
+- *Modularity*: The package is based on a modular architecture that clearly separates the different functionalities (Modelling & Simulation, Signal Processing, Modal Extraction, Visualization & Animation) and facilitates the maintenance and extension. The general architecture of the package is presented in \autoref{fig:architecture}.
+
+![General architecture of StructuralVibration.jl](assets/images/sv_diagram.png)
+
 ## Features
 
 The package provides the following features:
