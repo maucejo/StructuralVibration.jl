@@ -6,6 +6,16 @@ format:
     number-sections: false
 ---
 
+## 1.10.3
+
+- Fix the coefficient of the stiffness-velocity term in the Newmark family solvers, which reduced `Newmark`, `HHT`, `WBZ`, `FoxGoodwin`, `LinearAcceleration` and `GeneralizedAlpha` with `ρ < 1` to first-order accuracy. The default `GeneralizedAlpha()` and `MidPoint` are not affected.
+- Fix the inverted validation of `αf` and `αm` in `HHT`, `WBZ` and `GeneralizedAlpha`, which rejected valid values and accepted invalid ones.
+- Out-of-range values of `ρ` in `HHT`, `WBZ` and `GeneralizedAlpha` now throw an `ArgumentError`, as does providing only one of `αf` and `αm` in `GeneralizedAlpha`.
+
+**Internals**
+
+- Add a second-order convergence test for the Newmark family solvers.
+
 ## 1.10.2
 
 **Internals**

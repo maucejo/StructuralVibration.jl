@@ -1,7 +1,7 @@
 using Parameters, DSP, LinearAlgebra, Interpolations
 @usingany GLMakie
 
-includet("../../../src/models/sdof.jl")
+includet("../../../src/models/sdof_mdof.jl")
 
 ## SDOF system
 m = 1.
