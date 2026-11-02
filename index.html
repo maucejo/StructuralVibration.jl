@@ -2,17 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>StructuralVibration.jl</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -69,15 +75,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="./assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-62295ad22f4918014458b2d6938fa5eb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-a725d1f31e95e8f52643e126b0b7b8fc.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-0e51b4e25238c3c2b9aea47dc2975d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-e23dafc20b066d5450f0492a61e707a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -217,7 +222,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#features" id="toc-features" class="nav-link active" data-scroll-target="#features">Features</a>
+  <li><a href="#software-design" id="toc-software-design" class="nav-link active" data-scroll-target="#software-design">Software design</a></li>
+  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a>
   <ul class="collapse">
   <li><a href="#mechanical-models" id="toc-mechanical-models" class="nav-link" data-scroll-target="#mechanical-models">Mechanical models</a></li>
   <li><a href="#vibration-data-generation" id="toc-vibration-data-generation" class="nav-link" data-scroll-target="#vibration-data-generation">Vibration data generation</a></li>
@@ -257,7 +263,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <img src="./assets/logo/doclogo.svg" class="img-fluid" style="width:35.0%">
 </center>
 <p><br></p>
-<p><a href=""><img src="https://img.shields.io/badge/Version-1.10.2-cornflowerblue.svg" class="img-fluid" alt="Generic badge"></a> <a href="https://github.com/maucejo/elsearticle/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-forestgreen.png" class="img-fluid" alt="MIT License"></a> <a href="https://github.com/JuliaTesting/Aqua.jl"><img src="https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg" class="img-fluid" alt="Aqua QA"></a> <a href="https://github.com/MilesCranmer/DispatchDoctor.jl"><img src="https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white" class="img-fluid" alt="DispatchDoctor"></a> <a href="https://doi.org/10.5281/zenodo.18850296"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.18850296.svg" class="img-fluid" alt="DOI"></a></p>
+<p><a href=""><img src="https://img.shields.io/badge/Version-1.10.3-cornflowerblue.svg" class="img-fluid" alt="Generic badge"></a> <a href="https://github.com/maucejo/elsearticle/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-forestgreen.png" class="img-fluid" alt="MIT License"></a> <a href="https://github.com/JuliaTesting/Aqua.jl"><img src="https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg" class="img-fluid" alt="Aqua QA"></a> <a href="https://github.com/MilesCranmer/DispatchDoctor.jl"><img src="https://img.shields.io/badge/%F0%9F%A9%BA_tested_with-DispatchDoctor.jl-blue?labelColor=white" class="img-fluid" alt="DispatchDoctor"></a> <a href="https://doi.org/10.5281/zenodo.18850296"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.18850296.svg" class="img-fluid" alt="DOI"></a></p>
 <p><code>StructuralVibration.jl</code> is a Julia package designed to generate vibration data for mechanical systems. This package can be used for educational and research purposes. As a teacher, you can use it to illustrate vibration theory and its practical implementation. As a researcher, you can use it to test new methods on synthetic data.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -272,6 +278,23 @@ Warning
 <p>The package is under active development and is developed as part of my research activities on source identification in structural dynamics and acoustics.</p>
 </div>
 </div>
+<section id="software-design" class="level2">
+<h2 class="anchored" data-anchor-id="software-design">Software design</h2>
+<p><code>StructuralVibration.jl</code> is designed according to certain guidelines to ensure that it is user-friendly, efficient, extensible, and composable. These guidelines include:</p>
+<ul>
+<li><p><em>Type stability</em>: All of the package’s functions are designed to ensure type stability, allowing for efficient execution and better performance.</p></li>
+<li><p><em>Type genericity</em>: The package is designed to be type-generic, enabling users to work with various data types, such as <code>Float64</code>, <code>ComplexF32</code>, while maintaining performance and flexibility.</p></li>
+<li><p><em>Composability</em>: The package is design to be compatible with other Julia packages. For example, users can define a state-space model using <code>StructuralVibration.jl</code> and perform the resolution using another package such as <code>DifferentialEquations.jl</code>.</p></li>
+<li><p><em>Reliability</em>: <code>StructuralVibration.jl</code> includes a comprehensive documentation and a test suite that ensures the reliability and correctness of the package. The documentation provides detailed explanations of the theoretical background of the package’s features, as well as the API of the data types and functions implemented. Various examples are also provided to help users get started.</p></li>
+<li><p><em>Modularity</em>: The package is based on a modular architecture that clearly separates the different functionalities (Modelling &amp; Simulation, Signal Processing, Modal Extraction, Visualization &amp; Animation) and facilitates the maintenance and extension. The general architecture of the package is presented in .</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/images/sv_diagram.png" class="img-fluid figure-img"></p>
+<figcaption>General architecture of StructuralVibration.jl</figcaption>
+</figure>
+</div>
+</section>
 <section id="features" class="level2">
 <h2 class="anchored" data-anchor-id="features">Features</h2>
 <p>The package provides the following features:</p>
