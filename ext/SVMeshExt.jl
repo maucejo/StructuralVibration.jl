@@ -4,6 +4,6 @@ module SVMeshExt
     import StructuralVibration: detrend_mesh, renumber_element_connectivity,
         build_mesh, deformed_grid
 
-    include("common_mesh.jl")
-    include("mesh_utils.jl")
+    include("mesh/common_mesh.jl")
+    include("mesh/mesh_utils.jl")
 end

@@ -3,6 +3,6 @@ module SVAnimExt
 
     import StructuralVibration: animate_mesh, viz_mesh, fast_cmap
 
-    include("common_mesh.jl")
-    include("anim_utils.jl")
+    include("mesh/common_mesh.jl")
+    include("anim/anim_utils.jl")
 end

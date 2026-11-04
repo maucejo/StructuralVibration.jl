@@ -4,5 +4,5 @@ module SVMakieExt
     import StructuralVibration: sv_plot, bode_plot, nyquist_plot,
         peaks_plot, stabilization_plot, waterfall_plot, theme_choice
 
-    include("./common_plots.jl")
+    include("viz/common_plots.jl")
 end

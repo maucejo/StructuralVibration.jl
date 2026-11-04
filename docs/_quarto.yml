@@ -20,6 +20,8 @@ website:
         file: modal_extraction/index.qmd
       - text: "Extensions"
         file: extensions/index.qmd
+      - text: "Apps"
+        file: apps/index.qmd
       - text: "References"
         file: references/index.qmd
     right:
@@ -61,10 +63,6 @@ website:
         - modal_extraction/ods.qmd
         - modal_extraction/indicators.qmd
         - modal_extraction/modal_density.qmd
-
-    - title: "Extensions"
-      contents:
-        - extensions/index.qmd
 
     - title: "References"
       contents:

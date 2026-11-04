@@ -6,6 +6,17 @@ format:
     number-sections: false
 ---
 
+## 1.11.0
+
+**New features**
+
+- Add five new applications in `SVAppsExt.jl` extension for educational purposes:
+  - Free Response of a 1-DOF System
+  - Forced Response of a 1-DOF System
+  - Free Response of a 2-DOF System
+  - Forced Response of a 2-DOF System
+  - Newmark Method for a 2-DOF System
+
 ## 1.10.3
 
 - Fix the coefficient of the stiffness-velocity term in the Newmark family solvers, which reduced `Newmark`, `HHT`, `WBZ`, `FoxGoodwin`, `LinearAcceleration` and `GeneralizedAlpha` with `ρ < 1` to first-order accuracy. The default `GeneralizedAlpha()` and `MidPoint` are not affected.

@@ -1,0 +1,5 @@
+function free_response_1dof end
+function forced_response_1dof end
+function free_response_2dof end
+function forced_response_2dof end
+function newmark_2dof end

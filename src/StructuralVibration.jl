@@ -69,6 +69,9 @@ module StructuralVibration
        # Functions for mesh animation
        export animate_mesh, build_mesh, deformed_grid, detrend_mesh, detrend_plane, fast_cmap, renumber_element_connectivity, viz_mesh
 
+       # Functions for apps
+       export free_response_1dof, forced_response_1dof, free_response_2dof, forced_response_2dof, newmark_2dof
+
        # Include files - Utils
        include("utils/macro_utils.jl")
 
@@ -125,6 +128,9 @@ module StructuralVibration
        # Include files - Meshes
        include("utils/mesh_utils.jl")
        include("utils/animation_utils.jl")
+
+       # Include files - Apps
+       include("utils/apps_utils.jl")
 end
 
 # end
