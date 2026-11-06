@@ -5,7 +5,7 @@ module StructuralVibration
        using DataInterpolations, FastGaussQuadrature, FFTW, LinearAlgebra,
              Optim, Peaks, Polynomials, ProgressMeter, Random, SpecialFunctions, Statistics, SkipNan, ToeplitzMatrices
 
-       using DSP: conv, filt, filtfilt, remez, rms, hilbert
+       using DSP: conv, filt, filtfilt, remez, rms, hilbert, unwrap!
 
        # Structs - Models
        export Bar, Beam, ContinuousStateSpace, DiscreteStateSpace, Mdof,
@@ -60,7 +60,7 @@ module StructuralVibration
        export bartlett, bartlett_hann, blackman, blackman_harris,
               blackman_nuttall, cosine, csd, dpss, exponential, flattop, flattri, force, gaussian, hamming, hanning, kaiser, lanczos, nuttall, parzen, planck, rect, spectrum, tfestimate, triang, tukey, welch
 
-       export detrend, gradient
+       export detrend, gradient, peak2peak, peak_value, ref_dB, rms_value, to_dB, unwrap_phase
 
        # Functions for plotting
        export bode_plot, nyquist_plot, peaks_plot, stabilization_plot, sv_plot,
@@ -88,6 +88,9 @@ module StructuralVibration
        include("signal_processing/denoising.jl")
        include("signal_processing/windows.jl")
        include("signal_processing/signal.jl")
+       include("signal_processing/decibel.jl")
+       include("signal_processing/amplitude.jl")
+       include("signal_processing/phase.jl")
 
        # Include files - Modal extraction
        include("modal_extraction/modal_analysis_types.jl")

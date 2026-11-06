@@ -377,27 +377,13 @@ function bode_plot(freq, y...; lw = 1., xlabel = "Frequency (Hz)", xscale = iden
         ax2.ylabel = ylab2
     end
 
-    ymag = similar(freq)
-    ϕ = similar(freq)
     if ny == 1
-        @. ymag = abs(y[1])
-        if isdeg
-            @. ϕ = rad2deg(angle(y[1]))
-        else
-            @. ϕ = angle(y[1])
-        end
-        lines!(ax1, freq, 20log10.(ymag/ref_dB), linewidth = lw, label = leg.entry[1])
-        lines!(ax2, freq, unwrap(ϕ), linewidth = lw)
+        lines!(ax1, freq, to_dB(y[1], ref_dB), linewidth = lw, label = leg.entry[1])
+        lines!(ax2, freq, unwrap_phase(y[1], deg = isdeg), linewidth = lw)
     else
         for (yi, labeli) in zip(y, leg.entry)
-            @. ymag = abs(yi)
-            if isdeg
-                @. ϕ = rad2deg(angle(yi))
-            else
-                @. ϕ = angle(yi)
-            end
-            lines!(ax1, freq, 20log10.(ymag/ref_dB), linewidth = lw, label = labeli)
-            lines!(ax2, freq, unwrap(ϕ), linewidth = lw, label = labeli)
+            lines!(ax1, freq, to_dB(yi, ref_dB), linewidth = lw, label = labeli)
+            lines!(ax2, freq, unwrap_phase(yi, deg = isdeg), linewidth = lw, label = labeli)
         end
     end
 

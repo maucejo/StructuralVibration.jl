@@ -38,10 +38,10 @@ version = "1.5.0"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "dee8388a9bec89c8713ad176f96960ae2f98598a"
+git-tree-sha1 = "eec8a0ad4e4b673afba213931504c360fffb8f97"
 registries = "General"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
-version = "4.7.4"
+version = "4.8.0"
 weakdeps = ["SparseArrays", "StaticArrays"]
 
     [deps.Adapt.extensions]
@@ -649,10 +649,10 @@ version = "1.6.1"
 
 [[deps.PrettyTables]]
 deps = ["Crayons", "LaTeXStrings", "Markdown", "PrecompileTools", "Printf", "REPL", "Reexport", "StringManipulation", "StyledStrings", "Tables"]
-git-tree-sha1 = "99fd8f32ab6728ff205cddd24e2d9ea6cbb498d3"
+git-tree-sha1 = "eeac4c9337f876c3c32b8da732141953567f57c9"
 registries = "General"
 uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
-version = "3.5.0"
+version = "3.5.1"
 
     [deps.PrettyTables.extensions]
     PrettyTablesExcelExt = "XLSX"
@@ -713,10 +713,10 @@ version = "1.0.0"
 
 [[deps.SIMD]]
 deps = ["PrecompileTools"]
-git-tree-sha1 = "37ac518b3c924f110d82d50173eaf4ebeaf27ad7"
+git-tree-sha1 = "0651e0ac84b2027c5f227c058d37f81b5be373bd"
 registries = "General"
 uuid = "fdea26ae-647d-5447-a871-4b548cad5224"
-version = "3.8.1"
+version = "3.8.2"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -813,7 +813,7 @@ version = "0.6.1"
 deps = ["DSP", "DataInterpolations", "FFTW", "FastGaussQuadrature", "LinearAlgebra", "Optim", "Peaks", "Polynomials", "ProgressMeter", "Random", "SkipNan", "SpecialFunctions", "Statistics", "ToeplitzMatrices"]
 path = ".."
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "1.11.0"
+version = "1.11.1"
 
     [deps.StructuralVibration.extensions]
     SVAnimExt = ["Meshes", "Makie"]

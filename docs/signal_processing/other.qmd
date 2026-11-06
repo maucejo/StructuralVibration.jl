@@ -121,3 +121,162 @@ Being based on interpolation, `gradient` is not robust against noise. For robust
 
 [^1]: R. Chartrand. "Numerical differentiation of noisy, nonsmooth data". ISRN Applied Mathematics, vol. 2011, 164564, 2011.
 :::
+## Amplitude of a signal
+
+In vibration measurements, the amplitude of a signal $x(t)$ (displacement, velocity or acceleration) can be defined in different ways:
+
+* **Peak value**: $x_{peak} = \max(|x(t)|)$. It is often used for short-duration phenomena (e.g. shocks), but does not account for the time evolution of the vibration.
+
+* **Peak-to-peak value**: $x_{p-p} = \max(x(t)) - \min(x(t))$. It is often used for displacement measurements, to be compared with a critical displacement.
+
+* **Root mean square (RMS) value**:
+$$
+x_{RMS} = \sqrt{\frac{1}{T}\int_0^T x^2(t)\, dt}
+$$
+It is related to the vibratory energy and accounts for the time evolution of the signal.
+
+### API
+
+::: {.api}
+**peak_value**
+
+---
+```{julia}
+#| echo: false
+@doc peak_value
+```
+:::
+
+::: {.api}
+**peak2peak**
+
+---
+```{julia}
+#| echo: false
+@doc peak2peak
+```
+:::
+
+::: {.api}
+**rms_value**
+
+---
+```{julia}
+#| echo: false
+@doc rms_value
+```
+:::
+
+### Example
+```julia
+# Signal
+fs = 1000
+t = (0:fs - 1)/fs
+x = @. 2sin(2π*5t) + 0.5
+
+# Amplitudes
+x_peak = peak_value(x)
+x_pp = peak2peak(x)
+x_rms = rms_value(x)
+
+x_peak, x_pp, x_rms
+```
+
+## Phase unwrapping
+
+The phase of a complex signal (FRF, spectrum, ...) computed with `angle` is wrapped in the interval $(-\pi, \pi]$, which leads to artificial jumps of $2\pi$. The `unwrap_phase` function removes these jumps to obtain a continuous phase.
+
+::: {.callout-warning}
+The unwrapping must always be performed in radians. Converting the phase to degrees **before** unwrapping it leads to wrong results. To get the unwrapped phase in degrees, use the `deg = true` keyword argument.
+:::
+
+### API
+
+::: {.api}
+**unwrap_phase**
+
+---
+```{julia}
+#| echo: false
+@doc unwrap_phase
+```
+:::
+
+### Example
+```{julia}
+#| output: false
+# FRF of a delayed system
+freq = 0:0.5:100
+τ = 0.02
+H = @. exp(-2im*π*freq*τ)
+
+# Wrapped and unwrapped phases
+ϕ_wrapped = rad2deg.(angle.(H))
+ϕ_unwrapped = unwrap_phase(H, deg = true)
+```
+
+```{julia}
+#| echo: false
+fig_ϕ = Figure()
+ax_ϕ = Axis(fig_ϕ[1, 1], xlabel = "Frequency (Hz)", ylabel = "Phase (deg)")
+lines!(ax_ϕ, freq, ϕ_wrapped, label = "Wrapped")
+lines!(ax_ϕ, freq, ϕ_unwrapped, label = "Unwrapped", linestyle = :dash)
+axislegend(ax_ϕ, position = :lb)
+xlims!(ax_ϕ, freq[1], freq[end])
+
+display(fig_ϕ);
+```
+
+## Decibel conversion
+
+The `to_dB` function converts a signal to decibels with respect to a reference value. Two cases must be distinguished:
+
+* **Amplitude (root-power) quantities** (displacement, velocity, acceleration, pressure, FRF, RMS values, ...):
+$$
+L = 20 \log_{10}\left(\frac{|X|}{X_{ref}}\right)
+$$
+
+* **Power (energy) quantities** (squared amplitude, power, energy, PSD, autospectrum, ...):
+$$
+L = 10 \log_{10}\left(\frac{|X|}{X_{ref}}\right)
+$$
+
+In both cases, $X_{ref}$ is expressed in the same unit as $X$. For a power quantity, the reference is therefore the square of the amplitude reference, so that both definitions lead to the same level.
+
+Usual reference values can be obtained with the `ref_dB` function.
+
+### API
+
+::: {.api}
+**to_dB**
+
+---
+```{julia}
+#| echo: false
+@doc to_dB
+```
+:::
+
+::: {.api}
+**ref_dB**
+
+---
+```{julia}
+#| echo: false
+@doc ref_dB
+```
+:::
+
+### Example
+```julia
+# Acceleration amplitude of 1 mm/s² (ref = 1 µm/s²)
+L_amp = to_dB(1e-3, 1e-6)
+
+# Same quantity expressed as a power quantity (ref = (1 µm/s²)²)
+L_pow = to_dB((1e-3)^2, (1e-6)^2, type = :power)
+
+# Using the usual reference values
+L_ref = to_dB(1e-3, ref_dB(:acceleration))
+
+L_amp, L_pow, L_ref
+```

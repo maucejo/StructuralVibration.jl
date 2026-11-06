@@ -6,6 +6,23 @@ format:
     number-sections: false
 ---
 
+## 1.12.0
+
+**New features**
+
+- Add `to_dB` function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (`type = :amplitude`, 20 log₁₀) from power/energy quantities (`type = :power`, 10 log₁₀).
+- Add `ref_dB` function returning the usual reference values (`:mobility`, `:accelerance`, `:displacement`, `:velocity`, `:acceleration`, `:pressure`) for amplitude or power quantities.
+- Add `peak_value`, `peak2peak` and `rms_value` functions to compute the peak, peak-to-peak and RMS values of a signal.
+- Add `unwrap_phase` function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (`deg = true`), and independently for each channel of a multichannel signal.
+
+**Bug fixes**
+
+- Fix the phase unwrapping in `bode_plot` when `isdeg = true`. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase.
+
+**Internals**
+
+- `bode_plot` now relies on `to_dB` and `unwrap_phase`.
+
 ## 1.11.0
 
 **New features**
