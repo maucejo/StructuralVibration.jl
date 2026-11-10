@@ -78,7 +78,7 @@ Plot a 2D plot.
 **Output**
 * `fig`: Figure
 """
-function sv_plot(x, y...; lw = 1., xscale = identity, yscale = identity, axis_tight = true, title = " ",  xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, orientation = :vertical, entry = " "))
+function sv_plot(x, y...; lw = 1.5, xscale = identity, yscale = identity, axis_tight = true, title = " ",  xlabel = "x", ylabel = "y", legend = (active = false, position = :rt, orientation = :vertical, entry = " "))
 
     # Some checks
     t = typeof(legend)

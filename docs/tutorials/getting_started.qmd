@@ -17,16 +17,16 @@ using StructuralVibration, ShareAdd
 @usingany CairoMakie
 ```
 
-This page takes you from installation to your first results in about ten minutes. No prior knowledge of the package is assumed; basic notions of vibration (mass, stiffness, damping, resonance) are enough.
+This page takes you from installation to your first results in about ten minutes. No prior knowledge of the package is assumed and basic notions of vibration (mass, stiffness, damping, resonance) are enough.
 
 ::: {.callout-tip}
 ## The main idea to remember
-Every computation in StructuralVibration.jl follows the same four steps:
+Every computation in `StructuralVibration.jl` follows the same four steps:
 
 1. **Model** – describe the structure (`Sdof`, `Beam`, `Plate`, FE matrices...)
-2. **Problem** – say *what* you want to compute (free response, forced response, FRF...)
+2. **Problem** – say *what* you want to compute (free response, forced response, FRF,...)
 3. **Solve** – call `solve(prob)` (optionally with a solver, e.g. `solve(prob, Newmark())`)
-4. **Post-process** – plot, compare, extract modal parameters...
+4. **Post-process** – plot, compare, extract modal parameters, ...
 
 Once you have understood this pattern on a single-degree-of-freedom system, the rest of the package follows naturally.
 :::
@@ -35,10 +35,10 @@ Once you have understood this pattern on a single-degree-of-freedom system, the 
 
 ```julia
 julia> ]
-pkg> add StructuralVibration CairoMakie
+pkg> add StructuralVibration, CairoMakie
 ```
 
-`CairoMakie` is optional: it activates the plotting functions of the package (`bode_plot`, `stabilization_plot`, ...). Any other Makie backend (`GLMakie`, `WGLMakie`) works as well.
+`CairoMakie.jl` is optional but it activates the plotting functions of the package (`bode_plot`, `stabilization_plot`, ...). Any other Makie backend (`GLMakie.jl`, `WGLMakie.jl`) works as well.
 
 ```julia
 using StructuralVibration, CairoMakie
@@ -71,17 +71,14 @@ x_free = solve(prob_free).u
 ```
 
 ```{julia}
-fig = Figure()
-ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
-lines!(ax, t, x_free)
-fig
+sv_plot(t, x_free, xlabel = "Time (s)", ylabel = "Displacement (m)")
 ```
 
 The system oscillates at (almost) $f_0$ = 10 Hz and the amplitude decays because of damping. Try `ξ = 0.` or `ξ = 1.` to see an undamped and a critically damped system.
 
 ## Step 3 – Forced response
 
-Now we excite the mass with a harmonic force $F(t) = F_0 \sin(2\pi f t)$. Only the *problem* changes: the model and the call to `solve` stay the same.
+Now, we excite the mass with a harmonic force $F(t) = F_0 \sin(2\pi f t)$. Only the *problem* changes: the model and the call to `solve` stay the same.
 
 ```{julia}
 #| output: false
@@ -93,10 +90,7 @@ x_harmo = solve(prob_harmo).u
 ```
 
 ```{julia}
-fig = Figure()
-ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
-lines!(ax, t, x_harmo)
-fig
+sv_plot(t, x_harmo, xlabel = "Time (s)", ylabel = "Displacement (m)")
 ```
 
 The response combines a decaying transient (free response) and a steady-state oscillation at the excitation frequency. Arbitrary excitations (impacts, sweeps, random noise) are handled by `SdofForcedTimeProblem` together with the signals described in [Excitation models](../models/excitation.qmd).
@@ -121,7 +115,7 @@ The resonance peak is located at $f_0$ and its sharpness is governed by $\xi$. T
 
 ## Step 5 – Same pattern, real structure
 
-The four steps remain the same for continuous structures. Here we compute the FRFs of a simply supported steel beam from its modes, add measurement noise, and identify its natural frequencies back, as an experimentalist would.
+The four steps remain the same for continuous structures. Here, we compute the FRFs of a simply supported steel beam from its modes, add measurement noise, and identify its natural frequencies back, as an experimentalist would.
 
 ```{julia}
 #| output: false
@@ -150,8 +144,8 @@ We computed accelerances (acceleration/force) because this is what an accelerome
 ```{julia}
 fig = Figure()
 ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)")
-lines!(ax, freq, 20log10.(abs.(H_meas[1, 1, :])), label = "Noisy FRF")
-lines!(ax, freq, 20log10.(abs.(H[1, 1, :])), label = "Exact FRF")
+lines!(ax, freq, to_dB.(H_meas[1, 1, :]), label = "Noisy FRF")
+lines!(ax, freq, to_dB.(H[1, 1, :]), label = "Exact FRF")
 vlines!(ax, fn_id, color = :black, linestyle = :dash, label = "Identified modes")
 xlims!(ax, freq[1], freq[end])
 axislegend(ax, position = :rb)

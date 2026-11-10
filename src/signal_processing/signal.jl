@@ -155,10 +155,7 @@ function tfestimate(input_signal::AbstractVector, output_signal::AbstractVector,
     Gyy ./= n_segments
     Gxy ./= n_segments
 
-    # Note: no window energy correction is applied here. Transfer functions and coherence are
-    # ratios of spectral densities: with identical windows, the corrections cancel out, and with
-    # different windows (e.g. force/exponential windows for impact testing), applying them would
-    # bias the estimate by rms(window_input)/rms(window_output).
+    # Note: no window energy correction is applied here. Transfer functions and coherence are ratios of spectral densities: with identical windows, the corrections cancel out, and with different windows (e.g. force/exponential windows for impact testing), applying them would bias the estimate by rms(window_input)/rms(window_output).
 
     # Tranfer function estimation
     if type == :h1
