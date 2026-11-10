@@ -20,7 +20,7 @@ using StructuralVibration, ShareAdd
 This page takes you from installation to your first results in about ten minutes. No prior knowledge of the package is assumed; basic notions of vibration (mass, stiffness, damping, resonance) are enough.
 
 ::: {.callout-tip}
-## The one idea to remember
+## The main idea to remember
 Every computation in StructuralVibration.jl follows the same four steps:
 
 1. **Model** – describe the structure (`Sdof`, `Beam`, `Plate`, FE matrices...)
