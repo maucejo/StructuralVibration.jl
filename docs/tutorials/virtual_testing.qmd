@@ -1,0 +1,288 @@
+---
+title: From model to virtual measurement
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+::: {.callout-note}
+## In this tutorial
+
+- **You will learn** how to simulate a complete impact hammer test (excitation, time responses, measurement noise, FRF estimation) and how the test parameters affect the quality of the measured FRFs.
+- **Prerequisites**: the [Getting started](getting_started.qmd) page.
+- **Duration**: about 20 minutes.
+:::
+
+The main purpose of StructuralVibration.jl is to generate **realistic synthetic data**, for which the ground truth is known. In this tutorial, we reproduce numerically what an experimentalist does in the lab: hitting a beam with an impact hammer, recording the force and the accelerations, and estimating the Frequency Response Functions (FRFs).
+
+## Step 1 – The structure and the test setup
+
+The structure is a simply supported steel beam. Three accelerometers are placed at $x$ = 0.2, 0.5 and 0.7 m, and the beam is hit at $x$ = 0.35 m.
+
+```{julia}
+#| output: false
+# Structure
+L, b, h = 1., 0.03, 0.01
+beam = Beam(L, b*h, b*h^3/12, 2.1e11, 7850.)
+ξ = 0.01                                 # Modal damping ratio
+
+# Test setup
+x_acc = [0.2, 0.5, 0.7]                  # Accelerometer locations (m)
+x_hit = [0.35]                           # Impact location (m)
+```
+
+The acquisition is defined by the sampling rate `fs` and the block size `bs`. `FFTParameters` derives the time vector of one block and the frequency vector. As on a real analyzer, the useful bandwidth is limited to `fs/2.56` to leave room for the anti-aliasing filter.
+
+```{julia}
+fs = 8192                                # Sampling rate (Hz)
+bs = 8192                                # Block size → 1 s per block
+fft_params = FFTParameters(fs, bs)
+tb, freq = fft_params.t, fft_params.freq
+
+println("Frequency resolution: ", fft_params.df, " Hz")
+println("Useful bandwidth: ", freq[end], " Hz")
+```
+
+The beam is described by its modal basis. We keep all the modes up to the Nyquist frequency, so that the modes located above the analysis band also contribute to the response, as in reality.
+
+```{julia}
+#| output: false
+ωn, kn = modefreq(beam, fs/2)
+Φ_acc = modeshape(beam, kn, x_acc)       # Mode shapes at the accelerometers
+Φ_hit = modeshape(beam, kn, x_hit)       # Mode shapes at the impact point
+nmodes = length(ωn)
+```
+
+```{julia}
+println("Natural frequencies below 1 kHz (Hz): ", round.(ωn[ωn .< 2π*1000]/2π, digits = 1))
+```
+
+## Step 2 – Choosing the hammer tip
+
+An impact hammer excites a frequency band whose width is inversely proportional to the impact duration, which is controlled by the hardness of the tip. The `Hammer` excitation reproduces this behaviour through its parameter `θ`: the smaller `θ`, the shorter the impact.
+
+```{julia}
+using FFTW
+
+tips = [("Soft tip (θ = 0.6 ms)", 6e-4), ("Medium tip (θ = 0.1 ms)", 1e-4), ("Hard tip (θ = 0.05 ms)", 5e-5)]
+
+fig = Figure()
+ax1 = Axis(fig[1, 1], xlabel = "Time (ms)", ylabel = "Force (N)")
+ax2 = Axis(fig[1, 2], xlabel = "Frequency (Hz)", ylabel = "Force spectrum (dB)")
+for (name, θ) in tips
+    F = excitation(Hammer(100., 0., 9.7, θ), tb)
+    S = abs.(rfft(F))[1:length(freq)]
+    lines!(ax1, 1e3tb, F, label = name)
+    lines!(ax2, freq, 20log10.(S/S[1]), label = name)
+end
+xlims!(ax1, 0., 15.)
+xlims!(ax2, 0., 1000.)
+ylims!(ax2, -60., 5.)
+axislegend(ax1, position = :rt)
+fig
+```
+
+To measure the beam up to 1 kHz, the force spectrum must remain as flat as possible over this band: we choose the **hard tip**. With the soft tip, the force spectrum has already lost 30 dB at 250 Hz, and the corresponding FRFs would be dominated by noise above a few hundred Hz.
+
+::: {.callout-tip}
+## Rule of thumb
+Choose the tip so that the force spectrum loses less than 10–20 dB over the frequency band of interest.
+:::
+
+## Step 3 – Simulating the impacts
+
+A real test consists of several impacts, one per acquisition block, which are then averaged. The amplitude of a human hit is never exactly the same: we draw it randomly between 80 and 120 N.
+
+```{julia}
+#| output: false
+using Random
+Random.seed!(1)
+
+navg = 10                                         # Number of impacts (averages)
+impact = excitation(Hammer(1., 0., 9.7, 5e-5), tb) # Unit impact at the start of a block
+amplitudes = 80. .+ 40. .* rand(navg)
+
+force_signal = reduce(vcat, [A*impact for A in amplitudes])
+t = range(0., step = fft_params.dt, length = length(force_signal))
+```
+
+The accelerations are computed by modal superposition. The modal participation factors are obtained by projecting the force on the mode shapes at the impact point.
+
+```{julia}
+#| output: false
+F = reshape(force_signal, 1, :)                     # One row per excitation point
+u0 = (zeros(nmodes), zeros(nmodes))                 # Beam at rest
+prob = ForcedModalTimeProblem(ωn, Φ_acc, ξ, Φ_hit'*F, u0, t)
+acc_signal = solve(prob).ddu                        # One row per accelerometer
+```
+
+## Step 4 – Adding measurement noise
+
+Every measurement chain adds noise. We add a Gaussian white noise with a signal-to-noise ratio (SNR) of 40 dB on the force and 30 dB on the accelerations.
+
+```{julia}
+#| output: false
+force_meas = agwn(force_signal, 40., rst = false)
+acc_meas = agwn(acc_signal, 30., rst = false)
+```
+
+::: {.callout-note}
+By default, `agwn` resets its random number generator (`rst = true`), so that the same noise is generated at each call. This is convenient for reproducibility, but it would here generate the same noise sequence on the force and on the accelerations. Setting `rst = false` uses the global generator instead, which we have seeded with `Random.seed!` above.
+:::
+
+```{julia}
+fig = Figure()
+ax1 = Axis(fig[1, 1], ylabel = "Force (N)", title = "Measured signals – first 3 impacts")
+ax2 = Axis(fig[2, 1], xlabel = "Time (s)", ylabel = "Acceleration (m/s²)")
+idx = 1:3bs
+lines!(ax1, t[idx], force_meas[idx])
+lines!(ax2, t[idx], acc_meas[2, idx])
+xlims!(ax1, 0., t[3bs])
+xlims!(ax2, 0., t[3bs])
+fig
+```
+
+## Step 5 – Estimating the FRFs
+
+The FRFs are estimated block by block and averaged with the $H_1$ estimator, $H_1(f) = G_{xy}(f)/G_{xx}(f)$, which minimizes the influence of the noise on the output. `tfestimate` also returns the **coherence** $\gamma^2(f) \in [0, 1]$, which measures the fraction of the output that is linearly explained by the input: values close to 1 indicate a reliable estimate.
+
+The response of the beam has almost vanished at the end of each block (1 s), so a rectangular window can be used without significant leakage.
+
+```{julia}
+#| output: false
+H1, _, coh = tfestimate(reshape(force_meas, 1, :), acc_meas, bs, rect, fs = fs)
+
+# Exact accelerances for comparison
+H_exact = solve(ModalFRFProblem(ωn, ξ, freq, Φ_acc, Φ_hit), type = :acc, progress = false).u
+```
+
+```{julia}
+fig = Figure(size = (700, 700))
+ax1 = Axis(fig[1, 1], ylabel = "Accelerance (dB, ref: 1 m/s²/N)", title = "Accelerometer at x = 0.5 m")
+ax2 = Axis(fig[2, 1], ylabel = "Phase (°)", yticks = -180:90:180)
+ax3 = Axis(fig[3, 1], xlabel = "Frequency (Hz)", ylabel = "Coherence")
+lines!(ax1, freq, 20log10.(abs.(H1[2, 1, :])), label = "Estimated H₁")
+lines!(ax1, freq, 20log10.(abs.(H_exact[2, 1, :])), linestyle = :dash, label = "Exact")
+lines!(ax2, freq, rad2deg.(angle.(H1[2, 1, :])))
+lines!(ax2, freq, rad2deg.(angle.(H_exact[2, 1, :])), linestyle = :dash)
+lines!(ax3, freq, coh[2, 1, :])
+for ax in (ax1, ax2, ax3)
+    xlims!(ax, 0., 1000.)
+end
+ylims!(ax3, 0., 1.05)
+axislegend(ax1, position = :rb)
+rowsize!(fig.layout, 3, Relative(0.2))
+fig
+```
+
+The estimated FRF closely follows the exact one, in amplitude and in phase. The phase of an accelerance jumps by -180° at each resonance and by +180° at each anti-resonance. The coherence drops at the anti-resonances, where the response is weak and therefore dominated by noise: this is the typical signature of a good measurement.
+
+Note that modes 2 and 4 (94 and 375 Hz) are missing from this FRF: mid-span is a **node** of all the even modes of a simply supported beam. This is why a modal test always uses several measurement points.
+
+## Step 6 – Why averaging matters
+
+Let us compare the estimates obtained with a single impact and with all ten impacts.
+
+```{julia}
+#| output: false
+using Statistics
+
+band = 5. .< freq .< 1000.
+function frf_error(H)
+    ΔdB = 20log10.(abs.(H[:, 1, band])) .- 20log10.(abs.(H_exact[:, 1, band]))
+    return median(abs, ΔdB)
+end
+
+H1_single, _, coh_single = tfestimate(reshape(force_meas[1:bs], 1, :), acc_meas[:, 1:bs], bs, rect, fs = fs)
+```
+
+```{julia}
+println("1 impact   → median error = ", round(frf_error(H1_single), digits = 2), " dB, mean coherence = ", round(mean(coh_single[:, 1, band]), digits = 3))
+println("10 impacts → median error = ", round(frf_error(H1), digits = 2), " dB, mean coherence = ", round(mean(coh[:, 1, band]), digits = 3))
+```
+
+::: {.callout-warning}
+## Pitfall
+With a single block, the coherence is **identically equal to 1**, whatever the quality of the measurement: it carries no information. The coherence only becomes meaningful when several blocks are averaged. In practice, 5 to 10 impacts are a good starting point.
+:::
+
+## Step 7 – Impact testing windows
+
+Towards the end of each block, the response has almost vanished and the acceleration signal is mostly noise. Impact testing therefore commonly relies on two dedicated windows:
+
+- a **force window** on the input, equal to 1 during the impact and 0 afterwards, which removes the noise recorded on the force channel between impacts;
+- an **exponential window** on the output, which attenuates the end of the block, where the signal-to-noise ratio is poor. It also forces the response to vanish at the end of the block, which is the classical remedy when the block is too short to let the response decay (leakage).
+
+`tfestimate` accepts a different window for the input and for the output. Following Fladung and Rost, the exponential decay of the force window is set equal to that of the exponential window.
+
+```{julia}
+#| output: false
+ε = 0.05                                   # Value of the exponential windows at the end of the block
+win_force(N) = force(N, 0.01, ε)           # Force window: 1 % of the block, then zero
+win_exp(N) = exponential(N, ε)
+
+H1_w, _, coh_w = tfestimate(reshape(force_meas, 1, :), acc_meas, bs, win_force, win_exp, fs = fs)
+```
+
+```{julia}
+println("Rectangular windows    → median error = ", round(frf_error(H1), digits = 2), " dB, mean coherence = ", round(mean(coh[:, 1, band]), digits = 3))
+println("Force + exponential    → median error = ", round(frf_error(H1_w), digits = 2), " dB, mean coherence = ", round(mean(coh_w[:, 1, band]), digits = 3))
+```
+
+The windows improve the coherence, but they are not free. Multiplying the response by $e^{-t/\tau}$ is equivalent to measuring a **more damped structure**: each mode receives an additional damping ratio
+$$
+\xi_\text{add} = \frac{1}{\tau\,\omega_n}, \qquad \text{with} \quad \tau = \frac{T_\text{block}}{\ln(1/\varepsilon)}.
+$$
+The natural frequencies are not affected, but the identified damping ratios must be corrected. Let us check this by identifying the modes (see the [EMA tutorial](ema_workflow.qmd)) from both estimates.
+
+```{julia}
+function identify(H)
+    stab = stabilization(EMAProblem(H, collect(freq), type_frf = :acc, frange = [5., 1000.]), 20, LSCF())
+    p = stab.poles[end]
+    return poles2modal(p[.!isnan.(p)])
+end
+
+fn_r, ξn_r = identify(H1)
+fn_w, ξn_w = identify(H1_w)
+
+τ = (bs - 1)/fs/log(1/ε)
+ξ_add = 1 ./ (τ*2π*fn_w)
+
+println("Mode | ξ rect (%) | ξ windowed (%) | ξ windowed, corrected (%)")
+for i in eachindex(fn_w)
+    println(lpad(i, 4), " | ", lpad(round(100ξn_r[i], digits = 2), 10), " | ", lpad(round(100ξn_w[i], digits = 2), 14),
+            " | ", lpad(round(100(ξn_w[i] - ξ_add[i]), digits = 2), 25))
+end
+```
+
+After correction, the damping ratios are recovered (exact value: 1 %), except for the first mode. For this mode, the added damping (about 2 %) is larger than the physical one, so that the corrected value is very sensitive to small estimation errors.
+
+::: {.callout-tip}
+## Rule of thumb
+Use the mildest exponential window that does the job (the largest `ε`), and always correct the identified damping ratios. If the block is long enough for the response to decay, the exponential window is not needed.
+:::
+
+## Step 8 – Your turn
+
+The whole chain is now in place. Try to change one parameter at a time and observe its effect on the FRFs and on the coherence:
+
+- use the soft tip (`θ = 6e-4`) and look at the coherence above 300 Hz;
+- decrease the SNR of the accelerations to 10 dB;
+- decrease the block size to `bs = 2048` (0.25 s): the response no longer vanishes at the end of each block;
+- plot the FRFs of the two other accelerometers (`H1[1, 1, :]` and `H1[3, 1, :]`) and check that all the modes are visible.
+
+**Next step**: these FRFs are exactly the input of an experimental modal analysis. See [Experimental modal analysis](ema_workflow.qmd).
+
+**Reference pages**: [Excitation models](../models/excitation.qmd), [Noise models](../models/noise.qmd), [Modal time solvers](../solvers/modal_time_solvers.qmd), [Signal processing](../signal_processing/index.qmd).

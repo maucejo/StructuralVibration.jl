@@ -1,0 +1,182 @@
+---
+title: Getting started
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+This page takes you from installation to your first results in about ten minutes. No prior knowledge of the package is assumed; basic notions of vibration (mass, stiffness, damping, resonance) are enough.
+
+::: {.callout-tip}
+## The one idea to remember
+Every computation in StructuralVibration.jl follows the same four steps:
+
+1. **Model** – describe the structure (`Sdof`, `Beam`, `Plate`, FE matrices...)
+2. **Problem** – say *what* you want to compute (free response, forced response, FRF...)
+3. **Solve** – call `solve(prob)` (optionally with a solver, e.g. `solve(prob, Newmark())`)
+4. **Post-process** – plot, compare, extract modal parameters...
+
+Once you have understood this pattern on a single-degree-of-freedom system, the rest of the package follows naturally.
+:::
+
+## Installation
+
+```julia
+julia> ]
+pkg> add StructuralVibration CairoMakie
+```
+
+`CairoMakie` is optional: it activates the plotting functions of the package (`bode_plot`, `stabilization_plot`, ...). Any other Makie backend (`GLMakie`, `WGLMakie`) works as well.
+
+```julia
+using StructuralVibration, CairoMakie
+```
+
+## Step 1 – Define a model
+
+We start with the simplest vibrating system: a mass $m$ attached to a spring and a viscous damper. It is fully described by its mass, its natural frequency $f_0$ and its damping ratio $\xi$.
+
+```{julia}
+#| output: false
+m  = 1.     # Mass (kg)
+f0 = 10.    # Natural frequency (Hz)
+ξ  = 0.02   # Damping ratio (2 %)
+
+sdof = Sdof(m, f0, ξ)
+```
+
+## Step 2 – Free response
+
+Let us pull the mass away from its equilibrium position and release it. The *problem* gathers the model, the initial conditions `[x₀, v₀]` and the time vector.
+
+```{julia}
+#| output: false
+t  = 0.:1e-3:2.
+u0 = [1e-3, 0.]    # Initial displacement (m) and velocity (m/s)
+
+prob_free = SdofFreeTimeProblem(sdof, u0, t)
+x_free = solve(prob_free).u
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax, t, x_free)
+fig
+```
+
+The system oscillates at (almost) $f_0$ = 10 Hz and the amplitude decays because of damping. Try `ξ = 0.` or `ξ = 1.` to see an undamped and a critically damped system.
+
+## Step 3 – Forced response
+
+Now we excite the mass with a harmonic force $F(t) = F_0 \sin(2\pi f t)$. Only the *problem* changes: the model and the call to `solve` stay the same.
+
+```{julia}
+#| output: false
+F0 = 10.   # Force amplitude (N)
+f  = 9.5   # Excitation frequency (Hz), close to resonance
+
+prob_harmo = SdofHarmonicTimeProblem(sdof, u0, t, F0, f, :force)
+x_harmo = solve(prob_harmo).u
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)")
+lines!(ax, t, x_harmo)
+fig
+```
+
+The response combines a decaying transient (free response) and a steady-state oscillation at the excitation frequency. Arbitrary excitations (impacts, sweeps, random noise) are handled by `SdofForcedTimeProblem` together with the signals described in [Excitation models](../models/excitation.qmd).
+
+## Step 4 – Frequency Response Function
+
+Rather than computing one response per excitation frequency, we usually characterize a structure by its Frequency Response Function (FRF) $H(f)$, the ratio between the displacement and the force at each frequency.
+
+```{julia}
+#| output: false
+freq = 1.:0.05:30.
+
+prob_frf = SdofFRFProblem(sdof, freq)
+H = solve(prob_frf).u
+```
+
+```{julia}
+bode_plot(freq, H, isdeg = true)
+```
+
+The resonance peak is located at $f_0$ and its sharpness is governed by $\xi$. The phase shifts by 180° when crossing the resonance.
+
+## Step 5 – Same pattern, real structure
+
+The four steps remain the same for continuous structures. Here we compute the FRFs of a simply supported steel beam from its modes, add measurement noise, and identify its natural frequencies back, as an experimentalist would.
+
+```{julia}
+#| output: false
+# 1. Model - Simply supported beam
+L, b, h = 1., 0.03, 0.01
+beam = Beam(L, b*h, b*h^3/12, 2.1e11, 7850.)
+
+fmax = 500.
+ωn, kn = modefreq(beam, 2fmax)       # Natural frequencies and wavenumbers
+xm, xe = [0.2, 0.7], [0.35]          # Measurement and excitation points
+ms_m, ms_e = modeshape(beam, kn, xm), modeshape(beam, kn, xe)
+
+# 2. Problem + 3. Solve - Accelerances by modal superposition
+freq = 1.:0.25:fmax
+prob = ModalFRFProblem(ωn, 0.01, freq, ms_m, ms_e)
+H = solve(prob, type = :acc, progress = false).u
+
+# 4. Post-process - Noisy "measurement" (SNR = 40 dB) + modal identification
+H_meas = agwn(H, 40.)
+poles = poles_extraction(EMAProblem(H_meas, freq, type_frf = :acc), 20, LSCF())
+fn_id, ξn_id = poles2modal(poles)
+```
+
+We computed accelerances (acceleration/force) because this is what an accelerometer and an impact hammer actually measure.
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)")
+lines!(ax, freq, 20log10.(abs.(H_meas[1, 1, :])), label = "Noisy FRF")
+lines!(ax, freq, 20log10.(abs.(H[1, 1, :])), label = "Exact FRF")
+vlines!(ax, fn_id, color = :black, linestyle = :dash, label = "Identified modes")
+xlims!(ax, freq[1], freq[end])
+axislegend(ax, position = :rb)
+fig
+```
+
+```{julia}
+fn_exact = ωn[ωn .≤ 2π*fmax]/2π
+println("Exact frequencies (Hz):      ", round.(fn_exact, digits = 2))
+println("Identified frequencies (Hz): ", round.(fn_id, digits = 2))
+println("Identified damping (%):      ", round.(100ξn_id, digits = 2))
+```
+
+In twenty lines, we went from a structural model to synthetic measurements and back to modal parameters with a known ground truth. This round trip is what the package is designed for.
+
+## Where to go next?
+
+| I want to... | Go to |
+|:-------------|:------|
+| Discover structural dynamics interactively | [Apps](../apps/index.qmd) |
+| Build a complete virtual test campaign | [From model to virtual measurement](virtual_testing.qmd) |
+| Perform an experimental modal analysis | [Experimental modal analysis](ema_workflow.qmd) |
+| Identify modes from responses only | [Operational modal analysis](oma_workflow.qmd) |
+| Simulate a FE model in the time domain | [Choosing a time integration scheme](time_integration.qmd) |
+| Estimate the noise level of a signal or denoise it | [Noise estimation and denoising](denoising.qmd) |
+| Display and animate mode shapes | [Visualizing and animating deflection shapes](visualization.qmd) |
+| Use my own matrices or measurements | [Using your own models and data](own_data.qmd) |
+| Look up a function or a type | [Models](../models/index.qmd), [Solvers](../solvers/index.qmd), [Signal processing](../signal_processing/index.qmd) |

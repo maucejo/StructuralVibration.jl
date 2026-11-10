@@ -17,7 +17,7 @@ function agwn(x, snr_dB; rst = true)
     rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     SNR = 10^(snr_dB/10.)                     # SNR in linear scale
-    En = vec(mean(abs2, x, dims = ndims(x)))  # Signal energy
+    En = mean(abs2, x, dims = ndims(x))       # Signal energy (dimensions kept for broadcasting)
     V = En/SNR                                # Noise variance
 
     σ = sqrt.(V)                              # Standard deviation
@@ -214,7 +214,7 @@ function mixed_noise(x, snr_dB; rst = true)
     rng = rst ? MersenneTwister(1000) : Random.default_rng()
 
     SNR = 10^(snr_dB/10.)                      # SNR in linear scale
-    En = mean(abs2, x, dims = ndims(x))[:]     # Signal energy
+    En = mean(abs2, x, dims = ndims(x))        # Signal energy (dimensions kept for broadcasting)
     V = En/SNR                                 # Noise variance
 
     σ = sqrt.(V)                               #Standard deviation

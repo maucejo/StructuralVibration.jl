@@ -1,0 +1,174 @@
+---
+title: Visualizing and animating deflection shapes
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie, Meshes
+```
+
+::: {.callout-note}
+## In this tutorial
+
+- **You will learn** how to build a measurement mesh, display mode shapes and operational deflection shapes (ODS) on it, and turn them into animations.
+- **Prerequisites**: the [Getting started](getting_started.qmd) page. Basic knowledge of Makie is helpful.
+- **Duration**: about 15 minutes.
+:::
+
+The visualization tools of StructuralVibration.jl are provided by package extensions, which are activated by loading [Makie](https://docs.makie.org/stable/) (any backend) and [Meshes.jl](https://juliageometry.github.io/Meshes.jl/stable/):
+
+```julia
+using StructuralVibration, CairoMakie, Meshes   # or GLMakie for interactive 3D views
+```
+
+## Step 1 – The structure
+
+We consider a simply supported steel plate of 600 × 400 × 1 mm. The analytical `Plate` model gives its natural frequencies and the corresponding wavenumbers.
+
+```{julia}
+plate = Plate(0.6, 0.4, 1e-3, 2.1e11, 7800., 0.33)   # Lx, Ly, thickness, E, ρ, ν
+ωn, kn = modefreq(plate, 300.)[1:2]
+
+# Mode indices (m, n): number of half-waves along x and y
+mn = round.(Int, [kn[1, :]*0.6/π kn[2, :]*0.4/π])
+for i in 1:6
+    println("Mode $i: (m, n) = ($(mn[i, 1]), $(mn[i, 2])), f = ", round(ωn[i]/2π, digits = 1), " Hz")
+end
+```
+
+## Step 2 – Building a measurement mesh
+
+A mesh is defined by a matrix of node coordinates (one row per node, columns $x$, $y$, $z$) and a list of elements, each element being the vector of its node indices. Here, we use a regular grid of 13 × 9 points and quadrangular elements.
+
+```{julia}
+#| output: false
+using LazyGrids
+
+nx, ny = 13, 9
+X, Y = ndgrid(range(0., 0.6, nx), range(0., 0.4, ny))
+xp, yp = X[:], Y[:]
+nodes = [xp yp zeros(length(xp))]
+
+# Quadrangles, with nodes listed counter-clockwise
+function quad_elements(nx, ny)
+    elts = Vector{Vector{Int}}()
+    for j in 1:(ny - 1), i in 1:(nx - 1)
+        n1 = (j - 1)*nx + i
+        push!(elts, [n1, n1 + 1, n1 + nx + 1, n1 + nx])
+    end
+    return elts
+end
+elts = quad_elements(nx, ny)
+
+mesh = build_mesh(nodes, elts)
+```
+
+```{julia}
+viz_mesh(mesh, title = "Measurement mesh", zlim = (-0.05, 0.05))
+```
+
+::: {.callout-tip}
+Any mesh can be used, including meshes coming from a FE software or from an experimental setup, as long as the nodes are numbered from 1 to the number of nodes. Triangles and quadrangles can be mixed. If the numbering is not contiguous, `renumber_element_connectivity` fixes the connectivity.
+:::
+
+## Step 3 – Displaying mode shapes
+
+The mode shapes are evaluated at the nodes of the mesh. To display a deformed mesh, `deformed_grid` needs a displacement vector with three components per node ($u_x$, $u_y$, $u_z$, node after node): for a plate in bending, only $u_z$ is non-zero.
+
+```{julia}
+#| output: false
+Φ = modeshape(plate, kn, xp, yp)       # One row per node, one column per mode
+
+# Helper: out-of-plane displacement field → 3 components per node
+function out_of_plane(w)
+    u = zeros(3length(w))
+    u[3:3:end] .= w
+    return u
+end
+
+function show_shape(w, title; scale = 0.03)
+    w = w/maximum(abs, w)                                # Unit maximum
+    deformed = deformed_grid(nodes, out_of_plane(w), scale)
+    return viz_mesh(SimpleMesh(deformed, mesh.topology.connec), color = w, title = title,
+                    zlim = (-0.05, 0.05))
+end
+```
+
+```{julia}
+show_shape(Φ[:, 1], "Mode 1 – (1, 1) – $(round(ωn[1]/2π, digits = 1)) Hz")
+```
+
+```{julia}
+show_shape(Φ[:, 4], "Mode 4 – (3, 1) – $(round(ωn[4]/2π, digits = 1)) Hz")
+```
+
+The color map highlights the nodal lines, where the displacement vanishes. They are the places to avoid when choosing excitation or measurement points.
+
+## Step 4 – Operational deflection shapes
+
+A structure excited at a given frequency does not vibrate according to a single mode shape, but according to an **operational deflection shape** (ODS), which combines the contributions of all the modes. The ODS at frequency $f$ is given by a column of the FRF matrix: the response of all the nodes to a force applied at one point.
+
+```{julia}
+#| output: false
+# Point force at (x, y) = (0.15, 0.10) m
+i_exc = argmin((xp .- 0.15).^2 .+ (yp .- 0.1).^2)
+freq = 1.:0.5:300.
+H = solve(ModalFRFProblem(ωn, 0.01, freq, Φ, Φ[i_exc:i_exc, :]), progress = false).u
+
+# ODS at 60 Hz, between modes 2 (43 Hz) and 3 (69 Hz)
+i60 = findfirst(>=(60.), freq)
+ods_complex = H[:, 1, i60]
+ods = real_normalization(reshape(ods_complex, :, 1))[:, 1]   # Complex → real shape
+```
+
+```{julia}
+show_shape(ods, "ODS at 60 Hz")
+```
+
+The MAC with each mode shape quantifies the contribution of the modes to the ODS.
+
+```{julia}
+mac_ods = [mac(ods, Φ[:, k])[1] for k in 1:6]
+
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Mode", ylabel = "MAC with the ODS at 60 Hz", xticks = 1:6)
+barplot!(ax, 1:6, mac_ods)
+ylims!(ax, 0., 1.)
+fig
+```
+
+The ODS at 60 Hz is dominated by modes 3 and 2, the two modes surrounding the excitation frequency, but neither of them alone describes it. This is why an ODS should never be confused with a mode shape, unless the excitation frequency is very close to an isolated resonance.
+
+## Step 5 – Animating a deflection shape
+
+`animate_mesh` records a video of the harmonic motion of a deflection shape.
+
+```julia
+w = ods/maximum(abs, ods)
+animate_mesh(nodes, elts, out_of_plane(w), color = w, scale_factor = 0.03, zlim = (-0.05, 0.05),
+             title = "ODS at 60 Hz", framerate = 24, frequency = 4., filename = "plate_ods.mp4")
+```
+
+{{< video ../assets/images/plate_ods.mp4 >}}
+
+The same function also animates a time or frequency evolution: if `values` is a matrix with one column per time step (or frequency), and the corresponding vector is given as fourth argument, the title of the video displays the current time (or frequency).
+
+```julia
+animate_mesh(nodes, elts, U, t, unit_x = "s", quantity_y = "Time", filename = "response.mp4")
+```
+
+::: {.callout-tip}
+With `GLMakie`, the 3D views can be rotated and zoomed interactively, which is very convenient to inspect complex shapes. `CairoMakie` is better suited to static figures for reports.
+:::
+
+**Reference pages**: [Extensions](../extensions/index.qmd), [Operational deflection shapes](../modal_extraction/ods.qmd), [Mechanical models](../models/index.qmd).

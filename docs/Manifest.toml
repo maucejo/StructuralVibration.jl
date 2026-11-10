@@ -813,7 +813,7 @@ version = "0.6.1"
 deps = ["DSP", "DataInterpolations", "FFTW", "FastGaussQuadrature", "LinearAlgebra", "Optim", "Peaks", "Polynomials", "ProgressMeter", "Random", "SkipNan", "SpecialFunctions", "Statistics", "ToeplitzMatrices"]
 path = ".."
 uuid = "85cedecc-ec67-4717-8ef3-ce3f1b8dc459"
-version = "1.11.1"
+version = "1.12.1"
 
     [deps.StructuralVibration.extensions]
     SVAnimExt = ["Meshes", "Makie"]

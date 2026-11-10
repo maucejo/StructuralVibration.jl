@@ -1,0 +1,305 @@
+---
+title: Choosing a time integration scheme
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+::: {.callout-note}
+## In this tutorial
+
+- **You will learn** why a time simulation of a finite element (FE) model can blow up, how to choose the time step, and when to use numerical dissipation.
+- **Prerequisites**: the [Getting started](getting_started.qmd) page.
+- **Duration**: about 20 minutes.
+:::
+
+Direct time integration solves the equation of motion
+$$
+\mathbf{M} \ddot{\mathbf{x}}(t) + \mathbf{C} \dot{\mathbf{x}}(t) + \mathbf{K} \mathbf{x}(t) = \mathbf{F}(t)
+$$
+step by step, from $t_k$ to $t_{k+1} = t_k + \Delta t$. Two questions must be answered before running any simulation:
+
+1. **Stability**: will the numerical solution remain bounded?
+2. **Accuracy**: is the numerical solution close to the true one?
+
+The answers depend on the scheme *and* on the time step $\Delta t$. We explore them on a simple but representative example: a simply supported steel beam, modelled by finite elements and hit by an impact hammer.
+
+## Step 1 – Build the FE model
+
+```{julia}
+#| output: false
+using LinearAlgebra
+
+# Beam: 1 m long, 30 mm × 10 mm steel cross-section
+L, b, h = 1., 0.03, 0.01
+beam = Beam(L, b*h, b*h^3/12, 2.1e11, 7850.)
+
+# FE model: 20 Euler-Bernoulli elements, simply supported
+mesh = OneDMesh(beam, 0., 20, :SS)
+K, M = assembly(beam, mesh)
+K = apply_bc(K, mesh)
+M = apply_bc(M, mesh)
+ndofs = size(K, 1)
+
+# Modes and modal damping matrix (ξ = 0.1 % for all modes)
+ω, Φ = eigenmode(K, M)
+C = modal_damping_matrix(M, ω, 0.001, Φ)
+```
+
+Each node carries two degrees of freedom (transverse displacement and rotation), so node $i$ corresponds to the global DOF $2i - 1$ for the displacement. We excite the beam at $x$ = 0.3 m (node 7) and observe the response at mid-span (node 11).
+
+```{julia}
+#| output: false
+dof_exc = findfirst(==(13), mesh.free_dofs)   # Node 7  → x = 0.3 m
+dof_obs = findfirst(==(21), mesh.free_dofs)   # Node 11 → x = 0.5 m
+```
+
+How good is this FE model? Let us compare its natural frequencies with the exact ones given by the analytical beam model.
+
+```{julia}
+ω_exact, _ = modefreq(beam, ω[end])
+nm = min(length(ω), length(ω_exact))
+fe_error = 100*(ω[1:nm] ./ ω_exact[1:nm] .- 1)
+
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Mode number", ylabel = "Frequency error (%)", yscale = log10,
+          title = "FE model accuracy")
+scatter!(ax, 2:nm, fe_error[2:nm])   # Mode 1 is exact to machine precision
+fig
+```
+
+```{julia}
+println("Number of DOFs: ", ndofs)
+println("Frequency range of the FE model: ", round(ω[1]/2π, digits = 1), " Hz – ",
+        round(ω[end]/2π, digits = 1), " Hz")
+```
+
+::: {.callout-important}
+## Key observation
+A FE model always contains **high-frequency modes that are not physical**. Here, the frequency errors exceed 1 % beyond mode 13 (about 4 kHz), yet the model has modes up to about 48 kHz. These modes are artefacts of the discretization, and they will be at the root of the difficulties below.
+:::
+
+## Step 2 – Excitation and reference solution
+
+The impact is modelled by a half-sine pulse of 100 N lasting 0.5 ms. Its spectrum is significant up to about 3 kHz, the first zero of the spectrum of a half-sine pulse of duration $\tau$ being located at $1.5/\tau$.
+
+```{julia}
+#| output: false
+impact = HalfSine(100., 1e-3, 0.5e-3)    # Amplitude (N), start (s), duration (s)
+T = 0.05                                 # Simulation duration (s)
+u0 = (zeros(ndofs), zeros(ndofs))        # Beam at rest
+
+# Force matrix: one row per DOF, one column per time step
+function impact_force(t)
+    F = zeros(ndofs, length(t))
+    F[dof_exc, :] = excitation(impact, t)
+    return F
+end
+```
+
+To assess the accuracy of the direct solvers, we need a reference. Since the system is linear, the modal solver computed on a very fine time grid provides it.
+
+```{julia}
+#| output: false
+dt_ref = 5e-6
+t_ref = 0.:dt_ref:T
+prob_ref = ForcedModalTimeProblem(K, M, 0.001, impact_force(t_ref), u0, t_ref)
+x_ref = solve(prob_ref).u[dof_obs, :]
+
+# Relative error of a response computed with time step dt w.r.t. the reference
+function rel_error(x, dt)
+    idx = 1:round(Int, dt/dt_ref):length(t_ref)
+    n = min(length(idx), length(x))
+    return norm(x[1:n] - x_ref[idx[1:n]])/norm(x_ref[idx[1:n]])
+end
+```
+
+## Step 3 – Central difference: a conditionally stable scheme
+
+The central difference scheme is **explicit**: each step is cheap because no linear system involving $\mathbf{K}$ has to be solved. The price to pay is that it is only stable if
+$$
+\Delta t \leq \Delta t_\text{cr} = \frac{2}{\omega_\text{max}},
+$$
+where $\omega_\text{max}$ is the **highest** natural angular frequency of the model.
+
+```{julia}
+dt_cr = 2/ω[end]
+println("Critical time step: ", round(1e6dt_cr, digits = 2), " µs")
+```
+
+Let us run the simulation just below and just above this limit.
+
+```{julia}
+#| output: false
+t_stable = 0.:0.95dt_cr:T
+prob_stable = DirectTimeProblem(K, M, C, impact_force(t_stable), u0, t_stable)
+x_stable = solve(prob_stable, CentralDiff(), progress = false).u[dof_obs, :]
+
+t_unstable = 0.:1.05dt_cr:T
+prob_unstable = DirectTimeProblem(K, M, C, impact_force(t_unstable), u0, t_unstable)
+x_unstable = solve(prob_unstable, CentralDiff(), progress = false).u[dof_obs, :]
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "Δt = 0.95 Δt_cr")
+lines!(ax, t_ref, x_ref, label = "Reference")
+lines!(ax, t_stable, x_stable, linestyle = :dash, label = "Central difference")
+xlims!(ax, 0., T)
+axislegend(ax, position = :rb)
+fig
+```
+
+```{julia}
+println("Δt = 0.95 Δt_cr → max |x| = ", maximum(abs, x_stable), " m")
+println("Δt = 1.05 Δt_cr → max |x| = ", maximum(abs, x_unstable), " m")
+```
+
+A 10 % change of the time step is the difference between a perfect result and an overflow (`NaN`): the scheme has **diverged**.
+
+::: {.callout-warning}
+## Pitfall
+The critical time step is dictated by $\omega_\text{max}$, that is by the *non-physical* modes of the model, and not by the frequency range you are interested in. Here $\Delta t_\text{cr}$ ≈ 6.7 µs, although nothing of interest happens above a few kHz. Worse, refining the mesh increases $\omega_\text{max}$: for Euler-Bernoulli beam elements of size $h_e$, $\omega_\text{max} \propto 1/h_e^2$, so **halving the element size divides the critical time step by four**.
+
+This is the usual explanation when a simulation "explodes" after a mesh refinement.
+:::
+
+## Step 4 – Newmark: unconditional stability, but not unconditional accuracy
+
+The average acceleration Newmark scheme ($\gamma$ = 1/2, $\beta$ = 1/4, default values of `Newmark()`) is **implicit** and **unconditionally stable**: the solution stays bounded whatever $\Delta t$. The time step can therefore be chosen for accuracy only.
+
+```{julia}
+dts = [1e-5, 2e-5, 5e-5, 1e-4, 2e-4, 5e-4]
+errors = map(dts) do dt
+    t = 0.:dt:T
+    prob = DirectTimeProblem(K, M, C, impact_force(t), u0, t)
+    x = solve(prob, Newmark(), progress = false).u[dof_obs, :]
+    rel_error(x, dt)
+end
+
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time step (s)", ylabel = "Relative error",
+          xscale = log10, yscale = log10, title = "Newmark – accuracy vs time step")
+scatterlines!(ax, dts, errors)
+fig
+```
+
+```{julia}
+for (dt, e) in zip(dts, errors)
+    println("Δt = ", rpad(dt, 7), " s → relative error = ", round(100e, digits = 2), " %")
+end
+```
+
+No divergence, even with a time step 75 times larger than $\Delta t_\text{cr}$, but the accuracy degrades quickly. Two effects are at play:
+
+- **Period elongation**: the numerical solution oscillates slightly too slowly, and the phase error accumulates over time. The error is small as long as each period of interest is described by enough time steps.
+- **Excitation sampling**: with $\Delta t$ = 0.2 ms, the 0.5 ms impact is described by only two samples, so that the force actually applied to the model differs from the intended one. With $\Delta t$ = 0.5 ms, the impact falls between two time steps and the model is not excited at all: hence the 100 % error.
+
+```{julia}
+fig = Figure()
+for (i, dt) in enumerate([5e-5, 2e-4])
+    t = 0.:dt:T
+    prob = DirectTimeProblem(K, M, C, impact_force(t), u0, t)
+    x = solve(prob, Newmark(), progress = false).u[dof_obs, :]
+
+    axi = Axis(fig[i, 1], ylabel = "Displacement (m)", title = "Newmark – Δt = $(round(Int, 1e6dt)) µs")
+    lines!(axi, t_ref, x_ref, label = "Reference")
+    lines!(axi, t, x, linestyle = :dash, label = "Newmark")
+    xlims!(axi, 0., T)
+    i == 2 && (axi.xlabel = "Time (s)")
+    i == 1 && axislegend(axi, position = :rb)
+end
+fig
+```
+
+::: {.callout-tip}
+## Rule of thumb
+Choose $\Delta t$ so that:
+
+- the highest frequency of interest $f_\text{max}$ is described by at least 20 points per period, i.e. $\Delta t \leq 1/(20 f_\text{max})$;
+- the shortest event of the excitation (impact, shock...) is described by at least 10 samples.
+:::
+
+## Step 5 – Numerical dissipation: taming the spurious modes
+
+The impact excites, a little, the high-frequency modes of the FE model. With the average acceleration Newmark scheme, these modes are integrated **without any numerical damping**. As they are only weakly damped physically, they pollute the velocities and, above all, the accelerations, that is the quantities you would compare with accelerometer measurements.
+
+Schemes such as HHT or the generalized-α method introduce a **controlled numerical dissipation**: high-frequency modes are damped, while the low-frequency ones are almost unaffected. The amount of dissipation is set by the spectral radius at infinity $\rho_\infty \in [0, 1]$: $\rho_\infty$ = 1 means no dissipation, and the dissipation increases as $\rho_\infty$ decreases.
+
+```{julia}
+#| output: false
+using FFTW
+
+dt = 5e-5
+t = 0.:dt:T
+prob = DirectTimeProblem(K, M, C, impact_force(t), u0, t)
+freq = rfftfreq(length(t), 1/dt)
+
+algs = [("Newmark", Newmark()),
+        ("Generalized-α (ρ∞ = 0.8)", GeneralizedAlpha(ρ = 0.8)),
+        ("Generalized-α (ρ∞ = 0.5)", GeneralizedAlpha(ρ = 0.5))]
+
+results = map(algs) do (name, alg)
+    sol = solve(prob, alg, progress = false)
+    (name = name, x = sol.u[dof_obs, :], a = sol.ddu[dof_obs, :])
+end
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Acceleration spectrum (dB)",
+          title = "Mid-span acceleration")
+for r in results
+    lines!(ax, freq, 20log10.(abs.(rfft(r.a)) .+ eps()), label = r.name)
+end
+vlines!(ax, ω[13]/2π, color = :black, linestyle = :dash)
+text!(ax, ω[13]/2π, 0., text = " FE error > 1 %", align = (:left, :bottom))
+xlims!(ax, 0., freq[end])
+axislegend(ax, position = :rt)
+fig
+```
+
+```{julia}
+for r in results
+    A = abs.(rfft(r.a))
+    hf = sqrt(sum(abs2, A[freq .> 3000.])/sum(abs2, A))
+    println(rpad(r.name, 26), "→ HF content of acceleration: ", round(100hf, digits = 1),
+            " %, displacement error: ", round(100rel_error(r.x, dt), digits = 2), " %")
+end
+```
+
+The numerical dissipation strongly reduces the high-frequency content of the acceleration, while the displacement, governed by the first modes, is almost unchanged. The slight increase of the displacement error for small values of $\rho_\infty$ reminds us that numerical dissipation is never completely free: $\rho_\infty$ between 0.5 and 0.9 is usually a good compromise.
+
+::: {.callout-note}
+## Which solver for which situation?
+`HHT` and `WBZ` offer the same kind of dissipation as `GeneralizedAlpha`, which provides the best trade-off between dissipation at high frequency and accuracy at low frequency. If the model is heavily damped (e.g. 1 % modal damping on all modes, including the spurious ones), the physical damping already does most of the job and the benefit of numerical dissipation is smaller.
+:::
+
+## Summary
+
+| Situation | Recommended choice |
+|:----------|:-------------------|
+| Small model, short duration, $\Delta t$ imposed by a fine excitation | `CentralDiff()` with $\Delta t < 2/\omega_\text{max}$ (check it!) |
+| General purpose linear analysis | `Newmark()` with $\Delta t \leq 1/(20 f_\text{max})$ |
+| Velocities or accelerations of a FE model, lightly damped | `GeneralizedAlpha(ρ = 0.5 … 0.9)` |
+| Linear system, response at a few points | Modal solvers (`ForcedModalTimeProblem`), exact and fast |
+
+Before trusting a direct time simulation, it is always worth:
+
+1. computing $\omega_\text{max}$ of the model,
+2. checking that $\Delta t$ resolves both the frequency range of interest and the excitation,
+3. comparing with a modal solution or with a simulation using $\Delta t/2$.
+
+**Reference pages**: [Direct time solvers](../solvers/direct_time_solvers.qmd), [Modal time solvers](../solvers/modal_time_solvers.qmd), [FE models](../models/index.qmd), [Excitation models](../models/excitation.qmd).

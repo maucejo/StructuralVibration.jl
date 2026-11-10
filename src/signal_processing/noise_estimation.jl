@@ -102,10 +102,10 @@ function varest(x, method::NoiseEstimation = DerricoEst(); batch_size::Int = 0, 
         nr, nc = size(x)
 
         # Create batches
-        batches_candidate = Vector{typeof(x)}[x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
+        batches_candidate = typeof(x)[x[:, i:min(i + batch_size - 1, end)] for i in 1:batch_size:nc]
 
         # Valid batches
-        len_b = length.(batches_candidate)
+        len_b = size.(batches_candidate, 2)      # Number of samples in each batch
         valid_batches = findall(len_b .≥ batch_size)
 
         batches = batches_candidate[valid_batches]

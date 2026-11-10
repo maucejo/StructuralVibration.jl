@@ -1,0 +1,182 @@
+---
+title: Noise estimation and denoising
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+::: {.callout-note}
+## In this tutorial
+
+- **You will learn** how to estimate the noise level of a measured signal without knowing the noise-free signal, and how to choose a denoising method.
+- **Prerequisites**: the [Getting started](getting_started.qmd) page.
+- **Duration**: about 15 minutes.
+:::
+
+Many post-processing operations are very sensitive to noise: numerical differentiation, inverse problems (force identification, model updating...), or Kalman filtering, whose tuning requires the noise covariance. Knowing the noise level of a signal, and being able to reduce it, is therefore an essential step. As usual, we work with synthetic data so that every result can be compared with the truth.
+
+## Step 1 – A noisy measurement
+
+A simply supported beam is hit by an impact hammer at $x$ = 0.35 m, and its displacement is recorded at four points during 0.5 s.
+
+```{julia}
+#| output: false
+using LinearAlgebra, Statistics
+
+# Structure and sensors
+L, b, h = 1., 0.03, 0.01
+beam = Beam(L, b*h, b*h^3/12, 2.1e11, 7850.)
+ξ = 0.01
+x_sensors = [0.2, 0.35, 0.5, 0.7]
+
+fs = 4096
+ωn, kn = modefreq(beam, fs/2)
+Φ_s = modeshape(beam, kn, x_sensors)
+Φ_e = modeshape(beam, kn, [0.35])
+nmodes = length(ωn)
+
+# Impact response
+t = 0.:1/fs:0.5
+F = reshape(excitation(Hammer(100., 0., 9.7, 1e-4), t), 1, :)
+prob = ForcedModalTimeProblem(ωn, Φ_s, ξ, Φ_e'*F, (zeros(nmodes), zeros(nmodes)), t)
+sol = solve(prob)
+x_true, v_true = sol.u, sol.du       # Noise-free displacement and velocity
+
+# Measurement: 20 dB SNR on each channel
+SNR_true = 20.
+y = agwn(x_true, SNR_true)
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "Sensor at x = 0.2 m")
+lines!(ax, t, y[1, :], color = (:gray, 0.6), label = "Measured")
+lines!(ax, t, x_true[1, :], label = "Noise-free")
+xlims!(ax, 0., 0.5)
+axislegend(ax, position = :rt)
+fig
+```
+
+## Step 2 – Why noise matters: numerical differentiation
+
+Suppose we need the velocity, but only the displacement was measured. Differentiating the measured signal is the obvious solution.
+
+```{julia}
+#| output: false
+rel_error(a, ref) = [norm(a[i, :] - ref[i, :])/norm(ref[i, :]) for i in axes(ref, 1)]
+
+v_noisy = gradient(y, t)           # Differentiation along time (dims = 1: one signal per row)
+```
+
+```{julia}
+println("Displacement error (measured):          ", round.(100rel_error(y, x_true), digits = 1), " %")
+println("Velocity error (differentiated):        ", round.(100rel_error(v_noisy, v_true), digits = 1), " %")
+```
+
+A 10 % error on the displacement becomes an error of several hundred percent on the velocity. Differentiation amplifies the high-frequency content of the signal, where the noise dominates. This is typical of an **ill-posed** operation, and the reason why noise must be handled before such operations.
+
+## Step 3 – Estimating the noise level
+
+In practice, the noise-free signal is unknown, and so is the noise level. `varest` estimates the noise variance of each channel from the measured signal only. Several methods are available:
+
+- `DerricoEst()` (default): a fast statistical estimator, based on finite differences of the signal;
+- `GCVEst()` and `LCurveEst()`: estimators based on the regularized smoothing of the signal, whose regularization parameter is selected by Generalized Cross-Validation or by the L-curve criterion;
+- `BayesianEst()`: a Bayesian version of the regularized smoothing.
+
+```{julia}
+#| output: false
+methods = [("D'Errico", DerricoEst()), ("GCV", GCVEst()), ("L-curve", LCurveEst()), ("Bayesian", BayesianEst())]
+SNR_est = [(name, estimated_SNR(y, varest(y, m))) for (name, m) in methods]
+```
+
+```{julia}
+println("True SNR: ", SNR_true, " dB on all channels")
+for (name, snr) in SNR_est
+    println(rpad(name, 9), " → estimated SNR (dB): ", round.(snr, digits = 1))
+end
+```
+
+D'Errico, GCV and Bayesian estimators recover the SNR within about 1 dB. The L-curve estimator is less reliable here: it tends to over-smooth the signal, and thus to overestimate the noise level.
+
+## Step 4 – Denoising
+
+The same ideas lead to denoising methods. Regularization-based methods solve
+$$
+\widehat{\mathbf{x}} = \underset{\mathbf{x}}{\text{argmin}} \Vert \mathbf{y} - \mathbf{x} \Vert_2^2 + \lambda \Vert \mathbf{D} \mathbf{x} \Vert_2^2,
+$$
+where $\mathbf{D}$ is a second-order difference operator that penalizes non-smooth signals and $\lambda$ is selected automatically. Kalman-based methods model the signal as the output of a random-walk state-space model, the noise variance being estimated with `varest`. The `rts = true` option adds a backward pass (Rauch-Tung-Striebel smoother), which uses the whole signal to estimate each sample.
+
+```{julia}
+#| output: false
+denoisers = [("GCV", GCVDenoising()), ("L-curve", LCurveDenoising()), ("Bayesian", BayesDenoising()),
+             ("Kalman filter", KalmanDenoising()), ("Kalman smoother", KalmanDenoising(rts = true))]
+x_dn = Dict(name => denoising(y, alg) for (name, alg) in denoisers)
+```
+
+```{julia}
+println("Measured signal  → error (%): ", round.(100rel_error(y, x_true), digits = 1))
+for (name, _) in denoisers
+    println(rpad(name, 16), " → error (%): ", round.(100rel_error(x_dn[name], x_true), digits = 1))
+end
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "Sensor at x = 0.2 m – zoom")
+lines!(ax, t, y[1, :], color = (:gray, 0.4), label = "Measured")
+lines!(ax, t, x_true[1, :], color = :black, label = "Noise-free")
+lines!(ax, t, x_dn["GCV"][1, :], linestyle = :dash, label = "GCV")
+lines!(ax, t, x_dn["Kalman smoother"][1, :], linestyle = :dot, label = "Kalman smoother")
+xlims!(ax, 0., 0.1)
+axislegend(ax, position = :rt)
+fig
+```
+
+GCV and Bayesian regularization divide the error by about three, the Kalman smoother by about two. The Kalman filter alone, which only uses past samples, is less accurate, but it can be applied in real time. As for noise estimation, the L-curve criterion over-smooths some channels.
+
+## Step 5 – Back to differentiation
+
+```{julia}
+v_dn = gradient(x_dn["GCV"], t)
+println("Velocity error from measured signal:  ", round.(100rel_error(v_noisy, v_true), digits = 1), " %")
+println("Velocity error from denoised signal:  ", round.(100rel_error(v_dn, v_true), digits = 1), " %")
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Velocity (m/s)", title = "Sensor at x = 0.2 m")
+lines!(ax, t, v_noisy[1, :], color = (:gray, 0.4), label = "From measured signal")
+lines!(ax, t, v_true[1, :], color = :black, label = "Exact")
+lines!(ax, t, v_dn[1, :], linestyle = :dash, label = "From denoised signal")
+xlims!(ax, 0., 0.1)
+axislegend(ax, position = :rt)
+fig
+```
+
+Denoising before differentiating reduces the velocity error by more than an order of magnitude.
+
+## Summary
+
+| Need | Recommended tool |
+|:-----|:-----------------|
+| Quick estimate of the noise level | `varest(y)` (D'Errico) |
+| More accurate estimate | `varest(y, GCVEst())` or `varest(y, BayesianEst())` |
+| Offline denoising | `denoising(y, GCVDenoising())` or `denoising(y, BayesDenoising())` |
+| Real-time or streaming denoising | `denoising(y, KalmanDenoising())` |
+| Offline denoising of long signals | `denoising(y, KalmanDenoising(rts = true))` |
+
+The SNR of a signal is given by `estimated_SNR(y, varest(y))`, which is a useful sanity check of any measurement.
+
+**Reference pages**: [Noise estimation and denoising](../signal_processing/noise.qmd), [Noise models](../models/noise.qmd).

@@ -147,7 +147,7 @@ function tfestimate(input_signal::AbstractVector, output_signal::AbstractVector,
         # Spectral densities
         @. Gxx += abs2(X)
         @. Gyy += abs2(Y)
-        @. Gxy += X*conj(Y)
+        @. Gxy += conj(X)*Y      # Cross-spectrum G_xy = E[X* Y], so that H1 = G_xy/G_xx = Y/X
     end
 
     # Averaging correction
@@ -155,14 +155,10 @@ function tfestimate(input_signal::AbstractVector, output_signal::AbstractVector,
     Gyy ./= n_segments
     Gxy ./= n_segments
 
-    # Correcting factors for energy due to windowing
-    energy_correction_input = 1/rms(window_input(bs))
-    energy_correction_output = 1/rms(window_output(bs))
-
-    # Energy correction
-    Gxx .*= energy_correction_input^2
-    Gyy .*= energy_correction_output^2
-    Gxy .*= energy_correction_input*energy_correction_output
+    # Note: no window energy correction is applied here. Transfer functions and coherence are
+    # ratios of spectral densities: with identical windows, the corrections cancel out, and with
+    # different windows (e.g. force/exponential windows for impact testing), applying them would
+    # bias the estimate by rms(window_input)/rms(window_output).
 
     # Tranfer function estimation
     if type == :h1

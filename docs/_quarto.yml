@@ -10,6 +10,8 @@ website:
     left:
       - text: "Overview"
         file: index.qmd
+      - text: "Tutorials"
+        file: tutorials/getting_started.qmd
       - text: "Models"
         file: models/index.qmd
       - text: "Solvers"
@@ -35,6 +37,23 @@ website:
         - index.qmd
         - overview/installation.qmd
         - overview/release_notes.qmd
+
+    - title: "Tutorials"
+      contents:
+        - tutorials/getting_started.qmd
+        - section: "End-to-end workflows"
+          contents:
+            - tutorials/virtual_testing.qmd
+            - tutorials/ema_workflow.qmd
+            - tutorials/oma_workflow.qmd
+        - section: "Numerical methods"
+          contents:
+            - tutorials/time_integration.qmd
+            - tutorials/denoising.qmd
+        - section: "Going further"
+          contents:
+            - tutorials/visualization.qmd
+            - tutorials/own_data.qmd
 
     - title: "Models"
       contents:

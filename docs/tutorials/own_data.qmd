@@ -1,0 +1,260 @@
+---
+title: Using your own models and data
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+::: {.callout-note}
+## In this tutorial
+
+- **You will learn** how to use StructuralVibration.jl with mass and stiffness matrices coming from your own model, and how to feed measured data to the modal analysis tools.
+- **Prerequisites**: the [Getting started](getting_started.qmd) page. The [EMA](ema_workflow.qmd) and [OMA](oma_workflow.qmd) tutorials are useful for the second part.
+- **Duration**: about 20 minutes.
+:::
+
+The built-in models (`Sdof`, `Beam`, `Plate`...) are convenient for learning and testing, but real applications rely on your own models and on your own measurements. The good news is that the package only manipulates **plain Julia arrays**: as soon as your data are stored in arrays with the expected layout, every solver and every identification method can be used.
+
+## Part 1 – Your own model
+
+### The model matrices
+
+As an example, we consider a four-storey shear building, whose mass and stiffness matrices could have been exported from any FE software. Here, we simply write them down.
+
+```{julia}
+#| output: false
+using LinearAlgebra
+
+# Floor masses (kg) and inter-storey stiffnesses (N/m)
+m = [1.2e3, 1.0e3, 1.0e3, 0.8e3]
+k = [2.0e6, 1.6e6, 1.2e6, 0.8e6]
+
+M = Matrix(Diagonal(m))
+K = [k[1]+k[2]   -k[2]       0.          0.
+     -k[2]       k[2]+k[3]   -k[3]       0.
+     0.          -k[3]       k[3]+k[4]   -k[4]
+     0.          0.          -k[4]       k[4]]
+```
+
+::: {.callout-tip}
+## Importing matrices
+Matrices exported as text files can be read with the `DelimitedFiles` standard library, e.g. `K = readdlm("K.txt")`. Sparse matrices can be used as well. For a FE model, remember to apply the boundary conditions before using the matrices, i.e. to remove the constrained DOFs.
+:::
+
+### Modes and damping
+
+`eigenmode` solves the generalized eigenvalue problem and returns the natural angular frequencies and the **mass-normalized** mode shapes.
+
+```{julia}
+ω, Φ = eigenmode(K, M)
+println("Natural frequencies (Hz): ", round.(ω/2π, digits = 3))
+```
+
+FE models rarely provide a damping matrix. Two classical choices are available:
+
+- `modal_damping_matrix(M, ω, ξ, Φ)` builds a damping matrix that gives the prescribed damping ratio(s) to each mode;
+- `rayleigh_damping_matrix(M, K, α, β)` builds $\mathbf{C} = \alpha \mathbf{M} + \beta \mathbf{K}$, which gives a damping ratio $\xi(\omega) = \frac{\alpha}{2\omega} + \frac{\beta\omega}{2}$.
+
+The Rayleigh coefficients are usually chosen so that two target modes have a given damping ratio. Here, we target 2 % on modes 1 and 3.
+
+```{julia}
+ξ_target = 0.02
+ωa, ωb = ω[1], ω[3]
+β = 2ξ_target/(ωa + ωb)
+α = β*ωa*ωb
+C = rayleigh_damping_matrix(M, K, α, β)
+
+ξ_rayleigh = @. α/(2ω) + β*ω/2
+println("Resulting damping ratios (%): ", round.(100ξ_rayleigh, digits = 2))
+```
+
+The modes located between the two target modes are slightly less damped, and those located outside are more damped: keep this frequency dependence in mind when choosing the target modes.
+
+### Frequency response functions
+
+With the model matrices, the FRFs are computed by the direct method, i.e. by inverting the dynamic stiffness matrix $\mathbf{K} + j\omega\mathbf{C} - \omega^2\mathbf{M}$ at each frequency. The result is an array of size (number of outputs × number of inputs × number of frequencies).
+
+```{julia}
+#| output: false
+freq = 0.1:0.01:15.
+H_all = solve(DirectFRFProblem(K, M, C, freq), type = :acc, progress = false).u
+H = H_all[:, 4:4, :]           # Excitation on the top floor (DOF 4), response of all floors
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)",
+          title = "Response to a force on the top floor")
+for i in 1:4
+    lines!(ax, freq, 20log10.(abs.(H[i, 1, :])), label = "Floor $i")
+end
+xlims!(ax, freq[1], freq[end])
+axislegend(ax, position = :rb)
+fig
+```
+
+For large models, the modal approach `ModalFRFProblem(ω, ξ, freq, Φ_o, Φ_e)`, restricted to the first modes, is much faster than the direct method.
+
+### Time responses
+
+The same matrices feed the time solvers. For instance, the response to an ambient excitation (independent random forces on each floor) is computed with the default generalized-α scheme of `DirectTimeProblem`. As explained in the [time integration tutorial](time_integration.qmd), the time step must resolve the highest frequency of the model (10.9 Hz here): with `fs = 256` Hz, each period of the last mode is described by more than 20 time steps.
+
+```{julia}
+#| output: false
+using Random
+Random.seed!(1)
+
+fs = 256
+T = 600.                                       # 10 minutes of ambient vibrations
+t = 0.:1/fs:(T - 1/fs)
+F = reduce(vcat, [excitation(ColoredNoise(0., 0., T, 500.), t)' for _ in 1:4])
+
+prob_time = DirectTimeProblem(K, M, C, F, (zeros(4), zeros(4)), t)
+acc = solve(prob_time, progress = false).ddu  # One row per floor
+```
+
+The matrices can also be converted into a state-space model with `ss_model(K, M, C)`, and solved with the built-in state-space solvers or with [DifferentialEquations.jl](https://docs.sciml.ai/DiffEqDocs/stable/), as shown in [Direct time solvers](../solvers/direct_time_solvers.qmd).
+
+## Part 2 – Your own measurements
+
+### Expected data layout
+
+All the signal processing and modal analysis functions use the same conventions.
+
+| Data | Julia type | Layout |
+|:-----|:-----------|:-------|
+| Time signals | `Matrix{Float64}` | one row per channel, one column per sample |
+| Sampling rate | `Int` | in Hz |
+| FRFs or cross-spectra | `Array{ComplexF64, 3}` | (outputs × inputs × frequencies) |
+| Frequency vector | `Vector{Float64}` or range | in Hz |
+| Mode shapes | `Matrix` | one row per measurement point, one column per mode |
+
+Measurement files can be read with any Julia package: `DelimitedFiles` or [CSV.jl](https://csv.juliadata.org/stable/) for text files, or [UFFFiles.jl](https://github.com/maucejo/UFFFiles.jl) for the Universal File Format (UFF) widely used by modal analysis software. You then only have to arrange the data according to the table above.
+
+In the following, the "measurements" are generated from the building model of Part 1, so that we can check the results, but they are used exactly as if they had been loaded from files.
+
+### Measured FRFs → experimental modal analysis
+
+Suppose that a modal test has provided the accelerances of the four floors for a force applied on the top floor (for instance exported by the acquisition system as UFF files).
+
+```{julia}
+#| output: false
+# "Measured" FRFs: an array of size (4 outputs × 1 input × nf) and a frequency vector
+H_meas = agwn(H, 40.)
+freq_meas = collect(freq)
+```
+
+Once the data are arranged, the [EMA workflow](ema_workflow.qmd) applies as is.
+
+```{julia}
+prob_ema = EMAProblem(H_meas, freq_meas, type_frf = :acc)
+stab = stabilization(prob_ema, 20, LSCF())
+poles = stab.poles[end]
+poles = poles[.!isnan.(poles)]
+fn, ξn = poles2modal(poles)
+
+# Driving point: top floor (output 4) for the input 1
+Φ_ema = modeshape_extraction(prob_ema, poles, LSFit(), dpi = [4, 1])
+
+println("Identified frequencies (Hz): ", round.(fn, digits = 3), " – exact: ", round.(ω/2π, digits = 3))
+println("Identified damping (%):      ", round.(100ξn, digits = 2), " – exact: ", round.(100ξ_rayleigh, digits = 2))
+println("MAC with the model:          ", round.(diag(mac(Φ_ema, Φ)), digits = 3))
+```
+
+### Measured force and responses → FRF estimation → EMA
+
+If the acquisition system only provides raw time signals, the FRFs have to be estimated first. Suppose that a shaker applies a random force on the top floor, and that both the force and the four accelerations are recorded during 10 minutes at 256 Hz.
+
+```{julia}
+#| output: false
+using Statistics
+
+# "Measured" signals: force (1 × nt) and accelerations (4 × nt)
+F_shaker = zeros(4, length(t))
+F_shaker[4, :] = excitation(ColoredNoise(0., 0., T, 500.), t)
+acc_shaker = solve(DirectTimeProblem(K, M, C, F_shaker, (zeros(4), zeros(4)), t), progress = false).ddu
+
+force_meas = agwn(F_shaker[4:4, :], 40., rst = false)
+acc_meas = agwn(acc_shaker, 30., rst = false)
+```
+
+The FRFs are estimated with the $H_1$ estimator, using Hanning windows and a 50 % overlap, which are the usual settings for random excitation.
+
+```{julia}
+#| output: false
+bs = 8192                                     # 32 s blocks → frequency resolution of 0.03 Hz
+H1, freq_H1, coh = tfestimate(force_meas, acc_meas, bs, hanning, fs = fs, overlap = 0.5)
+```
+
+::: {.callout-warning}
+## Pitfall
+The frequency resolution `fs/bs` must be finer than the half-power bandwidth of the modes, $2\xi f_n$. For the first mode, $2 \times 0.02 \times 2.28 \approx$ 0.09 Hz: with 4 s blocks (`bs = 1024`, resolution 0.25 Hz), the resonance peaks are smeared by the window, and the identification returns split modes and overestimated damping ratios. Lightly damped, low-frequency structures require long blocks, hence long records.
+:::
+
+```{julia}
+prob_H1 = EMAProblem(H1, collect(freq_H1), type_frf = :acc, frange = [0.5, 12.])
+stab_H1 = stabilization(prob_H1, 20, LSCF())
+poles_H1 = stab_H1.poles[end]
+fn_H1, ξn_H1 = poles2modal(poles_H1[.!isnan.(poles_H1)])
+
+println("Mean coherence (0.5–12 Hz):  ", round(mean(coh[:, 1, 0.5 .< freq_H1 .< 12.]), digits = 3))
+println("Identified frequencies (Hz): ", round.(fn_H1, digits = 3), " – exact: ", round.(ω/2π, digits = 3))
+println("Identified damping (%):      ", round.(100ξn_H1, digits = 2), " – exact: ", round.(100ξ_rayleigh, digits = 2))
+```
+
+::: {.callout-warning}
+Do not decimate the signals to speed up the computation without filtering them first: the shaker force is broadband, and its content above the new Nyquist frequency would be folded back into the analysis band (aliasing), ruining the coherence. Use `anti_alias` before decimating.
+:::
+
+### Measured time responses → operational modal analysis
+
+Suppose now that the building has been instrumented with four accelerometers recording its ambient vibrations, and that the records are available as a matrix (one row per floor). Measurement noise is added to make the data realistic.
+
+Before running the identification, it is good practice to **decimate** the signals: the records were sampled at 256 Hz, whereas the modes of interest are below 11 Hz. Subspace methods perform poorly when the sampling rate is much larger than the frequencies of interest, and a sampling rate of 64 Hz is more than enough here. Since the response has no content above 11 Hz, keeping one sample out of four is sufficient; with real data, the signals must be low-pass filtered first to avoid aliasing (see `anti_alias`).
+
+```{julia}
+#| output: false
+decim = 4
+y_meas = agwn(acc[:, 1:decim:end], 30., rst = false)   # "Measured" accelerations
+t_meas = collect(t[1:decim:end])
+fs_meas = fs ÷ decim                                   # 64 Hz
+```
+
+The [OMA workflow](oma_workflow.qmd) then applies directly.
+
+```{julia}
+prob_oma = OMAProblem(y_meas, t_meas, fs_meas, 512, frange = [0.5, 15.])
+poles_oma, Ψ = modes_extraction(prob_oma, 12, CovSSI())
+fn_oma, ξn_oma = poles2modal(poles_oma)
+Φ_oma = real_normalization(Ψ)
+
+println("Identified frequencies (Hz): ", round.(fn_oma, digits = 3), " – exact: ", round.(ω/2π, digits = 3))
+println("Identified damping (%):      ", round.(100ξn_oma, digits = 2), " – exact: ", round.(100ξ_rayleigh, digits = 2))
+println("MAC with the model:          ", round.(diag(mac(Φ_oma, Φ)), digits = 3))
+```
+
+The four modes are identified from the responses only. The natural frequencies are slightly underestimated (by up to about 0.6 % for mode 4): this small bias does not come from the identification, but from the period elongation of the time integration scheme used to *generate* the data. Synthetic data are only as accurate as the simulation that produced them!
+
+::: {.callout-tip}
+Try `decim = 1` (no decimation): the first mode, at 2.3 Hz, is no longer identified.
+:::
+
+## Summary
+
+- Any model defined by its `M`, `K` (and `C`) matrices can be used with the direct (`DirectFRFProblem`, `DirectTimeProblem`), modal (`eigenmode`, `ModalFRFProblem`, `ForcedModalTimeProblem`) and state-space (`ss_model`) tools.
+- Damping can be added with `modal_damping_matrix` or `rayleigh_damping_matrix`.
+- Measured data only need to be arranged as plain arrays, with the layouts given above, to be processed by `EMAProblem` or `OMAProblem`.
+
+**Reference pages**: [Discrete models](../models/index.qmd), [Frequency-domain solvers](../solvers/frequency_solvers.qmd), [Direct time solvers](../solvers/direct_time_solvers.qmd), [State-space solvers](../solvers/state_space_solvers.qmd).

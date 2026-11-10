@@ -1,0 +1,231 @@
+---
+title: Experimental modal analysis
+format:
+  html:
+    toc: true
+    number-sections: true
+engine: julia
+execute:
+  freeze: auto
+  cache: true
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using StructuralVibration, ShareAdd
+@usingany CairoMakie
+```
+
+::: {.callout-note}
+## In this tutorial
+
+- **You will learn** how to identify the natural frequencies, damping ratios and mode shapes of a structure from measured FRFs, and how to validate the identified modal model.
+- **Prerequisites**: the [Getting started](getting_started.qmd) page. The [virtual testing](virtual_testing.qmd) tutorial explains how FRFs are measured.
+- **Duration**: about 20 minutes.
+:::
+
+Experimental Modal Analysis (EMA) consists in fitting a modal model to measured Frequency Response Functions (FRFs). Because we work here with synthetic data, the exact modal parameters are known, and we can check every step of the identification.
+
+## Step 1 – The measured FRFs
+
+We consider a simply supported steel beam, equipped with 19 accelerometers regularly spaced every 5 cm and excited by an impact hammer at $x$ = 0.15 m. The hammer location coincides with the 3rd accelerometer: this **driving point** will be needed to scale the mode shapes.
+
+```{julia}
+#| output: false
+# Structure
+L, b, h = 1., 0.03, 0.01
+beam = Beam(L, b*h, b*h^3/12, 2.1e11, 7850.)
+ξ = 0.01
+
+# Test setup
+x_acc = collect(0.05:0.05:0.95)   # 19 accelerometers
+x_hit = [0.15]                    # Impact location = 3rd accelerometer
+dpi = [3, 1]                      # Driving point: (accelerometer 3, impact 1)
+
+# Exact modal basis (ground truth), including modes above the analysis band
+fmax = 1000.
+ωn, kn = modefreq(beam, 4fmax)
+Φ_acc = modeshape(beam, kn, x_acc)
+Φ_hit = modeshape(beam, kn, x_hit)
+```
+
+To keep this tutorial short, the noisy accelerances are generated directly in the frequency domain, with a signal-to-noise ratio of 40 dB. The [virtual testing](virtual_testing.qmd) tutorial shows how to obtain them from simulated time signals.
+
+```{julia}
+#| output: false
+freq = 1.:0.5:fmax
+H_exact = solve(ModalFRFProblem(ωn, ξ, freq, Φ_acc, Φ_hit), type = :acc, progress = false).u
+H = agwn(H_exact, 40.)            # Array of size (19 accelerometers × 1 impact × nf)
+
+# Ground truth in the analysis band
+in_band = ωn .< 2π*fmax
+fn_exact = ωn[in_band]/2π
+Φ_exact = Φ_acc[:, in_band]
+nmodes = length(fn_exact)
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)",
+          title = "Measured FRFs (19 accelerometers)")
+for i in axes(H, 1)
+    lines!(ax, freq, 20log10.(abs.(H[i, 1, :])), color = (:gray, 0.4))
+end
+lines!(ax, freq, 20log10.(abs.(H[dpi[1], 1, :])), label = "Driving point FRF")
+xlims!(ax, 0., fmax)
+axislegend(ax, position = :rb)
+fig
+```
+
+## Step 2 – Defining the EMA problem
+
+All the identification methods take an `EMAProblem` as input. It gathers the FRFs, the frequency vector and, importantly, the **type of FRF**.
+
+```{julia}
+#| output: false
+prob = EMAProblem(H, freq, type_frf = :acc)
+```
+
+::: {.callout-warning}
+## Pitfall
+The modal model fitted by the identification methods is formulated for admittances (displacement/force). `EMAProblem` converts the FRFs internally, but only if you tell it what you provide. Forgetting `type_frf = :acc` does not raise any error, but biases the results, as shown below for the damping ratio of the first mode.
+:::
+
+```{julia}
+for (label, p) in [("type_frf = :acc ", EMAProblem(H, freq, type_frf = :acc)),
+                   ("type_frf omitted", EMAProblem(H, freq))]
+    stable_poles = stabilization(p, 30, LSCF()).poles[end]   # See Step 3
+    fn, ξn = poles2modal(stable_poles[.!isnan.(stable_poles)])
+    println(label, " → mode 1: f = ", round(fn[1], digits = 2), " Hz, ξ = ", round(100ξn[1], digits = 2),
+            " % (exact: ", 100ξ, " %)")
+end
+```
+
+## Step 3 – Stabilization diagram
+
+The identification methods of the LSCF family require a **model order**, i.e. the number of modes of the fitted model. This number is unknown in practice, and overestimating it creates spurious, non-physical poles. The **stabilization diagram** solves this problem: the poles are computed for increasing model orders, and the physical poles are those that remain *stable* (in frequency and damping) from one order to the next.
+
+```{julia}
+stab = stabilization(prob, 30, LSCF())
+stabilization_plot(stab)
+```
+
+The vertical alignments of stable poles indicate the physical modes. The background curve is the PSIF (Power Spectrum Indicator Function), which summarizes all the FRFs and helps to locate the resonances. Six physical modes clearly appear in the frequency band.
+
+The poles that are stable at the highest model order are retained.
+
+```{julia}
+#| output: false
+poles = stab.poles[end]
+poles = poles[.!isnan.(poles)]    # Unstable poles are flagged as NaN
+fn_id, ξn_id = poles2modal(poles)
+```
+
+```{julia}
+println("Mode | f exact (Hz) | f identified (Hz) | ξ identified (%)")
+for i in eachindex(fn_id)
+    println(lpad(i, 4), " | ", lpad(round(fn_exact[i], digits = 2), 12), " | ",
+            lpad(round(fn_id[i], digits = 2), 17), " | ", lpad(round(100ξn_id[i], digits = 2), 16))
+end
+```
+
+The natural frequencies are identified within 0.2 % and the damping ratios, which are always much harder to estimate, within a few percent of the exact value (1 %).
+
+## Step 4 – Mode shapes
+
+Once the poles are known, the mode shapes are obtained by fitting each resonance peak of the FRFs. Here we use a single-degree-of-freedom least-squares fit (`LSFit`) in the vicinity of each identified natural frequency. Thanks to the driving point, the mode shapes are **mass-normalized**, and can therefore be directly compared with the exact ones.
+
+```{julia}
+#| output: false
+Φ_id = modeshape_extraction(prob, poles, LSFit(), dpi = dpi)
+```
+
+```{julia}
+fig = Figure(size = (700, 600))
+for i in 1:nmodes
+    axi = Axis(fig[(i - 1) ÷ 2 + 1, (i - 1) % 2 + 1], title = "Mode $i – $(round(fn_id[i], digits = 1)) Hz")
+    lines!(axi, x_acc, Φ_exact[:, i], label = "Exact")
+    scatter!(axi, x_acc, Φ_id[:, i], color = :orange, label = "Identified")
+    xlims!(axi, 0., L)
+    i == 1 && axislegend(axi, position = :cb)
+end
+fig
+```
+
+## Step 5 – Validation with the MAC
+
+The **Modal Assurance Criterion** (MAC) measures the correlation between two mode shapes: 1 means that the shapes are identical (up to a scaling factor), 0 that they are orthogonal. In practice, a MAC above 0.9 is considered a good match.
+
+```{julia}
+MAC = mac(Φ_id, Φ_exact)
+
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Identified mode", ylabel = "Exact mode", title = "MAC matrix",
+          xticks = 1:nmodes, yticks = 1:nmodes, aspect = DataAspect())
+hm = heatmap!(ax, 1:nmodes, 1:nmodes, MAC, colorrange = (0, 1), colormap = :Blues)
+for i in 1:nmodes, j in 1:nmodes
+    text!(ax, i, j, text = string(round(MAC[i, j], digits = 2)), align = (:center, :center),
+          color = MAC[i, j] > 0.5 ? :white : :black, fontsize = 12)
+end
+Colorbar(fig[1, 2], hm)
+fig
+```
+
+A diagonal MAC matrix with values close to 1 indicates that each identified mode matches one exact mode, and only one.
+
+::: {.callout-tip}
+Without a reference model, the MAC is computed between the identified mode shapes themselves (`mac(Φ_id, Φ_id)`, the *AutoMAC*). Large off-diagonal terms then reveal either a spatial aliasing (too few measurement points) or a spurious mode.
+:::
+
+## Step 6 – FRF synthesis
+
+The final check consists in rebuilding the FRFs from the identified modal model and comparing them with the measured ones. The residues of the modal model are computed from the mass-normalized mode shapes.
+
+```{julia}
+#| output: false
+res, _ = mode2residues(Φ_id, poles, 1:length(x_acc), [dpi[1]])
+H_synth = frf_reconstruction(res, poles, freq, type = :acc)
+```
+
+```{julia}
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)",
+          title = "Accelerometer at x = $(x_acc[7]) m")
+lines!(ax, freq, 20log10.(abs.(H[7, 1, :])), label = "Measured")
+lines!(ax, freq, 20log10.(abs.(H_synth[7, 1, :])), linestyle = :dash, label = "Synthesized")
+xlims!(ax, 0., fmax)
+axislegend(ax, position = :rb)
+fig
+```
+
+The synthesized FRF follows the measurement over the whole band. The small differences near the anti-resonances come from the modes located outside the analysis band, which are not included in the modal model.
+
+## Step 7 – Why the type of FRF matters
+
+In the [Getting started](getting_started.qmd) page, we used accelerances rather than admittances. Let us see why, by adding the same 40 dB noise to the admittances.
+
+```{julia}
+H_dis = agwn(solve(ModalFRFProblem(ωn, ξ, freq, Φ_acc, Φ_hit), progress = false).u, 40.)
+stab_dis = stabilization(EMAProblem(H_dis, freq), 30, LSCF())
+poles_dis = stab_dis.poles[end]
+poles_dis = poles_dis[.!isnan.(poles_dis)]
+
+println("Modes identified from accelerances: ", round.(fn_id, digits = 1))
+println("Modes identified from admittances:  ", round.(poles2modal(poles_dis)[1], digits = 1))
+```
+
+The admittance of a beam decreases roughly as $1/\omega^2$ above the first resonance. For a given SNR defined over the whole band, the high-frequency modes of the admittance are therefore buried in the noise, and the last mode is lost. Accelerances, whose level is much more uniform over the frequency band, do not suffer from this problem. This is also why accelerometers are the sensors of choice for modal testing.
+
+## Summary
+
+A complete EMA follows these steps:
+
+1. Define an `EMAProblem` with the right `type_frf`.
+2. Build a stabilization diagram (`stabilization` + `stabilization_plot`) and select the stable poles.
+3. Extract the mode shapes (`modeshape_extraction`), using a driving point to scale them.
+4. Validate with the MAC (`mac`) and with an FRF synthesis (`mode2residues` + `frf_reconstruction`).
+
+**Next step**: when the excitation cannot be measured, the same modal parameters can be identified from the responses only. See [Operational modal analysis](oma_workflow.qmd).
+
+**Reference pages**: [Modal extraction](../modal_extraction/index.qmd), [Modal indicators](../modal_extraction/indicators.qmd).

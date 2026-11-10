@@ -282,7 +282,9 @@ function excitation(type::Hammer, t)
     # Check the type of t
     !isa(t, Array) ? t = collect(t) : nothing
 
-    pos_start = argmin(@. (t - tstart)^2.)
+    # First sample at or after tstart (the closest sample may lie before tstart, which would lead to a negative time raised to a non-integer power)
+    pos_start = findfirst(≥(tstart), t)
+    isnothing(pos_start) && return Ft
 
     t_hammer = @. t[pos_start:end] - tstart
 
