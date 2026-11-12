@@ -225,20 +225,19 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.11.1</a></li>
-  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.12.0</a></li>
-  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.11.0</a></li>
-  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.10.3</a></li>
-  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.10.2</a></li>
-  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">1.10.1</a></li>
-  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">1.10.0</a></li>
-  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">1.9.1</a></li>
-  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">1.9.0</a></li>
-  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">1.8.0</a></li>
-  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">1.7.0</a></li>
-  <li><a href="#section-11" id="toc-section-11" class="nav-link" data-scroll-target="#section-11">1.6.1</a></li>
-  <li><a href="#section-12" id="toc-section-12" class="nav-link" data-scroll-target="#section-12">1.6.0</a></li>
-  <li><a href="#section-13" id="toc-section-13" class="nav-link" data-scroll-target="#section-13">1.5.0</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.12.0</a></li>
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.11.0</a></li>
+  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.10.3</a></li>
+  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.10.2</a></li>
+  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.10.1</a></li>
+  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">1.10.0</a></li>
+  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">1.9.1</a></li>
+  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">1.9.0</a></li>
+  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">1.8.0</a></li>
+  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">1.7.0</a></li>
+  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">1.6.1</a></li>
+  <li><a href="#section-11" id="toc-section-11" class="nav-link" data-scroll-target="#section-11">1.6.0</a></li>
+  <li><a href="#section-12" id="toc-section-12" class="nav-link" data-scroll-target="#section-12">1.5.0</a></li>
   <li><a href="#v1.4.1" id="toc-v1.4.1" class="nav-link" data-scroll-target="#v1.4.1">v1.4.1</a></li>
   <li><a href="#v1.4.0" id="toc-v1.4.0" class="nav-link" data-scroll-target="#v1.4.0">v1.4.0</a></li>
   <li><a href="#v1.3.0" id="toc-v1.3.0" class="nav-link" data-scroll-target="#v1.3.0">v1.3.0</a></li>
@@ -280,48 +279,15 @@ window.Quarto = {
 
 
 <section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section">1.11.1</h2>
-<p><strong>Bug fixes</strong></p>
+<h2 class="anchored" data-anchor-id="section">1.12.0</h2>
+<p><strong>New features</strong></p>
 <ul>
-<li>Fix the cross-spectrum convention in <code>tfestimate</code>. The cross-spectrum was computed as <span class="math inline">\(X Y^*\)</span> instead of <span class="math inline">\(X^* Y\)</span>, so that the estimated transfer functions (<code>:h1</code>, <code>:h2</code>, <code>:h3</code>, <code>:hv</code>) were the complex conjugates of the true ones (wrong sign of the phase). As a consequence, the modal parameters could not be identified from FRFs estimated with <code>tfestimate</code>. <strong>Breaking for code that compensated for this behaviour</strong> (e.g.&nbsp;with <code>conj</code>).</li>
-<li>Remove the window energy correction in <code>tfestimate</code>. Transfer functions and coherence are ratios of spectral densities, for which the correction cancels out when the same window is used for the input and the output. With different windows (e.g.&nbsp;<code>force</code> and <code>exponential</code> windows for impact testing), the correction biased the estimated FRFs by a factor <code>rms(window_input)/rms(window_output)</code> (about -8 dB in a typical impact test).</li>
-<li>Fix <code>agwn</code> and <code>mixed_noise</code> for arrays with more than two dimensions (e.g.&nbsp;FRF arrays of size <code>no × ni × nf</code>). The noise standard deviation was broadcast along the wrong dimension, which changed the size of the output when <code>ni &gt; 1</code>.</li>
-<li>Fix <code>excitation(::Hammer, t)</code> when <code>tstart</code> does not coincide with a time sample. The signal started at the closest sample, which could lie before <code>tstart</code> and led to a <code>DomainError</code>. The signal now starts at the first sample greater than or equal to <code>tstart</code>, and is zero if <code>tstart</code> is beyond the time vector.</li>
-<li>Fix <code>varest</code> when <code>batch_size &gt; 0</code>, which threw a <code>MethodError</code>. Incomplete batches are now correctly discarded for multichannel signals.</li>
-<li>Fix wrong analytical results:
-<ul>
-<li><code>impulse_response</code> (Mdof) kept only the last mode instead of summing all modes.</li>
-<li><code>modefreq</code> for clamped-free bars, rods and strings returned twice the natural frequencies.</li>
-<li><code>modefreq(::Beam, fmax, :CF)</code> used a wrong second root and skipped the fifth mode. Tabulated roots are more accurate and are now filtered by <code>fmax</code> for all beam boundary conditions.</li>
-<li><code>modeshape</code> was not mass-normalized for free-free bars (modes ≥ 2), clamped-free beams (first modes) and free-free beams (elastic and rotation modes).</li>
-<li><code>modefreq(::Membrane, fmax)</code> used the plate dispersion relation.</li>
-<li><code>srs(...; alg = :RecursiveInt)</code> was 1–4 % off. It now uses the exact Nigam-Jennings recursion.</li>
-<li><code>convert_csd(...; type = :vel)</code> returned spectra with the wrong sign.</li>
-<li><code>comac</code> could exceed 1 and <code>mpd</code> was non-zero for real modes with components of opposite signs.</li>
-<li><code>ods</code> weighted the candidates on the left of the peak by <code>msf²</code> instead of <code>msf</code>.</li>
-<li>EFDD fallback of <code>FSDD</code>: wrong time step (overestimated damping) and bell spectra accumulated across peaks.</li>
-<li>Poles identified with <code>LSCE</code>, <code>LSCF</code> and <code>pLSCF</code> on a frequency range not starting at 0 Hz are now shifted back exactly.</li>
-</ul></li>
-<li>Fix errors on valid inputs:
-<ul>
-<li>Sdof solvers with <code>ω0 = 0</code> and <code>solve(::SdofForcedTimeProblem; method = :interp)</code>.</li>
-<li><code>DirectFRFProblem</code> with an excitation selection matrix <code>Se</code> of fewer rows than DOFs, or when only <code>So</code> is given (same for <code>StateSpaceFRFProblem</code> and <code>StateSpaceModalFRFProblem</code>).</li>
-<li><code>tfestimate</code>, <code>welch</code>, <code>csd</code> and <code>spectrum</code> with an odd block size.</li>
-<li><code>detrend</code> with breakpoints, <code>planck</code> with an odd length, <code>acn</code> with a complex matrix, and <code>excitation(::GaussianPulse, t)</code> with a negative amplitude.</li>
-<li><code>SineWave</code>, <code>Hammer</code>, <code>Sdof</code> and <code>OneDMesh</code> now accept arguments of different numeric types (e.g.&nbsp;integers).</li>
-</ul></li>
-<li>Other fixes:
-<ul>
-<li><code>solve(::SdofForcedTimeProblem)</code> with <code>type_exc = :base</code> no longer overwrites the input vector.</li>
-<li><code>excitation(::ColoredNoise, t)</code> and <code>acn</code> no longer skip the time windowing when <code>frange</code> starts at 0 Hz.</li>
-<li><code>varest(x, DerricoEst())</code> returns a single value for a vector.</li>
-<li><code>ref_dB(:displacement)</code> returns 1 pm, as documented.</li>
-<li><code>msf</code> threw an <code>UndefVarError</code> instead of a <code>DimensionMismatch</code>.</li>
-<li>The ESD scaling of <code>welch</code> and <code>csd</code> uses the block duration <code>bs/fs</code>. <code>xcorr</code> uses an unbiased normalization.</li>
-<li><code>KalmanDenoising</code>: the search range of the process noise variance is now derived from the data, and the RTS covariance update is corrected.</li>
-<li>Regularization-based denoising uses <code>idct</code> instead of a dense <code>n × n</code> matrix (memory now <code>O(n)</code>).</li>
-</ul></li>
+<li>Add <code>to_dB</code> function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (<code>type = :amplitude</code>, 20 log₁₀) from power/energy quantities (<code>type = :power</code>, 10 log₁₀).</li>
+<li>Add <code>ref_dB</code> function returning the usual reference values (<code>:mobility</code>, <code>:accelerance</code>, <code>:displacement</code>, <code>:velocity</code>, <code>:acceleration</code>, <code>:pressure</code>) for amplitude or power quantities.</li>
+<li>Add <code>peak_value</code>, <code>peak2peak</code> and <code>rms_value</code> functions to compute the peak, peak-to-peak and RMS values of a signal.</li>
+<li>Add <code>unwrap_phase</code> function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (<code>deg = true</code>), and independently for each channel of a multichannel signal.</li>
 </ul>
+<p><strong>Bug fixes</strong> - Fix the phase unwrapping in <code>bode_plot</code> when <code>isdeg = true</code>. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase. - Fix the cross-spectrum convention in <code>tfestimate</code>. The cross-spectrum was computed as <span class="math inline">\(X Y^*\)</span> instead of <span class="math inline">\(X^* Y\)</span>, so that the estimated transfer functions (<code>:h1</code>, <code>:h2</code>, <code>:h3</code>, <code>:hv</code>) were the complex conjugates of the true ones (wrong sign of the phase). As a consequence, the modal parameters could not be identified from FRFs estimated with <code>tfestimate</code>. <strong>Breaking for code that compensated for this behaviour</strong> (e.g.&nbsp;with <code>conj</code>). - Remove the window energy correction in <code>tfestimate</code>. Transfer functions and coherence are ratios of spectral densities, for which the correction cancels out when the same window is used for the input and the output. With different windows (e.g.&nbsp;<code>force</code> and <code>exponential</code> windows for impact testing), the correction biased the estimated FRFs by a factor <code>rms(window_input)/rms(window_output)</code> (about -8 dB in a typical impact test). - Fix <code>agwn</code> and <code>mixed_noise</code> for arrays with more than two dimensions (e.g.&nbsp;FRF arrays of size <code>no × ni × nf</code>). The noise standard deviation was broadcast along the wrong dimension, which changed the size of the output when <code>ni &gt; 1</code>. - Fix <code>excitation(::Hammer, t)</code> when <code>tstart</code> does not coincide with a time sample. The signal started at the closest sample, which could lie before <code>tstart</code> and led to a <code>DomainError</code>. The signal now starts at the first sample greater than or equal to <code>tstart</code>, and is zero if <code>tstart</code> is beyond the time vector. - Fix <code>varest</code> when <code>batch_size &gt; 0</code>, which threw a <code>MethodError</code>. Incomplete batches are now correctly discarded for multichannel signals. - Fix wrong analytical results: - <code>impulse_response</code> (Mdof) kept only the last mode instead of summing all modes. - <code>modefreq</code> for clamped-free bars, rods and strings returned twice the natural frequencies. - <code>modefreq(::Beam, fmax, :CF)</code> used a wrong second root and skipped the fifth mode. Tabulated roots are more accurate and are now filtered by <code>fmax</code> for all beam boundary conditions. - <code>modeshape</code> was not mass-normalized for free-free bars (modes ≥ 2), clamped-free beams (first modes) and free-free beams (elastic and rotation modes). - <code>modefreq(::Membrane, fmax)</code> used the plate dispersion relation. - <code>srs(...; alg = :RecursiveInt)</code> was 1–4 % off. It now uses the exact Nigam-Jennings recursion. - <code>convert_csd(...; type = :vel)</code> returned spectra with the wrong sign. - <code>comac</code> could exceed 1 and <code>mpd</code> was non-zero for real modes with components of opposite signs. - <code>ods</code> weighted the candidates on the left of the peak by <code>msf²</code> instead of <code>msf</code>. - EFDD fallback of <code>FSDD</code>: wrong time step (overestimated damping) and bell spectra accumulated across peaks. - Poles identified with <code>LSCE</code>, <code>LSCF</code> and <code>pLSCF</code> on a frequency range not starting at 0 Hz are now shifted back exactly. - Fix errors on valid inputs: - Sdof solvers with <code>ω0 = 0</code> and <code>solve(::SdofForcedTimeProblem; method = :interp)</code>. - <code>DirectFRFProblem</code> with an excitation selection matrix <code>Se</code> of fewer rows than DOFs, or when only <code>So</code> is given (same for <code>StateSpaceFRFProblem</code> and <code>StateSpaceModalFRFProblem</code>). - <code>tfestimate</code>, <code>welch</code>, <code>csd</code> and <code>spectrum</code> with an odd block size. - <code>detrend</code> with breakpoints, <code>planck</code> with an odd length, <code>acn</code> with a complex matrix, and <code>excitation(::GaussianPulse, t)</code> with a negative amplitude. - <code>SineWave</code>, <code>Hammer</code>, <code>Sdof</code> and <code>OneDMesh</code> now accept arguments of different numeric types (e.g.&nbsp;integers). - Other fixes: - <code>solve(::SdofForcedTimeProblem)</code> with <code>type_exc = :base</code> no longer overwrites the input vector. - <code>excitation(::ColoredNoise, t)</code> and <code>acn</code> no longer skip the time windowing when <code>frange</code> starts at 0 Hz. - <code>varest(x, DerricoEst())</code> returns a single value for a vector. - <code>msf</code> threw an <code>UndefVarError</code> instead of a <code>DimensionMismatch</code>. - The ESD scaling of <code>welch</code> and <code>csd</code> uses the block duration <code>bs/fs</code>. <code>xcorr</code> uses an unbiased normalization. - <code>KalmanDenoising</code>: the search range of the process noise variance is now derived from the data, and the RTS covariance update is corrected. - Regularization-based denoising uses <code>idct</code> instead of a dense <code>n × n</code> matrix (memory now <code>O(n)</code>).</p>
 <p><strong>Documentation</strong></p>
 <ul>
 <li>Fix the <code>mcf</code> docstring: 0 for real modes, 1 for complex modes.</li>
@@ -340,25 +306,7 @@ window.Quarto = {
 </ul>
 </section>
 <section id="section-1" class="level2">
-<h2 class="anchored" data-anchor-id="section-1">1.12.0</h2>
-<p><strong>New features</strong></p>
-<ul>
-<li>Add <code>to_dB</code> function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (<code>type = :amplitude</code>, 20 log₁₀) from power/energy quantities (<code>type = :power</code>, 10 log₁₀).</li>
-<li>Add <code>ref_dB</code> function returning the usual reference values (<code>:mobility</code>, <code>:accelerance</code>, <code>:displacement</code>, <code>:velocity</code>, <code>:acceleration</code>, <code>:pressure</code>) for amplitude or power quantities.</li>
-<li>Add <code>peak_value</code>, <code>peak2peak</code> and <code>rms_value</code> functions to compute the peak, peak-to-peak and RMS values of a signal.</li>
-<li>Add <code>unwrap_phase</code> function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (<code>deg = true</code>), and independently for each channel of a multichannel signal.</li>
-</ul>
-<p><strong>Bug fixes</strong></p>
-<ul>
-<li>Fix the phase unwrapping in <code>bode_plot</code> when <code>isdeg = true</code>. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase.</li>
-</ul>
-<p><strong>Internals</strong></p>
-<ul>
-<li><code>bode_plot</code> now relies on <code>to_dB</code> and <code>unwrap_phase</code>.</li>
-</ul>
-</section>
-<section id="section-2" class="level2">
-<h2 class="anchored" data-anchor-id="section-2">1.11.0</h2>
+<h2 class="anchored" data-anchor-id="section-1">1.11.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add five new applications in <code>SVAppsExt.jl</code> extension for educational purposes:
@@ -371,8 +319,8 @@ window.Quarto = {
 </ul></li>
 </ul>
 </section>
-<section id="section-3" class="level2">
-<h2 class="anchored" data-anchor-id="section-3">1.10.3</h2>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2">1.10.3</h2>
 <ul>
 <li>Fix the coefficient of the stiffness-velocity term in the Newmark family solvers, which reduced <code>Newmark</code>, <code>HHT</code>, <code>WBZ</code>, <code>FoxGoodwin</code>, <code>LinearAcceleration</code> and <code>GeneralizedAlpha</code> with <code>ρ &lt; 1</code> to first-order accuracy. The default <code>GeneralizedAlpha()</code> and <code>MidPoint</code> are not affected.</li>
 <li>Fix the inverted validation of <code>αf</code> and <code>αm</code> in <code>HHT</code>, <code>WBZ</code> and <code>GeneralizedAlpha</code>, which rejected valid values and accepted invalid ones.</li>
@@ -383,21 +331,21 @@ window.Quarto = {
 <li>Add a second-order convergence test for the Newmark family solvers.</li>
 </ul>
 </section>
-<section id="section-4" class="level2">
-<h2 class="anchored" data-anchor-id="section-4">1.10.2</h2>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3">1.10.2</h2>
 <p><strong>Internals</strong></p>
 <ul>
 <li>Add Fast colormap from Paraview as the default colormap for mesh visualization and animation in <code>SVAnimExt.jl</code> extension. The <code>colormap</code> argument of <code>viz_mesh</code> and <code>animate_mesh</code> functions now defaults to <code>fast_cmap()</code> instead of <code>:jet1</code>.</li>
 </ul>
 </section>
-<section id="section-5" class="level2">
-<h2 class="anchored" data-anchor-id="section-5">1.10.1</h2>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4">1.10.1</h2>
 <ul>
 <li>Fix minor bugs in <code>animate_mesh</code> function in <code>SVAnimExt.jl</code> extension.</li>
 </ul>
 </section>
-<section id="section-6" class="level2">
-<h2 class="anchored" data-anchor-id="section-6">1.10.0</h2>
+<section id="section-5" class="level2">
+<h2 class="anchored" data-anchor-id="section-5">1.10.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add mesh manipulation functions in <code>SVMeshExt.jl</code> extension:
@@ -414,15 +362,15 @@ window.Quarto = {
 <li>Simplify the implementation of <code>ods</code> function.</li>
 </ul>
 </section>
-<section id="section-7" class="level2">
-<h2 class="anchored" data-anchor-id="section-7">1.9.1</h2>
+<section id="section-6" class="level2">
+<h2 class="anchored" data-anchor-id="section-6">1.9.1</h2>
 <ul>
 <li>Fix type instability issues in <code>gradient</code> function.</li>
 <li>Improve <code>compute_poles</code> functions for <code>SdofEMA</code>.</li>
 </ul>
 </section>
-<section id="section-8" class="level2">
-<h2 class="anchored" data-anchor-id="section-8">1.9.0</h2>
+<section id="section-7" class="level2">
+<h2 class="anchored" data-anchor-id="section-7">1.9.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>modal_density</code> function to compute the modal density of a structure from the knowledge of its resonance frequencies.</li>
@@ -433,15 +381,15 @@ window.Quarto = {
 <li>Replace <code>Interpolations.jl</code> with <code>DataInterpolations.jl</code> for interpolation.</li>
 </ul>
 </section>
-<section id="section-9" class="level2">
-<h2 class="anchored" data-anchor-id="section-9">1.8.0</h2>
+<section id="section-8" class="level2">
+<h2 class="anchored" data-anchor-id="section-8">1.8.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>wave_parameters</code> function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.</li>
 </ul>
 </section>
-<section id="section-10" class="level2">
-<h2 class="anchored" data-anchor-id="section-10">1.7.0</h2>
+<section id="section-9" class="level2">
+<h2 class="anchored" data-anchor-id="section-9">1.7.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Remove <code>AutoEMASdofProblem</code> and <code>AutoEMAMdofProblem</code> structures</li>
@@ -453,14 +401,14 @@ window.Quarto = {
 <li>Fix various type instability issues.</li>
 </ul>
 </section>
-<section id="section-11" class="level2">
-<h2 class="anchored" data-anchor-id="section-11">1.6.1</h2>
+<section id="section-10" class="level2">
+<h2 class="anchored" data-anchor-id="section-10">1.6.1</h2>
 <ul>
 <li>Remove <code>DispatchDoctor</code> from dependencies</li>
 </ul>
 </section>
-<section id="section-12" class="level2">
-<h2 class="anchored" data-anchor-id="section-12">1.6.0</h2>
+<section id="section-11" class="level2">
+<h2 class="anchored" data-anchor-id="section-11">1.6.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Simplify <code>poles_extraction</code> method by removing <code>scaling</code> argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.</li>
@@ -471,8 +419,8 @@ window.Quarto = {
 <li>Fix type instability issues in <code>varest</code> and <code>poles_extraction</code> functions.</li>
 </ul>
 </section>
-<section id="section-13" class="level2">
-<h2 class="anchored" data-anchor-id="section-13">1.5.0</h2>
+<section id="section-12" class="level2">
+<h2 class="anchored" data-anchor-id="section-12">1.5.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Refactor <code>poles_extraction</code> function to add <code>scaling::Function</code> argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection</li>
