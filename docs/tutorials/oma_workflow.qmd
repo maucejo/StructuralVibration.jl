@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd
+using StructuralVibration, ShareAdd, PrettyTables, LinearAlgebra
 @usingany CairoMakie
 ```
 
@@ -25,7 +25,7 @@ using StructuralVibration, ShareAdd
 - **Duration**: about 20 minutes.
 :::
 
-Large or in-service structures (bridges, buildings, machines in operation) cannot easily be excited by a hammer or a shaker. They are, however, permanently excited by their environment: wind, traffic, machinery... Operational Modal Analysis (OMA) exploits these **ambient vibrations** to identify the modal parameters from the measured responses only. The price to pay is an additional assumption: the excitation must be broadband and random, so that it excites all the modes in the frequency band.
+Large or in-service structures, such as bridges, buildings or machines in operation, cannot easily be excited by a hammer or a shaker. They are, however, permanently excited by their environment: wind, traffic, machinery, etc. Operational Modal Analysis (OMA) exploits these **ambient vibrations** to identify the modal parameters from the measured responses only. The price to pay is an additional assumption: the excitation must be broadband and random, so that it excites all the modes in the frequency band.
 
 ## Step 1 – Simulating ambient vibrations
 
@@ -68,11 +68,7 @@ fn_exact = ωn[in_band]/2π
 ```
 
 ```{julia}
-fig = Figure()
-ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Acceleration (m/s²)", title = "Accelerometer at x = 0.2 m")
-lines!(ax, t, y[4, :], linewidth = 0.5)
-xlims!(ax, 0., 2.)
-fig
+sv_plot(t, y[4, :], xlabel = "Time (s)", ylabel = "Acceleration (m/s²)", title = "Accelerometer at x = 0.2 m")
 ```
 
 Unlike an impact response, the measured signal looks like noise: the modal content is hidden in its statistics.
@@ -83,7 +79,7 @@ The output-only methods do not work on FRFs but on the **cross-spectral densitie
 
 ```{julia}
 #| output: false
-bs = fs                                       # 1 s blocks → 1 Hz resolution
+bs = fs  # 1 s blocks → 1 Hz resolution
 prob = OMAProblem(y, t, fs, bs, frange = [1., 1000.])
 ```
 
@@ -118,17 +114,21 @@ Besides the six physical modes, the model contains poles with a damping ratio ar
 
 ```{julia}
 #| output: false
-physical = ξn .< 0.05                            # Keep modes with less than 5 % damping
+physical = ξn .< 0.05 # Keep modes with less than 5 % damping
 fn_id, ξn_id = fn[physical], ξn[physical]
-Φ_id = real_normalization(Ψ[:, physical])        # Complex → real mode shapes
+Φ_id = real_normalization(Ψ[:, physical]) # Complex → real mode shapes
 ```
 
 ```{julia}
-println("Mode | f exact (Hz) | f identified (Hz) | ξ identified (%)")
-for i in eachindex(fn_id)
-    println(lpad(i, 4), " | ", lpad(round(fn_exact[i], digits = 2), 12), " | ",
-            lpad(round(fn_id[i], digits = 2), 17), " | ", lpad(round(100ξn_id[i], digits = 2), 16))
-end
+data = hcat(string.(eachindex(fn_id)), round.(fn_exact[eachindex(fn_id)], digits = 2),
+            round.(fn_id, digits = 2), round.(100ξn_id, digits = 2))
+
+pretty_table(
+    HTML,
+    data,
+    column_labels = ["Mode", "f exact (Hz)", "f identified (Hz)", "ξ identified (%)"],
+    alignment = :c
+)
 ```
 
 The natural frequencies are identified within about 1 %. The damping ratios are correct except for the first mode, which is overestimated: the damping of low-frequency modes is the most difficult quantity to estimate in OMA, because few periods are averaged and the frequency resolution is coarse compared with the half-power bandwidth of the mode ($2\xi f_1 \approx$ 0.5 Hz here, for a resolution of 1 Hz).
@@ -137,7 +137,7 @@ The natural frequencies are identified within about 1 %. The damping ratios are 
 
 ```{julia}
 MAC = mac(Φ_id, Φ_exact)
-println("Diagonal of the MAC matrix: ", round.([MAC[i, i] for i in axes(MAC, 1)], digits = 3))
+println("Diagonal of the MAC matrix: ", round.(diag(MAC), digits = 3))
 ```
 
 ```{julia}
@@ -146,7 +146,7 @@ for i in eachindex(fn_id)
     # OMA mode shapes are not scaled: normalize both shapes to a unit maximum for display
     ϕ_ref = Φ_exact[:, i]/maximum(abs, Φ_exact[:, i])
     ϕ_id = Φ_id[:, i]/maximum(abs, Φ_id[:, i])
-    ϕ_id .*= sign(sum(ϕ_id .* ϕ_ref))               # Same sign convention
+    ϕ_id .*= sign(sum(ϕ_id .* ϕ_ref)) # Same sign convention
 
     axi = Axis(fig[(i - 1) ÷ 2 + 1, (i - 1) % 2 + 1], title = "Mode $i – $(round(fn_id[i], digits = 1)) Hz")
     lines!(axi, x_acc, ϕ_ref, label = "Exact")
@@ -161,7 +161,7 @@ The mode shapes are perfectly identified (MAC = 1), but only **up to a scaling f
 
 ::: {.callout-important}
 ## EMA vs OMA
-Because the excitation is not measured, OMA mode shapes cannot be mass-normalized. Consequently, an OMA model cannot be used to predict the response to a given force (FRF synthesis), unless the mode shapes are scaled by other means (mass-change method, finite element model...). This is the main limitation of OMA compared with EMA.
+Because the excitation is not measured, OMA mode shapes cannot be mass-normalized. Consequently, an OMA model cannot be used to predict the response to a given force (FRF synthesis), unless the mode shapes are scaled by other means (mass-change method, finite element model,...). This is the main limitation of OMA compared with EMA.
 :::
 
 ## Going further

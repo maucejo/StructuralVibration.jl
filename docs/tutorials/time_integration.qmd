@@ -69,7 +69,7 @@ dof_obs = findfirst(==(21), mesh.free_dofs)   # Node 11 → x = 0.5 m
 How good is this FE model? Let us compare its natural frequencies with the exact ones given by the analytical beam model.
 
 ```{julia}
-ω_exact, _ = modefreq(beam, ω[end])
+ω_exact = modefreq(beam, ω[end])[1]
 nm = min(length(ω), length(ω_exact))
 fe_error = 100*(ω[1:nm] ./ ω_exact[1:nm] .- 1)
 
@@ -93,7 +93,7 @@ A FE model always contains **high-frequency modes that are not physical**. Here,
 
 ## Step 2 – Excitation and reference solution
 
-The impact is modelled by a half-sine pulse of 100 N lasting 0.5 ms. Its spectrum is significant up to about 3 kHz, the first zero of the spectrum of a half-sine pulse of duration $\tau$ being located at $1.5/\tau$.
+The impact is modeled by a half-sine pulse of 100 N lasting 0.5 ms. Its spectrum is significant up to about 3 kHz, the first zero of the spectrum of a half-sine pulse of duration $\tau$ being located at $1.5/\tau$.
 
 ```{julia}
 #| output: false
@@ -158,7 +158,7 @@ ax = Axis(fig[1, 1], xlabel = "Time (s)", ylabel = "Displacement (m)", title = "
 lines!(ax, t_ref, x_ref, label = "Reference")
 lines!(ax, t_stable, x_stable, linestyle = :dash, label = "Central difference")
 xlims!(ax, 0., T)
-axislegend(ax, position = :rb)
+axislegend(ax, position = :lb)
 fig
 ```
 
@@ -174,6 +174,15 @@ A 10 % change of the time step is the difference between a perfect result and an
 The critical time step is dictated by $\omega_\text{max}$, that is by the *non-physical* modes of the model, and not by the frequency range you are interested in. Here $\Delta t_\text{cr}$ ≈ 6.7 µs, although nothing of interest happens above a few kHz. Worse, refining the mesh increases $\omega_\text{max}$: for Euler-Bernoulli beam elements of size $h_e$, $\omega_\text{max} \propto 1/h_e^2$, so **halving the element size divides the critical time step by four**.
 
 This is the usual explanation when a simulation "explodes" after a mesh refinement.
+:::
+
+::: {.callout-note}
+## In practice
+Computing $\omega_\text{max}$ of the assembled model requires solving an eigenvalue problem, which is unaffordable for large models. Explicit FE codes therefore estimate the critical time step at the element level, from the smallest (or stiffest) element. This estimate is **conservative**: the highest natural frequency of the assembled model never exceeds the highest natural frequency of its elements taken separately (Irons–Treharne theorem):
+$$
+\omega_\text{max} \leq \max_e \omega_\text{max}^{(e)}.
+$$
+For the beam above, a single element has $\omega_\text{max}^{(e)}$ ≈ 5.5 × 10⁵ rad/s, giving $\Delta t_\text{cr}$ ≈ 3.7 µs instead of the exact 6.7 µs. The exact stability limit remains the one given by the $\omega_\text{max}$ of the assembled model.
 :::
 
 ## Step 4 – Newmark: unconditional stability, but not unconditional accuracy
@@ -219,7 +228,7 @@ for (i, dt) in enumerate([5e-5, 2e-4])
     lines!(axi, t, x, linestyle = :dash, label = "Newmark")
     xlims!(axi, 0., T)
     i == 2 && (axi.xlabel = "Time (s)")
-    i == 1 && axislegend(axi, position = :rb)
+    i == 1 && axislegend(axi, position = :lb)
 end
 fig
 ```
@@ -262,7 +271,7 @@ fig = Figure()
 ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Acceleration spectrum (dB)",
           title = "Mid-span acceleration")
 for r in results
-    lines!(ax, freq, 20log10.(abs.(rfft(r.a)) .+ eps()), label = r.name)
+    lines!(ax, freq, to_dB.(rfft(r.a) .+ eps()), label = r.name)
 end
 vlines!(ax, ω[13]/2π, color = :black, linestyle = :dash)
 text!(ax, ω[13]/2π, 0., text = " FE error > 1 %", align = (:left, :bottom))

@@ -25,7 +25,7 @@ using StructuralVibration, ShareAdd
 - **Duration**: about 15 minutes.
 :::
 
-The visualization tools of StructuralVibration.jl are provided by package extensions, which are activated by loading [Makie](https://docs.makie.org/stable/) (any backend) and [Meshes.jl](https://juliageometry.github.io/Meshes.jl/stable/):
+The visualization tools of `StructuralVibration.jl` are provided by package extensions, which are activated by loading [Makie](https://docs.makie.org/stable/) (any backend) and [Meshes.jl](https://juliageometry.github.io/Meshes.jl/stable/):
 
 ```julia
 using StructuralVibration, CairoMakie, Meshes   # or GLMakie for interactive 3D views
@@ -87,10 +87,10 @@ The mode shapes are evaluated at the nodes of the mesh. To display a deformed me
 
 ```{julia}
 #| output: false
-Φ = modeshape(plate, kn, xp, yp)       # One row per node, one column per mode
+Φ = modeshape(plate, kn, xp, yp) # One row per node, one column per mode
 
 # Helper: out-of-plane displacement field → 3 components per node
-function out_of_plane(w)
+function out_of_plane!(w)
     u = zeros(3length(w))
     u[3:3:end] .= w
     return u
@@ -98,7 +98,7 @@ end
 
 function show_shape(w, title; scale = 0.03)
     w = w/maximum(abs, w)                                # Unit maximum
-    deformed = deformed_grid(nodes, out_of_plane(w), scale)
+    deformed = deformed_grid(nodes, out_of_plane!(w), scale)
     return viz_mesh(SimpleMesh(deformed, mesh.topology.connec), color = w, title = title,
                     zlim = (-0.05, 0.05))
 end
@@ -128,7 +128,7 @@ H = solve(ModalFRFProblem(ωn, 0.01, freq, Φ, Φ[i_exc:i_exc, :]), progress = f
 # ODS at 60 Hz, between modes 2 (43 Hz) and 3 (69 Hz)
 i60 = findfirst(>=(60.), freq)
 ods_complex = H[:, 1, i60]
-ods = real_normalization(reshape(ods_complex, :, 1))[:, 1]   # Complex → real shape
+ods = real_normalization(reshape(ods_complex, :, 1))[:, 1] # Complex → real shape
 ```
 
 ```{julia}
@@ -155,7 +155,7 @@ The ODS at 60 Hz is dominated by modes 3 and 2, the two modes surrounding the ex
 
 ```julia
 w = ods/maximum(abs, ods)
-animate_mesh(nodes, elts, out_of_plane(w), color = w, scale_factor = 0.03, zlim = (-0.05, 0.05),
+animate_mesh(nodes, elts, out_of_plane!(w), color = w, scale_factor = 0.03, zlim = (-0.05, 0.05),
              title = "ODS at 60 Hz", framerate = 24, frequency = 4., filename = "plate_ods.mp4")
 ```
 

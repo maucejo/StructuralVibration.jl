@@ -130,7 +130,8 @@ ms_m, ms_e = modeshape(beam, kn, xm), modeshape(beam, kn, xe)
 
 # 2. Problem + 3. Solve - Accelerances by modal superposition
 freq = 1.:0.25:fmax
-prob = ModalFRFProblem(ωn, 0.01, freq, ms_m, ms_e)
+ξn = 0.01
+prob = ModalFRFProblem(ωn, ξ, freq, ms_m, ms_e)
 H = solve(prob, type = :acc, progress = false).u
 
 # 4. Post-process - Noisy "measurement" (SNR = 40 dB) + modal identification
@@ -146,7 +147,7 @@ fig = Figure()
 ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)")
 lines!(ax, freq, to_dB.(H_meas[1, 1, :]), label = "Noisy FRF")
 lines!(ax, freq, to_dB.(H[1, 1, :]), label = "Exact FRF")
-vlines!(ax, fn_id, color = :black, linestyle = :dash, label = "Identified modes")
+vlines!(ax, fn_id, color = :green, linestyle = :dash, label = "Identified modes")
 xlims!(ax, freq[1], freq[end])
 axislegend(ax, position = :rb)
 fig

@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd
+using StructuralVibration, ShareAdd, PrettyTables
 @usingany CairoMakie
 ```
 
@@ -25,7 +25,7 @@ using StructuralVibration, ShareAdd
 - **Duration**: about 15 minutes.
 :::
 
-Many post-processing operations are very sensitive to noise: numerical differentiation, inverse problems (force identification, model updating...), or Kalman filtering, whose tuning requires the noise covariance. Knowing the noise level of a signal, and being able to reduce it, is therefore an essential step. As usual, we work with synthetic data so that every result can be compared with the truth.
+Many post-processing operations are very sensitive to noise: numerical differentiation, inverse problems (force identification, model updating, ...), or Kalman filtering, whose tuning requires the noise covariance. Knowing the noise level of a signal, and being able to reduce it, is therefore an essential step. As usual, we work with synthetic data so that every result can be compared with the truth.
 
 ## Step 1 – A noisy measurement
 
@@ -52,7 +52,7 @@ t = 0.:1/fs:0.5
 F = reshape(excitation(Hammer(100., 0., 9.7, 1e-4), t), 1, :)
 prob = ForcedModalTimeProblem(ωn, Φ_s, ξ, Φ_e'*F, (zeros(nmodes), zeros(nmodes)), t)
 sol = solve(prob)
-x_true, v_true = sol.u, sol.du       # Noise-free displacement and velocity
+x_true, v_true = sol.u, sol.du # Noise-free displacement and velocity
 
 # Measurement: 20 dB SNR on each channel
 SNR_true = 20.
@@ -77,12 +77,12 @@ Suppose we need the velocity, but only the displacement was measured. Differenti
 #| output: false
 rel_error(a, ref) = [norm(a[i, :] - ref[i, :])/norm(ref[i, :]) for i in axes(ref, 1)]
 
-v_noisy = gradient(y, t)           # Differentiation along time (dims = 1: one signal per row)
+v_noisy = gradient(y, t) # Differentiation along time (dims = 1: one signal per row)
 ```
 
 ```{julia}
-println("Displacement error (measured):          ", round.(100rel_error(y, x_true), digits = 1), " %")
-println("Velocity error (differentiated):        ", round.(100rel_error(v_noisy, v_true), digits = 1), " %")
+println("Displacement error (measured):       ", round.(100rel_error(y, x_true), digits = 1), " %")
+println("Velocity error (differentiated):     ", round.(100rel_error(v_noisy, v_true), digits = 1), " %")
 ```
 
 A 10 % error on the displacement becomes an error of several hundred percent on the velocity. Differentiation amplifies the high-frequency content of the signal, where the noise dominates. This is typical of an **ill-posed** operation, and the reason why noise must be handled before such operations.
@@ -91,24 +91,30 @@ A 10 % error on the displacement becomes an error of several hundred percent on 
 
 In practice, the noise-free signal is unknown, and so is the noise level. `varest` estimates the noise variance of each channel from the measured signal only. Several methods are available:
 
-- `DerricoEst()` (default): a fast statistical estimator, based on finite differences of the signal;
+- `BayesianEst()` (default): a Bayesian version of the regularized smoothing.
+- `DerricoEst()`: a fast statistical estimator, based on finite differences of the signal;
 - `GCVEst()` and `LCurveEst()`: estimators based on the regularized smoothing of the signal, whose regularization parameter is selected by Generalized Cross-Validation or by the L-curve criterion;
-- `BayesianEst()`: a Bayesian version of the regularized smoothing.
 
 ```{julia}
 #| output: false
-methods = [("D'Errico", DerricoEst()), ("GCV", GCVEst()), ("L-curve", LCurveEst()), ("Bayesian", BayesianEst())]
+methods = [("Bayesian", BayesianEst()), ("D'Errico", DerricoEst()), ("GCV", GCVEst()), ("L-curve", LCurveEst())]
 SNR_est = [(name, estimated_SNR(y, varest(y, m))) for (name, m) in methods]
 ```
 
 ```{julia}
-println("True SNR: ", SNR_true, " dB on all channels")
-for (name, snr) in SNR_est
-    println(rpad(name, 9), " → estimated SNR (dB): ", round.(snr, digits = 1))
-end
+nch = length(SNR_est[1][2])
+data = vcat(hcat("True", fill(SNR_true, 1, nch)),
+            [hcat(name, round.(snr, digits = 1)') for (name, snr) in SNR_est]...)
+
+pretty_table(
+    HTML,
+    data,
+    column_labels = ["Method"; ["Channel $i (dB)" for i in 1:nch]],
+    alignment = :c
+)
 ```
 
-D'Errico, GCV and Bayesian estimators recover the SNR within about 1 dB. The L-curve estimator is less reliable here: it tends to over-smooth the signal, and thus to overestimate the noise level.
+Bayesian, D'Errico and GCV estimators recover the SNR within about 1 dB. The L-curve estimator is less reliable here: it tends to over-smooth the signal, and thus to overestimate the noise level.
 
 ## Step 4 – Denoising
 
@@ -126,10 +132,16 @@ x_dn = Dict(name => denoising(y, alg) for (name, alg) in denoisers)
 ```
 
 ```{julia}
-println("Measured signal  → error (%): ", round.(100rel_error(y, x_true), digits = 1))
-for (name, _) in denoisers
-    println(rpad(name, 16), " → error (%): ", round.(100rel_error(x_dn[name], x_true), digits = 1))
-end
+nch = size(x_true, 1)
+data = vcat(hcat("Measured signal", round.(100rel_error(y, x_true), digits = 1)'),
+            [hcat(name, round.(100rel_error(x_dn[name], x_true), digits = 1)') for (name, _) in denoisers]...)
+
+pretty_table(
+    HTML,
+    data,
+    column_labels = ["Signal"; ["Channel $i error (%)" for i in 1:nch]],
+    alignment = :c
+)
 ```
 
 ```{julia}

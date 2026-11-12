@@ -144,7 +144,7 @@
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "ω_exact, _ = modefreq(beam, ω[end])\n",
+        "ω_exact = modefreq(beam, ω[end])[1]\n",
         "nm = min(length(ω), length(ω_exact))\n",
         "fe_error = 100*(ω[1:nm] ./ ω_exact[1:nm] .- 1)\n",
         "\n",
@@ -209,7 +209,7 @@
         "\n",
         "## Step 2 – Excitation and reference solution\n",
         "\n",
-        "The impact is modelled by a half-sine pulse of 100 N lasting 0.5 ms. Its spectrum is significant up to about 3 kHz, the first zero of the spectrum of a half-sine pulse of duration $\\tau$ being located at $1.5/\\tau$."
+        "The impact is modeled by a half-sine pulse of 100 N lasting 0.5 ms. Its spectrum is significant up to about 3 kHz, the first zero of the spectrum of a half-sine pulse of duration $\\tau$ being located at $1.5/\\tau$."
       ]
     },
     {
@@ -693,7 +693,7 @@
       ]
     }
   ],
-  "timestamp": "2026-11-10T13:27:19.610",
+  "timestamp": "2026-11-12T11:04:34.202",
   "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/tutorials/time_integration.qmd",
   "qnr_schema_version": "1.0.0"
 }

@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd
+using StructuralVibration, ShareAdd, PrettyTables
 @usingany CairoMakie
 ```
 
@@ -25,7 +25,7 @@ using StructuralVibration, ShareAdd
 - **Duration**: about 20 minutes.
 :::
 
-The main purpose of StructuralVibration.jl is to generate **realistic synthetic data**, for which the ground truth is known. In this tutorial, we reproduce numerically what an experimentalist does in the lab: hitting a beam with an impact hammer, recording the force and the accelerations, and estimating the Frequency Response Functions (FRFs).
+The main purpose of `StructuralVibration.jl` is to generate **realistic synthetic data**, for which the ground truth is known. In this tutorial, we reproduce numerically what an experimentalist does in the lab: hitting a beam with an impact hammer, recording the force and the accelerations, and estimating the Frequency Response Functions (FRFs).
 
 ## Step 1 – The structure and the test setup
 
@@ -79,8 +79,8 @@ using FFTW
 tips = [("Soft tip (θ = 0.6 ms)", 6e-4), ("Medium tip (θ = 0.1 ms)", 1e-4), ("Hard tip (θ = 0.05 ms)", 5e-5)]
 
 fig = Figure()
-ax1 = Axis(fig[1, 1], xlabel = "Time (ms)", ylabel = "Force (N)")
-ax2 = Axis(fig[1, 2], xlabel = "Frequency (Hz)", ylabel = "Force spectrum (dB)")
+ax1 = Axis(fig[2, 1], xlabel = "Time (ms)", ylabel = "Force (N)")
+ax2 = Axis(fig[2, 2], xlabel = "Frequency (Hz)", ylabel = "Force spectrum (dB)")
 for (name, θ) in tips
     F = excitation(Hammer(100., 0., 9.7, θ), tb)
     S = abs.(rfft(F))[1:length(freq)]
@@ -90,7 +90,7 @@ end
 xlims!(ax1, 0., 15.)
 xlims!(ax2, 0., 1000.)
 ylims!(ax2, -60., 5.)
-axislegend(ax1, position = :rt)
+Legend(fig[1, 1:2], ax1, orientation = :horizontal)
 fig
 ```
 
@@ -110,7 +110,7 @@ A real test consists of several impacts, one per acquisition block, which are th
 using Random
 Random.seed!(1)
 
-navg = 10                                         # Number of impacts (averages)
+navg = 10 # Number of impacts (averages)
 impact = excitation(Hammer(1., 0., 9.7, 5e-5), tb) # Unit impact at the start of a block
 amplitudes = 80. .+ 40. .* rand(navg)
 
@@ -173,8 +173,8 @@ fig = Figure(size = (700, 700))
 ax1 = Axis(fig[1, 1], ylabel = "Accelerance (dB, ref: 1 m/s²/N)", title = "Accelerometer at x = 0.5 m")
 ax2 = Axis(fig[2, 1], ylabel = "Phase (°)", yticks = -180:90:180)
 ax3 = Axis(fig[3, 1], xlabel = "Frequency (Hz)", ylabel = "Coherence")
-lines!(ax1, freq, 20log10.(abs.(H1[2, 1, :])), label = "Estimated H₁")
-lines!(ax1, freq, 20log10.(abs.(H_exact[2, 1, :])), linestyle = :dash, label = "Exact")
+lines!(ax1, freq, to_dB.(H1[2, 1, :]), label = "Estimated H₁")
+lines!(ax1, freq, to_dB.(H_exact[2, 1, :]), linestyle = :dash, label = "Exact")
 lines!(ax2, freq, rad2deg.(angle.(H1[2, 1, :])))
 lines!(ax2, freq, rad2deg.(angle.(H_exact[2, 1, :])), linestyle = :dash)
 lines!(ax3, freq, coh[2, 1, :])
@@ -201,7 +201,7 @@ using Statistics
 
 band = 5. .< freq .< 1000.
 function frf_error(H)
-    ΔdB = 20log10.(abs.(H[:, 1, band])) .- 20log10.(abs.(H_exact[:, 1, band]))
+    ΔdB = to_dB.(H[:, 1, band]) .- to_dB.(H_exact[:, 1, band])
     return median(abs, ΔdB)
 end
 
@@ -229,8 +229,8 @@ Towards the end of each block, the response has almost vanished and the accelera
 
 ```{julia}
 #| output: false
-ε = 0.05                                   # Value of the exponential windows at the end of the block
-win_force(N) = force(N, 0.01, ε)           # Force window: 1 % of the block, then zero
+ε = 0.05 # Value of the exponential windows at the end of the block
+win_force(N) = force(N, 0.01, ε) # Force window: 1 % of the block, then zero
 win_exp(N) = exponential(N, ε)
 
 H1_w, _, coh_w = tfestimate(reshape(force_meas, 1, :), acc_meas, bs, win_force, win_exp, fs = fs)
@@ -243,9 +243,13 @@ println("Force + exponential    → median error = ", round(frf_error(H1_w), dig
 
 The windows improve the coherence, but they are not free. Multiplying the response by $e^{-t/\tau}$ is equivalent to measuring a **more damped structure**: each mode receives an additional damping ratio
 $$
-\xi_\text{add} = \frac{1}{\tau\,\omega_n}, \qquad \text{with} \quad \tau = \frac{T_\text{block}}{\ln(1/\varepsilon)}.
+\xi_n^\text{add} = \frac{1}{\tau\,\omega_n}, \qquad \text{with} \quad \tau = \frac{T_\text{block}}{\ln(1/\varepsilon)}.
 $$
 The natural frequencies are not affected, but the identified damping ratios must be corrected. Let us check this by identifying the modes (see the [EMA tutorial](ema_workflow.qmd)) from both estimates.
+
+::: {.callout-note}
+For a modal system, the free response of a given mode $n$ is proportional to $e^{-\xi_n\omega_n t}$. Multiplying it by an exponential window $e^{-t/\tau}$ is equivalent to measuring a system with a damping ratio $\tilde{\xi}_n = \xi_n + 1/(\tau\omega_n)$. We can therefore correct the identified damping ratios by subtracting $\xi_n^\text{add} = 1/(\tau\omega_n)$.
+:::
 
 ```{julia}
 function identify(H)
@@ -258,13 +262,17 @@ fn_r, ξn_r = identify(H1)
 fn_w, ξn_w = identify(H1_w)
 
 τ = (bs - 1)/fs/log(1/ε)
-ξ_add = 1 ./ (τ*2π*fn_w)
+ξn_add = 1 ./ (τ*2π*fn_w)
 
-println("Mode | ξ rect (%) | ξ windowed (%) | ξ windowed, corrected (%)")
-for i in eachindex(fn_w)
-    println(lpad(i, 4), " | ", lpad(round(100ξn_r[i], digits = 2), 10), " | ", lpad(round(100ξn_w[i], digits = 2), 14),
-            " | ", lpad(round(100(ξn_w[i] - ξ_add[i]), digits = 2), 25))
-end
+data = hcat(string.(eachindex(fn_w)),round.(100ξn_r, digits = 2), round.(100ξn_w, digits = 2),
+            round.(100(ξn_w .- ξn_add), digits = 2))
+
+pretty_table(
+    HTML,
+    data,
+    column_labels = ["Mode", "ξ rect (%)", "ξ windowed (%)", "ξ windowed, corrected (%)"],
+    alignment = :c
+)
 ```
 
 After correction, the damping ratios are recovered (exact value: 1 %), except for the first mode. For this mode, the added damping (about 2 %) is larger than the physical one, so that the corrected value is very sensitive to small estimation errors.
@@ -274,14 +282,15 @@ After correction, the damping ratios are recovered (exact value: 1 %), except fo
 Use the mildest exponential window that does the job (the largest `ε`), and always correct the identified damping ratios. If the block is long enough for the response to decay, the exponential window is not needed.
 :::
 
-## Step 8 – Your turn
+## Summary
 
-The whole chain is now in place. Try to change one parameter at a time and observe its effect on the FRFs and on the coherence:
+A virtual impact hammer test follows these steps:
 
-- use the soft tip (`θ = 6e-4`) and look at the coherence above 300 Hz;
-- decrease the SNR of the accelerations to 10 dB;
-- decrease the block size to `bs = 2048` (0.25 s): the response no longer vanishes at the end of each block;
-- plot the FRFs of the two other accelerometers (`H1[1, 1, :]` and `H1[3, 1, :]`) and check that all the modes are visible.
+1. Choose the hammer tip (`Hammer`) so that the excited frequency band covers the frequency range of interest.
+2. Simulate several impacts of random amplitude and compute the responses (`ForcedModalTimeProblem`).
+3. Add measurement noise to the force and to the responses (`agwn`, with `rst = false` to get independent noise sequences).
+4. Estimate the FRFs and the coherence with the $H_1$ estimator (`tfestimate`), averaging several blocks: with a single block, the coherence is meaningless.
+5. If needed, apply a force window on the input and an exponential window on the output, and correct the identified damping ratios for the damping added by the exponential window.
 
 **Next step**: these FRFs are exactly the input of an experimental modal analysis. See [Experimental modal analysis](ema_workflow.qmd).
 

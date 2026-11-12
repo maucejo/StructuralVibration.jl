@@ -13,7 +13,7 @@ execute:
 ```{julia}
 #| echo: false
 #| output: false
-using StructuralVibration, ShareAdd
+using StructuralVibration, ShareAdd, PrettyTables
 @usingany CairoMakie
 ```
 
@@ -56,7 +56,7 @@ To keep this tutorial short, the noisy accelerances are generated directly in th
 #| output: false
 freq = 1.:0.5:fmax
 H_exact = solve(ModalFRFProblem(ωn, ξ, freq, Φ_acc, Φ_hit), type = :acc, progress = false).u
-H = agwn(H_exact, 40.)            # Array of size (19 accelerometers × 1 impact × nf)
+H = agwn(H_exact, 40.) # Array of size (19 accelerometers × 1 impact × nf)
 
 # Ground truth in the analysis band
 in_band = ωn .< 2π*fmax
@@ -70,9 +70,9 @@ fig = Figure()
 ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)",
           title = "Measured FRFs (19 accelerometers)")
 for i in axes(H, 1)
-    lines!(ax, freq, 20log10.(abs.(H[i, 1, :])), color = (:gray, 0.4))
+    lines!(ax, freq, to_dB.(H[i, 1, :]), color = (:gray, 0.4))
 end
-lines!(ax, freq, 20log10.(abs.(H[dpi[1], 1, :])), label = "Driving point FRF")
+lines!(ax, freq, to_dB.(H[dpi[1], 1, :]), label = "Driving point FRF")
 xlims!(ax, 0., fmax)
 axislegend(ax, position = :rb)
 fig
@@ -123,18 +123,22 @@ fn_id, ξn_id = poles2modal(poles)
 ```
 
 ```{julia}
-println("Mode | f exact (Hz) | f identified (Hz) | ξ identified (%)")
-for i in eachindex(fn_id)
-    println(lpad(i, 4), " | ", lpad(round(fn_exact[i], digits = 2), 12), " | ",
-            lpad(round(fn_id[i], digits = 2), 17), " | ", lpad(round(100ξn_id[i], digits = 2), 16))
-end
+data = hcat(string.(eachindex(fn_id)), round.(fn_exact[eachindex(fn_id)], digits = 2),
+            round.(fn_id, digits = 2), round.(100ξn_id, digits = 2))
+
+pretty_table(
+    HTML,
+    data,
+    column_labels = ["Mode", "f exact (Hz)", "f identified (Hz)", "ξ identified (%)"],
+    alignment = :c
+)
 ```
 
 The natural frequencies are identified within 0.2 % and the damping ratios, which are always much harder to estimate, within a few percent of the exact value (1 %).
 
 ## Step 4 – Mode shapes
 
-Once the poles are known, the mode shapes are obtained by fitting each resonance peak of the FRFs. Here we use a single-degree-of-freedom least-squares fit (`LSFit`) in the vicinity of each identified natural frequency. Thanks to the driving point, the mode shapes are **mass-normalized**, and can therefore be directly compared with the exact ones.
+Once the poles are known, the mode shapes are obtained by fitting each resonance peak of the FRFs. Here, we use a single-degree-of-freedom least-squares fit (`LSFit`) in the vicinity of each identified natural frequency. Thanks to the driving point, the mode shapes are **mass-normalized**, and can therefore be directly compared with the exact ones.
 
 ```{julia}
 #| output: false
@@ -184,7 +188,7 @@ The final check consists in rebuilding the FRFs from the identified modal model 
 
 ```{julia}
 #| output: false
-res, _ = mode2residues(Φ_id, poles, 1:length(x_acc), [dpi[1]])
+res = mode2residues(Φ_id, poles, 1:length(x_acc), [dpi[1]])[1]
 H_synth = frf_reconstruction(res, poles, freq, type = :acc)
 ```
 
@@ -192,8 +196,8 @@ H_synth = frf_reconstruction(res, poles, freq, type = :acc)
 fig = Figure()
 ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)",
           title = "Accelerometer at x = $(x_acc[7]) m")
-lines!(ax, freq, 20log10.(abs.(H[7, 1, :])), label = "Measured")
-lines!(ax, freq, 20log10.(abs.(H_synth[7, 1, :])), linestyle = :dash, label = "Synthesized")
+lines!(ax, freq, to_dB.(H[7, 1, :]), label = "Measured")
+lines!(ax, freq, to_dB.(H_synth[7, 1, :]), linestyle = :dash, label = "Synthesized")
 xlims!(ax, 0., fmax)
 axislegend(ax, position = :rb)
 fig

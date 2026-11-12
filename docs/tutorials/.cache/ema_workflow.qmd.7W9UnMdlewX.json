@@ -25,7 +25,7 @@
       "source": [
         "#| echo: false\n",
         "#| output: false\n",
-        "using StructuralVibration, ShareAdd\n",
+        "using StructuralVibration, ShareAdd, PrettyTables\n",
         "@usingany CairoMakie"
       ],
       "outputs": [
@@ -109,7 +109,7 @@
         "#| output: false\n",
         "freq = 1.:0.5:fmax\n",
         "H_exact = solve(ModalFRFProblem(ωn, ξ, freq, Φ_acc, Φ_hit), type = :acc, progress = false).u\n",
-        "H = agwn(H_exact, 40.)            # Array of size (19 accelerometers × 1 impact × nf)\n",
+        "H = agwn(H_exact, 40.) # Array of size (19 accelerometers × 1 impact × nf)\n",
         "\n",
         "# Ground truth in the analysis band\n",
         "in_band = ωn .< 2π*fmax\n",
@@ -315,17 +315,25 @@
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "println(\"Mode | f exact (Hz) | f identified (Hz) | ξ identified (%)\")\n",
-        "for i in eachindex(fn_id)\n",
-        "    println(lpad(i, 4), \" | \", lpad(round(fn_exact[i], digits = 2), 12), \" | \",\n",
-        "            lpad(round(fn_id[i], digits = 2), 17), \" | \", lpad(round(100ξn_id[i], digits = 2), 16))\n",
-        "end"
+        "data = hcat(string.(eachindex(fn_id)), round.(fn_exact[eachindex(fn_id)], digits = 2),\n",
+        "            round.(fn_id, digits = 2), round.(100ξn_id, digits = 2))\n",
+        "\n",
+        "pretty_table(\n",
+        "    HTML,\n",
+        "    data,\n",
+        "    column_labels = [\"Mode\", \"f exact (Hz)\", \"f identified (Hz)\", \"ξ identified (%)\"],\n",
+        "    alignment = :c\n",
+        ")"
       ],
       "outputs": [
         {
-          "output_type": "stream",
-          "name": "stdout",
-          "text": "Mode | f exact (Hz) | f identified (Hz) | ξ identified (%)\n   1 |        23.45 |             23.41 |             0.96\n   2 |        93.81 |              93.8 |              1.0\n   3 |       211.08 |            211.07 |              1.0\n   4 |       375.25 |            375.26 |              1.0\n   5 |       586.33 |            586.37 |              1.0\n   6 |       844.32 |            844.25 |             0.98\n"
+          "output_type": "execute_result",
+          "execution_count": 1,
+          "data": {
+            "text/html": "<table>\n  <thead>\n    <tr class = \"columnLabelRow\">\n      <th style = \"font-weight: bold; text-align: center;\">Mode</th>\n      <th style = \"font-weight: bold; text-align: center;\">f exact (Hz)</th>\n      <th style = \"font-weight: bold; text-align: center;\">f identified (Hz)</th>\n      <th style = \"font-weight: bold; text-align: center;\">ξ identified (%)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr class = \"dataRow\">\n      <td style = \"text-align: center;\">1</td>\n      <td style = \"text-align: center;\">23.45</td>\n      <td style = \"text-align: center;\">23.41</td>\n      <td style = \"text-align: center;\">0.96</td>\n    </tr>\n    <tr class = \"dataRow\">\n      <td style = \"text-align: center;\">2</td>\n      <td style = \"text-align: center;\">93.81</td>\n      <td style = \"text-align: center;\">93.8</td>\n      <td style = \"text-align: center;\">1.0</td>\n    </tr>\n    <tr class = \"dataRow\">\n      <td style = \"text-align: center;\">3</td>\n      <td style = \"text-align: center;\">211.08</td>\n      <td style = \"text-align: center;\">211.07</td>\n      <td style = \"text-align: center;\">1.0</td>\n    </tr>\n    <tr class = \"dataRow\">\n      <td style = \"text-align: center;\">4</td>\n      <td style = \"text-align: center;\">375.25</td>\n      <td style = \"text-align: center;\">375.26</td>\n      <td style = \"text-align: center;\">1.0</td>\n    </tr>\n    <tr class = \"dataRow\">\n      <td style = \"text-align: center;\">5</td>\n      <td style = \"text-align: center;\">586.33</td>\n      <td style = \"text-align: center;\">586.37</td>\n      <td style = \"text-align: center;\">1.0</td>\n    </tr>\n    <tr class = \"dataRow\">\n      <td style = \"text-align: center;\">6</td>\n      <td style = \"text-align: center;\">844.32</td>\n      <td style = \"text-align: center;\">844.25</td>\n      <td style = \"text-align: center;\">0.98</td>\n    </tr>\n  </tbody>\n</table>\n",
+            "text/plain": "HTML{String}(\"<table>\\n  <thead>\\n    <tr class = \\\"columnLabelRow\\\">\\n      <th style = \\\"font-weight: bold; text-align: center;\\\">Mode</th>\\n      <th style = \\\"font-weight: bold; text-align: center;\\\">f exact (Hz)</th>\\n      <th style = \\\"font-weight: bold; text-align: center;\\\">f identified (Hz)</th>\\n      <th style = \\\"font-weight: bold; text-align: center;\\\">ξ identified (%)</th>\\n    </tr>\\n  </thead>\\n  <tbody>\\n    <tr class = \\\"dataRow\\\">\\n      <td style = \\\"text-align: center;\\\">1</td>\\n      <td style = \\\"text-align: center;\\\">23.45</td>\\n      <td style = \\\"text-align: center;\\\">23.41</td>\\n      <td style = \\\"text-align: center;\\\">0.96</td>\\n    </tr>\\n    <tr class = \\\"dataRow\\\">\\n      <td style = \\\"text-align: center;\\\">2</td>\\n      <td style = \\\"text-align: center;\\\">93.81</td>\\n      <td style = \\\"text-align: center;\\\">93.8</td>\\n      <td style = \\\"text-align: center;\\\">1.0</td>\\n    </tr>\\n    <tr class = \\\"dataRow\\\">\\n      <td style = \\\"text-align: center;\\\">3</td>\\n      <td style = \\\"text-align: center;\\\">211.08</td>\\n      <td style = \\\"text-align: center;\\\">211.07</td>\\n      <td style = \\\"text-align: center;\\\">1.0</td>\\n    </tr>\\n    <tr class = \\\"dataRow\\\">\\n      <td style = \\\"text-align: center;\\\">4</td>\\n      <td style = \\\"text-align: center;\\\">375.25</td>\\n      <td style = \\\"text-align: center;\\\">375.26</td>\\n      <td style = \\\"text-align: center;\\\">1.0</td>\\n    </tr>\\n    <tr class = \\\"dataRow\\\">\\n      <td style = \\\"text-align: center;\\\">5</td>\\n      <td style = \\\"text-align: center;\\\">586.33</td>\\n      <td style = \\\"text-align: center;\\\">586.37</td>\\n      <td style = \\\"text-align: center;\\\">1.0</td>\\n    </tr>\\n    <tr class = \\\"dataRow\\\">\\n      <td style = \\\"text-align: center;\\\">6</td>\\n      <td style = \\\"text-align: center;\\\">844.32</td>\\n      <td style = \\\"text-align: center;\\\">844.25</td>\\n      <td style = \\\"text-align: center;\\\">0.98</td>\\n    </tr>\\n  </tbody>\\n</table>\\n\")"
+          },
+          "metadata": {}
         }
       ],
       "execution_count": 1
@@ -583,7 +591,7 @@
       ]
     }
   ],
-  "timestamp": "2026-11-10T14:17:47.867",
+  "timestamp": "2026-11-12T10:20:33.594",
   "file": "/Users/maucejo/Documents/01_Recherche/04_Projets/Codes/Julia/StructuralVibration/docs/tutorials/ema_workflow.qmd",
   "qnr_schema_version": "1.0.0"
 }

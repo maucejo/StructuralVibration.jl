@@ -74,17 +74,17 @@ Estimates the noise variance of a signal `x` using a given method
 **Inputs**
 * `x`: Signal
 * `method`: Noise estimation method
-    * `BayesianEst`: Bayesian noise estimation (To be implemented)
+    * `BayesianEst`: Bayesian noise estimation (dafault)
     * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
     * `LCurveEst`: L-curve noise estimation
-    * `DerricoEst`: D'Errico noise estimation (default)
+    * `DerricoEst`: D'Errico noise estimation
 * `batch_size::Int`: Batch size for batch processing (default = 0)
 * `summary`: Summary function for batch processing (default = mean)
 
 **Output**
 * `noisevar`: Noise variance - Vector{Real}
 """
-function varest(x, method::NoiseEstimation = DerricoEst(); batch_size::Int = 0, summary = mean)
+function varest(x, method::NoiseEstimation = BayesianEst(); batch_size::Int = 0, summary = mean)
     varestfun = let
         if method isa OptimFamily
             x -> varest_optim(x, method)

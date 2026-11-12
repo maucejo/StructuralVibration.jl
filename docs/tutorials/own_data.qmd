@@ -25,7 +25,7 @@ using StructuralVibration, ShareAdd
 - **Duration**: about 20 minutes.
 :::
 
-The built-in models (`Sdof`, `Beam`, `Plate`...) are convenient for learning and testing, but real applications rely on your own models and on your own measurements. The good news is that the package only manipulates **plain Julia arrays**: as soon as your data are stored in arrays with the expected layout, every solver and every identification method can be used.
+The built-in models (`Sdof`, `Beam`, `Plate`, ...) are convenient for learning and testing, but real applications rely on your own models and on your own measurements. The good news is that the package only manipulates **plain Julia arrays**: as soon as your data are stored in arrays with the expected layout, every solver and every identification method can be used.
 
 ## Part 1 – Your own model
 
@@ -90,7 +90,7 @@ With the model matrices, the FRFs are computed by the direct method, i.e. by inv
 #| output: false
 freq = 0.1:0.01:15.
 H_all = solve(DirectFRFProblem(K, M, C, freq), type = :acc, progress = false).u
-H = H_all[:, 4:4, :]           # Excitation on the top floor (DOF 4), response of all floors
+H = H_all[:, 4:4, :] # Excitation on the top floor (DOF 4), response of all floors
 ```
 
 ```{julia}
@@ -98,7 +98,7 @@ fig = Figure()
 ax = Axis(fig[1, 1], xlabel = "Frequency (Hz)", ylabel = "Accelerance (dB, ref: 1 m/s²/N)",
           title = "Response to a force on the top floor")
 for i in 1:4
-    lines!(ax, freq, 20log10.(abs.(H[i, 1, :])), label = "Floor $i")
+    lines!(ax, freq, to_dB.(H[i, 1, :]), label = "Floor $i")
 end
 xlims!(ax, freq[1], freq[end])
 axislegend(ax, position = :rb)
@@ -200,7 +200,7 @@ H1, freq_H1, coh = tfestimate(force_meas, acc_meas, bs, hanning, fs = fs, overla
 
 ::: {.callout-warning}
 ## Pitfall
-The frequency resolution `fs/bs` must be finer than the half-power bandwidth of the modes, $2\xi f_n$. For the first mode, $2 \times 0.02 \times 2.28 \approx$ 0.09 Hz: with 4 s blocks (`bs = 1024`, resolution 0.25 Hz), the resonance peaks are smeared by the window, and the identification returns split modes and overestimated damping ratios. Lightly damped, low-frequency structures require long blocks, hence long records.
+The frequency resolution `fs/bs` must be finer than the half-power bandwidth of the modes, $2\xi_n f_n$. For the first mode, $2 \times 0.02 \times 2.28 \approx$ 0.09 Hz: with 4 s blocks (`bs = 1024`, resolution 0.25 Hz), the resonance peaks are smeared by the window, and the identification returns split modes and overestimated damping ratios. Lightly damped, low-frequency structures require long blocks, hence long records.
 :::
 
 ```{julia}
@@ -229,7 +229,7 @@ Before running the identification, it is good practice to **decimate** the signa
 decim = 4
 y_meas = agwn(acc[:, 1:decim:end], 30., rst = false)   # "Measured" accelerations
 t_meas = collect(t[1:decim:end])
-fs_meas = fs ÷ decim                                   # 64 Hz
+fs_meas = fs ÷ decim # 64 Hz
 ```
 
 The [OMA workflow](oma_workflow.qmd) then applies directly.
