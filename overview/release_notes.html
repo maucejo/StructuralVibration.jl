@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.20">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -40,14 +40,15 @@ ul.task-list li input[type="checkbox"] {
 <link href="../assets/logo/doclogo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-a725d1f31e95e8f52643e126b0b7b8fc.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-74243e483b0ac2e5097d27ba025f9437.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e23dafc20b066d5450f0492a61e707a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a9eb72e3e58318b32e974ea2afd71e13.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,14 +78,43 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
@@ -95,8 +125,7 @@ ul.task-list li input[type="checkbox"] {
     <span class="navbar-title">StructuralVibration.jl</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -104,6 +133,10 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link active" href="../index.html" aria-current="page"> 
 <span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/getting_started.html"> 
+<span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../models/index.html"> 
@@ -126,6 +159,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Extensions</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../apps/index.html"> 
+<span class="menu-text">Apps</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../references/index.html"> 
 <span class="menu-text">References</span></a>
   </li>  
@@ -140,15 +177,16 @@ ul.task-list li input[type="checkbox"] {
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../overview/release_notes.html">Release Notes</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../overview/release_notes.html">Release Notes</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -156,7 +194,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -183,21 +221,24 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.10.3</a></li>
-  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.10.2</a></li>
-  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.10.1</a></li>
-  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.10.0</a></li>
-  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.9.1</a></li>
-  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">1.9.0</a></li>
-  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">1.8.0</a></li>
-  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">1.7.0</a></li>
-  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">1.6.1</a></li>
-  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">1.6.0</a></li>
-  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">1.5.0</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.11.1</a></li>
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.12.0</a></li>
+  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.11.0</a></li>
+  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.10.3</a></li>
+  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.10.2</a></li>
+  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">1.10.1</a></li>
+  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">1.10.0</a></li>
+  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">1.9.1</a></li>
+  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">1.9.0</a></li>
+  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">1.8.0</a></li>
+  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">1.7.0</a></li>
+  <li><a href="#section-11" id="toc-section-11" class="nav-link" data-scroll-target="#section-11">1.6.1</a></li>
+  <li><a href="#section-12" id="toc-section-12" class="nav-link" data-scroll-target="#section-12">1.6.0</a></li>
+  <li><a href="#section-13" id="toc-section-13" class="nav-link" data-scroll-target="#section-13">1.5.0</a></li>
   <li><a href="#v1.4.1" id="toc-v1.4.1" class="nav-link" data-scroll-target="#v1.4.1">v1.4.1</a></li>
   <li><a href="#v1.4.0" id="toc-v1.4.0" class="nav-link" data-scroll-target="#v1.4.0">v1.4.0</a></li>
   <li><a href="#v1.3.0" id="toc-v1.3.0" class="nav-link" data-scroll-target="#v1.3.0">v1.3.0</a></li>
@@ -217,7 +258,7 @@ ul.task-list li input[type="checkbox"] {
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -239,7 +280,99 @@ ul.task-list li input[type="checkbox"] {
 
 
 <section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section">1.10.3</h2>
+<h2 class="anchored" data-anchor-id="section">1.11.1</h2>
+<p><strong>Bug fixes</strong></p>
+<ul>
+<li>Fix the cross-spectrum convention in <code>tfestimate</code>. The cross-spectrum was computed as <span class="math inline">\(X Y^*\)</span> instead of <span class="math inline">\(X^* Y\)</span>, so that the estimated transfer functions (<code>:h1</code>, <code>:h2</code>, <code>:h3</code>, <code>:hv</code>) were the complex conjugates of the true ones (wrong sign of the phase). As a consequence, the modal parameters could not be identified from FRFs estimated with <code>tfestimate</code>. <strong>Breaking for code that compensated for this behaviour</strong> (e.g.&nbsp;with <code>conj</code>).</li>
+<li>Remove the window energy correction in <code>tfestimate</code>. Transfer functions and coherence are ratios of spectral densities, for which the correction cancels out when the same window is used for the input and the output. With different windows (e.g.&nbsp;<code>force</code> and <code>exponential</code> windows for impact testing), the correction biased the estimated FRFs by a factor <code>rms(window_input)/rms(window_output)</code> (about -8 dB in a typical impact test).</li>
+<li>Fix <code>agwn</code> and <code>mixed_noise</code> for arrays with more than two dimensions (e.g.&nbsp;FRF arrays of size <code>no × ni × nf</code>). The noise standard deviation was broadcast along the wrong dimension, which changed the size of the output when <code>ni &gt; 1</code>.</li>
+<li>Fix <code>excitation(::Hammer, t)</code> when <code>tstart</code> does not coincide with a time sample. The signal started at the closest sample, which could lie before <code>tstart</code> and led to a <code>DomainError</code>. The signal now starts at the first sample greater than or equal to <code>tstart</code>, and is zero if <code>tstart</code> is beyond the time vector.</li>
+<li>Fix <code>varest</code> when <code>batch_size &gt; 0</code>, which threw a <code>MethodError</code>. Incomplete batches are now correctly discarded for multichannel signals.</li>
+<li>Fix wrong analytical results:
+<ul>
+<li><code>impulse_response</code> (Mdof) kept only the last mode instead of summing all modes.</li>
+<li><code>modefreq</code> for clamped-free bars, rods and strings returned twice the natural frequencies.</li>
+<li><code>modefreq(::Beam, fmax, :CF)</code> used a wrong second root and skipped the fifth mode. Tabulated roots are more accurate and are now filtered by <code>fmax</code> for all beam boundary conditions.</li>
+<li><code>modeshape</code> was not mass-normalized for free-free bars (modes ≥ 2), clamped-free beams (first modes) and free-free beams (elastic and rotation modes).</li>
+<li><code>modefreq(::Membrane, fmax)</code> used the plate dispersion relation.</li>
+<li><code>srs(...; alg = :RecursiveInt)</code> was 1–4 % off. It now uses the exact Nigam-Jennings recursion.</li>
+<li><code>convert_csd(...; type = :vel)</code> returned spectra with the wrong sign.</li>
+<li><code>comac</code> could exceed 1 and <code>mpd</code> was non-zero for real modes with components of opposite signs.</li>
+<li><code>ods</code> weighted the candidates on the left of the peak by <code>msf²</code> instead of <code>msf</code>.</li>
+<li>EFDD fallback of <code>FSDD</code>: wrong time step (overestimated damping) and bell spectra accumulated across peaks.</li>
+<li>Poles identified with <code>LSCE</code>, <code>LSCF</code> and <code>pLSCF</code> on a frequency range not starting at 0 Hz are now shifted back exactly.</li>
+</ul></li>
+<li>Fix errors on valid inputs:
+<ul>
+<li>Sdof solvers with <code>ω0 = 0</code> and <code>solve(::SdofForcedTimeProblem; method = :interp)</code>.</li>
+<li><code>DirectFRFProblem</code> with an excitation selection matrix <code>Se</code> of fewer rows than DOFs, or when only <code>So</code> is given (same for <code>StateSpaceFRFProblem</code> and <code>StateSpaceModalFRFProblem</code>).</li>
+<li><code>tfestimate</code>, <code>welch</code>, <code>csd</code> and <code>spectrum</code> with an odd block size.</li>
+<li><code>detrend</code> with breakpoints, <code>planck</code> with an odd length, <code>acn</code> with a complex matrix, and <code>excitation(::GaussianPulse, t)</code> with a negative amplitude.</li>
+<li><code>SineWave</code>, <code>Hammer</code>, <code>Sdof</code> and <code>OneDMesh</code> now accept arguments of different numeric types (e.g.&nbsp;integers).</li>
+</ul></li>
+<li>Other fixes:
+<ul>
+<li><code>solve(::SdofForcedTimeProblem)</code> with <code>type_exc = :base</code> no longer overwrites the input vector.</li>
+<li><code>excitation(::ColoredNoise, t)</code> and <code>acn</code> no longer skip the time windowing when <code>frange</code> starts at 0 Hz.</li>
+<li><code>varest(x, DerricoEst())</code> returns a single value for a vector.</li>
+<li><code>ref_dB(:displacement)</code> returns 1 pm, as documented.</li>
+<li><code>msf</code> threw an <code>UndefVarError</code> instead of a <code>DimensionMismatch</code>.</li>
+<li>The ESD scaling of <code>welch</code> and <code>csd</code> uses the block duration <code>bs/fs</code>. <code>xcorr</code> uses an unbiased normalization.</li>
+<li><code>KalmanDenoising</code>: the search range of the process noise variance is now derived from the data, and the RTS covariance update is corrected.</li>
+<li>Regularization-based denoising uses <code>idct</code> instead of a dense <code>n × n</code> matrix (memory now <code>O(n)</code>).</li>
+</ul></li>
+</ul>
+<p><strong>Documentation</strong></p>
+<ul>
+<li>Fix the <code>mcf</code> docstring: 0 for real modes, 1 for complex modes.</li>
+<li>Add a <em>Tutorials</em> section, organized by user profile:
+<ul>
+<li><em>Getting started</em></li>
+<li><em>From model to virtual measurement</em>: simulation of an impact hammer test, FRF estimation, averaging and impact testing windows</li>
+<li><em>Experimental modal analysis</em>: stabilization diagram, mode shape extraction, MAC and FRF synthesis</li>
+<li><em>Operational modal analysis</em>: identification from ambient vibrations with Covariance-driven SSI</li>
+<li><em>Choosing a time integration scheme</em>: stability, accuracy and numerical dissipation</li>
+<li><em>Noise estimation and denoising</em></li>
+<li><em>Visualizing and animating deflection shapes</em></li>
+<li><em>Using your own models and data</em></li>
+</ul></li>
+<li>Add a “New to the package?” entry point on the home page.</li>
+</ul>
+</section>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1">1.12.0</h2>
+<p><strong>New features</strong></p>
+<ul>
+<li>Add <code>to_dB</code> function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (<code>type = :amplitude</code>, 20 log₁₀) from power/energy quantities (<code>type = :power</code>, 10 log₁₀).</li>
+<li>Add <code>ref_dB</code> function returning the usual reference values (<code>:mobility</code>, <code>:accelerance</code>, <code>:displacement</code>, <code>:velocity</code>, <code>:acceleration</code>, <code>:pressure</code>) for amplitude or power quantities.</li>
+<li>Add <code>peak_value</code>, <code>peak2peak</code> and <code>rms_value</code> functions to compute the peak, peak-to-peak and RMS values of a signal.</li>
+<li>Add <code>unwrap_phase</code> function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (<code>deg = true</code>), and independently for each channel of a multichannel signal.</li>
+</ul>
+<p><strong>Bug fixes</strong></p>
+<ul>
+<li>Fix the phase unwrapping in <code>bode_plot</code> when <code>isdeg = true</code>. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase.</li>
+</ul>
+<p><strong>Internals</strong></p>
+<ul>
+<li><code>bode_plot</code> now relies on <code>to_dB</code> and <code>unwrap_phase</code>.</li>
+</ul>
+</section>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2">1.11.0</h2>
+<p><strong>New features</strong></p>
+<ul>
+<li>Add five new applications in <code>SVAppsExt.jl</code> extension for educational purposes:
+<ul>
+<li>Free Response of a 1-DOF System</li>
+<li>Forced Response of a 1-DOF System</li>
+<li>Free Response of a 2-DOF System</li>
+<li>Forced Response of a 2-DOF System</li>
+<li>Newmark Method for a 2-DOF System</li>
+</ul></li>
+</ul>
+</section>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3">1.10.3</h2>
 <ul>
 <li>Fix the coefficient of the stiffness-velocity term in the Newmark family solvers, which reduced <code>Newmark</code>, <code>HHT</code>, <code>WBZ</code>, <code>FoxGoodwin</code>, <code>LinearAcceleration</code> and <code>GeneralizedAlpha</code> with <code>ρ &lt; 1</code> to first-order accuracy. The default <code>GeneralizedAlpha()</code> and <code>MidPoint</code> are not affected.</li>
 <li>Fix the inverted validation of <code>αf</code> and <code>αm</code> in <code>HHT</code>, <code>WBZ</code> and <code>GeneralizedAlpha</code>, which rejected valid values and accepted invalid ones.</li>
@@ -250,21 +383,21 @@ ul.task-list li input[type="checkbox"] {
 <li>Add a second-order convergence test for the Newmark family solvers.</li>
 </ul>
 </section>
-<section id="section-1" class="level2">
-<h2 class="anchored" data-anchor-id="section-1">1.10.2</h2>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4">1.10.2</h2>
 <p><strong>Internals</strong></p>
 <ul>
 <li>Add Fast colormap from Paraview as the default colormap for mesh visualization and animation in <code>SVAnimExt.jl</code> extension. The <code>colormap</code> argument of <code>viz_mesh</code> and <code>animate_mesh</code> functions now defaults to <code>fast_cmap()</code> instead of <code>:jet1</code>.</li>
 </ul>
 </section>
-<section id="section-2" class="level2">
-<h2 class="anchored" data-anchor-id="section-2">1.10.1</h2>
+<section id="section-5" class="level2">
+<h2 class="anchored" data-anchor-id="section-5">1.10.1</h2>
 <ul>
 <li>Fix minor bugs in <code>animate_mesh</code> function in <code>SVAnimExt.jl</code> extension.</li>
 </ul>
 </section>
-<section id="section-3" class="level2">
-<h2 class="anchored" data-anchor-id="section-3">1.10.0</h2>
+<section id="section-6" class="level2">
+<h2 class="anchored" data-anchor-id="section-6">1.10.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add mesh manipulation functions in <code>SVMeshExt.jl</code> extension:
@@ -281,15 +414,15 @@ ul.task-list li input[type="checkbox"] {
 <li>Simplify the implementation of <code>ods</code> function.</li>
 </ul>
 </section>
-<section id="section-4" class="level2">
-<h2 class="anchored" data-anchor-id="section-4">1.9.1</h2>
+<section id="section-7" class="level2">
+<h2 class="anchored" data-anchor-id="section-7">1.9.1</h2>
 <ul>
 <li>Fix type instability issues in <code>gradient</code> function.</li>
 <li>Improve <code>compute_poles</code> functions for <code>SdofEMA</code>.</li>
 </ul>
 </section>
-<section id="section-5" class="level2">
-<h2 class="anchored" data-anchor-id="section-5">1.9.0</h2>
+<section id="section-8" class="level2">
+<h2 class="anchored" data-anchor-id="section-8">1.9.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>modal_density</code> function to compute the modal density of a structure from the knowledge of its resonance frequencies.</li>
@@ -300,15 +433,15 @@ ul.task-list li input[type="checkbox"] {
 <li>Replace <code>Interpolations.jl</code> with <code>DataInterpolations.jl</code> for interpolation.</li>
 </ul>
 </section>
-<section id="section-6" class="level2">
-<h2 class="anchored" data-anchor-id="section-6">1.8.0</h2>
+<section id="section-9" class="level2">
+<h2 class="anchored" data-anchor-id="section-9">1.8.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>wave_parameters</code> function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.</li>
 </ul>
 </section>
-<section id="section-7" class="level2">
-<h2 class="anchored" data-anchor-id="section-7">1.7.0</h2>
+<section id="section-10" class="level2">
+<h2 class="anchored" data-anchor-id="section-10">1.7.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Remove <code>AutoEMASdofProblem</code> and <code>AutoEMAMdofProblem</code> structures</li>
@@ -320,14 +453,14 @@ ul.task-list li input[type="checkbox"] {
 <li>Fix various type instability issues.</li>
 </ul>
 </section>
-<section id="section-8" class="level2">
-<h2 class="anchored" data-anchor-id="section-8">1.6.1</h2>
+<section id="section-11" class="level2">
+<h2 class="anchored" data-anchor-id="section-11">1.6.1</h2>
 <ul>
 <li>Remove <code>DispatchDoctor</code> from dependencies</li>
 </ul>
 </section>
-<section id="section-9" class="level2">
-<h2 class="anchored" data-anchor-id="section-9">1.6.0</h2>
+<section id="section-12" class="level2">
+<h2 class="anchored" data-anchor-id="section-12">1.6.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Simplify <code>poles_extraction</code> method by removing <code>scaling</code> argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.</li>
@@ -338,8 +471,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fix type instability issues in <code>varest</code> and <code>poles_extraction</code> functions.</li>
 </ul>
 </section>
-<section id="section-10" class="level2">
-<h2 class="anchored" data-anchor-id="section-10">1.5.0</h2>
+<section id="section-13" class="level2">
+<h2 class="anchored" data-anchor-id="section-13">1.5.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Refactor <code>poles_extraction</code> function to add <code>scaling::Function</code> argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection</li>
@@ -626,7 +759,8 @@ ul.task-list li input[type="checkbox"] {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -635,8 +769,69 @@ ul.task-list li input[type="checkbox"] {
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -650,6 +845,7 @@ ul.task-list li input[type="checkbox"] {
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -812,44 +1008,54 @@ ul.task-list li input[type="checkbox"] {
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -948,7 +1154,10 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="../overview/installation.html" class="pagination-link" aria-label="Installation">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Installation</span>

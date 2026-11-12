@@ -14,59 +14,95 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/other.html</loc>
-    <lastmod>2026-03-04T11:58:17.056Z</lastmod>
+    <lastmod>2026-11-06T10:49:51.860Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/overview/installation.html</loc>
-    <lastmod>2025-11-20T13:21:54.982Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/apps/index.html</loc>
+    <lastmod>2026-11-04T11:40:00.607Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/extensions/index.html</loc>
-    <lastmod>2026-03-18T12:31:06.317Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/overview/release_notes.html</loc>
+    <lastmod>2026-11-12T12:35:20.082Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/models/noise.html</loc>
-    <lastmod>2026-03-04T09:18:44.922Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/oma_workflow.html</loc>
+    <lastmod>2026-11-12T09:52:02.022Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/models/excitation.html</loc>
-    <lastmod>2026-03-06T15:06:45.194Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/own_data.html</loc>
+    <lastmod>2026-11-12T11:30:27.892Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/index.html</loc>
-    <lastmod>2025-09-04T14:24:13.398Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/virtual_testing.html</loc>
+    <lastmod>2026-11-12T11:49:29.378Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/frequency_solvers.html</loc>
-    <lastmod>2026-03-06T15:15:24.183Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/time_integration.html</loc>
+    <lastmod>2026-11-12T10:35:56.758Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/references/index.html</loc>
-    <lastmod>2026-11-02T13:08:03.301Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/direct_time_solvers.html</loc>
-    <lastmod>2026-03-06T15:14:25.055Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html</loc>
-    <lastmod>2026-03-18T12:42:15.834Z</lastmod>
-  </url>
-  <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/state_space_solvers.html</loc>
-    <lastmod>2026-03-06T15:17:14.530Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/index.html</loc>
+    <lastmod>2026-11-12T13:38:54.082Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/models/index.html</loc>
     <lastmod>2026-02-23T17:39:37.690Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/index.html</loc>
-    <lastmod>2026-11-02T13:17:05.860Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/state_space_solvers.html</loc>
+    <lastmod>2026-03-06T15:17:14.530Z</lastmod>
   </url>
   <url>
-    <loc>https://maucejo.github.io/StructuralVibration.jl/overview/release_notes.html</loc>
-    <lastmod>2026-11-02T13:08:03.300Z</lastmod>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/modal_time_solvers.html</loc>
+    <lastmod>2026-03-18T12:42:15.834Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/direct_time_solvers.html</loc>
+    <lastmod>2026-03-06T15:14:25.055Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/references/index.html</loc>
+    <lastmod>2026-11-02T13:08:03.301Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/frequency_solvers.html</loc>
+    <lastmod>2026-03-06T15:15:24.183Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/solvers/index.html</loc>
+    <lastmod>2025-09-04T14:24:13.398Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/models/excitation.html</loc>
+    <lastmod>2026-03-06T15:06:45.194Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/models/noise.html</loc>
+    <lastmod>2026-03-04T09:18:44.922Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/extensions/index.html</loc>
+    <lastmod>2026-03-18T12:31:06.317Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/denoising.html</loc>
+    <lastmod>2026-11-12T10:48:25.577Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/getting_started.html</loc>
+    <lastmod>2026-11-12T08:06:42.179Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/visualization.html</loc>
+    <lastmod>2026-11-12T11:04:01.860Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/tutorials/ema_workflow.html</loc>
+    <lastmod>2026-11-12T09:28:55.438Z</lastmod>
+  </url>
+  <url>
+    <loc>https://maucejo.github.io/StructuralVibration.jl/overview/installation.html</loc>
+    <lastmod>2025-11-20T13:21:54.982Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/index.html</loc>
@@ -74,7 +110,7 @@
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/signal_processing/noise.html</loc>
-    <lastmod>2026-03-06T15:10:32.685Z</lastmod>
+    <lastmod>2026-11-12T13:32:32.908Z</lastmod>
   </url>
   <url>
     <loc>https://maucejo.github.io/StructuralVibration.jl/modal_extraction/oma.html</loc>
