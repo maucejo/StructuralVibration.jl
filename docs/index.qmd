@@ -213,7 +213,7 @@ The package provides the following features:
 # Project direct dependencies
 
 ```julia
-Project StructuralVibration v1.11.0
+Project StructuralVibration v1.11.1
 Status
   [717857b8] DSP v0.8.7
   [82cc6244] DataInterpolations v10.1.4
