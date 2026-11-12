@@ -6,10 +6,17 @@ format:
     number-sections: false
 ---
 
-## 1.11.1
+## 1.12.0
+
+**New features**
+
+- Add `to_dB` function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (`type = :amplitude`, 20 log₁₀) from power/energy quantities (`type = :power`, 10 log₁₀).
+- Add `ref_dB` function returning the usual reference values (`:mobility`, `:accelerance`, `:displacement`, `:velocity`, `:acceleration`, `:pressure`) for amplitude or power quantities.
+- Add `peak_value`, `peak2peak` and `rms_value` functions to compute the peak, peak-to-peak and RMS values of a signal.
+- Add `unwrap_phase` function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (`deg = true`), and independently for each channel of a multichannel signal.
 
 **Bug fixes**
-
+- Fix the phase unwrapping in `bode_plot` when `isdeg = true`. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase.
 - Fix the cross-spectrum convention in `tfestimate`. The cross-spectrum was computed as $X Y^*$ instead of $X^* Y$, so that the estimated transfer functions (`:h1`, `:h2`, `:h3`, `:hv`) were the complex conjugates of the true ones (wrong sign of the phase). As a consequence, the modal parameters could not be identified from FRFs estimated with `tfestimate`. **Breaking for code that compensated for this behaviour** (e.g. with `conj`).
 - Remove the window energy correction in `tfestimate`. Transfer functions and coherence are ratios of spectral densities, for which the correction cancels out when the same window is used for the input and the output. With different windows (e.g. `force` and `exponential` windows for impact testing), the correction biased the estimated FRFs by a factor `rms(window_input)/rms(window_output)` (about -8 dB in a typical impact test).
 - Fix `agwn` and `mixed_noise` for arrays with more than two dimensions (e.g. FRF arrays of size `no × ni × nf`). The noise standard deviation was broadcast along the wrong dimension, which changed the size of the output when `ni > 1`.
@@ -37,7 +44,6 @@ format:
   - `solve(::SdofForcedTimeProblem)` with `type_exc = :base` no longer overwrites the input vector.
   - `excitation(::ColoredNoise, t)` and `acn` no longer skip the time windowing when `frange` starts at 0 Hz.
   - `varest(x, DerricoEst())` returns a single value for a vector.
-  - `ref_dB(:displacement)` returns 1 pm, as documented.
   - `msf` threw an `UndefVarError` instead of a `DimensionMismatch`.
   - The ESD scaling of `welch` and `csd` uses the block duration `bs/fs`. `xcorr` uses an unbiased normalization.
   - `KalmanDenoising`: the search range of the process noise variance is now derived from the data, and the RTS covariance update is corrected.
@@ -56,23 +62,6 @@ format:
   - *Visualizing and animating deflection shapes*
   - *Using your own models and data*
 - Add a "New to the package?" entry point on the home page.
-
-## 1.12.0
-
-**New features**
-
-- Add `to_dB` function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (`type = :amplitude`, 20 log₁₀) from power/energy quantities (`type = :power`, 10 log₁₀).
-- Add `ref_dB` function returning the usual reference values (`:mobility`, `:accelerance`, `:displacement`, `:velocity`, `:acceleration`, `:pressure`) for amplitude or power quantities.
-- Add `peak_value`, `peak2peak` and `rms_value` functions to compute the peak, peak-to-peak and RMS values of a signal.
-- Add `unwrap_phase` function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (`deg = true`), and independently for each channel of a multichannel signal.
-
-**Bug fixes**
-
-- Fix the phase unwrapping in `bode_plot` when `isdeg = true`. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase.
-
-**Internals**
-
-- `bode_plot` now relies on `to_dB` and `unwrap_phase`.
 
 ## 1.11.0
 
