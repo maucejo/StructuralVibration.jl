@@ -16,6 +16,7 @@ format:
 - Add `unwrap_phase` function to compute the unwrapped phase of a signal. The unwrapping is always performed in radians before an optional conversion to degrees (`deg = true`), and independently for each channel of a multichannel signal.
 
 **Bug fixes**
+
 - Fix the phase unwrapping in `bode_plot` when `isdeg = true`. The phase was converted to degrees before being unwrapped with a 2π range, leading to a wrong phase.
 - Fix the cross-spectrum convention in `tfestimate`. The cross-spectrum was computed as $X Y^*$ instead of $X^* Y$, so that the estimated transfer functions (`:h1`, `:h2`, `:h3`, `:hv`) were the complex conjugates of the true ones (wrong sign of the phase). As a consequence, the modal parameters could not be identified from FRFs estimated with `tfestimate`. **Breaking for code that compensated for this behaviour** (e.g. with `conj`).
 - Remove the window energy correction in `tfestimate`. Transfer functions and coherence are ratios of spectral densities, for which the correction cancels out when the same window is used for the input and the output. With different windows (e.g. `force` and `exponential` windows for impact testing), the correction biased the estimated FRFs by a factor `rms(window_input)/rms(window_output)` (about -8 dB in a typical impact test).
