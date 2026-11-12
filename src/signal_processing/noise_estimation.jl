@@ -74,7 +74,7 @@ Estimates the noise variance of a signal `x` using a given method
 **Inputs**
 * `x`: Signal
 * `method`: Noise estimation method
-    * `BayesianEst`: Bayesian noise estimation (dafault)
+    * `BayesianEst`: Bayesian noise estimation (default)
     * `GCVEst`: Generalized Cross-Validation (GCV) noise estimation
     * `LCurveEst`: L-curve noise estimation
     * `DerricoEst`: D'Errico noise estimation
@@ -203,11 +203,12 @@ function varest_bayesian(x, prior = :invgamma)
         # Define α depending on the type of x
         eltype(x) == Complex{Float64} ? α = 1. : α = 0.5
 
-        γₐ = 1.
-        γₛ = 1.
-        βₐ = 1e-10
-        βₛ = 1e-10
-        vₖ = (α*sum(@. abs2(z)/fₖ) + βₐ + βₛ/λ)/(2. + γₛ + γₐ +  α*n)
+        # Inverse-gamma priors (shape γ, scale β) on the signal variance σx² (γₓ, βₓ) and on the noise variance σn² = λσx² (γₙ, βₙ)
+        γₓ = 1.
+        γₙ = 1.
+        βₓ = 1e-10
+        βₙ = 1e-10
+        vₖ = (α*sum(@. abs2(z)/fₖ) + βₓ + βₙ/λ)/(2. + γₙ + γₓ +  α*n)
     end
 
     return λ*vₖ
@@ -241,14 +242,15 @@ function bayesfun!(Λ, z, s², prior)
 
         J = α*sum(log, fₖ) + (α*n - 2)*log(vₖ)
     elseif prior == :invgamma
-        γₐ = 1.
-        γₛ = 1.
-        βₐ = 1e-10
-        βₛ = 1e-10
-        M = 2. + γₛ + γₐ +  α*n
-        vₖ = (α*sum(@. abs2(z)/fₖ) + βₐ .+ βₛ ./(10. .^Λ))/M
+        # Inverse-gamma priors (shape γ, scale β) on the signal variance σx² (γₓ, βₓ) and on the noise variance σn² = λσx² (γₙ, βₙ)
+        γₓ = 1.
+        γₙ = 1.
+        βₓ = 1e-10
+        βₙ = 1e-10
+        M = 2. + γₙ + γₓ +  α*n
+        vₖ = (α*sum(@. abs2(z)/fₖ) + βₓ .+ βₙ ./(10. .^Λ))/M
 
-        J = α*sum(log, fₖ) .+ (M - 2)*log.(vₖ) .+ (1. + γₛ)*log.(10. .^Λ)
+        J = α*sum(log, fₖ) .+ (M - 2)*log.(vₖ) .+ (1. + γₙ)*log.(10. .^Λ)
     end
 
     return only(J)
@@ -381,7 +383,7 @@ Estimates the noise variance of a signal `x` using the method proposed by John D
 """
 function varest_derrico(x)
 
-    noisevar = similar(real(x), size(x, 1))
+    noisevar = similar(real(x), ndims(x) == 1 ? 1 : size(x, 1))
     if !isreal(x)
         noisevar .= varest_derrico_real(real(x)) .+ varest_derrico_real(imag(x))
     else

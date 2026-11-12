@@ -62,25 +62,75 @@ $$
 
 The main point here is to find an appropriate regularization parameter $\lambda$. In the literature, several methods have been proposed to estimate the regularization parameter. In this package, the following methods are implemented:
 
-- Generalized Cross Validation (GCV)[^1]
-- L-curve method[^2]
+- Bayesian regularization[^1]^,^[^2] (default)
+- Generalized Cross Validation (GCV)[^3]
+- L-curve method[^4]
 
 ::: {.callout-note}
 In practice, this estimator can be computed without computing the denoised signal $\widehat{\mathbf{x}}_i$ explicitly. To do so, the implementation makes use of the discrete cosine transform (DCT).
 :::
 
-[^1]: D. Garcia. "Robust smoothing of gridded data in one and higher dimensions with missing values". Computational Statistics & Data Analysis, 54(5), pp. 1167-1178, 2010.
-[^2]: P. C. Hansen. "The L-curve and its use in the numerical treatment of inverse problems". Computational Inverse Problems in Electrocardiology, pp. 119-142, 2001.
+[^1]: M. Aucejo and O. De Smet. "A frequency-domain sequential Bayesian filter for sparse and broadband force estimation problems". Mechanical Systems and Signal Processing, 232, pp. 112729, 2025.
+[^2]: M. Aucejo and O. De Smet. "An adaptive frequency-domain Kalman filter for source identification in structural dynamics". Journal of Sound and Vibration, 647, pp. 120170, 2027.
+[^3]: D. Garcia. "Robust smoothing of gridded data in one and higher dimensions with missing values". Computational Statistics & Data Analysis, 54(5), pp. 1167-1178, 2010.
+[^4]: P. C. Hansen. "The L-curve and its use in the numerical treatment of inverse problems". Computational Inverse Problems in Electrocardiology, pp. 119-142, 2001.
+
+<!-- ##### Bayesian regularization {.unnumbered}
+
+The Bayesian approach gives a probabilistic interpretation of the regularized problem. The noise is assumed to be Gaussian with variance $\sigma_n^2$, and the smoothness of the noise-free signal is introduced through a Gaussian prior of variance $\sigma_x^2$:
+$$
+p(\mathbf{y}_i | \mathbf{x}_i) \propto \exp\left(-\frac{\Vert \mathbf{y}_i - \mathbf{x}_i \Vert_2^2}{2\sigma_n^2}\right), \quad p(\mathbf{x}_i) \propto \exp\left(-\frac{\Vert \mathbf{D}\mathbf{x}_i \Vert_2^2}{2\sigma_x^2}\right).
+$$
+The maximum a posteriori estimate of $\mathbf{x}_i$ is then the solution of the regularized problem with $\lambda = \sigma_n^2/\sigma_x^2$.
+
+Instead of being tuned, $\lambda$ and $\sigma_x^2$ are treated as hyperparameters and estimated from the data by maximizing their posterior distribution, obtained by marginalizing the noise-free signal. Let $z_k$ be the DCT coefficients of $\mathbf{y}_i$ and $s_k$ the eigenvalues of $\mathbf{D}$. The DCT diagonalizes the problem, so that the marginal distribution of each $z_k$ is Gaussian with variance $\sigma_x^2 f_k(\lambda)$, where:
+$$
+f_k(\lambda) = \frac{1 + \lambda s_k^2}{s_k^2}.
+$$
+
+Two priors on the hyperparameters are available:
+
+- `:uniform`: non-informative prior. Eliminating $\sigma_x^2$ leads to the minimization of:
+$$
+J(\lambda) = \alpha \sum_{k = 1}^n \log f_k(\lambda) + (\alpha n - 2) \log\left(\frac{1}{n} \sum_{k = 1}^n \frac{|z_k|^2}{f_k(\lambda)}\right).
+$$
+
+- `:invgamma` (default): weakly informative inverse-gamma priors on $\sigma_x^2$ and $\sigma_n^2$ (shape $\gamma = 1$, scale $\beta = 10^{-10}$), which regularize the estimation when the noise level is very low. The estimate of $\sigma_x^2$ is then given in closed form for each $\lambda$:
+$$
+\widehat{\sigma}_x^2(\lambda) = \frac{\alpha \sum_{k} |z_k|^2/f_k(\lambda) + \beta_x + \beta_n/\lambda}{2 + \gamma_x + \gamma_n + \alpha n},
+$$
+and $\lambda$ minimizes:
+$$
+J(\lambda) = \alpha \sum_{k = 1}^n \log f_k(\lambda) + (\gamma_x + \gamma_n + \alpha n) \log \widehat{\sigma}_x^2(\lambda) + (1 + \gamma_n) \log \lambda,
+$$
+where $(\gamma_x, \beta_x)$ and $(\gamma_n, \beta_n)$ are the parameters of the inverse-gamma priors on $\sigma_x^2$ and $\sigma_n^2 = \lambda \sigma_x^2$ respectively.
+
+In these expressions, $\alpha = 1/2$ for real signals and $\alpha = 1$ for complex signals. The optimization is performed with respect to $\log_{10} \lambda \in [-5, 5]$, and the noise variance is finally estimated as:
+$$
+\widehat{\sigma}_n^2 = \widehat{\lambda} \, \widehat{\sigma}_x^2(\widehat{\lambda}).
+$$
+
+Compared with GCV and L-curve, the Bayesian approach provides the noise variance directly as a by-product of the hyperparameter estimation, within a consistent probabilistic framework. -->
 
 #### Filtering-based noise estimation
 
-Heuristic-based noise estimation methods are based on a careful analysis of the statistics of a noisy signal and often rely on the assumption that the noise is Gaussian. These methods do not involve optimization and are typically faster than regularization-based methods. They can be used to estimate the noise variance directly from the noisy signal. `StructuralVibration.jl` implements the method proposed John D'Errico in the Matlab function `estimatenoise.m`[^3]
+Heuristic-based noise estimation methods are based on a careful analysis of the statistics of a noisy signal and often rely on the assumption that the noise is Gaussian. These methods do not involve optimization and are typically faster than regularization-based methods. They can be used to estimate the noise variance directly from the noisy signal. `StructuralVibration.jl` implements the method proposed John D'Errico in the Matlab function `estimatenoise.m`[^5]
 
-[^3]: John D'Errico. "Estimatenoise", MATLAB Central File Exchange. Retrieved December 7, 2023. [Link](https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
+[^5]: John D'Errico. "Estimatenoise", MATLAB Central File Exchange. Retrieved December 7, 2023. [Link](https://www.mathworks.com/matlabcentral/fileexchange/16683-estimatenoise)
 
 ### API
 
 **Data types**
+
+::: {.api}
+**BayesianEst**
+
+---
+```{julia}
+#| echo: false
+@doc BayesianEst
+```
+:::
 
 ::: {.api}
 **GCVEst**
@@ -173,6 +223,9 @@ SNR_ref = 25.
 y = agwn(u, SNR_ref)
 
 # Variance estimation - Average over all channels
+v0 = varest(y, BayesianEst())
+SNR_est0 = mean(estimated_SNR(y, v0))
+
 v1 = varest(y, GCVEst())
 SNR_est1 = mean(estimated_SNR(y, v1))
 
@@ -187,13 +240,14 @@ SNR_est3 = mean(estimated_SNR(y, v3))
 #| echo: false
 #| tbl-cap: Noise variance estimation
 
+s0 = round(SNR_est0, digits = 2)
 s1 = round(SNR_est1, digits = 2)
 s2 = round(SNR_est2, digits = 2)
 s3 = round(SNR_est3, digits = 2)
 
 table_noise = begin
-    data = ["$SNR_ref dB" "$s1 dB" "$s2 dB" "$s3 dB"]
-    header = ["Reference", "GCV", "L-curve", "D'Errico"]
+    data = ["$SNR_ref dB" "$s0 dB" "$s1 dB" "$s2 dB" "$s3 dB"]
+    header = ["Reference", "Bayesian", "GCV", "L-curve", "D'Errico"]
     pretty_table(
       HTML,
       data,
@@ -217,7 +271,7 @@ Signal denoising is the process of removing noise from a signal to recover the u
 
 #### Regularization-based denoising
 
-Regularization-based denoising consists in solving the minimization problem defined in @sec-reg. This implies a proper estimation of the regularization parameter $\lambda$. Similar to the noise estimation process, two methods are available for estimating the regularization parameter, namely GCV and L-curve methods.
+Regularization-based denoising consists in solving the minimization problem defined in @sec-reg. This implies a proper estimation of the regularization parameter $\lambda$. Similar to the noise estimation process, three methods are available for estimating the regularization parameter, namely Bayesian regularization, GCV and L-curve methods. For the Bayesian approach, the denoised signal is the maximum a posteriori estimate obtained with the optimal regularization parameter $\widehat{\lambda}$.
 
 #### Filtering-based denoising
 
@@ -274,6 +328,16 @@ where $\widehat{\mathbf{x}}_k^s$ is the smoothed state vector, $\widehat{\mathbf
 ### API
 
 **Data types**
+
+::: {.api}
+**BayesDenoising**
+
+---
+```{julia}
+#| echo: false
+@doc BayesDenoising
+```
+:::
 
 ::: {.api}
 **GCVDenoising**
@@ -365,6 +429,7 @@ snr_dB = 10.
 y = agwn(u, snr_dB)
 
 # Regularization denoising
+yc_bayes = denoising(y, BayesDenoising())
 yc_gcv = denoising(y, GCVDenoising())
 yc_lcurve = denoising(y, LCurveDenoising())
 
@@ -381,12 +446,14 @@ ax1 = Axis(fig[1, 1], title = "Node 4", ylabel = "Displacement (m)")
 ax2 = Axis(fig[2, 1], title = "Node 13", xlabel = "Time (s)", ylabel = "Displacement (m)")
 lines!(ax1, t, y[4, :], color = (:blue, 0.1), label = "Noisy signal", transparency = true)
 lines!(ax1, t, u[4, :], label = "Reference")
+lines!(ax1, t, yc_bayes[4, :], color = :orange, linewidth = 2, linestyle = :dot, label = "Bayesian")
 lines!(ax1, t, yc_gcv[4, :], color = :red, linewidth = 2, linestyle = :dash, label = "GCV")
 lines!(ax1, t, yc_lcurve[4, :], color = :green, linewidth = 2, linestyle = :dashdot, label = "LCurve")
 xlims!(ax1, 0., tmax)
 
 lines!(ax2, t, y[13, :], color = (:blue, 0.1), label = "Noisy signal", transparency = true)
 lines!(ax2, t, u[13, :], label = "Reference")
+lines!(ax2, t, yc_bayes[13, :], color = :orange, linewidth = 2, linestyle = :dot, label = "Bayesian")
 lines!(ax2, t, yc_gcv[13, :], color = :red, linewidth = 2, linestyle = :dash, label = "GCV")
 lines!(ax2, t, yc_lcurve[13, :], color = :green, linewidth = 2, linestyle = :dashdot, label = "LCurve")
 xlims!(ax2, 0., tmax)

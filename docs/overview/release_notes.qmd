@@ -6,7 +6,7 @@ format:
     number-sections: false
 ---
 
-## 1.12.1
+## 1.11.1
 
 **Bug fixes**
 
@@ -15,9 +15,37 @@ format:
 - Fix `agwn` and `mixed_noise` for arrays with more than two dimensions (e.g. FRF arrays of size `no × ni × nf`). The noise standard deviation was broadcast along the wrong dimension, which changed the size of the output when `ni > 1`.
 - Fix `excitation(::Hammer, t)` when `tstart` does not coincide with a time sample. The signal started at the closest sample, which could lie before `tstart` and led to a `DomainError`. The signal now starts at the first sample greater than or equal to `tstart`, and is zero if `tstart` is beyond the time vector.
 - Fix `varest` when `batch_size > 0`, which threw a `MethodError`. Incomplete batches are now correctly discarded for multichannel signals.
+- Fix wrong analytical results:
+  - `impulse_response` (Mdof) kept only the last mode instead of summing all modes.
+  - `modefreq` for clamped-free bars, rods and strings returned twice the natural frequencies.
+  - `modefreq(::Beam, fmax, :CF)` used a wrong second root and skipped the fifth mode. Tabulated roots are more accurate and are now filtered by `fmax` for all beam boundary conditions.
+  - `modeshape` was not mass-normalized for free-free bars (modes ≥ 2), clamped-free beams (first modes) and free-free beams (elastic and rotation modes).
+  - `modefreq(::Membrane, fmax)` used the plate dispersion relation.
+  - `srs(...; alg = :RecursiveInt)` was 1–4 % off. It now uses the exact Nigam-Jennings recursion.
+  - `convert_csd(...; type = :vel)` returned spectra with the wrong sign.
+  - `comac` could exceed 1 and `mpd` was non-zero for real modes with components of opposite signs.
+  - `ods` weighted the candidates on the left of the peak by `msf²` instead of `msf`.
+  - EFDD fallback of `FSDD`: wrong time step (overestimated damping) and bell spectra accumulated across peaks.
+  - Poles identified with `LSCE`, `LSCF` and `pLSCF` on a frequency range not starting at 0 Hz are now shifted back exactly.
+- Fix errors on valid inputs:
+  - Sdof solvers with `ω0 = 0` and `solve(::SdofForcedTimeProblem; method = :interp)`.
+  - `DirectFRFProblem` with an excitation selection matrix `Se` of fewer rows than DOFs, or when only `So` is given (same for `StateSpaceFRFProblem` and `StateSpaceModalFRFProblem`).
+  - `tfestimate`, `welch`, `csd` and `spectrum` with an odd block size.
+  - `detrend` with breakpoints, `planck` with an odd length, `acn` with a complex matrix, and `excitation(::GaussianPulse, t)` with a negative amplitude.
+  - `SineWave`, `Hammer`, `Sdof` and `OneDMesh` now accept arguments of different numeric types (e.g. integers).
+- Other fixes:
+  - `solve(::SdofForcedTimeProblem)` with `type_exc = :base` no longer overwrites the input vector.
+  - `excitation(::ColoredNoise, t)` and `acn` no longer skip the time windowing when `frange` starts at 0 Hz.
+  - `varest(x, DerricoEst())` returns a single value for a vector.
+  - `ref_dB(:displacement)` returns 1 pm, as documented.
+  - `msf` threw an `UndefVarError` instead of a `DimensionMismatch`.
+  - The ESD scaling of `welch` and `csd` uses the block duration `bs/fs`. `xcorr` uses an unbiased normalization.
+  - `KalmanDenoising`: the search range of the process noise variance is now derived from the data, and the RTS covariance update is corrected.
+  - Regularization-based denoising uses `idct` instead of a dense `n × n` matrix (memory now `O(n)`).
 
 **Documentation**
 
+- Fix the `mcf` docstring: 0 for real modes, 1 for complex modes.
 - Add a *Tutorials* section, organized by user profile:
   - *Getting started*
   - *From model to virtual measurement*: simulation of an impact hammer test, FRF estimation, averaging and impact testing windows

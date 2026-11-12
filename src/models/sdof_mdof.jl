@@ -18,7 +18,10 @@ Structure containing the data of a sdof system
     ω0::T
     ξ::T
 
-    Sdof(m::T, f0::T, ξ::T) where T = new{T}(m, 2π*f0, ξ)
+    function Sdof(m::Real, f0::Real, ξ::Real)
+        T = float(promote_type(typeof(m), typeof(f0), typeof(ξ)))
+        return new{T}(m, 2π*f0, ξ)
+    end
 end
 
 """

@@ -64,7 +64,8 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
 
     # Initialization for EFDD if needed
     npoints = 2(nf - 1)
-    dt = 1/2.56freq[end]
+    # dt = 1/2.56freq[end]
+    dt = 1/(npoints*(freq[2] - freq[1])) # Time step of the irfft grid
     t_sdof = 0:dt:(npoints÷2 - 1)*dt
     sdof_bell = zeros(eltype(fullspec), nf)
     corr_sdof = similar(freq, npoints÷2)
@@ -98,6 +99,7 @@ function modes_extraction(prob::OMAProblem, alg::FSDD; width::Int = 1, min_prom 
 
         if ωn < Ωn
             @warn "Damping ratio is estimated to be greater than 100% for the mode at $(freq[idx_peak]) Hz. Using EFDD estimation of poles instead."
+            fill!(sdof_bell, 0)
             sdof_bell[id_bell] .= eGyy
 
             corr_sdof .= irfft(sdof_bell, npoints)[1:npoints÷2]

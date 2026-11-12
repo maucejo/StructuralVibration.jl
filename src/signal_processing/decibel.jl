@@ -69,7 +69,7 @@ function ref_dB(quantity::Symbol; type = :amplitude)
     elseif quantity === :accelerance
         ref = 1.
     elseif quantity === :displacement
-        ref = 1e-6
+        ref = 1e-12
     elseif quantity === :velocity
         ref = 1e-9
     elseif quantity === :acceleration

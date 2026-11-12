@@ -58,13 +58,13 @@ Structure containing the data feeding the direct solver for calculating an FRF
 **Note**
 It is assumed that the output equation is of the form y = So*x
 """
-@show_data struct StateSpaceFRFProblem{Tf <: AbstractRange, Ts <: AbstractMatrix}
+@show_data struct StateSpaceFRFProblem{Tf <: AbstractRange, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
     css::ContinuousStateSpace
     freq::Tf
-    So::Ts
-    Se::Ts
+    So::Tso
+    Se::Tse
 
-    StateSpaceFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2))) where {Tf, Ts} = new{Tf, Ts}(css, freq, So, Se)
+    StateSpaceFRFProblem(css, freq::Tf, So::Tso = I(Int(size(css.Ac, 1)/2)), Se::Tse = I(size(css.Bc, 2))) where {Tf, Tso, Tse} = new{Tf, Tso, Tse}(css, freq, So, Se)
 end
 
 """
@@ -79,18 +79,18 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * `Se`: Selection matrix for excitation points
 * `n`: Number of mode pairs to keep in the modal basis (default = size(css.Ac, 2) ÷ 2)
 """
-@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractRange, Ts <: AbstractMatrix}
+@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractRange, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
     css::ContinuousStateSpace
     freq::Tf
-    So::Ts
-    Se::Ts
+    So::Tso
+    Se::Tse
     n::Int
 
-    function StateSpaceModalFRFProblem(css, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), Se::Ts = I(size(css.Bc, 2)), n = size(css.Ac, 2) ÷ 2) where {Tf, Ts}
+    function StateSpaceModalFRFProblem(css, freq::Tf, So::Tso = I(Int(size(css.Ac, 1)/2)), Se::Tse = I(size(css.Bc, 2)), n = size(css.Ac, 2) ÷ 2) where {Tf, Tso, Tse}
 
-        isodd(n) || n == 0 ? throw(ArgumentError("n must be even and greater than 0")) : nothing
+        n > 0 || throw(ArgumentError("n must be greater than 0"))
 
-        return new{Tf, Ts}(css, freq, So, Se, n)
+        return new{Tf, Tso, Tse}(css, freq, So, Se, n)
     end
 end
 
@@ -147,7 +147,7 @@ Structure containing the data feeding the modal solver for calculating the frequ
 
     function StateSpaceModalFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), n = size(css.Ac, 2) ÷ 2) where {TF, Tf, Ts}
 
-        isodd(n) || n == 0 ? throw(ArgumentError("n must be even and greater than 0")) : nothing
+        n > 0 || throw(ArgumentError("n must be greater than 0"))
 
         return new{TF, Tf, Ts}(css, F, freq, So, n)
     end

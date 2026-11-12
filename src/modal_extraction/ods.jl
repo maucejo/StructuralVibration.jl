@@ -59,7 +59,7 @@ function ods(y::Matrix{T}, freq, pks_indices, min_mac = 1.) where {T <: Complex}
 
             navg += 1
             c = only(msf(candidate, ods_ref))
-            ods_cand .+= candidate .* c^2
+            ods_cand .+= candidate .* c
             lp -= 1
         end
 

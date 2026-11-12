@@ -320,11 +320,13 @@ function planck(N, ϵ = 0.25)
     w = zeros(N)
 
     pos1 = @. 1 ≤ n < δ
-    pos2 = @. δ ≤ n < Int(N/2)
-    pos3 = @. 0 ≤ n < Int(N/2)
+    Nh = N ÷ 2
+    pos2 = @. δ ≤ n < Nh
+    pos3 = @. 0 ≤ n < Nh
     @. w[pos1] = 1/(1 + exp(δ/n[pos1] - δ/(δ - n[pos1])))
     @. w[pos2] = 1.
     @. w[N .- n[pos3]] = w[pos3]
+    w[Nh+1:N-Nh] .= 1. # Central sample for odd N
 
     return w
 end

@@ -75,7 +75,7 @@ function acn(x::VecOrMat{T}, snr_dB, freq::AbstractVector, color = :pink; rst = 
     colored_noise = white_noise.*scale'
 
     # Colored noise with scaled variance
-    colored_noise .*= σ/std(colored_noise, dims = ndx)
+    colored_noise .*= σ./std(colored_noise, dims = ndx)
 
     return x .+ colored_noise
 end
@@ -140,30 +140,15 @@ function acn(x::VecOrMat{T}, snr_dB, fs, color = :pink; frange = T[], rst = true
     colored_noise = irfft(colored_fft, L, ndx)
     colored_noise .*= σ./std(colored_noise, dims = ndx)
 
-    if length(frange) > 0
-        flag = true
-        if frange[1] > freq[1] && frange[2] < freq[end]
-            # Band-pass filter
-            filter_type = DSP.Bandpass(frange[1], frange[2])
-        elseif frange[1] < freq[1] && frange[2] < freq[end]
-            # Low-pass filter
-            filter_type = DSP.Lowpass(frange[2])
-        elseif frange[1] > freq[1] && frange[2] > freq[end]
-            # High-pass filter
-            filter_type = DSP.Highpass(frange[1])
+    filter_type = noise_filter(frange, freq)
+    if !isnothing(filter_type)
+        df = DSP.digitalfilter(filter_type, DSP.Butterworth(4); fs)
+        if ndx == 1
+            colored_noise .= DSP.filtfilt(df, colored_noise)
         else
-            flag = false
-        end
-
-        if flag
-            df = DSP.digitalfilter(filter_type, DSP.Butterworth(4); fs)
-            if ndx == 1
-                colored_noise .= DSP.filtfilt(df, colored_noise)
-            else
-                N = size(x, 1)
-                for i in 1:N
-                    colored_noise[i, :] .= DSP.filtfilt(df, colored_noise[i, :])
-                end
+            N = size(x, 1)
+            for i in 1:N
+                colored_noise[i, :] .= DSP.filtfilt(df, colored_noise[i, :])
             end
         end
     end
@@ -223,4 +208,26 @@ function mixed_noise(x, snr_dB; rst = true)
     muln = randn(rng, eltype(x), size(x))/sqrt(SNR)
 
     return @. (1. + muln)*x + addn
+end
+
+"""
+    noise_filter(frange, freq)
+
+Returns the DSP filter type (band-pass, low-pass or high-pass) matching the frequency band `frange` with respect to the frequency vector `freq`, or `nothing` if no filtering is required.
+
+Note: This function is not intended to be used directly
+"""
+function noise_filter(frange, freq)
+    isempty(frange) && return nothing
+
+    has_low = frange[1] > freq[1]       # Lower cut-off frequency within the band
+    has_high = frange[2] < freq[end]    # Upper cut-off frequency within the band
+
+    if has_low && has_high
+        return DSP.Bandpass(frange[1], frange[2])
+    elseif has_high
+        return DSP.Lowpass(frange[2])
+    elseif has_low
+        return DSP.Highpass(frange[1])
+    end
 end

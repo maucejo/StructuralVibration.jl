@@ -13,21 +13,21 @@ Structure containing the data feeding the modal solver for calculating an FRF
 **Note**
 The mode shapes must be mass-normalized
 """
-@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractRange, Tp <: AbstractMatrix}
+@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractRange, Tpo <: AbstractMatrix, Tpe <: AbstractMatrix}
     ωn::Vector{T}
     ξn::Vector{T}
     freq::Tf
-    ϕo::Tp
-    ϕe::Tp
+    ϕo::Tpo
+    ϕe::Tpe
 
-    function ModalFRFProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, freq::Tf, ϕo::Tp, ϕe::Tp) where {T, Tf, Tp}
+    function ModalFRFProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, freq::Tf, ϕo::Tpo, ϕe::Tpe) where {T, Tf, Tpo, Tpe}
         if !isa(ξn, Array)
             ξn = fill(ξn, length(ωn))
         elseif length(ξn) != length(ωn)
             throw(DimensionMismatch("The number of damping ratios must be equal to the number of resonance frequencies"))
         end
 
-        new{T, Tf, Tp}(ωn, ξn, freq, ϕo, ϕe)
+        new{T, Tf, Tpo, Tpe}(ωn, ξn, freq, ϕo, ϕe)
     end
 end
 
@@ -44,15 +44,15 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * `So::AbstractMatrix`: Selection matrix for observation points
 * `Se::AbstractMatrix`: Selection matrix for excitation points
 """
-@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
+@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractRange, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
     K::Tk
     M::Tm
     C::Tc
     freq::Tf
-    So::Ts
-    Se::Ts
+    So::Tso
+    Se::Tse
 
-    DirectFRFProblem(K::Tk, M::Tm, C::Tc, freq::Tf, So::Ts = I(size(K, 1)), Se::Ts = I(size(K, 1))) where {Tk, Tm, Tc, Tf, Ts} = new{Tk, Tm, Tc, Tf, Ts}(K, M, C, freq, So, Se)
+    DirectFRFProblem(K::Tk, M::Tm, C::Tc, freq::Tf, So::Tso = I(size(K, 1)), Se::Tse = I(size(K, 1))) where {Tk, Tm, Tc, Tf, Tso, Tse} = new{Tk, Tm, Tc, Tf, Tso, Tse}(K, M, C, freq, So, Se)
 end
 
 """
@@ -190,7 +190,7 @@ function solve(prob::DirectFRFProblem; type = :dis, progress = true)
     nf = length(freq)
 
     FRF = similar(K, Complex{eltype(K)}, no, ne, nf)
-    D = similar(K, Complex{eltype(K)}, Ndofs, Ndofs)
+    D = similar(K, Complex{eltype(K)}, Ndofs, ne)
 
     ωf = 2π*freq
     p = Progress(nf, desc = "FRF calculation - Direct method...", showspeed = true)

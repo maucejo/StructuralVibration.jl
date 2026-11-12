@@ -240,13 +240,13 @@ function modefreq(model::WaveEquation, fmax, bc = :CC)
         end
     elseif bc === :CF
         n = 1
-        ki = (2n - 1)π/L
+        ki = (2n - 1)π/2L
         ωi = c*ki
         while ωi ≤ ωmax
             push!(ωn, ωi)
             push!(kn, ki)
             n += 1
-            ki = (2n - 1)π/L
+            ki = (2n - 1)π/2L
             ωi = c*ki
         end
     elseif bc == :FF
@@ -287,7 +287,7 @@ function modefreq(model::Beam, fmax, bc = :SS)
             ωi = c*ki^2
         end
     elseif bc == :CC
-        append!(kn, [4.73, 7.85, 11]./L)
+        append!(kn, [4.7300, 7.8532, 10.9956]./L)
         append!(ωn, c.*kn.^2)
 
         n = 4
@@ -301,7 +301,7 @@ function modefreq(model::Beam, fmax, bc = :SS)
             ωi = c*ki.^2
         end
     elseif bc == :CS
-        append!(kn, [3.92, 7.07, 10.2]./L)
+        append!(kn, [3.9266, 7.0686, 10.2102]./L)
         append!(ωn, c.*kn.^2)
 
         n = 4
@@ -315,21 +315,21 @@ function modefreq(model::Beam, fmax, bc = :SS)
             ωi = c*ki^2
         end
     elseif bc == :CF
-        append!(kn, [1.87,  4.73, 7.85, 11]./L)
+        append!(kn, [1.8751, 4.6941, 7.8548, 10.9955]./L)
         append!(ωn, c.*kn.^2)
 
         n = 5
-        ki = (2n + 1)π/2L
+        ki = (2n - 1)π/2L
         ωi = c*ki^2
         while ωi ≤ ωmax
             push!(kn, ki)
             push!(ωn, ωi)
             n += 1
-            ki = (2n + 1)π/2L
+            ki = (2n - 1)π/2L
             ωi = c*ki^2
         end
     elseif bc == :SF
-        append!(kn, [3.92, 7.07, 10.2]./L)
+        append!(kn, [3.9266, 7.0686, 10.2102]./L)
         append!(ωn, c.*kn.^2)
 
         n = 4
@@ -343,7 +343,7 @@ function modefreq(model::Beam, fmax, bc = :SS)
             ωi = c*ki^2
         end
     elseif bc == :FF
-        append!(kn, [0., 0., 4.73, 7.85, 11]./L)
+        append!(kn, [0., 0., 4.7300, 7.8532, 10.9956]./L)
         append!(ωn, c.*kn.^2)
 
         n = 4
@@ -360,7 +360,10 @@ function modefreq(model::Beam, fmax, bc = :SS)
         error("Boundary conditions not implemented")
     end
 
-    return ωn, kn
+    # Tabulated roots may lie above fmax
+    fidx = ωn .≤ ωmax
+
+    return ωn[fidx], kn[fidx]
 end
 
 """
@@ -405,7 +408,7 @@ function modeshape(model::WaveEquation, kn, x, bc = :CC)
     elseif bc == :FF
         # Modal mass
         n = length(kn)
-        Mn = m*L.*ones(length(n))./2
+        Mn = m*L.*ones(n)./2
         Mn[1] *= 2.
 
         for (i, xi) in enumerate(x)
@@ -460,15 +463,8 @@ function modeshape(model::Beam, kn, x, bc = :SS)
         end
 
     elseif bc == :CF
-        Mn = @. m*(
-                -2kn*L*cos(2kn*L)
-                - 7sin(2kn*L)
-                + cosh(2kn*L)*(2kn*L + 3sin(2kn*L))
-                - 2cosh(kn*L)*(3sin(kn*L) + sin(3kn*L))
-                - sin(4kn*L)
-                + (6cos(kn*L) + 6cos(3kn*L) - 8kn*L*sin(kn*L))*sinh(kn*L)
-                + 6cos(kn*L)^2*sinh(2kn*L)
-                )/(4kn*(cos(kn*L) + cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L)).^2)
+        # ∫(cosh - cos - σ(sinh - sin))² dx = L at the roots of the characteristic equation
+        Mn = @. m*L/(cosh(kn*L) + cos(kn*L))^2
 
         for (i, xi) in enumerate(x)
             @. ϕ[i, :] = ((cosh(xi*kn) - cos(xi*kn))/(cosh(kn*L) + cos(kn*L)) - (sinh(xi*kn) - sin(xi*kn))/(sinh(kn*L) + sin(kn*L)))/sqrt(Mn)
@@ -495,10 +491,12 @@ function modeshape(model::Beam, kn, x, bc = :SS)
                 + 3cos(kn*L)^2*sinh(2kn*L)
             )/(2kn*(cos(kn*L) - cosh(kn*L))^2*(sin(kn*L) - sinh(kn*L))^2)
 
-        Mn[1:2] .= m*L
+        # Rigid body modes: translation and rotation about the center
+        Mn[1] = m*L
+        Mn[2] = m*L^3/12
 
         for (i, xi) in enumerate(x)
-            @. ϕ[i, :] = ((cosh(xi*kn) + cos(xi*kn))/(cosh(kn*L) - cos(kn*L))) - ((sinh(xi*kn) + sin(xi*kn))/(sinh(kn*L) - sin(kn*L)))/sqrt(Mn)
+            @. ϕ[i, :] = ((cosh(xi*kn) + cos(xi*kn))/(cosh(kn*L) - cos(kn*L)) - (sinh(xi*kn) + sin(xi*kn))/(sinh(kn*L) - sin(kn*L)))/sqrt(Mn)
         end
 
         ϕ[:, 1] .= 1/sqrt(Mn[1])

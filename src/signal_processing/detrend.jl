@@ -22,15 +22,13 @@ function detrend(t, y, order = 1, bp = eltype(y)[])
     if length(bp) == 0
         return y .- polyval(polyfit(t, y, order[1]), t)
     else
-        idb = findall(@. bp ≥ t[1] || bp ≤ t[end])
+        # Keep only the breakpoints within the time range
+        idb = findall(b -> t[1] ≤ b ≤ t[end], bp)
 
-        # If there is only one breakpoint, convert it to a scalar
-        length(idb) == 1 ? idb = only(idb) : nothing
-
-        bpi = unique([t[1]; bp[idb]; t[end]])
+        bpi = unique(sort([t[1]; bp[idb]; t[end]]))
 
         if length(order) == 1
-            order = order*ones(length(bpi) - 1)
+            order = fill(Int(order[1]), length(bpi) - 1)
         else
             if length(order) != length(bpi) - 1
                 throw(ArgumentError("The number of orders must be equal to the number of segments."))

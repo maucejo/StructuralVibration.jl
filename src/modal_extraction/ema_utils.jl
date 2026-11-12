@@ -125,11 +125,13 @@ function poles_validity(raw_poles, order, freq, stabdiag)
     sort!(p_valid, by = abs)
 
     # To avoid modifying the stability of the dynamic system in case of frequency offset, we set real(poles_new) = real(poles_old). This means that dn_new = dn_old * fn_old / fn_new.
-    fn, ξn = poles2modal(p_valid)
-    if freq[1] != 0.
-        @. ξn *= fn / (fn + freq[1])
-        fn .+= freq[1]
-    end
+    # fn, ξn = poles2modal(p_valid)
+    # if freq[1] != 0.
+    #     @. ξn *= fn / (fn + freq[1])
+    #     fn .+= freq[1]
+    # end
+    # The poles are identified on a frequency axis starting at freq[1]. The frequency offset is compensated exactly by shifting the imaginary part of the poles (the real part, i.e. the stability, is unchanged).
+    fn, ξn = poles2modal(p_valid .+ 2im*π*freq[1])
 
     # Keep only the poles within frange
     fidx = @. freq[1] ≤ fn ≤ freq[end]

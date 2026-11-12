@@ -121,7 +121,7 @@ end
 
 Compute the mode complexity factor.
 
-This indicator aims to measure the complexity of a mode. Its value ranges from 1 (purely real mode) to 0 (purely complex mode).
+This indicator aims to measure the complexity of a mode. Its value ranges from 0 (purely real mode) to 1 (purely complex mode).
 
 **Input**
 - `ms`: Mode shapes (each column corresponds to a mode)
@@ -183,8 +183,8 @@ function mpd(ms)
     n, m = size(ms)
     mpd = zeros(m)
 
-    S = similar(ms, n, 2)
-    num = similar(ms, n)
+    S = similar(real(ms), n, 2)
+    num = similar(S, n)
     for (i, phi) in enumerate(eachcol(ms))
         S[:, 1] .= real(phi)
         S[:, 2] .= imag(phi)
@@ -192,7 +192,8 @@ function mpd(ms)
         V = svd(S).V
         V12 = V[1, 2]
         V22 = V[2, 2]
-        @. num = abs(phi)*acos((S[:, 1]*V22 - S[:, 2]*V12)/(sqrt(V12^2 + V22^2)*abs(phi)))
+        # The absolute value makes the deviation independent of the sign of each component (0 for real modes)
+        @. num = abs(phi)*acos(min(abs(S[:, 1]*V22 - S[:, 2]*V12)/(sqrt(V12^2 + V22^2)*abs(phi)), 1))
         den = sum(abs, phi)
 
         mpd[i] = real(sum(skipnan(num))/den)
@@ -235,7 +236,7 @@ function msf(ms_exp, ms_ref)
     ne, me = size(ms_exp)
     nr, mr = size(ms_ref)
     if (ne != nr) || (me != mr)
-        throw(DimensionMismatchError("Experimental and reference mode shapes must have the same dimensions"))
+        throw(DimensionMismatch("Experimental and reference mode shapes must have the same dimensions"))
     end
 
     msf = similar(ms_exp, me)
@@ -284,9 +285,10 @@ function comac(ms_exp, ms_ref)
 
     comac = zeros(ne)
     for (p, (phi, psi)) in enumerate(zip(eachrow(ms_exp_scaled), eachrow(ms_ref)))
-        num =  abs2(dot(phi, conj.(psi)))
-        den = abs(dot(psi, conj.(psi))) * abs(dot(phi, conj.(phi)))
-        comac[p] = real(num/den)
+        # Note: dot(a, b) = Σ conj(a)*b
+        num = abs2(dot(psi, phi))
+        den = sum(abs2, psi) * sum(abs2, phi)
+        comac[p] = num/den
     end
 
     return comac

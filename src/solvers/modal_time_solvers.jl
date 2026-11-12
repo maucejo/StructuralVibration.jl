@@ -510,7 +510,7 @@ function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false)
         error("The number of damping ratios must be equal to n")
     end
 
-    h = similar(K, ndofs, ndofs, nt)
+    h = fill!(similar(K, ndofs, ndofs, nt), 0)
     hsdof = similar(t)
 
     for (fm, ξm, Φm) in zip(fn, ξn, eachcol(Φn))
@@ -519,7 +519,7 @@ function impulse_response(K, M, ξn, t, n = size(K, 1); ismodal = false)
         hsdof .= impulse_response(sdof, t)
 
         for (i, hi) in enumerate(hsdof)
-            h[:, :, i] .= Φm*hi*Φm'
+            h[:, :, i] .+= Φm*hi*Φm'
         end
     end
 

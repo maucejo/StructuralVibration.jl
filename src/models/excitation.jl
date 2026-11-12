@@ -50,6 +50,8 @@ Struct to define a hammer impact excitation signal
     θ::Tp
 end
 
+Hammer(F::Real, tstart::Real, p::Real, θ::Real) = Hammer(F, tstart, promote(p, θ)...)
+
 """
     SmoothRect(F, tstart, tr, duration)
 
@@ -97,7 +99,10 @@ Struct to define a sine wave excitation signal
     ϕ::Tw
     zero_end::Bool
 
-    SineWave(F::Tf, tstart::Tt, duration::Td, freq::Tw, ϕ::Tw = 0.; zero_end = true) where {Tf, Tt, Td, Tw} = new{Tf, Tt, Td, Tw}(F, tstart, duration, 2π*freq, ϕ, zero_end)
+    function SineWave(F::Tf, tstart::Tt, duration::Td, freq::Real, ϕ::Real = 0.; zero_end = true) where {Tf, Tt, Td}
+        ω, ϕ = promote(2π*freq, ϕ)
+        return new{Tf, Tt, Td, typeof(ω)}(F, tstart, duration, ω, ϕ, zero_end)
+    end
 end
 
 """
@@ -467,7 +472,7 @@ function excitation(type::GaussianPulse, t)
     tpulse = t[pos_start:end] .- tstart .- duration/2
 
     # The precision parameter calibrates the standard deviation of the pulse, so that the duration = n*σ, within some precision. If n = 1.96 then the confidence interval of the Gaussian distribution is 95%. To do so, we compute n so that at t = duration = n*σ , the amplitude of F*exp(-0.5*(t - duration/2)^2/sigma^2) = 10^(-precision)
-    n = 2sqrt(2(precision*log(10) + log(F)))
+    n = 2sqrt(2(precision*log(10) + log(abs(F))))
     σ = duration/n
 
     @. Ft[pos_start:end] = F*exp(-0.5*(tpulse/σ)^2)*cos(2π*fc*tpulse)
@@ -515,20 +520,8 @@ function excitation(type::ColoredNoise, t)
         @. Ft = F + colored_noise
     end
 
-    if !isempty(frange)
-        if frange[1] > freq[1] && frange[2] < freq[end]
-            # Band-pass filter
-            filter_type = DSP.Bandpass(frange[1], frange[2])
-        elseif frange[1] < freq[1] && frange[2] < freq[end]
-            # Low-pass filter
-            filter_type = DSP.Lowpass(frange[2])
-        elseif frange[1] > freq[1] && frange[2] > freq[end]
-            # High-pass filter
-            filter_type = DSP.Highpass(frange[1])
-        else
-            return Ft
-        end
-
+    filter_type = noise_filter(frange, freq)
+    if !isnothing(filter_type)
         df = DSP.digitalfilter(filter_type, DSP.Butterworth(4); fs)
         Ft .= DSP.filtfilt(df, Ft)
     end

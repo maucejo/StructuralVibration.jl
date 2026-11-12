@@ -35,9 +35,10 @@ Construct a mesh for a beam with Nelt elements, length L and starting at xmin.
     constrained_dofs::Vector{Int}
     free_dofs::Vector{Int}
 
-    function OneDMesh(model::OneDStructure, xmin::T, Nelt::Int, bc::Symbol = :CC) where T
+    function OneDMesh(model::OneDStructure, xmin::Real, Nelt::Int, bc::Symbol = :CC)
+        T = float(promote_type(typeof(xmin), typeof(model.L)))
         Nnodes = Nelt + 1
-        Nodes = similar([xmin], Nnodes)
+        Nodes = Vector{T}(undef, Nnodes)
         Elt = similar(Int[], Nelt, 3)
         elem_size = model.L/Nelt
 

@@ -35,7 +35,7 @@ Compute the cross-correlation matrix R of a signal y up to lag N-1.
     # Compute cross-correlation matrices
     R = similar(y, ny, nyref, N)
     for k in 1:N
-        R[:, :, k] .= (y[:, 1:nt - k + 1] * yref[:, k:nt]') / (nt - k)
+        R[:, :, k] .= (y[:, 1:nt - k + 1] * yref[:, k:nt]') / (nt - k + 1)
     end
 
     return R
@@ -242,9 +242,9 @@ function convert_csd(Gyy, freq; type = :dis)
         # Avoid division by zero
         ωf = ωf == 0. ? ω[2] : ωf
         if type == :vel
-            Gyy_conv[:, :, f] /= -ωf^2
+            Gyy_conv[:, :, f] /= ωf^2     # G_vv = ω² G_dd
         elseif type == :acc
-            Gyy_conv[:, :, f] /= ωf^4
+            Gyy_conv[:, :, f] /= ωf^4     # G_aa = ω⁴ G_dd
         end
     end
 

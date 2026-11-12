@@ -118,7 +118,7 @@ function tfestimate(input_signal::AbstractVector, output_signal::AbstractVector,
 
     # Check if the number of fft points is even or odd
     m = nfft > bs ? nfft : bs
-    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
+    n = m ÷ 2 + 1  # Number of rfft bins (even or odd m)
 
     Gxx = zeros(Complex{eltype(freq)}, n)
     Gyy = zeros(Complex{eltype(freq)}, n)
@@ -212,14 +212,14 @@ Estimation of one-sided Autopower functions of a signal using the Welch method
 function welch(input_signal::AbstractVector, bs::Int, window = hanning; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd)
 
     # FFT Parameters
-    (; tspan, freq) = FFTParameters(fs, bs, pow2 = false)
+    (; freq) = FFTParameters(fs, bs, pow2 = false)
 
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
     # Check if the number of fft points is even or odd
     m = nfft > bs ? nfft : bs
-    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
+    n = m ÷ 2 + 1 # Number of rfft bins (even or odd m)
 
     # Signal segmentation
     signal, n_segments = signal_segmentation(input_signal, bs, window(bs), overlap)
@@ -241,8 +241,8 @@ function welch(input_signal::AbstractVector, bs::Int, window = hanning; fs::Int 
         win_corr = sum(abs2, window(bs))
         scale *= win_corr*fs
 
-        # Explanation - ESD = T*PSD where T is the the acquisition block time
-        scaling == :esd ? scale /= tspan[2] : nothing
+        # Explanation - ESD = T*PSD where T = bs/fs is the acquisition block time
+        scaling == :esd ? scale /= bs/fs : nothing
 
     elseif scaling == :spectrum || scaling == :linear
         # Explanation: By definition, the double-sided autopower is Pxx = abs2.(fft(x))/n^2, where n is the bs. This result must take into account the amplitude correction factor (ACF) to compensate for the windowing effect and preserve the signal amplitude. By definition, ACF = 1/mean(window) = n/sum(window)). Therefore, Pxx_corrected = Pxx*ACF^2 = abs2.(fft(x))/sum(window)^2. Hence, the value of scale...
@@ -328,14 +328,14 @@ end
 function csd(x::AbstractVector, y::AbstractVector, bs::Int, window_x = hanning, window_y = window_x; fs::Int = 1, overlap = 0.5, nfft::Int = bs, scaling = :psd)
 
     # FFT Parameters
-    (; tspan, freq) = FFTParameters(fs, bs)
+    (; freq) = FFTParameters(fs, bs)
 
     # Check if the overlap ratio is between 0 and 1
     0. ≤ overlap ≤ 1. ? nothing : throw(DomainError("overlap ratio must be between 0 and 1"))
 
     # Check if the block size is even or odd
     m = nfft > bs ? nfft : bs
-    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
+    n = m ÷ 2 + 1    # Number of rfft bins (even or odd m)
 
     # Signal segmentation
     xsig, n_segments = signal_segmentation(x, bs, window_x(bs), overlap)
@@ -368,8 +368,8 @@ function csd(x::AbstractVector, y::AbstractVector, bs::Int, window_x = hanning, 
         win_corr = bs*rms(window_x(bs))*rms(window_y(bs))
         scale *= win_corr*fs
 
-        # Explanation - ESD = T*PSD where T is the the acquisition block time
-        scaling == :esd ? scale /= tspan[2] : nothing
+        # Explanation - ESD = T*PSD where T = bs/fs is the acquisition block time
+        scaling == :esd ? scale /= bs/fs : nothing
 
     elseif scaling == :spectrum || scaling == :linear
         # Explanation: By definition, the double-sided autopower is Pxx = abs2.(fft(x))/n^2, where n is the bs. This result must take into account the amplitude correction factor (ACF) to compensate for the windowing effect and preserve the signal amplitude. By definition, ACF = 1/mean(window) = n/sum(window)). Therefore, Pxx_corrected = Pxx*ACF^2 = abs2.(fft(x))/sum(window)^2. Hence, the value of scale...
@@ -428,7 +428,7 @@ function spectrum(input_signal::Vector{T}, bs::Int, window = hanning; fs::Int = 
     m = nfft > bs ? nfft : bs
 
     # Check if the block size is even or odd
-    n = iseven(m) ? m ÷ 2 + 1 : m ÷ 2
+    n = m ÷ 2 + 1 # Number of rfft bins (even or odd m)
 
     y = zeros(Complex{eltype(input_signal)}, n)
     for segment in signal

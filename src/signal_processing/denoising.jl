@@ -78,7 +78,7 @@ Denoises a signal `y`
 function denoising(y::T, alg::RegDenoising) where {T <: AbstractArray}
     reg_denoise = let
         if alg isa BayesDenoising
-            (x, s², U) -> bayes_denoise(x, s², U, alg.prior)
+            (x, s²) -> bayes_denoise(x, s², alg.prior)
         elseif alg isa GCVDenoising
             gcv_denoise
         elseif alg isa LCurveDenoising
@@ -93,35 +93,29 @@ function denoising(y::T, alg::RegDenoising) where {T <: AbstractArray}
     # Initialization
     s = similar(real(y), n)
     z = similar(y)
-    U = similar(y, n, n)
 
     # Eigenvalues of the second difference matrix
     @. s = 2(1. - cos((0:n-1)π/n))
     @. s[s == 0.] = 1e-8
     s² = s.^2
 
-    # Corresponding eigenvectors
-    scale = similar(s)
-    scale[1] = sqrt(1/n)
-    scale[2:end] .= sqrt(2/n)
-    U = [cos((k - 1)*(2j - 1)π/2n) for j = 1:n, k = 1:n].*scale'
-
+    # The corresponding eigenvectors are those of the orthonormal DCT, so that the inverse transform is computed with idct
     # Calculation of DCT-2
     z .= dct(y, ndim)
 
     x = similar(y)
     if ndim == 1
-        x .= reg_denoise(z, s², U)
+        x .= reg_denoise(z, s²)
     else
         for (idz, zi) in enumerate(eachrow(z))
-            x[idz, :] .= reg_denoise(zi, s², U)
+            x[idz, :] .= reg_denoise(zi, s²)
         end
     end
 
     return x
 end
 
-function bayes_denoise(z, s², U, prior)
+function bayes_denoise(z, s², prior)
     lb = -5.
     ub = 5.
 
@@ -129,10 +123,10 @@ function bayes_denoise(z, s², U, prior)
     res = optimize(optimfunc, lb, ub)
     λ = 10^only(Optim.minimizer(res))
 
-    return U*(z./(1 .+ λ*s²))
+    return idct(z./(1 .+ λ*s²))
 end
 
-function gcv_denoise(z, s², U)
+function gcv_denoise(z, s²)
     hmin = 1e-6
     hmax = 0.99
     lb = (((1 + sqrt(1+8*hmax.^(2)))/4hmax^2)^2 - 1)/16
@@ -142,10 +136,10 @@ function gcv_denoise(z, s², U)
     res = optimize(optimfunc, log10(lb), log10(ub))
     λ = 10^only(Optim.minimizer(res))
 
-    return U*(z./(1 .+ λ*s²))
+    return idct(z./(1 .+ λ*s²))
 end
 
-function lcurve_denoise(z, s², U)
+function lcurve_denoise(z, s²)
     npoints = 500
     lb = -22.
     ub = 22.
@@ -164,7 +158,7 @@ function lcurve_denoise(z, s², U)
     notnan = findall(@. !isnan(k))
     pos_max = argmax(k[notnan])
 
-    return U*(z./(1 .+ Λ[notnan][pos_max]*s²))
+    return idct(z./(1 .+ Λ[notnan][pos_max]*s²))
 end
 
 function denoising(y, alg::KalmanDenoising)
@@ -174,9 +168,11 @@ function denoising(y, alg::KalmanDenoising)
     R = Diagonal(vest)
     ny = size(vest, 1)
 
-    # Optimization pass
-    lb = -10.
-    ub = mean(vest)
+    # Optimization pass on log10(Q)
+    # For a random walk state model, var(diff(y)) = Q + 2R, so that Q ≤ var(diff(y))
+    nd = ndims(y)
+    ub = log10(maximum(var(diff(y, dims = nd), dims = nd)))
+    lb = ub - 12.
     objfun = λ -> kf_objfun!(λ, y, R)
     res = optimize(objfun, lb, ub)
     Q = 10^only(Optim.minimizer(res))*I(ny)
@@ -232,7 +228,7 @@ function kalman_denoise(y, Q, R, alg)
 
             Kk .= Pest[k]/Ppred
             x[:, k] .= xpred .+ Kk*(x[:, k + 1] - xpred)
-            P .= Pest[k] .+ Kk*(P .- Pest[k + 1])*Kk'
+            P .= Pest[k] .+ Kk*(P .- Ppred)*Kk'
         end
 
         xest .= x

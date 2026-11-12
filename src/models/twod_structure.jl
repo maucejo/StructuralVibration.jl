@@ -177,7 +177,7 @@ function modefreq(model::TwoDStructure, fmax)
     q = 1
     kp = p*π/L
     kq = q*π/b
-    ωi = c*(kp^2 + kq^2)
+    ωi = dispersion(model, c, kp, kq)
 
     ωpq = typeof(D)[]
     kpq = typeof(D)[]
@@ -192,14 +192,14 @@ function modefreq(model::TwoDStructure, fmax)
             q += 1
             kp = p*π/L
             kq = q*π/b
-            ωi = c*(kp^2 + kq^2)
+            ωi = dispersion(model, c, kp, kq)
         end
 
         p += 1
         q = 1
         kp = p*π/L
         kq = q*π/b
-        ωi = c*(kp^2 + kq^2)
+        ωi = dispersion(model, c, kp, kq)
     end
 
     kpq = reshape(kpq, (2, Int(length(kpq)/2)))
@@ -208,6 +208,10 @@ function modefreq(model::TwoDStructure, fmax)
 
     return ωpq[pos], kpq[:, pos], ind[:, pos]
 end
+
+# Dispersion relations
+dispersion(::Plate, c, kp, kq) = c*(kp^2 + kq^2)
+dispersion(::Membrane, c, kp, kq) = c*√(kp^2 + kq^2)
 
 """
     modeshape(model::Plate, kpq, x, y)

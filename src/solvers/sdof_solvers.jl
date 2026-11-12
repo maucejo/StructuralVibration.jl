@@ -215,8 +215,8 @@ Compute the free response of a single degree of freedom (Sdof) system.
 function free_response_sdof!(cache, ω0, ξ, x0, v0, t)
     if ω0 == 0.
         @. cache.xh = x0 + v0*t
-        cache.vh .= v0*one(cache.x)
-        cache.ah .= zero(cache.x)
+        cache.vh .= v0
+        cache.ah .= zero(eltype(cache.ah))
     elseif ξ < 1.
         Ω0 = ω0*√(1 - ξ^2)
         A = x0
@@ -331,8 +331,8 @@ function harmonic_response_sdof!(cache, F, ω, x0, v0, m, ω0, ξ, t, type_exc)
         if ω0 == 0.
             B = v0 + ρ0*ω*sin(ϕ)
             @. cache.xh = A + B*t
-            @. cache.vh =  B*one(xh)
-            @. cache.ah = zero(xh)
+            cache.vh .= B
+            cache.ah .= zero(eltype(cache.ah))
         elseif ξ < 1.
             Ω0 = ω0*√(1 - ξ^2)
             B = (v0 + ξ*ω0*A + ρ0*ω*sin(ϕ))/Ω0
@@ -477,22 +477,22 @@ function forced_response_sdof!(cache, F, m, ω0, ξ, t, type_exc, method)
         end
     end
 
+    # Equivalent force for base motion (the input vector is not modified)
     if type_exc == :base
         k, c = ω0^2*m, 2ξ*ω0*m
-        xb = F
-        vb = gradient(xb, t)
-
-        F .= k*xb .+ c*vb
+        Fe = k*F .+ c*gradient(collect(F), t)
+    else
+        Fe = F
     end
 
     if method == :interp || method == :conv
         if method == :interp
-            cache.xp .= duhamel_integral(F, cache.h, t)
+            cache.xp .= duhamel_integral(Fe, cache.h, t)
         else
-            cache.xp .= Δt*conv(F, cache.h)[1:length(F)]
+            cache.xp .= Δt*conv(Fe, cache.h)[1:length(Fe)]
         end
     else
-        cache.xp .= Δt*filt(cache.num, cache.denom, F)
+        cache.xp .= Δt*filt(cache.num, cache.denom, Fe)
     end
 
     cache.vp .= gradient(cache.xp, t)
@@ -514,8 +514,8 @@ Compute the Duhamel's integral
 """
 function duhamel_integral(F, h, t)
     # Interpolation
-    fc = cubic_spline_interpolation(t, F)
-    hc = cubic_spline_interpolation(t, h)
+    fc = CubicSpline(collect(F), t)
+    hc = CubicSpline(collect(h), t)
 
     # Gauss-Legendre quadrature
     nodes, weights = gausslegendre(500)
@@ -722,8 +722,8 @@ function srs_basic(f0, ξ, acc, t)
     ω0 = 2π*f0
     sdof = Sdof(1., f0, ξ)
 
-    prob = SdofForcedTimeProblem(sdof, [0., 0.], t, -acc, :conv)
-    (; u, du) = solve(prob)
+    prob = SdofForcedTimeProblem(sdof, [0., 0.], t, -acc)
+    (; u, du) = solve(prob, method = :conv)
 
     return -2ξ*ω0*du - ω0^2*u
 end
@@ -740,49 +740,40 @@ function srs_recursive_int(f0, ξ, acc, t)
     # Constants
     ω0 = 2π*f0
     Ω0 = ω0*√(1 - ξ^2)
+    r = ξ/√(1 - ξ^2)
 
     # Pre-compute integration constants
     eh = exp(-ξ*ω0*h)
-    eCos = eh*cos(Ω0*h)
-    eSin = eh*sin(Ω0*h)
+    s = sin(Ω0*h)
+    c = cos(Ω0*h)
 
-    # Integration coefficients of Duhamel's integral
-    c1 = eCos + ξ*eSin/(1 - ξ^2)
-    c2 = eSin/Ω0
-    c3 = (c1 - 1.)/ω0^2
-    c4 = (2ξ*(1. - eCos)/ω0/h + (1. - 2ξ^2)*eSin/Ω0/h - 1.)/ω0^2
-    c5 = (4ξ/ω0/h + ((2 - 8ξ^2)/ω0^2/h^2 - 2ξ/ω0/h)*(1. - eCos)
-        - ((1. - 2ξ^2)/ω0/h + (6ξ- 8ξ^3)/ω0^2/h^2)*eSin/√(1 - ξ^2))/2ω0^2
-    c6 = -c2*Ω0
-    c7 = (eCos - ξ*eSin/√(1 - ξ^2))/ω0
-    c8 = -c2/ω0
-    c9 = (c1 - 1.)/ω0^3/h
-    c10 = ((1/ω0/h + 4ξ/ω0^2/h^2)*(1. - eCos) + ((2. - 4ξ^2)/ω0^2/h^2 - ξ/ω0/h)*eSin/√(1 - ξ^2) - 2/ω0/h)/2ω0^2
+    # Exact recursive integration of z'' + 2ξω0 z' + ω0² z = -acc(t) for a piecewise linear acceleration (Nigam & Jennings, 1969)
+    # [z; dz]_{k+1} = A [z; dz]_k + B [acc_k; acc_{k+1}]
+    a11 = eh*(r*s + c)
+    a12 = eh*s/Ω0
+    a21 = -ω0*eh*s/√(1 - ξ^2)
+    a22 = eh*(c - r*s)
 
-    # Acceleration response
+    t1 = (2ξ^2 - 1)/(ω0^2*h)
+    t2 = 2ξ/(ω0^3*h)
+    b11 = eh*((t1 + ξ/ω0)*s/Ω0 + (t2 + 1/ω0^2)*c) - t2
+    b12 = -eh*(t1*s/Ω0 + t2*c) - 1/ω0^2 + t2
+    b21 = eh*((t1 + ξ/ω0)*(c - r*s) - (t2 + 1/ω0^2)*(Ω0*s + ξ*ω0*c)) + 1/(ω0^2*h)
+    b22 = -eh*(t1*(c - r*s) - t2*(Ω0*s + ξ*ω0*c)) - 1/(ω0^2*h)
+
+    # Absolute acceleration response
     x = similar(t)
 
     # Initial conditions - Relative displacement and velocity
     z = 0.
     dz = 0.
-    jerk = acc[1]
-    snap = acc[1]
+    x[1] = 0.
     for k in 1:nt - 1
-        z = c1*z + c2*dz + c3*acc[k] + c4*jerk + c5*snap
-        dz = ω0*(c6*z + c7*dz + c8*acc[k] + c9*jerk + c10*snap)
-        x[k] = -2ξ*ω0*dz - ω0^2*z
+        z, dz = a11*z + a12*dz + b11*acc[k] + b12*acc[k+1],
+                a21*z + a22*dz + b21*acc[k] + b22*acc[k+1]
 
-        jerk = acc[k + 1] - acc[k]
-        if k > 1
-            snap = acc[k+1] - 2*acc[k] + acc[k-1]
-        else
-            snap = acc[k+1] - 2acc[k]
-        end
+        x[k+1] = -2ξ*ω0*dz - ω0^2*z
     end
-
-    z = c1*z + c2*dz + c3*acc[end] + c4*jerk + c5*snap
-    dz = ω0*(c6*z + c7*dz + c8*acc[end] + c9*jerk + c10*snap)
-    x[end] = -2ξ*ω0*dz - ω0^2*z
 
     return x
 end
