@@ -225,19 +225,20 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.12.0</a></li>
-  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.11.0</a></li>
-  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.10.3</a></li>
-  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.10.2</a></li>
-  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.10.1</a></li>
-  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">1.10.0</a></li>
-  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">1.9.1</a></li>
-  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">1.9.0</a></li>
-  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">1.8.0</a></li>
-  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">1.7.0</a></li>
-  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">1.6.1</a></li>
-  <li><a href="#section-11" id="toc-section-11" class="nav-link" data-scroll-target="#section-11">1.6.0</a></li>
-  <li><a href="#section-12" id="toc-section-12" class="nav-link" data-scroll-target="#section-12">1.5.0</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link active" data-scroll-target="#section">1.12.1</a></li>
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">1.12.0</a></li>
+  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">1.11.0</a></li>
+  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">1.10.3</a></li>
+  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">1.10.2</a></li>
+  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">1.10.1</a></li>
+  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">1.10.0</a></li>
+  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">1.9.1</a></li>
+  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">1.9.0</a></li>
+  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">1.8.0</a></li>
+  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">1.7.0</a></li>
+  <li><a href="#section-11" id="toc-section-11" class="nav-link" data-scroll-target="#section-11">1.6.1</a></li>
+  <li><a href="#section-12" id="toc-section-12" class="nav-link" data-scroll-target="#section-12">1.6.0</a></li>
+  <li><a href="#section-13" id="toc-section-13" class="nav-link" data-scroll-target="#section-13">1.5.0</a></li>
   <li><a href="#v1.4.1" id="toc-v1.4.1" class="nav-link" data-scroll-target="#v1.4.1">v1.4.1</a></li>
   <li><a href="#v1.4.0" id="toc-v1.4.0" class="nav-link" data-scroll-target="#v1.4.0">v1.4.0</a></li>
   <li><a href="#v1.3.0" id="toc-v1.3.0" class="nav-link" data-scroll-target="#v1.3.0">v1.3.0</a></li>
@@ -279,7 +280,17 @@ window.Quarto = {
 
 
 <section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section">1.12.0</h2>
+<h2 class="anchored" data-anchor-id="section">1.12.1</h2>
+<p><strong>Improvements</strong></p>
+<ul>
+<li>The frequency <code>freq</code> of the frequency-domain problems (<code>DirectFRFProblem</code>, <code>ModalFRFProblem</code>, <code>DirectFreqProblem</code>, <code>ModalFreqProblem</code>, <code>StateSpaceFRFProblem</code>, <code>StateSpaceModalFRFProblem</code>, <code>StateSpaceFreqProblem</code>, <code>StateSpaceModalFreqProblem</code>, <code>SdofFRFProblem</code> and <code>SdofFrequencyProblem</code>) can now be a scalar, so that a single frequency <code>f0</code> no longer has to be written <code>f0:f0</code>. Any vector of frequencies (e.g.&nbsp;non-uniformly spaced) is also accepted, and not only ranges.</li>
+<li>For a single frequency, the excitation can be given as a vector (<code>F</code> for <code>DirectFreqProblem</code>, <code>StateSpaceFreqProblem</code> and <code>StateSpaceModalFreqProblem</code>, <code>Ln</code> for <code>ModalFreqProblem</code>) or as a scalar (<code>F</code> for <code>SdofFrequencyProblem</code>), instead of a one-column matrix.</li>
+<li>The size of the solutions is unchanged: for a single frequency, an FRF has size <code>no × ne × 1</code> and a response spectrum <code>no × 1</code>.</li>
+<li><code>solve(::SdofFrequencyProblem)</code> now allocates its output with a concrete element type instead of <code>Complex{Real}</code>.</li>
+</ul>
+</section>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1">1.12.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>to_dB</code> function to convert a signal to decibels, distinguishing amplitude (root-power) quantities (<code>type = :amplitude</code>, 20 log₁₀) from power/energy quantities (<code>type = :power</code>, 10 log₁₀).</li>
@@ -345,8 +356,8 @@ window.Quarto = {
 <li>Add a “New to the package?” entry point on the home page.</li>
 </ul>
 </section>
-<section id="section-1" class="level2">
-<h2 class="anchored" data-anchor-id="section-1">1.11.0</h2>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2">1.11.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add five new applications in <code>SVAppsExt.jl</code> extension for educational purposes:
@@ -359,8 +370,8 @@ window.Quarto = {
 </ul></li>
 </ul>
 </section>
-<section id="section-2" class="level2">
-<h2 class="anchored" data-anchor-id="section-2">1.10.3</h2>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3">1.10.3</h2>
 <ul>
 <li>Fix the coefficient of the stiffness-velocity term in the Newmark family solvers, which reduced <code>Newmark</code>, <code>HHT</code>, <code>WBZ</code>, <code>FoxGoodwin</code>, <code>LinearAcceleration</code> and <code>GeneralizedAlpha</code> with <code>ρ &lt; 1</code> to first-order accuracy. The default <code>GeneralizedAlpha()</code> and <code>MidPoint</code> are not affected.</li>
 <li>Fix the inverted validation of <code>αf</code> and <code>αm</code> in <code>HHT</code>, <code>WBZ</code> and <code>GeneralizedAlpha</code>, which rejected valid values and accepted invalid ones.</li>
@@ -371,21 +382,21 @@ window.Quarto = {
 <li>Add a second-order convergence test for the Newmark family solvers.</li>
 </ul>
 </section>
-<section id="section-3" class="level2">
-<h2 class="anchored" data-anchor-id="section-3">1.10.2</h2>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4">1.10.2</h2>
 <p><strong>Internals</strong></p>
 <ul>
 <li>Add Fast colormap from Paraview as the default colormap for mesh visualization and animation in <code>SVAnimExt.jl</code> extension. The <code>colormap</code> argument of <code>viz_mesh</code> and <code>animate_mesh</code> functions now defaults to <code>fast_cmap()</code> instead of <code>:jet1</code>.</li>
 </ul>
 </section>
-<section id="section-4" class="level2">
-<h2 class="anchored" data-anchor-id="section-4">1.10.1</h2>
+<section id="section-5" class="level2">
+<h2 class="anchored" data-anchor-id="section-5">1.10.1</h2>
 <ul>
 <li>Fix minor bugs in <code>animate_mesh</code> function in <code>SVAnimExt.jl</code> extension.</li>
 </ul>
 </section>
-<section id="section-5" class="level2">
-<h2 class="anchored" data-anchor-id="section-5">1.10.0</h2>
+<section id="section-6" class="level2">
+<h2 class="anchored" data-anchor-id="section-6">1.10.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add mesh manipulation functions in <code>SVMeshExt.jl</code> extension:
@@ -402,15 +413,15 @@ window.Quarto = {
 <li>Simplify the implementation of <code>ods</code> function.</li>
 </ul>
 </section>
-<section id="section-6" class="level2">
-<h2 class="anchored" data-anchor-id="section-6">1.9.1</h2>
+<section id="section-7" class="level2">
+<h2 class="anchored" data-anchor-id="section-7">1.9.1</h2>
 <ul>
 <li>Fix type instability issues in <code>gradient</code> function.</li>
 <li>Improve <code>compute_poles</code> functions for <code>SdofEMA</code>.</li>
 </ul>
 </section>
-<section id="section-7" class="level2">
-<h2 class="anchored" data-anchor-id="section-7">1.9.0</h2>
+<section id="section-8" class="level2">
+<h2 class="anchored" data-anchor-id="section-8">1.9.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>modal_density</code> function to compute the modal density of a structure from the knowledge of its resonance frequencies.</li>
@@ -421,15 +432,15 @@ window.Quarto = {
 <li>Replace <code>Interpolations.jl</code> with <code>DataInterpolations.jl</code> for interpolation.</li>
 </ul>
 </section>
-<section id="section-8" class="level2">
-<h2 class="anchored" data-anchor-id="section-8">1.8.0</h2>
+<section id="section-9" class="level2">
+<h2 class="anchored" data-anchor-id="section-9">1.8.0</h2>
 <p><strong>New features</strong></p>
 <ul>
 <li>Add <code>wave_parameters</code> function to compute the wave parameters (wavenumber, wavelength and wave speed) for continuous models.</li>
 </ul>
 </section>
-<section id="section-9" class="level2">
-<h2 class="anchored" data-anchor-id="section-9">1.7.0</h2>
+<section id="section-10" class="level2">
+<h2 class="anchored" data-anchor-id="section-10">1.7.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Remove <code>AutoEMASdofProblem</code> and <code>AutoEMAMdofProblem</code> structures</li>
@@ -441,14 +452,14 @@ window.Quarto = {
 <li>Fix various type instability issues.</li>
 </ul>
 </section>
-<section id="section-10" class="level2">
-<h2 class="anchored" data-anchor-id="section-10">1.6.1</h2>
+<section id="section-11" class="level2">
+<h2 class="anchored" data-anchor-id="section-11">1.6.1</h2>
 <ul>
 <li>Remove <code>DispatchDoctor</code> from dependencies</li>
 </ul>
 </section>
-<section id="section-11" class="level2">
-<h2 class="anchored" data-anchor-id="section-11">1.6.0</h2>
+<section id="section-12" class="level2">
+<h2 class="anchored" data-anchor-id="section-12">1.6.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Simplify <code>poles_extraction</code> method by removing <code>scaling</code> argument used for peak detection. The FRF magnitude is now always converted to dB scale for peak detection.</li>
@@ -459,8 +470,8 @@ window.Quarto = {
 <li>Fix type instability issues in <code>varest</code> and <code>poles_extraction</code> functions.</li>
 </ul>
 </section>
-<section id="section-12" class="level2">
-<h2 class="anchored" data-anchor-id="section-12">1.5.0</h2>
+<section id="section-13" class="level2">
+<h2 class="anchored" data-anchor-id="section-13">1.5.0</h2>
 <p><strong>Breaking changes</strong></p>
 <ul>
 <li>Refactor <code>poles_extraction</code> function to add <code>scaling::Function</code> argument for peak picking methods to specify the scaling of the FRF magnitude used for peak detection</li>
