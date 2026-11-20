@@ -51,20 +51,23 @@ Structure containing the data feeding the direct solver for calculating an FRF
 
 **Fields**
 * `css`: Continuous-time state space model
-* `freq`: Frequencies of interest
+* `freq`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `So`: Selection matrix for observation points
 * `Se`: Selection matrix for excitation points
 
 **Note**
 It is assumed that the output equation is of the form y = So*x
 """
-@show_data struct StateSpaceFRFProblem{Tf <: AbstractRange, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
+@show_data struct StateSpaceFRFProblem{Tf <: AbstractVector{<:Real}, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
     css::ContinuousStateSpace
     freq::Tf
     So::Tso
     Se::Tse
 
-    StateSpaceFRFProblem(css, freq::Tf, So::Tso = I(Int(size(css.Ac, 1)/2)), Se::Tse = I(size(css.Bc, 2))) where {Tf, Tso, Tse} = new{Tf, Tso, Tse}(css, freq, So, Se)
+    function StateSpaceFRFProblem(css, freq::Union{Real, AbstractVector{<:Real}}, So::Tso = I(Int(size(css.Ac, 1)/2)), Se::Tse = I(size(css.Bc, 2))) where {Tso, Tse}
+        freqv = _freq_vector(freq)
+        return new{typeof(freqv), Tso, Tse}(css, freqv, So, Se)
+    end
 end
 
 """
@@ -74,19 +77,21 @@ Structure containing the data feeding the direct solver for calculating an FRF
 
 **Fields**
 * `css`: Continuous-time state space model
-* `freq`: Frequencies of interest
+* `freq`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `So`: Selection matrix for observation points
 * `Se`: Selection matrix for excitation points
 * `n`: Number of mode pairs to keep in the modal basis (default = size(css.Ac, 2) ÷ 2)
 """
-@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractRange, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
+@show_data struct StateSpaceModalFRFProblem{Tf <: AbstractVector{<:Real}, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
     css::ContinuousStateSpace
     freq::Tf
     So::Tso
     Se::Tse
     n::Int
 
-    function StateSpaceModalFRFProblem(css, freq::Tf, So::Tso = I(Int(size(css.Ac, 1)/2)), Se::Tse = I(size(css.Bc, 2)), n = size(css.Ac, 2) ÷ 2) where {Tf, Tso, Tse}
+    function StateSpaceModalFRFProblem(css, freq::Union{Real, AbstractVector{<:Real}}, So::Tso = I(Int(size(css.Ac, 1)/2)), Se::Tse = I(size(css.Bc, 2)), n = size(css.Ac, 2) ÷ 2) where {Tso, Tse}
+        freq = _freq_vector(freq)
+        Tf = typeof(freq)
 
         n > 0 || throw(ArgumentError("n must be greater than 0"))
 
@@ -113,17 +118,21 @@ Structure containing the data feeding the modal solver for calculating the frequ
 
 **Fields**
 * `css`: Continuous-time state space model
-* `F`: External force matrix
-* `freq`: Frequencies of interest
+* `F`: External force matrix (a vector is accepted for a single frequency)
+* `freq`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `So`: Selection matrix for observation points
 """
-@show_data struct StateSpaceFreqProblem{TF <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
+@show_data struct StateSpaceFreqProblem{TF <: AbstractMatrix, Tf <: AbstractVector{<:Real}, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
     F::TF
     freq::Tf
     So::Ts
 
-    StateSpaceFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2))) where {TF, Tf, Ts} = new{TF, Tf, Ts}(css, F, freq, So)
+    function StateSpaceFreqProblem(css, F::AbstractVecOrMat, freq::Union{Real, AbstractVector{<:Real}}, So::Ts = I(Int(size(css.Ac, 1)/2))) where Ts
+        freqv = _freq_vector(freq)
+        Fm = _force_matrix(F)
+        return new{typeof(Fm), typeof(freqv), Ts}(css, Fm, freqv, So)
+    end
 end
 
 """
@@ -133,19 +142,23 @@ Structure containing the data feeding the modal solver for calculating the frequ
 
 **Fields**
 * `css`: Continuous-time state space model
-* `F`: External force matrix
-* `freq`: Frequencies of interest
+* `F`: External force matrix (a vector is accepted for a single frequency)
+* `freq`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `So`: Selection matrix for observation points
 * `n`: Number of mode pairs to keep in the modal basis (default = size(css.Ac, 2) ÷ 2)
 """
-@show_data struct StateSpaceModalFreqProblem{TF <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
+@show_data struct StateSpaceModalFreqProblem{TF <: AbstractMatrix, Tf <: AbstractVector{<:Real}, Ts <: AbstractMatrix}
     css::ContinuousStateSpace
     F::TF
     freq::Tf
     So::Ts
     n::Int
 
-    function StateSpaceModalFreqProblem(css, F::TF, freq::Tf, So::Ts = I(Int(size(css.Ac, 1)/2)), n = size(css.Ac, 2) ÷ 2) where {TF, Tf, Ts}
+    function StateSpaceModalFreqProblem(css, F::AbstractVecOrMat, freq::Union{Real, AbstractVector{<:Real}}, So::Ts = I(Int(size(css.Ac, 1)/2)), n = size(css.Ac, 2) ÷ 2) where Ts
+        freq = _freq_vector(freq)
+        F = _force_matrix(F)
+        Tf = typeof(freq)
+        TF = typeof(F)
 
         n > 0 || throw(ArgumentError("n must be greater than 0"))
 

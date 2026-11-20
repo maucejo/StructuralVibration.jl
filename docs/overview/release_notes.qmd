@@ -6,6 +6,15 @@ format:
     number-sections: false
 ---
 
+## 1.12.1
+
+**Improvements**
+
+- The frequency `freq` of the frequency-domain problems (`DirectFRFProblem`, `ModalFRFProblem`, `DirectFreqProblem`, `ModalFreqProblem`, `StateSpaceFRFProblem`, `StateSpaceModalFRFProblem`, `StateSpaceFreqProblem`, `StateSpaceModalFreqProblem`, `SdofFRFProblem` and `SdofFrequencyProblem`) can now be a scalar, so that a single frequency `f0` no longer has to be written `f0:f0`. Any vector of frequencies (e.g. non-uniformly spaced) is also accepted, and not only ranges.
+- For a single frequency, the excitation can be given as a vector (`F` for `DirectFreqProblem`, `StateSpaceFreqProblem` and `StateSpaceModalFreqProblem`, `Ln` for `ModalFreqProblem`) or as a scalar (`F` for `SdofFrequencyProblem`), instead of a one-column matrix.
+- The size of the solutions is unchanged: for a single frequency, an FRF has size `no × ne × 1` and a response spectrum `no × 1`.
+- `solve(::SdofFrequencyProblem)` now allocates its output with a concrete element type instead of `Complex{Real}`.
+
 ## 1.12.0
 
 **New features**

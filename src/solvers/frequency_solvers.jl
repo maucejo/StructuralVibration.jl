@@ -1,3 +1,10 @@
+# Internal helpers to allow scalar frequencies (and vector forces for a single frequency)
+_freq_vector(freq::Real) = [freq]
+_freq_vector(freq::AbstractVector{<:Real}) = freq
+
+_force_matrix(F::AbstractVector) = reshape(F, :, 1)
+_force_matrix(F::AbstractMatrix) = F
+
 """
     ModalFRFProblem(ωn, ξn, freq, ϕo, ϕe)
 
@@ -6,21 +13,23 @@ Structure containing the data feeding the modal solver for calculating an FRF
 **Fields**
 * `ωn::Vector{Real}`: Natural angular frequencies
 * `ξn::Vector{Real}`: Modal damping ratios
-* `freq::AbstractRange`: Frequencies of interest
+* `freq::Union{Real, AbstractVector}`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `ϕe::AbstractMatrix`: Mode shapes at excitation points
 * `ϕo::AbstractMatrix`: Mode shapes at observation points
 
 **Note**
 The mode shapes must be mass-normalized
 """
-@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractRange, Tpo <: AbstractMatrix, Tpe <: AbstractMatrix}
+@show_data struct ModalFRFProblem{T <: Real, Tf <: AbstractVector{<:Real}, Tpo <: AbstractMatrix, Tpe <: AbstractMatrix}
     ωn::Vector{T}
     ξn::Vector{T}
     freq::Tf
     ϕo::Tpo
     ϕe::Tpe
 
-    function ModalFRFProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, freq::Tf, ϕo::Tpo, ϕe::Tpe) where {T, Tf, Tpo, Tpe}
+    function ModalFRFProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, freq::Union{Real, AbstractVector{<:Real}}, ϕo::Tpo, ϕe::Tpe) where {T, Tpo, Tpe}
+        freq = _freq_vector(freq)
+        Tf = typeof(freq)
         if !isa(ξn, Array)
             ξn = fill(ξn, length(ωn))
         elseif length(ξn) != length(ωn)
@@ -40,11 +49,11 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * `K::AbstractMatrix`: Stiffness matrix
 * `M::AbstractMatrix`: Mass matrix
 * `C::AbstractMatrix`: Damping matrix
-* `freq::AbtractRange`: Frequencies of interest
+* `freq::Union{Real, AbstractVector}`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `So::AbstractMatrix`: Selection matrix for observation points
 * `Se::AbstractMatrix`: Selection matrix for excitation points
 """
-@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractRange, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
+@show_data struct DirectFRFProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, Tf <: AbstractVector{<:Real}, Tso <: AbstractMatrix, Tse <: AbstractMatrix}
     K::Tk
     M::Tm
     C::Tc
@@ -52,7 +61,10 @@ Structure containing the data feeding the direct solver for calculating an FRF
     So::Tso
     Se::Tse
 
-    DirectFRFProblem(K::Tk, M::Tm, C::Tc, freq::Tf, So::Tso = I(size(K, 1)), Se::Tse = I(size(K, 1))) where {Tk, Tm, Tc, Tf, Tso, Tse} = new{Tk, Tm, Tc, Tf, Tso, Tse}(K, M, C, freq, So, Se)
+    function DirectFRFProblem(K::Tk, M::Tm, C::Tc, freq::Union{Real, AbstractVector{<:Real}}, So::Tso = I(size(K, 1)), Se::Tse = I(size(K, 1))) where {Tk, Tm, Tc, Tso, Tse}
+        freqv = _freq_vector(freq)
+        return new{Tk, Tm, Tc, typeof(freqv), Tso, Tse}(K, M, C, freqv, So, Se)
+    end
 end
 
 """
@@ -63,18 +75,22 @@ Structure containing the data feeding the modal solver for calculating the frequ
 **Fields**
 * `ωn::Vector{Real}`: Natural angular frequencies
 * ξn::Vector{Real}: Modal damping ratios
-* `Ln::AbstractMatrix`: Modal participation factors
-* `freq::AbstractRange`: Frequencies of interest
+* `Ln::AbstractVecOrMat`: Modal participation factors (a vector is accepted for a single frequency)
+* `freq::Union{Real, AbstractVector}`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `ϕo::Matrix{Real}`: Mode shapes at observation points
 """
-@show_data struct ModalFreqProblem{T <: Real, Tln <: AbstractMatrix, Tf <: AbstractRange}
+@show_data struct ModalFreqProblem{T <: Real, Tln <: AbstractMatrix, Tf <: AbstractVector{<:Real}}
     ωn::Vector{T}
     ξn::Vector{T}
     Ln::Tln
     freq::Tf
     ϕo::Matrix{T}
 
-    function ModalFreqProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, Ln::Tln, freq::Tf, ϕo::Matrix{T}) where {T, Tln, Tf}
+    function ModalFreqProblem(ωn::Vector{T}, ξn::Union{T, Vector{T}}, Ln::AbstractVecOrMat, freq::Union{Real, AbstractVector{<:Real}}, ϕo::Matrix{T}) where T
+        freq = _freq_vector(freq)
+        Ln = _force_matrix(Ln)
+        Tf = typeof(freq)
+        Tln = typeof(Ln)
         if !isa(ξn, Array)
             ξn = fill(ξn, length(ωn))
         elseif length(ξn) != length(ωn)
@@ -94,11 +110,11 @@ Structure containing the data feeding the direct solver for calculating the moda
 * `K::AbstractMatrix`: Stiffness matrix
 * `M::AbstractMatrix`: Mass matrix
 * `C::AbstractMatrix`: Damping matrix
-* `F::AbstractMatrix`: Force matrix
-* `freq::AbstractRange`: Frequencies of interest
+* `F::AbstractVecOrMat`: Force matrix (a vector is accepted for a single frequency)
+* `freq::Union{Real, AbstractVector}`: Frequencies of interest (a scalar is accepted for a single frequency)
 * `So::AbstractMatrix`: Selection matrix for observation points
 """
-@show_data struct DirectFreqProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, TF <: AbstractMatrix, Tf <: AbstractRange, Ts <: AbstractMatrix}
+@show_data struct DirectFreqProblem{Tk <: AbstractMatrix, Tm <: AbstractMatrix, Tc <: AbstractMatrix, TF <: AbstractMatrix, Tf <: AbstractVector{<:Real}, Ts <: AbstractMatrix}
     K::Tk
     M::Tm
     C::Tc
@@ -106,7 +122,11 @@ Structure containing the data feeding the direct solver for calculating the moda
     freq::Tf
     So::Ts
 
-    DirectFreqProblem(K::Tk, M::Tm, C::Tc, F::TF, freq::Tf, So::Ts = I(size(K, 1))) where {Tk, Tm, Tc , TF, Tf, Ts} = new{Tk, Tm, Tc, TF, Tf, Ts}(K, M, C, F, freq, So)
+    function DirectFreqProblem(K::Tk, M::Tm, C::Tc, F::AbstractVecOrMat, freq::Union{Real, AbstractVector{<:Real}}, So::Ts = I(size(K, 1))) where {Tk, Tm, Tc, Ts}
+        freqv = _freq_vector(freq)
+        Fm = _force_matrix(F)
+        return new{Tk, Tm, Tc, typeof(Fm), typeof(freqv), Ts}(K, M, C, Fm, freqv, So)
+    end
 end
 
 """

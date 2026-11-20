@@ -107,7 +107,7 @@ Structure containing the data for computing the FRF a sdof system
 
 **Fields**
 * `sdof::Sdof`: Sdof structure
-* `freq::AbstractRange`: Vector of frequencies [Hz]
+* `freq::Union{Real, AbstractVector}`: Frequencies [Hz] (a scalar is accepted for a single frequency)
 * `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
@@ -116,13 +116,16 @@ Structure containing the data for computing the FRF a sdof system
     * `:vel`: Mobility
     * `:acc`: Accelerance
 """
-@show_data struct SdofFRFProblem{Tf <: AbstractRange}
+@show_data struct SdofFRFProblem{Tf <: AbstractVector{<:Real}}
     sdof::Sdof
     freq::Tf
     type_exc::Symbol
     type_resp::Symbol
 
-    SdofFRFProblem(sdof, freq::Tf; type_exc = :force, type_resp = :dis) where Tf = new{Tf}(sdof, freq, type_exc, type_resp)
+    function SdofFRFProblem(sdof, freq::Union{Real, AbstractVector{<:Real}}; type_exc = :force, type_resp = :dis)
+        freqv = _freq_vector(freq)
+        return new{typeof(freqv)}(sdof, freqv, type_exc, type_resp)
+    end
 end
 
 """
@@ -132,8 +135,8 @@ Structure containing the data for computing the frequency response of a sdof sys
 
 **Fields**
 * `sdof::Sdof`: Sdof structure
-* `freq::AbstractRange`: Vector of frequencies [Hz]
-* `F::AbstractVector`: Vector of the force excitation [N] or base motion [m]
+* `freq::Union{Real, AbstractVector}`: Frequencies [Hz] (a scalar is accepted for a single frequency)
+* `F::Union{Number, AbstractVector}`: Force excitation [N] or base motion [m] (a scalar is accepted for a single frequency)
 * `type_exc::Symbol`: Type of excitation
     * `:force`: External force (default)
     * `:base`: Base motion
@@ -142,14 +145,18 @@ Structure containing the data for computing the frequency response of a sdof sys
     * `:vel`: Velocity spectrum
     * `:acc`: Acceleration spectrum
 """
-@show_data struct SdofFrequencyProblem{Tf <: AbstractRange, TF <: AbstractVector}
+@show_data struct SdofFrequencyProblem{Tf <: AbstractVector{<:Real}, TF <: AbstractVector}
     sdof::Sdof
     freq::Tf
     F::TF
     type_exc::Symbol
     type_resp::Symbol
 
-    SdofFrequencyProblem(sdof, freq::Tf, F::TF; type_exc = :force, type_resp = :dis) where {Tf, TF} = new{Tf, TF}(sdof, freq, F, type_exc, type_resp)
+    function SdofFrequencyProblem(sdof, freq::Union{Real, AbstractVector{<:Real}}, F::Union{Number, AbstractVector}; type_exc = :force, type_resp = :dis)
+        freqv = _freq_vector(freq)
+        Fv = F isa Number ? [F] : F
+        return new{typeof(freqv), typeof(Fv)}(sdof, freqv, Fv, type_exc, type_resp)
+    end
 end
 
 """
@@ -583,7 +590,7 @@ function solve(prob::SdofFrequencyProblem)
     (; m, ω0, ξ) = sdof
     ω = 2π*freq
 
-    x = similar(freq, Complex{Real})
+    x = similar(ω, Complex{promote_type(eltype(ω), real(eltype(F)))})
     if type_exc == :force
         @. x = F/m/(ω0^2 - ω^2 + 2im*ξ*ω0*ω)
     else
